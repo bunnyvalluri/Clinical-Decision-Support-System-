@@ -134,8 +134,10 @@ class HasPatientAccess(BasePermission):
             # Clinicians can view patient records in hospital
             return True
 
-        # 3. Staff can view demographics and update basic contact info
+        # 3. Staff can view demographics, update basic contact info, and record clinical encounters
         if request.user.is_staff_member:
+            if getattr(view, "action", None) == "clinical_records":
+                return True
             if request.method in ("GET", "HEAD", "OPTIONS", "PATCH"):
                 return True
             # Staff cannot delete patient records

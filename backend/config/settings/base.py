@@ -18,6 +18,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # project root (4-1/)
 ROOT_DIR = BASE_DIR.parent
 
+import sys
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 # ---------------------------------------------------------------------------
 # Core Django
 # ---------------------------------------------------------------------------
@@ -122,12 +126,17 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database — Neon PostgreSQL (NEVER SQLite)
 # ---------------------------------------------------------------------------
 DATABASE_URL: str = config("DATABASE_URL")
+DATABASE_URL_UNPOOLED: str = config("DATABASE_URL_UNPOOLED", default=DATABASE_URL)
 DATABASES = {
     "default": dj_database_url.parse(
         DATABASE_URL,
         conn_max_age=600,
         conn_health_checks=True,
     )
+}
+DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
+DATABASES["default"]["TEST"] = {
+    "SERIALIZE": False,
 }
 # Explicit safety guard: refuse to start with SQLite
 assert "sqlite" not in DATABASES["default"].get("ENGINE", ""), (

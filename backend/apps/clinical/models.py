@@ -108,6 +108,36 @@ class ClinicalRecord(SoftDeleteModel):
         help_text="Body Mass Index (kg/m²).",
     )
 
+    # Core Laboratory Biomarkers (Model-Supported)
+    creatinine = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Serum creatinine level (mg/dL).",
+    )
+    sodium = models.DecimalField(
+        max_digits=5,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        help_text="Serum sodium concentration (mmol/L or mEq/L).",
+    )
+    calcium = models.DecimalField(
+        max_digits=4,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        help_text="Serum calcium concentration (mg/dL).",
+    )
+    lactic_acid = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Serum lactic acid / lactate concentration (mmol/L).",
+    )
+
     # Narrative & Semistructured Lab Data
     symptoms = models.TextField(
         blank=True,
@@ -132,6 +162,7 @@ class ClinicalRecord(SoftDeleteModel):
             models.Index(fields=["patient", "recorded_at"]),
             models.Index(fields=["recorded_at"]),
             models.Index(fields=["encounter_type", "recorded_at"]),
+            models.Index(fields=["recorded_by", "recorded_at"]),
         ]
         constraints = [
             models.CheckConstraint(
@@ -152,6 +183,22 @@ class ClinicalRecord(SoftDeleteModel):
                     | (models.Q(oxygen_saturation__gte=0) & models.Q(oxygen_saturation__lte=100))
                 ),
                 name="check_oxygen_saturation_range",
+            ),
+            models.CheckConstraint(
+                check=(models.Q(creatinine__isnull=True) | models.Q(creatinine__gte=0)),
+                name="check_creatinine_non_negative",
+            ),
+            models.CheckConstraint(
+                check=(models.Q(sodium__isnull=True) | models.Q(sodium__gte=0)),
+                name="check_sodium_non_negative",
+            ),
+            models.CheckConstraint(
+                check=(models.Q(calcium__isnull=True) | models.Q(calcium__gte=0)),
+                name="check_calcium_non_negative",
+            ),
+            models.CheckConstraint(
+                check=(models.Q(lactic_acid__isnull=True) | models.Q(lactic_acid__gte=0)),
+                name="check_lactic_acid_non_negative",
             ),
         ]
 

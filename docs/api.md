@@ -106,3 +106,50 @@ All endpoints are versioned under `/api/v1/` and return consistent JSON response
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/v1/audit/` | Filter and query HIPAA audit logs | `ADMIN` only |
 | `GET` | `/api/v1/audit/{id}/` | Audit log record detail | `ADMIN` only |
+
+---
+
+## 5. Patient Management Endpoints (`/api/v1/patients/`)
+
+| Method | Route | Description | Permission |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/patients/` | Register new hospital patient | Clinician, Staff, Admin |
+| `GET` | `/api/v1/patients/` | Paginated patient demographic list | Authenticated (scoped by role) |
+| `GET` | `/api/v1/patients/{id}/` | Retrieve full patient profile | Authorized User / Assigned Care Team |
+| `PATCH` | `/api/v1/patients/{id}/` | Update patient demographic info | Authorized User / Staff / Admin |
+| `DELETE` | `/api/v1/patients/{id}/` | Soft-delete patient record | `ADMIN` only |
+
+---
+
+## 6. Clinical Records Endpoints (`/api/v1/patients/{id}/clinical-records/`, `/api/v1/clinical-records/`)
+
+| Method | Route | Description | Permission |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/patients/{id}/clinical-records/` | Record new vitals & lab encounter | Clinician, Staff, Admin |
+| `GET` | `/api/v1/patients/{id}/clinical-records/` | List clinical encounter history for patient | Assigned Care Team / Patient (own) |
+| `GET` | `/api/v1/clinical-records/{id}/` | Retrieve specific clinical encounter | Assigned Care Team / Patient (own) |
+| `PATCH` | `/api/v1/clinical-records/{id}/` | Update clinical encounter observations | Clinician, Staff, Admin |
+
+---
+
+## 7. Machine Learning Model Registry Endpoints (`/api/v1/models/`)
+
+| Method | Route | Description | Permission |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/v1/models/` | List all registered model versions, statuses, and benchmark metrics | Authenticated |
+| `GET` | `/api/v1/models/{id}/` | Retrieve detailed model metadata, training dataset, and evaluation metrics | Authenticated |
+| `POST` | `/api/v1/models/{id}/activate/` | Promote candidate or archived model to ACTIVE (retires prior active version) | `ADMIN` or Clinician |
+| `POST` | `/api/v1/models/{id}/rollback/` | Safely rollback production serving to a prior verified model version | `ADMIN` or Clinician |
+
+---
+
+## 8. Patient Risk Level Prediction Endpoints (`/api/v1/predictions/`)
+
+| Method | Route | Description | Permission |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/v1/predictions/` | Execute real-time risk assessment for a patient from EHR vitals | Clinician, `ADMIN` |
+| `GET` | `/api/v1/predictions/` | Filter and paginate historical AI inferences (`patient_id`, `risk_level`) | Care Team / Patient (own) |
+| `GET` | `/api/v1/predictions/{id}/` | Retrieve full prediction detail including explainability and risk drivers | Care Team / Patient (own) |
+| `POST` | `/api/v1/predictions/batch/` | High-throughput vectorized risk assessment for up to 500 patient encounters | Clinician, `ADMIN` |
+| `POST` | `/api/v1/predictions/{id}/override/` | Record physician clinical override of AI risk prediction with justification | Clinician, `ADMIN` |
+
