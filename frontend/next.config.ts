@@ -26,12 +26,9 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Type-checking and linting during builds
+  // Type-checking during builds
   typescript: {
     ignoreBuildErrors: false,
-  },
-  eslint: {
-    ignoreDuringBuilds: false,
   },
 };
 

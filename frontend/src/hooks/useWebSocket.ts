@@ -43,7 +43,11 @@ export function useWebSocket({
   const retryCountRef = useRef(0);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const handlersRef = useRef(handlers);
-  handlersRef.current = handlers; // always use latest handlers without re-subscribing
+  const connectRef = useRef<() => void>(() => {});
+
+  useEffect(() => {
+    handlersRef.current = handlers;
+  }, [handlers]);
 
   const [state, setState] = useState<WebSocketState>({
     isConnected: false,
@@ -55,11 +59,15 @@ export function useWebSocket({
   const connect = useCallback(() => {
     const token = tokenStorage.getAccess();
     if (!token) {
-      setState((s) => ({ ...s, error: "No auth token — cannot connect." }));
+      queueMicrotask(() => {
+        setState((s) => ({ ...s, error: "No auth token — cannot connect." }));
+      });
       return;
     }
 
-    setState((s) => ({ ...s, isConnecting: true, error: null }));
+    queueMicrotask(() => {
+      setState((s) => ({ ...s, isConnecting: true, error: null }));
+    });
 
     // Append token as query param (Channels JWT middleware reads it)
     const url = `${WS_BASE_URL}/${path}?token=${token}`;
@@ -99,10 +107,16 @@ export function useWebSocket({
         const delay = Math.min(1000 * 2 ** retryCountRef.current, 30000);
         retryCountRef.current += 1;
         setState((s) => ({ ...s, retryCount: retryCountRef.current }));
-        retryTimerRef.current = setTimeout(connect, delay);
+        retryTimerRef.current = setTimeout(() => {
+          connectRef.current();
+        }, delay);
       }
     };
   }, [path, autoReconnect, maxRetries]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     connect();

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+echo "Starting development services..."
+(cd backend && ./venv/bin/python manage.py runserver 0.0.0.0:8000) &
+(cd frontend && npm run dev) &
+wait

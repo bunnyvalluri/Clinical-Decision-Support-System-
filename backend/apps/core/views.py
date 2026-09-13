@@ -1,12 +1,13 @@
 """
-Core views — system-level endpoints.
-
-Views here are intentionally minimal; all business logic lives in
-the service layer, not in views.
+Core views — system-level endpoints including liveness and readiness health checks.
 """
 import logging
+import time
+from datetime import datetime, timezone
 
+from django.conf import settings
 from django.db import connection
+from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -21,46 +22,90 @@ class HealthCheckView(APIView):
     """
     GET /api/v1/health/
 
-    Public endpoint used by Docker health checks, load balancers, and
-    monitoring systems to verify the application is running correctly.
-
-    Returns database and cache connectivity status.
+    Liveness probe. Indicates that the web process is running and able
+    to accept incoming HTTP connections.
     """
 
     permission_classes = [AllowAny]
     authentication_classes = []
 
     def get(self, request: Request) -> Response:
-        health: dict = {
+        payload = {
             "status": "healthy",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "version": "1.0.0",
-            "services": {},
+            "service": "Patient Risk Level Prediction API",
+        }
+        return success_response(data=payload)
+
+
+class HealthReadinessView(APIView):
+    """
+    GET /api/v1/health/ready/
+
+    Readiness probe. Verifies that all critical backing dependencies
+    (PostgreSQL database and Redis cache/channel layer) are operational.
+    Returns HTTP 200 if ready, or HTTP 503 if any required service is down.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request: Request) -> Response:
+        checks: dict = {}
+        all_ready = True
+
+        # 1. PostgreSQL Check
+        db_start = time.monotonic()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1;")
+                cursor.fetchone()
+            db_latency_ms = round((time.monotonic() - db_start) * 1000, 2)
+            checks["database"] = {
+                "status": "ok",
+                "engine": "PostgreSQL",
+                "latency_ms": db_latency_ms,
+            }
+        except Exception as exc:
+            logger.error("Readiness check — Database failure: %s", exc)
+            all_ready = False
+            checks["database"] = {
+                "status": "error",
+                "error": str(exc),
+            }
+
+        # 2. Redis Check
+        redis_start = time.monotonic()
+        try:
+            import redis
+
+            redis_url = getattr(settings, "REDIS_URL", "redis://localhost:6379/0")
+            r = redis.from_url(redis_url, socket_timeout=3)
+            r.ping()
+            redis_latency_ms = round((time.monotonic() - redis_start) * 1000, 2)
+            checks["redis"] = {
+                "status": "ok",
+                "latency_ms": redis_latency_ms,
+            }
+        except Exception as exc:
+            logger.error("Readiness check — Redis failure: %s", exc)
+            all_ready = False
+            checks["redis"] = {
+                "status": "error",
+                "error": str(exc),
+            }
+
+        overall_status = "ready" if all_ready else "not_ready"
+        http_status = status.HTTP_200_OK if all_ready else status.HTTP_503_SERVICE_UNAVAILABLE
+
+        response_data = {
+            "status": overall_status,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "dependencies": checks,
         }
 
-        # Check database
-        try:
-            connection.ensure_connection()
-            health["services"]["database"] = "ok"
-        except Exception as exc:
-            logger.error("Health check — database unreachable: %s", exc)
-            health["services"]["database"] = "error"
-            health["status"] = "degraded"
-
-        # Check Redis / channel layer
-        try:
-            from channels.layers import get_channel_layer  # noqa: PLC0415
-            from asgiref.sync import async_to_sync  # noqa: PLC0415
-
-            channel_layer = get_channel_layer()
-            if channel_layer:
-                async_to_sync(channel_layer.send)(
-                    "health-check",
-                    {"type": "health.check"},
-                )
-            health["services"]["redis"] = "ok"
-        except Exception as exc:
-            logger.warning("Health check — Redis unreachable: %s", exc)
-            health["services"]["redis"] = "error"
-            health["status"] = "degraded"
-
-        return success_response(data=health)
+        return Response(
+            {"success": all_ready, "data": response_data},
+            status=http_status,
+        )

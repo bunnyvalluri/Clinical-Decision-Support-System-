@@ -21,7 +21,7 @@ ROOT_DIR = BASE_DIR.parent
 # ---------------------------------------------------------------------------
 # Core Django
 # ---------------------------------------------------------------------------
-SECRET_KEY: str = config("DJANGO_SECRET_KEY")
+SECRET_KEY: str = config("DJANGO_SECRET_KEY", default=config("SECRET_KEY", default=""))
 DEBUG: bool = config("DJANGO_DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS: list[str] = config(
     "DJANGO_ALLOWED_HOSTS",
@@ -63,10 +63,13 @@ LOCAL_APPS = [
     "apps.core.apps.CoreConfig",
     "apps.accounts.apps.AccountsConfig",
     "apps.patients.apps.PatientsConfig",
+    "apps.clinical.apps.ClinicalConfig",
     "apps.predictions.apps.PredictionsConfig",
     "apps.ml_engine.apps.MlEngineConfig",
+    "apps.model_registry.apps.ModelRegistryConfig",
     "apps.reports.apps.ReportsConfig",
     "apps.notifications.apps.NotificationsConfig",
+    "apps.audit.apps.AuditConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
