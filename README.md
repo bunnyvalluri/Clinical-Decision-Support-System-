@@ -15,6 +15,7 @@
 </p>
 
 <p align="center">
+  <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Live Demo" /></a>
   <a href="https://github.com/bunnyvalluri/Clinical-Decision-Support-System-/actions"><img src="https://img.shields.io/badge/CI-Passing-success?style=flat-square&logo=githubactions" alt="CI Status" /></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.12" /></a>
   <a href="https://djangoproject.com"><img src="https://img.shields.io/badge/Django-5.0.14-092E20?style=flat-square&logo=django&logoColor=white" alt="Django 5.0" /></a>
@@ -652,6 +653,18 @@ For in-depth architectural specifications and subsystem runbooks, consult the `d
 - **Project Identifier:** `BPY-CSE-2666`
 - **Application Title:** Patient Risk Level Prediction Using Machine Learning for Intelligent Clinical Decision Support
 - **Repository:** [`bunnyvalluri/Clinical-Decision-Support-System-`](https://github.com/bunnyvalluri/Clinical-Decision-Support-System-)
+- **Live Production:** [clinical-decision-support-system-2026.vercel.app](https://clinical-decision-support-system-2026.vercel.app)
 - **License:** [MIT License](LICENSE)
 
-*Engineered with precision for modern healthcare workflows.*
+---
+
+## 🌐 Live Deployment
+
+| Environment | URL | Status |
+|---|---|---|
+| **Production (Vercel)** | [clinical-decision-support-system-2026.vercel.app](https://clinical-decision-support-system-2026.vercel.app) | ✅ Live |
+| **GitHub Repository** | [bunnyvalluri/Clinical-Decision-Support-System-](https://github.com/bunnyvalluri/Clinical-Decision-Support-System-) | ✅ Active |
+
+> **Deployment stack:** Next.js 16 frontend deployed on Vercel with automatic GitHub integration. Every push to `main` triggers a new production build.
+
+*Engineered with precision for modern healthcare workflows. Last updated: September 2026.*
