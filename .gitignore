@@ -72,3 +72,5 @@ docker-compose.override.yml
 
 # GitHub workflows (requires workflow token scope to push)
 .github/
+
+.vercel
