@@ -90,24 +90,65 @@ export function Shell({ children }: ShellProps) {
     autoReconnect: true,
   });
 
-  const navItems = [
-    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Patients", href: "/patients", icon: Users },
-    { label: "Clinical Records", href: "/clinical", icon: Activity },
-    { label: "Risk Prediction", href: "/predictions/new", icon: HeartPulse },
-    { label: "Prediction History", href: "/predictions", icon: History },
-    {
-      label: "Notifications",
-      href: "/notifications",
-      icon: Bell,
-      badge: unreadAlertsCount > 0 ? unreadAlertsCount : undefined,
-    },
-    { label: "Reports", href: "/reports", icon: FileText },
-    { label: "Model Registry", href: "/admin/models", icon: Cpu },
-    { label: "Audit Logs", href: "/admin/audit", icon: ShieldCheck },
-    { label: "Settings", href: "/settings", icon: Settings },
-    { label: "Clinician Profile", href: "/profile", icon: User },
-  ];
+  // Dynamic Navigation Items tailored strictly to active role
+  const navItems = React.useMemo(() => {
+    const role = user?.role || "DOCTOR";
+
+    if (role === "NURSE") {
+      return [
+        { label: "Triage & Bedside Center", href: "/dashboard", icon: LayoutDashboard },
+        { label: "Emergency Queue", href: "/clinical", icon: HeartPulse },
+        { label: "Hospital Census", href: "/patients", icon: Users },
+        {
+          label: "Doctor Escalations",
+          href: "/notifications",
+          icon: Bell,
+          badge: unreadAlertsCount > 0 ? unreadAlertsCount : undefined,
+        },
+        { label: "Nursing Reports", href: "/reports", icon: FileText },
+        { label: "Nurse Profile", href: "/profile", icon: User },
+      ];
+    }
+
+    if (role === "MEDICAL_INFORMATICIST" || role === "ANALYST") {
+      return [
+        { label: "Informatics & MLOps", href: "/dashboard", icon: LayoutDashboard },
+        { label: "scikit-learn Registry", href: "/admin/models", icon: Cpu },
+        { label: "Biomarker Telemetry", href: "/predictions", icon: BarChart3 },
+        { label: "Validation Reports", href: "/reports", icon: FileText },
+        { label: "Tamper-Evident Audits", href: "/admin/audit", icon: ShieldCheck },
+        { label: "Informaticist Profile", href: "/profile", icon: User },
+      ];
+    }
+
+    if (role === "IT_ADMIN" || role === "ADMIN") {
+      return [
+        { label: "Infrastructure Center", href: "/dashboard", icon: LayoutDashboard },
+        { label: "User Governance", href: "/admin/audit", icon: Users },
+        { label: "Model Deployments", href: "/admin/models", icon: Cpu },
+        { label: "Telemetry & Logs", href: "/reports", icon: ShieldCheck },
+        { label: "System Config", href: "/settings", icon: Settings },
+        { label: "Admin Profile", href: "/profile", icon: User },
+      ];
+    }
+
+    // Default DOCTOR navigation
+    return [
+      { label: "Physician Center", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Assigned Patients", href: "/patients", icon: Users },
+      { label: "Clinical Records", href: "/clinical", icon: Activity },
+      { label: "Risk Prediction", href: "/predictions/new", icon: HeartPulse },
+      { label: "Prediction History", href: "/predictions", icon: History },
+      {
+        label: "Clinical Alerts",
+        href: "/notifications",
+        icon: Bell,
+        badge: unreadAlertsCount > 0 ? unreadAlertsCount : undefined,
+      },
+      { label: "Clinical Reports", href: "/reports", icon: FileText },
+      { label: "Doctor Profile", href: "/profile", icon: User },
+    ];
+  }, [user?.role, unreadAlertsCount]);
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900 selection:bg-emerald-500/20 selection:text-emerald-800">
@@ -221,39 +262,49 @@ export function Shell({ children }: ShellProps) {
         {/* Quick Role Switcher for Evaluation */}
         <div className="border-t border-slate-200 px-4 py-3 bg-slate-50/70">
           <div className="mb-2 flex items-center justify-between text-[11px] text-slate-500">
-            <span>Clinician Role Switch:</span>
+            <span>Clinical Workspace:</span>
             <span className="font-mono font-semibold text-emerald-700">{user?.role || "DOCTOR"}</span>
           </div>
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-2 gap-1.5">
             <button
               onClick={() => loginAsRole("DOCTOR")}
-              className={`rounded px-1.5 py-1 text-[10px] font-medium transition-colors border ${
+              className={`rounded px-2 py-1.5 text-[10px] font-semibold transition-colors border ${
                 user?.role === "DOCTOR"
                   ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
               }`}
             >
               Doctor
             </button>
             <button
               onClick={() => loginAsRole("NURSE")}
-              className={`rounded px-1.5 py-1 text-[10px] font-medium transition-colors border ${
+              className={`rounded px-2 py-1.5 text-[10px] font-semibold transition-colors border ${
                 user?.role === "NURSE"
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                  ? "bg-sky-600 text-white border-sky-600 shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
               }`}
             >
-              Nurse
+              Triage Nurse
             </button>
             <button
-              onClick={() => loginAsRole("ADMIN")}
-              className={`rounded px-1.5 py-1 text-[10px] font-medium transition-colors border ${
-                user?.role === "ADMIN"
-                  ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+              onClick={() => loginAsRole("MEDICAL_INFORMATICIST")}
+              className={`rounded px-2 py-1.5 text-[10px] font-semibold transition-colors border ${
+                user?.role === "MEDICAL_INFORMATICIST" || user?.role === "ANALYST"
+                  ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
               }`}
             >
-              Admin
+              Informaticist
+            </button>
+            <button
+              onClick={() => loginAsRole("IT_ADMIN")}
+              className={`rounded px-2 py-1.5 text-[10px] font-semibold transition-colors border ${
+                user?.role === "IT_ADMIN" || user?.role === "ADMIN"
+                  ? "bg-slate-800 text-white border-slate-800 shadow-sm"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-100"
+              }`}
+            >
+              IT Admin
             </button>
           </div>
         </div>

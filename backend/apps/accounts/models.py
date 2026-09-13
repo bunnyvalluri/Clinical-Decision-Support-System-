@@ -13,21 +13,24 @@ from django.db import models
 
 class UserRole(models.TextChoices):
     """
-    Clinical role taxonomy.
+    Clinical role taxonomy for role-based workspaces.
 
-    ADMIN      — System administrators with full access to users, roles, audit logs, models.
-    CLINICIAN  — Physicians & clinicians who manage authorized patients, request predictions.
-    STAFF      — Clinical staff who register patients and perform limited operations.
-    PATIENT    — Patients who access strictly their own authorized records and predictions.
+    DOCTOR                — Physicians & clinicians who review patients, predictions, and record reviews.
+    NURSE                 — Triage & bedside nurses managing vitals, intake queue, and escalations.
+    MEDICAL_INFORMATICIST — Data & ML informaticists monitoring drift, calibration, and quality.
+    IT_ADMIN              — System administrators managing users, roles, services, and audit trails.
     """
 
+    DOCTOR = "DOCTOR", "Doctor / Physician"
+    NURSE = "NURSE", "Triage / Bedside Nurse"
+    MEDICAL_INFORMATICIST = "MEDICAL_INFORMATICIST", "Medical Informaticist"
+    IT_ADMIN = "IT_ADMIN", "IT System Administrator"
+
+    # Backward compatibility aliases
     ADMIN = "ADMIN", "Administrator"
     CLINICIAN = "CLINICIAN", "Clinician"
     STAFF = "STAFF", "Staff"
     PATIENT = "PATIENT", "Patient"
-    # Backwards compatibility aliases
-    DOCTOR = "DOCTOR", "Doctor"
-    NURSE = "NURSE", "Nurse"
     ANALYST = "ANALYST", "Analyst"
 
 
@@ -46,7 +49,7 @@ class Role(models.Model):
         max_length=50,
         unique=True,
         db_index=True,
-        help_text="Role name (e.g. ADMIN, DOCTOR, NURSE, ANALYST).",
+        help_text="Role name (e.g. DOCTOR, NURSE, MEDICAL_INFORMATICIST, IT_ADMIN).",
     )
     description = models.TextField(
         blank=True,
@@ -63,6 +66,74 @@ class Role(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class ClinicalPermission(models.Model):
+    """
+    Fine-grained clinical permission entity (e.g. doctor.patient.read, nurse.vitals.create).
+    """
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text="Unique identifier (UUID v4).",
+    )
+    codename = models.CharField(
+        max_length=100,
+        unique=True,
+        db_index=True,
+        help_text="Unique permission code (e.g. doctor.prediction.review, nurse.vitals.create).",
+    )
+    name = models.CharField(max_length=150, help_text="Human-readable permission label.")
+    category = models.CharField(
+        max_length=50,
+        db_index=True,
+        help_text="Permission domain: clinical, prediction, triage, informatics, admin.",
+    )
+    description = models.TextField(blank=True, help_text="Detailed capability description.")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "clinical_permissions"
+        verbose_name = "Clinical Permission"
+        verbose_name_plural = "Clinical Permissions"
+        ordering = ["category", "codename"]
+
+    def __str__(self) -> str:
+        return f"{self.codename} ({self.name})"
+
+
+class RolePermission(models.Model):
+    """
+    Mapping table linking Role to fine-grained ClinicalPermission entities.
+    """
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+    role = models.ForeignKey(
+        Role,
+        on_delete=models.CASCADE,
+        related_name="role_permissions",
+    )
+    permission = models.ForeignKey(
+        ClinicalPermission,
+        on_delete=models.CASCADE,
+        related_name="permission_roles",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "role_permissions"
+        verbose_name = "Role Permission"
+        verbose_name_plural = "Role Permissions"
+        unique_together = ("role", "permission")
+
+    def __str__(self) -> str:
+        return f"{self.role.name} -> {self.permission.codename}"
 
 
 class User(AbstractUser):
@@ -89,7 +160,7 @@ class User(AbstractUser):
         help_text="Email address — used as the login credential.",
     )
     role = models.CharField(
-        max_length=20,
+        max_length=50,
         choices=UserRole.choices,
         default=UserRole.DOCTOR,
         db_index=True,
@@ -157,33 +228,51 @@ class User(AbstractUser):
 
     @property
     def is_admin(self) -> bool:
-        return self.role == UserRole.ADMIN
+        return self.role in (UserRole.ADMIN, UserRole.IT_ADMIN) or self.is_superuser
+
+    @property
+    def is_it_admin(self) -> bool:
+        return self.is_admin
 
     @property
     def is_clinician(self) -> bool:
         return self.role in (UserRole.CLINICIAN, UserRole.DOCTOR)
 
     @property
-    def is_staff_member(self) -> bool:
-        return self.role in (UserRole.STAFF, UserRole.NURSE)
-
-    @property
-    def is_patient(self) -> bool:
-        return self.role == UserRole.PATIENT
-
-    @property
     def is_doctor(self) -> bool:
         return self.is_clinician
+
+    @property
+    def is_staff_member(self) -> bool:
+        return self.role in (UserRole.STAFF, UserRole.NURSE)
 
     @property
     def is_nurse(self) -> bool:
         return self.is_staff_member
 
     @property
+    def is_informaticist(self) -> bool:
+        return self.role in (UserRole.MEDICAL_INFORMATICIST, UserRole.ANALYST)
+
+    @property
     def is_analyst(self) -> bool:
-        return self.role == UserRole.ANALYST
+        return self.is_informaticist
+
+    @property
+    def is_patient(self) -> bool:
+        return self.role == UserRole.PATIENT
 
     @property
     def is_clinical_staff(self) -> bool:
         """True for roles that have direct clinical responsibilities."""
         return self.role in (UserRole.CLINICIAN, UserRole.DOCTOR, UserRole.STAFF, UserRole.NURSE)
+
+    def has_clinical_permission(self, codename: str) -> bool:
+        """
+        Check if user has fine-grained clinical permission either via role or superuser.
+        """
+        if self.is_superuser or self.is_admin:
+            return True
+        if self.role_obj:
+            return self.role_obj.role_permissions.filter(permission__codename=codename).exists()
+        return False

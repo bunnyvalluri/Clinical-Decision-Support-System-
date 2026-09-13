@@ -204,3 +204,198 @@ class ClinicalRecord(SoftDeleteModel):
 
     def __str__(self) -> str:
         return f"Encounter {self.encounter_type} - {self.patient.mrn} @ {self.recorded_at.strftime('%Y-%m-%d %H:%M')}"
+
+
+class TriageState(models.TextChoices):
+    WAITING = "WAITING", "Waiting for Triage"
+    TRIAGE_IN_PROGRESS = "TRIAGE_IN_PROGRESS", "Triage in Progress"
+    TRIAGED = "TRIAGED", "Triaged / Bed Assigned"
+    ESCALATED = "ESCALATED", "Escalated to Physician"
+    COMPLETED = "COMPLETED", "Triage Completed"
+
+
+class TriageRecord(SoftDeleteModel):
+    """
+    Emergency and ward triage queue record managed by nursing staff.
+    """
+
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.CASCADE,
+        related_name="triage_records",
+        help_text="Patient undergoing triage.",
+    )
+    nurse = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="nurse_triage_records",
+        help_text="Triage nurse managing patient intake.",
+    )
+    state = models.CharField(
+        max_length=30,
+        choices=TriageState.choices,
+        default=TriageState.WAITING,
+        db_index=True,
+    )
+    acuity_level = models.IntegerField(
+        default=3,
+        help_text="Emergency Severity Index: 1 (Resuscitation) to 5 (Non-urgent).",
+    )
+    chief_complaint = models.CharField(max_length=255, blank=True)
+    bed_assignment = models.CharField(max_length=50, blank=True)
+    arrival_time = models.DateTimeField(default=timezone.now, db_index=True)
+    reassessment_due = models.DateTimeField(null=True, blank=True)
+    triage_notes = models.TextField(blank=True)
+
+    class Meta:
+        db_table = "triage_records"
+        verbose_name = "Triage Record"
+        verbose_name_plural = "Triage Records"
+        ordering = ["acuity_level", "arrival_time"]
+
+    def __str__(self) -> str:
+        return f"Triage {self.patient.mrn} [{self.state}] ESI: {self.acuity_level}"
+
+
+class TaskType(models.TextChoices):
+    VITALS_CHECK = "VITALS_CHECK", "Vital Signs Check"
+    MEDICATION_ADMIN = "MEDICATION_ADMIN", "Medication Administration"
+    TRIAGE_REASSESS = "TRIAGE_REASSESS", "Triage Reassessment"
+    LAB_DRAW = "LAB_DRAW", "Stat Laboratory Draw"
+    DISCHARGE_PREP = "DISCHARGE_PREP", "Discharge Preparation"
+
+
+class TaskPriority(models.TextChoices):
+    ROUTINE = "ROUTINE", "Routine"
+    URGENT = "URGENT", "Urgent"
+    STAT = "STAT", "Emergency / STAT"
+
+
+class TaskStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    IN_PROGRESS = "IN_PROGRESS", "In Progress"
+    COMPLETED = "COMPLETED", "Completed"
+
+
+class ClinicalTask(SoftDeleteModel):
+    """
+    Bedside clinical task assignment for nursing staff.
+    """
+
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.CASCADE,
+        related_name="clinical_tasks",
+    )
+    assigned_to = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_tasks",
+    )
+    created_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_tasks",
+    )
+    title = models.CharField(max_length=200)
+    task_type = models.CharField(
+        max_length=30,
+        choices=TaskType.choices,
+        default=TaskType.VITALS_CHECK,
+    )
+    priority = models.CharField(
+        max_length=20,
+        choices=TaskPriority.choices,
+        default=TaskPriority.ROUTINE,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=TaskStatus.choices,
+        default=TaskStatus.PENDING,
+        db_index=True,
+    )
+    due_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        db_table = "clinical_tasks"
+        verbose_name = "Clinical Task"
+        verbose_name_plural = "Clinical Tasks"
+        ordering = ["due_at", "-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.title} [{self.status}] -> {self.patient.mrn}"
+
+
+class EscalationPriority(models.TextChoices):
+    HIGH = "HIGH", "High Priority"
+    CRITICAL = "CRITICAL", "Critical / STAT Alert"
+
+
+class EscalationStatus(models.TextChoices):
+    PENDING = "PENDING", "Pending Review"
+    ACKNOWLEDGED = "ACKNOWLEDGED", "Acknowledged by Doctor"
+    RESOLVED = "RESOLVED", "Resolved"
+
+
+class Escalation(SoftDeleteModel):
+    """
+    Direct nurse-to-physician patient deterioration escalation.
+    """
+
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.CASCADE,
+        related_name="escalations",
+    )
+    escalated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        related_name="nurse_escalations",
+    )
+    assigned_doctor = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="doctor_escalations",
+    )
+    prediction = models.ForeignKey(
+        "predictions.Prediction",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="escalations",
+    )
+    reason = models.TextField(help_text="Clinical justification for urgent escalation.")
+    priority = models.CharField(
+        max_length=20,
+        choices=EscalationPriority.choices,
+        default=EscalationPriority.HIGH,
+        db_index=True,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=EscalationStatus.choices,
+        default=EscalationStatus.PENDING,
+        db_index=True,
+    )
+    doctor_notes = models.TextField(blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "clinical_escalations"
+        verbose_name = "Clinical Escalation"
+        verbose_name_plural = "Clinical Escalations"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Escalation for {self.patient.mrn} by {self.escalated_by.username} [{self.status}]"
+

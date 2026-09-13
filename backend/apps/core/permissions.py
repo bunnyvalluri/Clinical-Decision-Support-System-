@@ -12,7 +12,7 @@ from apps.accounts.models import UserRole
 
 
 class IsAdmin(BasePermission):
-    """Grant access only to users with the ADMIN role."""
+    """Grant access only to users with the ADMIN or IT_ADMIN role."""
 
     message = "Administrator privileges are required."
 
@@ -20,12 +20,17 @@ class IsAdmin(BasePermission):
         return bool(
             request.user
             and request.user.is_authenticated
-            and getattr(request.user, "is_admin", request.user.role == UserRole.ADMIN)
+            and getattr(request.user, "is_admin", request.user.role in (UserRole.ADMIN, UserRole.IT_ADMIN))
         )
 
 
+class IsITAdmin(IsAdmin):
+    """Alias for IT System Administrator."""
+    message = "IT System Administrator privileges are required."
+
+
 class IsClinician(BasePermission):
-    """Grant access to CLINICIAN (and legacy DOCTOR) role."""
+    """Grant access to CLINICIAN (and DOCTOR) role."""
 
     message = "Clinician privileges are required."
 
@@ -37,8 +42,13 @@ class IsClinician(BasePermission):
         )
 
 
+class IsDoctor(IsClinician):
+    """Grant access to DOCTOR role."""
+    message = "Physician / Doctor privileges are required."
+
+
 class IsStaffUser(BasePermission):
-    """Grant access to STAFF (and legacy NURSE) role."""
+    """Grant access to STAFF (and NURSE) role."""
 
     message = "Clinical staff privileges are required."
 
@@ -47,6 +57,25 @@ class IsStaffUser(BasePermission):
             request.user
             and request.user.is_authenticated
             and getattr(request.user, "is_staff_member", request.user.role in (UserRole.STAFF, UserRole.NURSE))
+        )
+
+
+class IsNurse(IsStaffUser):
+    """Grant access to NURSE role."""
+    message = "Triage / Bedside Nurse privileges are required."
+
+
+class IsInformaticist(BasePermission):
+    """Grant access to MEDICAL_INFORMATICIST (and ANALYST) role or ADMIN."""
+
+    message = "Medical Informaticist privileges are required."
+
+    def has_permission(self, request: Request, view: APIView) -> bool:
+        if not (request.user and request.user.is_authenticated):
+            return False
+        return bool(
+            getattr(request.user, "is_informaticist", request.user.role in (UserRole.MEDICAL_INFORMATICIST, UserRole.ANALYST))
+            or request.user.is_admin
         )
 
 
@@ -64,7 +93,7 @@ class IsPatient(BasePermission):
 
 
 class IsClinicianOrStaff(BasePermission):
-    """Grant access to CLINICIAN, STAFF, or ADMIN roles."""
+    """Grant access to CLINICIAN, STAFF, NURSE, DOCTOR, or ADMIN roles."""
 
     message = "Clinical or hospital staff credentials are required."
 
@@ -79,7 +108,7 @@ class IsClinicianOrStaff(BasePermission):
 
 
 class IsAdminOrClinician(BasePermission):
-    """Grant access to ADMIN or CLINICIAN roles."""
+    """Grant access to ADMIN or CLINICIAN (Doctor) roles."""
 
     message = "Clinician or Administrator privileges are required."
 
@@ -87,6 +116,59 @@ class IsAdminOrClinician(BasePermission):
         if not (request.user and request.user.is_authenticated):
             return False
         return request.user.is_admin or request.user.is_clinician
+
+
+class CanReviewPrediction(BasePermission):
+    """Only licensed Physicians (Doctors) or Admins can record clinical reviews."""
+
+    message = "Clinical prediction review authority is restricted to licensed physicians."
+
+    def has_permission(self, request: Request, view: APIView) -> bool:
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and (request.user.is_doctor or request.user.is_admin)
+        )
+
+
+class CanManageTriage(BasePermission):
+    """Only Triage Nurses or Admins can manage the emergency triage intake queue."""
+
+    message = "Triage queue management is restricted to authorized nursing staff."
+
+    def has_permission(self, request: Request, view: APIView) -> bool:
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and (request.user.is_nurse or request.user.is_admin)
+        )
+
+
+class CanEnterVitals(BasePermission):
+    """Nurses and Doctors can enter/update physiological measurements."""
+
+    message = "Vital signs recording is restricted to clinical bedside staff."
+
+    def has_permission(self, request: Request, view: APIView) -> bool:
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and (request.user.is_nurse or request.user.is_doctor or request.user.is_admin)
+        )
+
+
+class CanManageUsers(BasePermission):
+    """Only IT System Administrators can create, activate, deactivate, or assign roles."""
+
+    message = "User and role management is restricted to IT System Administrators."
+
+    def has_permission(self, request: Request, view: APIView) -> bool:
+        return bool(
+            request.user
+            and request.user.is_authenticated
+            and request.user.is_admin
+        )
+
 
 
 class HasPatientAccess(BasePermission):

@@ -172,3 +172,72 @@ class PredictionExplanation(BaseModel):
 
     def __str__(self) -> str:
         return f"Explanation ({self.method}) for Prediction {self.prediction_id}"
+
+
+class ReviewStatus(models.TextChoices):
+    PENDING_REVIEW = "PENDING_REVIEW", "Pending Review"
+    REVIEWED = "REVIEWED", "Reviewed / Concurred"
+    REQUIRES_MORE_INFORMATION = "REQUIRES_MORE_INFORMATION", "Requires More Information"
+    ESCALATED = "ESCALATED", "Escalated"
+
+
+class ReviewDecision(models.TextChoices):
+    CONCUR = "CONCUR", "Concur with AI Risk Assessment"
+    OVERRIDE = "OVERRIDE", "Override AI Prediction"
+    MONITOR = "MONITOR", "Serial Observation Required"
+    TRANSFER = "TRANSFER", "ICU / Specialist Transfer"
+
+
+class ClinicalReview(BaseModel):
+    """
+    Human-in-the-loop clinical review record for machine learning predictions.
+    Audited with doctor, timestamp, prediction, review status, and action.
+    """
+
+    prediction = models.OneToOneField(
+        Prediction,
+        on_delete=models.CASCADE,
+        related_name="clinical_review",
+        help_text="Prediction reviewed by physician.",
+    )
+    doctor = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="clinical_reviews",
+        help_text="Physician performing the clinical review.",
+    )
+    status = models.CharField(
+        max_length=35,
+        choices=ReviewStatus.choices,
+        default=ReviewStatus.PENDING_REVIEW,
+        db_index=True,
+    )
+    decision = models.CharField(
+        max_length=30,
+        choices=ReviewDecision.choices,
+        default=ReviewDecision.CONCUR,
+    )
+    rationale = models.TextField(
+        blank=True,
+        help_text="Mandatory clinical rationale explaining physician decision or override.",
+    )
+    override_risk_level = models.CharField(
+        max_length=20,
+        choices=RiskLevel.choices,
+        null=True,
+        blank=True,
+        help_text="Target clinical risk tier if physician overrides.",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True, db_index=True)
+
+    class Meta:
+        db_table = "clinical_reviews"
+        verbose_name = "Clinical Review"
+        verbose_name_plural = "Clinical Reviews"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Review for {self.prediction.id} by {self.doctor} [{self.status}]"
+

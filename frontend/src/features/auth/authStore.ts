@@ -3,12 +3,14 @@
 import { create } from "zustand";
 import { tokenStorage } from "@/services/apiClient";
 
+export type RoleType = "DOCTOR" | "NURSE" | "MEDICAL_INFORMATICIST" | "IT_ADMIN" | "ADMIN" | "ANALYST";
+
 export interface UserProfile {
   id: string;
   email: string;
   username: string;
   full_name: string;
-  role: "ADMIN" | "DOCTOR" | "NURSE" | "ANALYST";
+  role: RoleType;
   department: string;
   phone_number?: string;
   license_number?: string;
@@ -22,11 +24,11 @@ interface AuthState {
   isLoading: boolean;
   setAuth: (user: UserProfile, tokens: { access: string; refresh: string }) => void;
   logout: () => void;
-  loginAsRole: (role: "ADMIN" | "DOCTOR" | "NURSE" | "ANALYST") => void;
+  loginAsRole: (role: RoleType) => void;
   initFromStorage: () => void;
 }
 
-const DEMO_PROFILES: Record<"ADMIN" | "DOCTOR" | "NURSE" | "ANALYST", UserProfile> = {
+const DEMO_PROFILES: Record<RoleType, UserProfile> = {
   DOCTOR: {
     id: "u-doc-001",
     email: "dr.elena.vance@hospital.org",
@@ -42,26 +44,44 @@ const DEMO_PROFILES: Record<"ADMIN" | "DOCTOR" | "NURSE" | "ANALYST", UserProfil
     username: "sjenkins",
     full_name: "Sarah Jenkins, RN",
     role: "NURSE",
-    department: "Emergency Triage",
+    department: "Emergency Triage & Bedside",
     license_number: "RN-449102",
+  },
+  MEDICAL_INFORMATICIST: {
+    id: "u-analyst-003",
+    email: "alex.rivera@hospital.org",
+    username: "arivera",
+    full_name: "Alex Rivera, MSc",
+    role: "MEDICAL_INFORMATICIST",
+    department: "Clinical Informatics & Data Science",
+    license_number: "BIO-10923",
   },
   ANALYST: {
     id: "u-analyst-003",
     email: "alex.rivera@hospital.org",
     username: "arivera",
     full_name: "Alex Rivera, MSc",
-    role: "ANALYST",
-    department: "Clinical Informatics & Biostatistics",
+    role: "MEDICAL_INFORMATICIST",
+    department: "Clinical Informatics & Data Science",
     license_number: "BIO-10923",
+  },
+  IT_ADMIN: {
+    id: "u-admin-004",
+    email: "m.chen@hospital.org",
+    username: "mchen",
+    full_name: "Marcus Chen",
+    role: "IT_ADMIN",
+    department: "IT Systems & Cybersecurity",
+    license_number: "CISSP-98210",
   },
   ADMIN: {
     id: "u-admin-004",
-    email: "admin@hospital.org",
-    username: "sysadmin",
-    full_name: "Chief Clinical Officer (Admin)",
-    role: "ADMIN",
-    department: "Hospital Administration",
-    license_number: "ADM-0001",
+    email: "m.chen@hospital.org",
+    username: "mchen",
+    full_name: "Marcus Chen",
+    role: "IT_ADMIN",
+    department: "IT Systems & Cybersecurity",
+    license_number: "CISSP-98210",
   },
 };
 
