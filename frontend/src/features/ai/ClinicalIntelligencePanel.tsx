@@ -411,7 +411,7 @@ export function ClinicalIntelligencePanel({
                       <button
                         type="button"
                         key={opt.value}
-                        onClick={() => setDecision(opt.value as any)}
+                        onClick={() => setDecision(opt.value as "APPROVED" | "MODIFIED" | "OVERRIDDEN" | "REJECTED")}
                         className={`p-2.5 rounded-lg border text-xs font-semibold text-center transition-all ${
                           decision === opt.value
                             ? "border-blue-600 bg-blue-50/60 text-blue-700 shadow-sm"
