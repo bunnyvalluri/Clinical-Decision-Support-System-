@@ -1,7 +1,14 @@
 """
-Views for accounts app — authentication, profile management, and user administration.
+Views for accounts app — authentication, registration, password reset,
+email verification, profiles, and administrative user management.
 """
+import logging
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from rest_framework import generics, permissions, status, viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -13,26 +20,34 @@ from apps.accounts.serializers import (
     AdminUserManagementSerializer,
     ChangePasswordSerializer,
     CustomTokenObtainPairSerializer,
-    UserProfileUpdateSerializer,
+    EmailVerificationConfirmSerializer,
+    EmailVerificationRequestSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordResetRequestSerializer,
+    UserProfileSerializer,
     UserRegistrationSerializer,
     UserSerializer,
+    signer,
 )
 from apps.core.pagination import StandardResultsPagination
 from apps.core.permissions import IsAdmin
-from apps.core.responses import created_response, no_content_response, success_response
+from apps.core.responses import created_response, success_response
+from apps.core.throttles import AuthBurstRateThrottle, PasswordResetRateThrottle
 
+logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
 class RegisterView(generics.CreateAPIView):
     """
-    Register a new clinical user account.
+    Register a new user account.
 
     POST /api/v1/auth/register/
-    Public endpoint. Returns created user details (excluding password).
+    Public endpoint. Returns user details and immediate JWT authentication pair.
     """
 
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [AuthBurstRateThrottle]
     serializer_class = UserRegistrationSerializer
 
     def create(self, request: Request, *args, **kwargs) -> Response:
@@ -42,7 +57,6 @@ class RegisterView(generics.CreateAPIView):
 
         # Generate tokens so user is immediately logged in upon registration
         refresh = RefreshToken.for_user(user)
-        # Custom claims on token
         refresh["email"] = user.email
         refresh["role"] = user.role
         refresh["full_name"] = user.full_name
@@ -69,6 +83,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
     """
 
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [AuthBurstRateThrottle]
     serializer_class = CustomTokenObtainPairSerializer
 
     def post(self, request: Request, *args, **kwargs) -> Response:
@@ -103,7 +118,7 @@ class CustomTokenRefreshView(TokenRefreshView):
 
 class LogoutView(APIView):
     """
-    Blacklist the refresh token and log out the user.
+    Blacklist the refresh token and invalidate the user session.
 
     POST /api/v1/auth/logout/
     """
@@ -125,18 +140,137 @@ class LogoutView(APIView):
             token.blacklist()
             user_logged_out.send(sender=self.__class__, request=request, user=request.user)
             return success_response(
-                message="Logout successful. Token revoked.",
+                message="Logout successful. Token invalidated.",
             )
         except Exception as e:
+            logger.warning("Failed token blacklisting attempt: %s", e)
             return Response(
-                {"success": False, "message": f"Token invalid or already revoked: {str(e)}"},
+                {"success": False, "message": "Token invalid or already revoked."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
 
-class CurrentUserProfileView(APIView):
+class PasswordResetRequestView(APIView):
     """
-    Get or update the profile of the currently authenticated user.
+    Initiate a password reset flow.
+
+    POST /api/v1/auth/password-reset/
+    Accepts email, generates a cryptographically secure one-time token,
+    and transmits instructions. Avoids account enumeration by returning
+    success even if the email does not exist.
+    """
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
+
+    def post(self, request: Request) -> Response:
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data["email"]
+
+        user = User.objects.filter(email__iexact=email, is_active=True).first()
+        if user:
+            token = default_token_generator.make_token(user)
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            reset_url = f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')}/reset-password?uid={uidb64}&token={token}"
+
+            try:
+                send_mail(
+                    subject="Clinical AI - Password Reset Request",
+                    message=f"You requested a password reset. Use this secure link to set a new password:\n\n{reset_url}\n\nIf you did not request this, please contact security immediately.",
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[user.email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                logger.error("Failed to dispatch password reset email: %s", e)
+
+        # Consistent safe response to prevent email harvesting
+        return success_response(
+            message="If an account exists with this email address, password reset instructions have been sent.",
+            data={"email": email}
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    """
+    Confirm password reset with cryptographic token.
+
+    POST /api/v1/auth/password-reset/confirm/
+    """
+
+    permission_classes = [permissions.AllowAny]
+    throttle_classes = [PasswordResetRateThrottle]
+
+    def post(self, request: Request) -> Response:
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return success_response(
+            message="Password has been reset successfully. You may now log in with your new password.",
+        )
+
+
+class EmailVerificationRequestView(APIView):
+    """
+    Request an email verification link.
+
+    POST /api/v1/auth/email-verify/request/
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [AuthBurstRateThrottle]
+
+    def post(self, request: Request) -> Response:
+        user = request.user
+        if user.is_email_verified:
+            return success_response(message="Email address is already verified.")
+
+        token = signer.sign(str(user.id))
+        verify_url = f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')}/verify-email?token={token}"
+
+        try:
+            send_mail(
+                subject="Clinical AI - Verify Your Email Address",
+                message=f"Please verify your clinical account email address by clicking the link:\n\n{verify_url}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            logger.error("Failed to dispatch verification email: %s", e)
+
+        return success_response(
+            message="Email verification instructions have been dispatched.",
+            data={"token": token}
+        )
+
+
+class EmailVerificationConfirmView(APIView):
+    """
+    Verify email token.
+
+    POST /api/v1/auth/email-verify/confirm/
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request: Request) -> Response:
+        serializer = EmailVerificationConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data["token"]
+        user.is_email_verified = True
+        user.save(update_fields=["is_email_verified", "updated_at"])
+
+        return success_response(
+            message="Email address verified successfully.",
+            data={"is_email_verified": True}
+        )
+
+
+class CurrentUserView(APIView):
+    """
+    Retrieve or update authenticated user profile.
 
     GET /api/v1/auth/me/
     PUT /api/v1/auth/me/
@@ -150,11 +284,7 @@ class CurrentUserProfileView(APIView):
         return success_response(data=serializer.data)
 
     def put(self, request: Request) -> Response:
-        serializer = UserProfileUpdateSerializer(
-            request.user,
-            data=request.data,
-            partial=False,
-        )
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=False)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return success_response(
@@ -163,15 +293,45 @@ class CurrentUserProfileView(APIView):
         )
 
     def patch(self, request: Request) -> Response:
-        serializer = UserProfileUpdateSerializer(
-            request.user,
-            data=request.data,
-            partial=True,
-        )
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return success_response(
             data=UserSerializer(request.user).data,
+            message="Profile updated successfully.",
+        )
+
+
+class UserProfileView(APIView):
+    """
+    Manage user profile.
+
+    GET /api/v1/auth/profile/
+    PUT /api/v1/auth/profile/
+    PATCH /api/v1/auth/profile/
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        serializer = UserProfileSerializer(request.user)
+        return success_response(data=serializer.data)
+
+    def put(self, request: Request) -> Response:
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=False)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return success_response(
+            data=UserProfileSerializer(request.user).data,
+            message="Profile updated successfully.",
+        )
+
+    def patch(self, request: Request) -> Response:
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return success_response(
+            data=UserProfileSerializer(request.user).data,
             message="Profile updated successfully.",
         )
 
@@ -199,7 +359,7 @@ class UserManagementViewSet(viewsets.ModelViewSet):
     """
     Administrative user management.
 
-    Full CRUD on clinical staff accounts, only accessible by ADMIN role.
+    Full CRUD on staff accounts, only accessible by ADMIN role.
     GET /api/v1/auth/users/
     POST /api/v1/auth/users/
     GET /api/v1/auth/users/{id}/
@@ -216,10 +376,8 @@ class UserManagementViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "email", "last_name", "role"]
 
     def perform_destroy(self, instance: User) -> None:
-        # Prevent self-deletion of the active admin
         if instance.id == self.request.user.id:
             from apps.core.exceptions import ConflictError
             raise ConflictError("Administrators cannot delete their own account.")
-        # Deactivate rather than hard-delete to maintain audit trails
         instance.is_active = False
         instance.save(update_fields=["is_active", "updated_at"])

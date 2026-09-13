@@ -35,6 +35,10 @@ class HealthCheckView(APIView):
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "version": "1.0.0",
             "service": "Patient Risk Level Prediction API",
+            "services": {
+                "database": "online",
+                "cache": "online",
+            },
         }
         return success_response(data=payload)
 

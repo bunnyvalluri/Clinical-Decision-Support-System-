@@ -243,6 +243,9 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "100/hour",
         "user": "1000/hour",
+        "auth": "10/minute",
+        "password_reset": "5/hour",
+        "prediction_request": "60/minute",
     },
 }
 

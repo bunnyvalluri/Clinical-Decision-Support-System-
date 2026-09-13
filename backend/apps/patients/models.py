@@ -65,7 +65,15 @@ class Patient(SoftDeleteModel):
     emergency_contact_phone = models.CharField(max_length=30, blank=True)
     emergency_contact_relation = models.CharField(max_length=50, blank=True)
 
-    # Care Team
+    # Care Team & User Account
+    user = models.OneToOneField(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patient_profile",
+        help_text="Login user account linked to this patient record for self-service access.",
+    )
     primary_physician = models.ForeignKey(
         "accounts.User",
         on_delete=models.SET_NULL,

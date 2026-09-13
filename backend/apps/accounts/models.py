@@ -15,13 +15,17 @@ class UserRole(models.TextChoices):
     """
     Clinical role taxonomy.
 
-    ADMIN    — System administrators with full access.
-    DOCTOR   — Physicians who can view/create predictions and full patient data.
-    NURSE    — Clinical nurses who can record vitals and view patient summaries.
-    ANALYST  — Data/ML analysts with read-only access to aggregate data and reports.
+    ADMIN      — System administrators with full access to users, roles, audit logs, models.
+    CLINICIAN  — Physicians & clinicians who manage authorized patients, request predictions.
+    STAFF      — Clinical staff who register patients and perform limited operations.
+    PATIENT    — Patients who access strictly their own authorized records and predictions.
     """
 
     ADMIN = "ADMIN", "Administrator"
+    CLINICIAN = "CLINICIAN", "Clinician"
+    STAFF = "STAFF", "Staff"
+    PATIENT = "PATIENT", "Patient"
+    # Backwards compatibility aliases
     DOCTOR = "DOCTOR", "Doctor"
     NURSE = "NURSE", "Nurse"
     ANALYST = "ANALYST", "Analyst"
@@ -119,6 +123,10 @@ class User(AbstractUser):
         default=True,
         help_text="Designates whether this user account is active.",
     )
+    is_email_verified = models.BooleanField(
+        default=False,
+        help_text="Designates whether this user has verified their email address.",
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
@@ -152,12 +160,24 @@ class User(AbstractUser):
         return self.role == UserRole.ADMIN
 
     @property
+    def is_clinician(self) -> bool:
+        return self.role in (UserRole.CLINICIAN, UserRole.DOCTOR)
+
+    @property
+    def is_staff_member(self) -> bool:
+        return self.role in (UserRole.STAFF, UserRole.NURSE)
+
+    @property
+    def is_patient(self) -> bool:
+        return self.role == UserRole.PATIENT
+
+    @property
     def is_doctor(self) -> bool:
-        return self.role == UserRole.DOCTOR
+        return self.is_clinician
 
     @property
     def is_nurse(self) -> bool:
-        return self.role == UserRole.NURSE
+        return self.is_staff_member
 
     @property
     def is_analyst(self) -> bool:
@@ -165,5 +185,5 @@ class User(AbstractUser):
 
     @property
     def is_clinical_staff(self) -> bool:
-        """True for roles that have direct patient-care responsibilities."""
-        return self.role in (UserRole.DOCTOR, UserRole.NURSE)
+        """True for roles that have direct clinical responsibilities."""
+        return self.role in (UserRole.CLINICIAN, UserRole.DOCTOR, UserRole.STAFF, UserRole.NURSE)
