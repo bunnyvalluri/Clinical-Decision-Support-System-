@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/features/auth/authStore";
 import { getRoleDashboard, ROLE_LABELS } from "@/lib/roleRoutes";
 
-export default function ForbiddenPage() {
+function ForbiddenContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuthStore();
@@ -89,3 +89,12 @@ export default function ForbiddenPage() {
     </div>
   );
 }
+
+export default function ForbiddenPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <ForbiddenContent />
+    </React.Suspense>
+  );
+}
+

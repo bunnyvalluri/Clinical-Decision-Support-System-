@@ -427,34 +427,88 @@ export default function LandingPage() {
             </div>
 
             {/* Navigation Section Anchor Links */}
-            <div className="space-y-1">
-              <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 mb-1">
-                Sections
+            {/* Navigation Section Anchor Links with Premium Clinical Icons */}
+            <div className="space-y-1.5">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-2 mb-1">
+                Platform Sections
               </p>
               {[
-                { href: "#simulator", label: "Risk Simulator" },
-                { href: "#features", label: "Capabilities & Algorithms" },
-                { href: "#workflow", label: "Care Pathway Integration" },
-                { href: "#architecture", label: "Cloud Backing Stack" },
-                { href: "#security", label: "Governance & HIPAA Security" },
-                { href: "#faq", label: "Evidence & FAQ" },
-              ].map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="touch-target flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 hover:text-teal-700 transition-colors text-slate-800 font-semibold text-sm"
-                >
-                  <span>{link.label}</span>
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
-                </a>
-              ))}
+                {
+                  href: "#simulator",
+                  label: "Risk Simulator",
+                  desc: "Live Physiological Inputs & SHAP Explainer",
+                  icon: Sliders,
+                  color: "bg-teal-50 text-teal-600 border-teal-200",
+                },
+                {
+                  href: "#features",
+                  label: "Capabilities & Algorithms",
+                  desc: "Platt Sigmoid & Multi-Class Inference",
+                  icon: Stethoscope,
+                  color: "bg-emerald-50 text-emerald-600 border-emerald-200",
+                },
+                {
+                  href: "#workflow",
+                  label: "Care Pathway Integration",
+                  desc: "Ward Admission to PDF Generation",
+                  icon: Activity,
+                  color: "bg-purple-50 text-purple-600 border-purple-200",
+                },
+                {
+                  href: "#architecture",
+                  label: "Cloud Backing Stack",
+                  desc: "PostgreSQL 16, Redis TLS & ASGI",
+                  icon: Radio,
+                  color: "bg-sky-50 text-sky-600 border-sky-200",
+                },
+                {
+                  href: "#security",
+                  label: "Governance & HIPAA Security",
+                  desc: "Audit Logging, RBAC & Overrides",
+                  icon: ShieldCheck,
+                  color: "bg-blue-50 text-blue-600 border-blue-200",
+                },
+                {
+                  href: "#faq",
+                  label: "Evidence & FAQ",
+                  desc: "SaMD Class II & Consensus Criteria",
+                  icon: HelpCircle,
+                  color: "bg-amber-50 text-amber-600 border-amber-200",
+                },
+              ].map((link) => {
+                const Icon = link.icon;
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="touch-target flex items-center justify-between p-2 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 hover:border-slate-200 transition-all text-slate-800 shadow-2xs group"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div
+                        className={`h-8 w-8 rounded-lg border flex items-center justify-center shrink-0 shadow-2xs ${link.color}`}
+                      >
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-bold text-xs text-slate-900 group-hover:text-teal-700 transition-colors truncate">
+                          {link.label}
+                        </p>
+                        <p className="text-[10px] text-slate-500 truncate">
+                          {link.desc}
+                        </p>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-1.5" />
+                  </a>
+                );
+              })}
             </div>
 
             {/* 1-Click Clinician Role Sandboxes */}
-            <div className="space-y-2 border-t border-slate-100 pt-4">
+            <div className="space-y-2 border-t border-slate-100 pt-3">
               <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-1">
-                1-Click Role Workspaces:
+                1-Click Clinician Workspaces:
               </p>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -463,12 +517,17 @@ export default function LandingPage() {
                     setMobileMenuOpen(false);
                     handleQuickDemo("DOCTOR");
                   }}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors"
+                  className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-left hover:border-teal-400 hover:bg-teal-50/40 transition-all group"
                 >
-                  <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
-                    MD • Doctor
-                  </span>
-                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Physician Portal</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                      MD
+                    </span>
+                    <HeartPulse className="h-3.5 w-3.5 text-teal-600" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors truncate">
+                    Dr. Elena Vance
+                  </p>
                   <p className="text-[10px] text-slate-500 truncate">Cardiology & ICU</p>
                 </button>
 
@@ -478,13 +537,18 @@ export default function LandingPage() {
                     setMobileMenuOpen(false);
                     handleQuickDemo("NURSE");
                   }}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-sky-400 hover:bg-sky-50/40 transition-colors"
+                  className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-left hover:border-sky-400 hover:bg-sky-50/40 transition-all group"
                 >
-                  <span className="text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
-                    RN • Nurse
-                  </span>
-                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Triage & Bedside</p>
-                  <p className="text-[10px] text-slate-500 truncate">Emergency Ward</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                      RN
+                    </span>
+                    <Activity className="h-3.5 w-3.5 text-sky-600" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors truncate">
+                    Sarah Jenkins
+                  </p>
+                  <p className="text-[10px] text-slate-500 truncate">Triage & Bedside</p>
                 </button>
 
                 <button
@@ -493,13 +557,18 @@ export default function LandingPage() {
                     setMobileMenuOpen(false);
                     handleQuickDemo("ANALYST");
                   }}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 hover:bg-amber-50/40 transition-colors"
+                  className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-left hover:border-amber-400 hover:bg-amber-50/40 transition-all group"
                 >
-                  <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                    BI • Analyst
-                  </span>
-                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Informatics / SHAP</p>
-                  <p className="text-[10px] text-slate-500 truncate">Telemetry Audit</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                      BI
+                    </span>
+                    <Brain className="h-3.5 w-3.5 text-amber-600" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors truncate">
+                    Alex Rivera
+                  </p>
+                  <p className="text-[10px] text-slate-500 truncate">Informatics / SHAP</p>
                 </button>
 
                 <button
@@ -508,13 +577,18 @@ export default function LandingPage() {
                     setMobileMenuOpen(false);
                     handleQuickDemo("ADMIN");
                   }}
-                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-purple-400 hover:bg-purple-50/40 transition-colors"
+                  className="p-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-left hover:border-purple-400 hover:bg-purple-50/40 transition-all group"
                 >
-                  <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
-                    IT • Admin
-                  </span>
-                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Governance</p>
-                  <p className="text-[10px] text-slate-500 truncate">Model Registry</p>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                      IT
+                    </span>
+                    <ShieldCheck className="h-3.5 w-3.5 text-purple-600" />
+                  </div>
+                  <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors truncate">
+                    Hospital Admin
+                  </p>
+                  <p className="text-[10px] text-slate-500 truncate">Governance & Audit</p>
                 </button>
               </div>
             </div>
