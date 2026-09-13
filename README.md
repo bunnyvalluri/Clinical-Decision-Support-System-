@@ -10,9 +10,7 @@
   <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-clinical--decision--support--system--2026.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
 </p>
 
-<p align="center">
-  <img src="frontend/public/logo.png" alt="PatientRisk CDSS Logo" width="64" height="64" style="border-radius: 20%;" />
-</p>
+
 
 <h3 align="center">Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning</h3>
 
