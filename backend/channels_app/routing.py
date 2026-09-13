@@ -23,4 +23,5 @@ websocket_urlpatterns = [
         consumers.PatientConsumer.as_asgi(),
     ),
     re_path(r"^ws/notifications/$", consumers.NotificationConsumer.as_asgi()),
+    re_path(r"^ws/user/$", consumers.UserConsumer.as_asgi()),
 ]

@@ -88,16 +88,16 @@ export default function RegisterPage() {
       {/* ------------------------------------------------------------------ */}
       {/* Left Column: Institutional Governance & RBAC Authority Panel */}
       {/* ------------------------------------------------------------------ */}
-      <div className="hidden lg:flex lg:col-span-5 xl:col-span-5 bg-slate-950 text-white relative flex-col justify-between p-10 xl:p-14 overflow-hidden border-r border-slate-800">
+      <div className="hidden lg:flex lg:col-span-5 xl:col-span-5 bg-slate-50/80 text-slate-900 relative flex-col justify-between p-10 xl:p-14 overflow-hidden border-r border-slate-200">
         {/* Ambient clinical lighting */}
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-teal-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none opacity-40" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
 
         {/* Top Branding */}
         <div className="relative z-10 space-y-4">
           <Link href="/" className="inline-flex items-center gap-3 group">
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-slate-700 bg-slate-900 p-0.5 group-hover:border-teal-400 transition-colors shadow-sm">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5 group-hover:border-teal-400 transition-colors shadow-xs">
               <Image
                 src="/logo.png"
                 alt="PatientRisk Logo"
@@ -109,21 +109,21 @@ export default function RegisterPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-teal-300 transition-colors">
+                <span className="text-lg font-extrabold tracking-tight text-slate-900 group-hover:text-teal-700 transition-colors">
                   PatientRisk
                 </span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-teal-950 text-teal-300 border border-teal-800/80">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
                   CDSS
                 </span>
               </div>
-              <span className="text-[10px] uppercase font-mono font-semibold text-slate-400 tracking-wider block">
+              <span className="text-[10px] uppercase font-mono font-semibold text-slate-500 tracking-wider block">
                 Clinical Decision Support • SaMD
               </span>
             </div>
           </Link>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/90 border border-slate-800 text-[11px] font-mono text-purple-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-[11px] font-mono text-purple-800 shadow-2xs">
+            <span className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-pulse" />
             <span>Role-Based Access Control (RBAC) • Audit Logged</span>
           </div>
         </div>
@@ -131,50 +131,50 @@ export default function RegisterPage() {
         {/* Middle Authority Presentation */}
         <div className="relative z-10 space-y-8 my-8">
           <div className="space-y-3">
-            <h1 className="text-2xl xl:text-3xl font-extrabold tracking-tight text-white leading-snug">
+            <h1 className="text-2xl xl:text-3xl font-extrabold tracking-tight text-slate-950 leading-snug">
               Institutional Clinical Staff <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 via-sky-300 to-purple-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-sky-700 to-purple-700">
                 Identity & Governance
               </span>
             </h1>
-            <p className="text-xs xl:text-sm text-slate-300 leading-relaxed max-w-md">
+            <p className="text-xs xl:text-sm text-slate-600 leading-relaxed max-w-md">
               Provision verified credentials with strict departmental segregation, tamper-evident audit logging, and clinician override authority.
             </p>
           </div>
 
           {/* Role Segregation Architecture */}
           <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
-              <div className="h-8 w-8 rounded-lg bg-teal-950 border border-teal-800 flex items-center justify-center text-teal-400 shrink-0 mt-0.5">
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <div className="h-8 w-8 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shrink-0 mt-0.5">
                 <HeartPulse className="h-4 w-4" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white">Physicians & Cardiologists (MD / DO)</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                <h4 className="text-xs font-bold text-slate-900">Physicians & Cardiologists (MD / DO)</h4>
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
                   Full patient EHR inspection, calibrated model execution, and documented clinical overrides.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
-              <div className="h-8 w-8 rounded-lg bg-sky-950 border border-sky-800 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <div className="h-8 w-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 shrink-0 mt-0.5">
                 <Activity className="h-4 w-4" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white">Emergency Triage Nurses (RN)</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                <h4 className="text-xs font-bold text-slate-900">Emergency Triage Nurses (RN)</h4>
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
                   Real-time vital sign capture, biological boundary checks, and sub-second bed deterioration alerts.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
-              <div className="h-8 w-8 rounded-lg bg-amber-950 border border-amber-800 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+              <div className="h-8 w-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0 mt-0.5">
                 <BarChart3 className="h-4 w-4" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white">Medical Informaticists & Analysts</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                <h4 className="text-xs font-bold text-slate-900">Medical Informaticists & Analysts</h4>
+                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
                   Global TreeSHAP explainability distributions, population drift evaluation, and calibration audits.
                 </p>
               </div>
@@ -182,19 +182,19 @@ export default function RegisterPage() {
           </div>
 
           {/* Compliance Callout Card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-900/90 border border-slate-800 space-y-2">
-            <div className="flex items-center gap-2 text-teal-400 text-xs font-bold">
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2">
+            <div className="flex items-center gap-2 text-teal-700 text-xs font-bold">
               <ShieldCheck className="h-4 w-4" />
               <span>Mandatory Clinician Audit Trails</span>
             </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">
+            <p className="text-[11px] text-slate-600 leading-relaxed">
               Under 45 CFR § 164.312, every model inspection, clinical override rationale, and report export is permanently bound to the practitioner&apos;s verified staff ID.
             </p>
           </div>
         </div>
 
         {/* Bottom Compliance Badges */}
-        <div className="relative z-10 pt-4 border-t border-slate-800/90 flex items-center justify-between text-[10px] font-mono text-slate-400">
+        <div className="relative z-10 pt-4 border-t border-slate-200 flex items-center justify-between text-[10px] font-mono text-slate-500">
           <div className="flex items-center gap-3">
             <span>HL7 FHIR v4.0.1</span>
             <span>•</span>
@@ -202,7 +202,7 @@ export default function RegisterPage() {
             <span>•</span>
             <span>SOC 2 Type II</span>
           </div>
-          <span className="text-purple-400 font-bold">RBAC ACTIVE</span>
+          <span className="text-purple-700 font-bold">RBAC ACTIVE</span>
         </div>
       </div>
 
@@ -395,10 +395,10 @@ export default function RegisterPage() {
                   type="submit"
                   variant="default"
                   isLoading={isLoading}
-                  className="w-full gap-2 text-xs sm:text-sm font-bold shadow-md bg-slate-950 hover:bg-slate-900 text-white border border-slate-800 mt-4 py-2.5 transition-all"
+                  className="w-full gap-2 text-xs sm:text-sm font-bold shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 mt-4 py-2.5 transition-all"
                 >
                   <span>Complete Staff Registration</span>
-                  <ArrowRight className="h-4 w-4 text-teal-400" />
+                  <ArrowRight className="h-4 w-4 text-white" />
                 </Button>
               </form>
             )}

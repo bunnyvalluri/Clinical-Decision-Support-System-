@@ -43,6 +43,12 @@ interface ClinicalStoreState {
   activityTimeline: ActivityTimelinePoint[];
   stats: DashboardStats;
   unreadAlertsCount: number;
+  llmEvaluations?: any[];
+  auditLogs?: any[];
+  dataQualityMetrics?: any[];
+  driftMonitors?: any[];
+  modelEvaluations?: any[];
+  mlModels?: any[];
 
   // Actions
   setPatients: (patients: Patient[]) => void;
@@ -144,6 +150,64 @@ export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
   activityTimeline: INITIAL_TIMELINE,
   stats: calculateStats(INITIAL_PATIENTS, INITIAL_PREDICTIONS, INITIAL_MODELS),
   unreadAlertsCount: INITIAL_NOTIFICATIONS.filter((n) => !n.read).length,
+  llmEvaluations: [
+    {
+      id: "llm-01",
+      evaluation_type: "Groundedness & Hallucination Check",
+      model_name: "Claude 3.5 Sonnet / Azure OpenAI",
+      evaluation_date: "2026-09-13T12:00:00Z",
+      overall_score: 0.982,
+    },
+    {
+      id: "llm-02",
+      evaluation_type: "Prompt Injection & Safety Boundary",
+      model_name: "Claude 3.5 Sonnet / Azure OpenAI",
+      evaluation_date: "2026-09-13T10:30:00Z",
+      overall_score: 1.0,
+    },
+  ],
+  auditLogs: [
+    {
+      id: "aud-01",
+      action: "PREDICTION_EVALUATED",
+      actor: "Dr. Elena Vance, MD",
+      timestamp: "2026-09-13T16:42:10Z",
+      status: "SUCCESS",
+    },
+  ],
+  dataQualityMetrics: [
+    {
+      id: "dq-01",
+      metric_name: "Vital Signs Completeness",
+      score: 0.994,
+      status: "PASSED",
+    },
+  ],
+  driftMonitors: [
+    {
+      id: "drift-01",
+      feature_name: "Systolic Blood Pressure (Resting)",
+      drift_score: 0.042,
+      detection_method: "Population Stability Index (PSI)",
+      drift_detected: false,
+    },
+    {
+      id: "drift-02",
+      feature_name: "ST Depression Distribution",
+      drift_score: 0.061,
+      detection_method: "Kolmogorov-Smirnov (KS)",
+      drift_detected: false,
+    },
+  ],
+  modelEvaluations: [
+    {
+      id: "eval-01",
+      model_name: "CardioEnsemble-RF v1.4.2",
+      metric: "AUROC",
+      value: 0.914,
+    },
+  ],
+  mlModels: INITIAL_MODELS,
 
   setPatients: (patients) =>
     set((state) => ({

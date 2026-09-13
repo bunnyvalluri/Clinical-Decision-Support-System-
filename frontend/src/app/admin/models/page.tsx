@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
-import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -158,8 +157,7 @@ export default function ModelManagementPage() {
   const activeModel = telemetry?.active_model || models.find((m) => m.status === "ACTIVE") || null;
 
   return (
-    <Shell>
-      <div className="space-y-6">
+    <div className="p-6 space-y-6 max-w-6xl mx-auto">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -477,6 +475,5 @@ export default function ModelManagementPage() {
           </Card>
         </div>
       </div>
-    </Shell>
   );
 }

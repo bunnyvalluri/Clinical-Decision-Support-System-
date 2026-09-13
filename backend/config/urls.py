@@ -25,6 +25,7 @@ urlpatterns = [
     path("api/v1/models/", include("apps.model_registry.urls", namespace="model_registry")),
     path("api/v1/audit/", include("apps.audit.urls", namespace="audit")),
     path("api/v1/ai/", include("apps.ai_orchestrator.urls", namespace="ai_orchestrator")),
+    path("api/v1/user/", include("apps.patient_portal.urls")),
 ]
 
 # Debug toolbar (development only)

@@ -75,6 +75,7 @@ LOCAL_APPS = [
     "apps.notifications.apps.NotificationsConfig",
     "apps.audit.apps.AuditConfig",
     "apps.ai_orchestrator.apps.AiOrchestratorConfig",
+    "apps.patient_portal.apps.PatientPortalConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

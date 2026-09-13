@@ -62,6 +62,11 @@ export interface PredictionRecord {
     rationale: string;
     timestamp: string;
   } | null;
+  age?: number;
+  gender?: string;
+  created_at?: string;
+  review_status?: "PENDING" | "REVIEWED" | "REQUIRES_INFO" | "OVERRIDDEN" | string;
+  feature_contributions?: Array<{ feature: string; attribution: number; description?: string }>;
 }
 
 export interface ClinicalNotification {

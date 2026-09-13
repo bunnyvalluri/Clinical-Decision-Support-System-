@@ -29,6 +29,7 @@ import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import { MobileFloatingNavigation } from "@/components/navigation/MobileFloatingNavigation";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -447,10 +448,13 @@ export function Shell({ children }: ShellProps) {
           </div>
         </header>
 
-        {/* Page Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        {/* Page Main Content Area (with safe bottom padding on mobile) */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-[calc(5.75rem+env(safe-area-inset-bottom,0px))] md:pb-8">
           {children}
         </main>
+
+        {/* Floating Mobile Bottom Navigation */}
+        <MobileFloatingNavigation role={user?.role} />
       </div>
     </div>
   );

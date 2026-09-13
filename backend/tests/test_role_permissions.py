@@ -96,12 +96,12 @@ def sample_patient(db, doctor_user):
 @pytest.fixture
 def sample_model_version(db):
     return ModelVersion.objects.create(
-        name="RandomForestClassifier",
+        model_name="RandomForestClassifier",
         version="v1.0.0",
         algorithm="RandomForestClassifier",
         status="ACTIVE",
+        artifact_location="models/rf_v1.joblib",
         metrics={"brier": 0.0027, "accuracy": 0.985},
-        feature_names=["age", "systolic_bp", "st_depression"],
     )
 
 

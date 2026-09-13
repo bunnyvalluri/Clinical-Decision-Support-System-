@@ -1,0 +1,55 @@
+"use client";
+
+import * as React from "react";
+import {
+  BarChart3,
+  Bell,
+  Brain,
+  ClipboardCheck,
+  Database,
+  FileText,
+  LayoutDashboard,
+  Settings,
+  Sparkles,
+  TrendingDown,
+  User,
+} from "lucide-react";
+import { RoleGuard } from "@/components/layout/RoleGuard";
+import { ResponsiveAppShell, NavItem } from "@/components/responsive/ResponsiveAppShell";
+
+const INFORMATICIST_NAV_ITEMS: NavItem[] = [
+  { href: "/informaticist/dashboard", icon: LayoutDashboard, label: "Dashboard", mobileQuick: true },
+  { href: "/informaticist/models", icon: Brain, label: "Models & Registry", mobileQuick: true },
+  { href: "/informaticist/drift", icon: TrendingDown, label: "Drift Monitor", mobileQuick: true },
+  { href: "/informaticist/analytics", icon: BarChart3, label: "Analytics", mobileQuick: true },
+  { href: "/informaticist/data-quality", icon: Database, label: "Data Quality" },
+  { href: "/informaticist/ai-evaluation", icon: Sparkles, label: "AI Evaluation" },
+  { href: "/informaticist/reports", icon: FileText, label: "Reports" },
+  { href: "/informaticist/audit", icon: ClipboardCheck, label: "Audit Ledger" },
+  { href: "/informaticist/notifications", icon: Bell, label: "Notifications" },
+];
+
+const INFORMATICIST_BOTTOM_ITEMS: NavItem[] = [
+  { href: "/informaticist/profile", icon: User, label: "Profile" },
+  { href: "/informaticist/settings", icon: Settings, label: "Settings" },
+];
+
+export default function InformaticistLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <RoleGuard requiredRoles={["ANALYST"]}>
+      <ResponsiveAppShell
+        role="ANALYST"
+        workspaceName="Medical Informatics"
+        workspaceSubtitle="MLOps & SHAP Telemetry"
+        accentColor="amber"
+        brandIcon={Brain}
+        navItems={INFORMATICIST_NAV_ITEMS}
+        bottomItems={INFORMATICIST_BOTTOM_ITEMS}
+        wsConnected={true}
+        wsStatusText="Telemetry Stream"
+      >
+        {children}
+      </ResponsiveAppShell>
+    </RoleGuard>
+  );
+}

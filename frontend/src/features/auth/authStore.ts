@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { tokenStorage } from "@/services/apiClient";
 
-export type RoleType = "DOCTOR" | "NURSE" | "MEDICAL_INFORMATICIST" | "IT_ADMIN" | "ADMIN" | "ANALYST";
+export type RoleType = "DOCTOR" | "NURSE" | "MEDICAL_INFORMATICIST" | "IT_ADMIN" | "ADMIN" | "ANALYST" | "PATIENT";
 
 export interface UserProfile {
   id: string;
@@ -26,6 +26,24 @@ interface AuthState {
   logout: () => void;
   loginAsRole: (role: RoleType) => void;
   initFromStorage: () => void;
+}
+
+export function getRoleHomeRoute(role?: RoleType): string {
+  switch (role) {
+    case "PATIENT":
+      return "/user/dashboard";
+    case "NURSE":
+      return "/nurse/dashboard";
+    case "MEDICAL_INFORMATICIST":
+    case "ANALYST":
+      return "/informaticist/dashboard";
+    case "IT_ADMIN":
+    case "ADMIN":
+      return "/admin/dashboard";
+    case "DOCTOR":
+    default:
+      return "/doctor/dashboard";
+  }
 }
 
 const DEMO_PROFILES: Record<RoleType, UserProfile> = {
@@ -83,6 +101,15 @@ const DEMO_PROFILES: Record<RoleType, UserProfile> = {
     department: "IT Systems & Cybersecurity",
     license_number: "CISSP-98210",
   },
+  PATIENT: {
+    id: "u-patient-005",
+    email: "eleanor.ward@patient.hospital.org",
+    username: "eward",
+    full_name: "Eleanor Ward",
+    role: "PATIENT",
+    department: "Cardiology Patient Portal",
+    license_number: "MRN-90241",
+  },
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -96,6 +123,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     tokenStorage.setTokens(tokens);
     if (typeof window !== "undefined") {
       localStorage.setItem("clinical_ai_user", JSON.stringify(user));
+      // Persist role cookie so Edge middleware can enforce route guards
+      document.cookie = `clinical_role=${user.role}; path=/; samesite=strict`;
     }
     set({
       user,
@@ -110,6 +139,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     tokenStorage.clear();
     if (typeof window !== "undefined") {
       localStorage.removeItem("clinical_ai_user");
+      // Clear role cookie
+      document.cookie = "clinical_role=; path=/; max-age=0";
     }
     set({
       user: null,
@@ -129,6 +160,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     tokenStorage.setTokens(mockTokens);
     if (typeof window !== "undefined") {
       localStorage.setItem("clinical_ai_user", JSON.stringify(profile));
+      // Persist role cookie so Edge middleware can enforce route guards
+      document.cookie = `clinical_role=${profile.role}; path=/; samesite=strict`;
     }
     set({
       user: profile,

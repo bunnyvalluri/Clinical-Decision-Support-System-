@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { Shell } from "@/components/layout/Shell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -108,8 +107,7 @@ export default function AuditLogsPage() {
   });
 
   return (
-    <Shell>
-      <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="p-6 space-y-6 max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -203,6 +201,5 @@ export default function AuditLogsPage() {
           </CardContent>
         </Card>
       </div>
-    </Shell>
   );
 }

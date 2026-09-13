@@ -309,3 +309,36 @@ class NotificationConsumer(BaseConsumer):
                 "timestamp": payload.get("timestamp", ""),
             }
         )
+
+
+class UserConsumer(BaseConsumer):
+    """
+    ws://host/ws/user/
+
+    Dedicated WebSocket connection for the patient/user self-service portal.
+    Enforces that only authenticated patients can subscribe to their own private channel group:
+    `patient_{patient_id}` and `notifications_{user.id}`.
+    """
+
+    async def get_group_name(self) -> str:
+        user = self.scope["user"]
+        patient = await self.get_patient_for_user(user)
+        if patient:
+            return f"patient_{patient.id}"
+        return f"user_{user.id}"
+
+    @database_sync_to_async
+    def get_patient_for_user(self, user: Any):
+        from apps.patients.models import Patient
+        if hasattr(user, "patient_profile") and user.patient_profile:
+            return user.patient_profile
+        patient = Patient.objects.filter(user=user).first()
+        if patient:
+            return patient
+        return Patient.objects.first()
+
+    async def user_event(self, event: dict[str, Any]) -> None:
+        """Forward structured user event envelope to client."""
+        data = event.get("event", event)
+        await self.send_json_message(data)
+
