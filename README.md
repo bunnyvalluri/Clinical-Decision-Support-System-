@@ -1,21 +1,28 @@
 # PatientRisk CDSS — Intelligent Clinical Decision Support System
 
 <p align="center">
-  <img src="frontend/public/logo.png" alt="PatientRisk CDSS Logo" width="120" height="120" style="border-radius: 20%;" />
+  <a href="https://clinical-decision-support-system-2026.vercel.app">
+    <img src="frontend/public/landing-hero.png" alt="PatientRisk CDSS — Real-Time Clinical Decision Support System" width="100%" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-clinical--decision--support--system--2026.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+</p>
+
+<p align="center">
+  <img src="frontend/public/logo.png" alt="PatientRisk CDSS Logo" width="64" height="64" style="border-radius: 20%;" />
 </p>
 
 <h3 align="center">Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning</h3>
 
 <p align="center">
   <em>Predict • Prevent • Support</em>
-</p>
-
-<p align="center">
+  &nbsp;|&nbsp;
   <strong>Project Code: BPY-CSE-2666</strong>
 </p>
 
 <p align="center">
-  <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=flat-square&logo=vercel&logoColor=white" alt="Live Demo" /></a>
   <a href="https://github.com/bunnyvalluri/Clinical-Decision-Support-System-/actions"><img src="https://img.shields.io/badge/CI-Passing-success?style=flat-square&logo=githubactions" alt="CI Status" /></a>
   <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.12" /></a>
   <a href="https://djangoproject.com"><img src="https://img.shields.io/badge/Django-5.0.14-092E20?style=flat-square&logo=django&logoColor=white" alt="Django 5.0" /></a>
@@ -26,67 +33,8 @@
   <a href="https://redis.io"><img src="https://img.shields.io/badge/Redis-7%20Alpine-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis 7" /></a>
   <a href="https://docs.celeryq.dev"><img src="https://img.shields.io/badge/Celery-5.4-37814A?style=flat-square&logo=celery&logoColor=white" alt="Celery 5.4" /></a>
   <a href="https://docker.com"><img src="https://img.shields.io/badge/Docker-Compose%20v2-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker Ready" /></a>
-  <a href="https://github.com/psf/black"><img src="https://img.shields.io/badge/Code%20Style-Black-000000?style=flat-square" alt="Code Style: Black" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License: MIT" /></a>
 </p>
-
----
-
-> [!IMPORTANT]
-> **LEGAL & CLINICAL PRACTICE NOTICE (SaMD / CDSS Disclaimer)**  
-> The PatientRisk Clinical Decision Support System is an **assistive diagnostic aid**, engineered exclusively to augment the clinical judgment of qualified medical professionals. Predictions, probabilistic risk categories, and feature attributions are **NOT medical diagnoses** and must **NEVER substitute for licensed clinical evaluations**, physical diagnostic examinations, specialized laboratory panels, or physician consultation.  
-> 
-> Licensed healthcare providers retain full diagnostic authority and must independently validate all inferences and algorithmic recommendations before initiating, changing, or withholding patient clinical interventions.
-
----
-
-## 📋 Table of Contents
-
-- [Screenshots & Live Preview](#️-screenshots--live-preview)
-- [Executive Summary](#-executive-summary)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Clinical Workflow](#-clinical-workflow)
-- [Technology Stack](#-technology-stack)
-- [Machine Learning & Explainable AI (XAI)](#-machine-learning--explainable-ai-xai)
-- [Repository Structure](#-repository-structure)
-- [Quick Start Guide](#-quick-start-guide)
-  - [Prerequisites](#prerequisites)
-  - [Docker Compose Deployment (Recommended)](#1-docker-compose-deployment-recommended)
-  - [Manual Local Development Setup](#2-manual-local-development-setup)
-  - [Database Migrations & Demo Seeding](#3-database-migrations--demo-seeding)
-  - [Machine Learning Model Training](#4-machine-learning-model-training)
-- [API Reference & Protocols](#-api-reference--protocols)
-  - [Response Envelopes](#standard-response-envelopes)
-  - [Core REST Endpoints](#core-rest-api-endpoints)
-  - [Real-Time WebSocket Streams](#real-time-websocket-streams)
-- [Security, Privacy & HIPAA Posture](#-security-privacy--hipaa-posture)
-- [Testing & Quality Assurance](#-testing--quality-assurance)
-- [Environment Configuration](#-environment-configuration)
-- [Documentation Index](#-documentation-index)
-- [Contributing & Attribution](#-contributing--attribution)
-
----
-
-## 🖼️ Screenshots & Live Preview
-
-<p align="center">
-  <a href="https://clinical-decision-support-system-2026.vercel.app">
-    <img src="frontend/public/landing-hero.png" alt="PatientRisk CDSS — Landing Page Hero" width="100%" style="border-radius: 12px; border: 1px solid #e5e7eb;" />
-  </a>
-</p>
-
-<p align="center">
-  <em>Live at <a href="https://clinical-decision-support-system-2026.vercel.app"><strong>clinical-decision-support-system-2026.vercel.app</strong></a></em>
-</p>
-
-<details>
-<summary>📸 Full Page Preview (click to expand)</summary>
-<br/>
-<p align="center">
-  <img src="frontend/public/landing-full.png" alt="PatientRisk CDSS — Full Landing Page" width="80%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
-</p>
-</details>
 
 ---
 
