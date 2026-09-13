@@ -1,7 +1,8 @@
 /**
  * Application Constants
  */
-export const APP_NAME = "Clinical Decision Support System";
+export const APP_NAME = "PatientRisk CDSS";
+export const APP_TAGLINE = "Predict • Prevent • Support";
 export const APP_VERSION = "1.0.0";
 
 export const API_ROUTES = {

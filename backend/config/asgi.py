@@ -17,14 +17,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
 # before importing from channels_app.
 django_asgi_app = get_asgi_application()
 
-# Import WS URL patterns AFTER Django setup
+from channels_app.middleware import JWTAuthMiddlewareStack  # noqa: E402
 from channels_app.routing import websocket_urlpatterns  # noqa: E402
 
 application = ProtocolTypeRouter(
     {
         "http": django_asgi_app,
         "websocket": AllowedHostsOriginValidator(
-            AuthMiddlewareStack(
+            JWTAuthMiddlewareStack(
                 URLRouter(websocket_urlpatterns)
             )
         ),

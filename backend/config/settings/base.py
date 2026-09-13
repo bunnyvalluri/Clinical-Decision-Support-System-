@@ -207,8 +207,23 @@ CHANNEL_LAYERS = {
 # ---------------------------------------------------------------------------
 # Celery
 # ---------------------------------------------------------------------------
-CELERY_BROKER_URL: str = config("CELERY_BROKER_URL", default=REDIS_URL)
-CELERY_RESULT_BACKEND: str = config("CELERY_RESULT_BACKEND", default=REDIS_URL)
+import ssl
+
+_raw_broker_url: str = config("CELERY_BROKER_URL", default=REDIS_URL)
+_raw_result_backend: str = config("CELERY_RESULT_BACKEND", default=REDIS_URL)
+
+if _raw_broker_url.startswith("rediss://") and "ssl_cert_reqs" not in _raw_broker_url:
+    _sep = "&" if "?" in _raw_broker_url else "?"
+    _raw_broker_url = f"{_raw_broker_url}{_sep}ssl_cert_reqs=CERT_NONE"
+    CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+
+if _raw_result_backend.startswith("rediss://") and "ssl_cert_reqs" not in _raw_result_backend:
+    _sep = "&" if "?" in _raw_result_backend else "?"
+    _raw_result_backend = f"{_raw_result_backend}{_sep}ssl_cert_reqs=CERT_NONE"
+    CELERY_REDIS_BACKEND_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE}
+
+CELERY_BROKER_URL: str = _raw_broker_url
+CELERY_RESULT_BACKEND: str = _raw_result_backend
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -218,6 +233,29 @@ CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes hard limit
 CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60  # 25 minutes soft limit
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 CELERY_RESULT_EXTENDED = True
+
+# Task Routing & Dedicated Queues
+CELERY_TASK_DEFAULT_QUEUE = "default"
+CELERY_TASK_QUEUES = {
+    "default": {"exchange": "default", "routing_key": "default"},
+    "reports": {"exchange": "reports", "routing_key": "reports"},
+    "notifications": {"exchange": "notifications", "routing_key": "notifications"},
+    "ml": {"exchange": "ml", "routing_key": "ml"},
+}
+CELERY_TASK_ROUTES = {
+    "apps.reports.tasks.*": {"queue": "reports"},
+    "celery_tasks.report_tasks.*": {"queue": "reports"},
+    "apps.notifications.tasks.*": {"queue": "notifications"},
+    "celery_tasks.notification_tasks.*": {"queue": "notifications"},
+    "apps.predictions.tasks.*": {"queue": "ml"},
+    "celery_tasks.ml_tasks.*": {"queue": "ml"},
+    "celery_tasks.scheduled_tasks.*": {"queue": "default"},
+}
+
+# Worker concurrency & reliability
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
 
 # ---------------------------------------------------------------------------
 # Django REST Framework

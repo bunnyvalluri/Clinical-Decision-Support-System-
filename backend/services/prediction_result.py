@@ -20,6 +20,14 @@ class ExplanationResult:
     feature_importances: dict[str, float]
     top_risk_factors: list[dict[str, Any]]
     baseline_value: float | None = None
+    features: list[dict[str, Any]] = field(default_factory=list)
+    explanation_type: str = "MODEL_EXPLANATION"
+    disclaimer: str = (
+        "This is a MODEL EXPLANATION, not a medical diagnosis. "
+        "Feature contributions represent statistical associations learned by the model "
+        "and do NOT prove medical causation. "
+        "Clinical decisions must be made by qualified healthcare professionals."
+    )
 
 
 @dataclass(frozen=True)

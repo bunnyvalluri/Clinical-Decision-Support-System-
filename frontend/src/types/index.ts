@@ -120,31 +120,86 @@ export interface ModelMetrics {
 }
 
 // ---------------------------------------------------------------------------
-// WebSocket event types
+// WebSocket event types & schemas
 // ---------------------------------------------------------------------------
 export type WSEventType =
   | "dashboard_update"
+  | "dashboard_stats_updated"
+  | "prediction_created"
   | "risk_alert"
   | "patient_update"
-  | "notification";
+  | "notification"
+  | "pong"
+  | "task_status_updated"
+  | "PREDICTION_CREATED"
+  | "RISK_ALERT"
+  | "DASHBOARD_STATS_UPDATED"
+  | "NOTIFICATION"
+  | "PONG"
+  | "TASK_STATUS_UPDATED";
 
 export interface WSEvent<T = unknown> {
+  event?: string;
   type: WSEventType;
-  payload: T;
+  payload?: T;
+  [key: string]: unknown;
+}
+
+export interface PredictionCreatedPayload {
+  prediction_id: UUID;
+  patient_id: UUID;
+  risk_level: RiskLevel;
+  probability: number;
+  model_name: string;
+  model_version: string;
+  timestamp: ISODateString;
 }
 
 export interface RiskAlertPayload {
   prediction_id: UUID;
   patient_id: UUID;
-  patient_name: string;
   risk_level: RiskLevel;
-  confidence: number;
+  probability: number;
+  message?: string;
+  patient_mrn?: string;
   timestamp: ISODateString;
 }
 
-export interface DashboardUpdatePayload {
+export interface DashboardStatsPayload {
   total_patients: number;
+  high_risk_cases: number;
+  critical_risk_cases: number;
   predictions_today: number;
-  critical_alerts: number;
-  risk_distribution: Record<RiskLevel, number>;
+  avg_latency_ms: number;
+  active_model: string;
 }
+
+export interface DashboardUpdatePayload {
+  total_patients?: number;
+  predictions_today?: number;
+  critical_alerts?: number;
+  risk_distribution?: Record<RiskLevel, number>;
+  stats?: DashboardStatsPayload;
+}
+
+export interface NotificationPayload {
+  notification_id: UUID;
+  title: string;
+  severity: string;
+  message: string;
+  action_url?: string;
+  timestamp: ISODateString;
+}
+
+export type TaskState = "QUEUED" | "PROCESSING" | "COMPLETED" | "FAILED" | "RETRYING";
+
+export interface TaskStatusPayload {
+  task_id: string;
+  task_name: string;
+  status: TaskState;
+  progress: number;
+  result?: Record<string, unknown> | null;
+  error?: string | null;
+  timestamp?: ISODateString;
+}
+

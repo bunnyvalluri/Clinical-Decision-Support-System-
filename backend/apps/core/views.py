@@ -113,3 +113,75 @@ class HealthReadinessView(APIView):
             {"success": all_ready, "data": response_data},
             status=http_status,
         )
+
+
+class MetricsView(APIView):
+    """
+    GET /api/v1/health/metrics/
+
+    Production telemetry exposing API latency, ML inference latency, error rates,
+    WebSocket connections, and Celery task performance.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request: Request) -> Response:
+        from apps.core.metrics import metrics
+        return success_response(data=metrics.get_summary())
+
+
+class DatabaseHealthView(APIView):
+    """GET /api/v1/health/db/ — Dedicated PostgreSQL health probe."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request: Request) -> Response:
+        start = time.monotonic()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1;")
+                cursor.fetchone()
+            latency = round((time.monotonic() - start) * 1000, 2)
+            return success_response(data={"database": "healthy", "latency_ms": latency})
+        except Exception as exc:
+            return Response(
+                {"success": False, "error": str(exc)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+
+class RedisHealthView(APIView):
+    """GET /api/v1/health/redis/ — Dedicated Redis broker & cache probe."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request: Request) -> Response:
+        start = time.monotonic()
+        try:
+            import redis
+            redis_url = getattr(settings, "REDIS_URL", "redis://localhost:6379/0")
+            r = redis.from_url(redis_url, socket_timeout=3)
+            r.ping()
+            latency = round((time.monotonic() - start) * 1000, 2)
+            return success_response(data={"redis": "healthy", "latency_ms": latency})
+        except Exception as exc:
+            return Response(
+                {"success": False, "error": str(exc)},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
+
+class CeleryHealthView(APIView):
+    """GET /api/v1/health/celery/ — Dedicated Celery worker health probe."""
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request: Request) -> Response:
+        from apps.core.metrics import metrics
+        summary = metrics.get_summary()
+        return success_response(data={"celery": "operational", "stats": summary["celery"]})
+

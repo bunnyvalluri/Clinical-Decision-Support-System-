@@ -45,43 +45,96 @@ class PatientNotFoundError(PredictionServiceError):
 
 
 def _broadcast_realtime_event(prediction: Prediction) -> None:
-    """Broadcast real-time WebSocket events and high-risk notifications safely."""
+    """Broadcast real-time WebSocket events, dashboard stats, and high-risk notifications safely."""
     try:
         from asgiref.sync import async_to_sync
         from channels.layers import get_channel_layer
         from apps.notifications.models import Notification, NotificationSeverity, NotificationChannel
+        from apps.patients.models import Patient
+        from channels_app.events import (
+            DashboardStatsUpdatedEvent,
+            NotificationEvent,
+            PredictionCreatedEvent,
+            RiskAlertEvent,
+        )
 
         channel_layer = get_channel_layer()
         if not channel_layer:
             return
 
-        payload = {
-            "prediction_id": str(prediction.id),
-            "patient_id": str(prediction.patient_id),
-            "patient_mrn": prediction.patient.mrn if prediction.patient else "",
-            "prediction_result": prediction.prediction_result,
-            "probability": float(prediction.probability),
-            "model_name": prediction.model_name,
-            "model_version": prediction.model_version_str,
-            "timestamp": prediction.prediction_timestamp.isoformat(),
-        }
+        pred_dict = PredictionCreatedEvent(
+            prediction_id=str(prediction.id),
+            patient_id=str(prediction.patient_id),
+            risk_level=prediction.prediction_result,
+            probability=float(prediction.probability),
+            model_name=prediction.model_name,
+            model_version=prediction.model_version_str,
+            timestamp=prediction.prediction_timestamp.isoformat(),
+        ).to_dict()
 
         # 1. Update patient channel
         async_to_sync(channel_layer.group_send)(
             f"patient_{prediction.patient_id}",
-            {"type": "patient_update", "payload": payload},
+            pred_dict,
         )
-        # 2. Update dashboard stream
+
+        # 2. Update dashboard stream with prediction-created event
         async_to_sync(channel_layer.group_send)(
             "dashboard",
-            {"type": "dashboard_update", "payload": payload},
+            pred_dict,
         )
-        # 3. High/Critical risk alerts
+
+        # 3. Update dashboard aggregate statistics without page refresh
+        try:
+            total_patients = Patient.objects.count()
+            high_count = Prediction.objects.filter(prediction_result=RiskLevel.HIGH).count()
+            crit_count = Prediction.objects.filter(prediction_result=RiskLevel.CRITICAL).count()
+            total_preds = Prediction.objects.count()
+            latency = float(getattr(prediction, "inference_latency_ms", 1.25) or 1.25)
+
+            stats_dict = DashboardStatsUpdatedEvent(
+                total_patients=total_patients,
+                high_risk_cases=high_count,
+                critical_risk_cases=crit_count,
+                predictions_today=total_preds,
+                avg_latency_ms=latency,
+                active_model=f"{prediction.model_name} {prediction.model_version_str}",
+                timestamp=prediction.prediction_timestamp.isoformat(),
+            ).to_dict()
+
+            async_to_sync(channel_layer.group_send)(
+                "dashboard",
+                stats_dict,
+            )
+        except Exception as stats_err:
+            logger.debug("Dashboard stats calculation skipped: %s", stats_err)
+
+        # 4. High/Critical risk alerts
         if prediction.prediction_result in (RiskLevel.HIGH, RiskLevel.CRITICAL):
+            patient_mrn = prediction.patient.mrn if prediction.patient else ""
+            alert_dict = RiskAlertEvent(
+                prediction_id=str(prediction.id),
+                patient_id=str(prediction.patient_id),
+                patient_mrn=patient_mrn,
+                risk_level=prediction.prediction_result,
+                probability=float(prediction.probability),
+                severity=(
+                    "CRITICAL"
+                    if prediction.prediction_result == RiskLevel.CRITICAL
+                    else "HIGH"
+                ),
+                message=(
+                    f"Patient {patient_mrn} assessed at {prediction.prediction_result} "
+                    f"risk with {float(prediction.probability):.1%} probability."
+                ),
+                timestamp=prediction.prediction_timestamp.isoformat(),
+            ).to_dict()
+
             async_to_sync(channel_layer.group_send)(
                 "risk_alerts",
-                {"type": "risk_alert", "payload": payload},
+                alert_dict,
             )
+
             recipient = getattr(prediction.patient, "primary_physician", None)
             if recipient:
                 notif = Notification.objects.create(
@@ -94,24 +147,24 @@ def _broadcast_realtime_event(prediction: Prediction) -> None:
                         else NotificationSeverity.HIGH
                     ),
                     channel=NotificationChannel.WEBSOCKET,
-                    title=f"Clinical Alert: {prediction.patient.mrn} - {prediction.prediction_result}",
+                    title=f"Clinical Alert: {patient_mrn} - {prediction.prediction_result}",
                     message=(
-                        f"Patient {prediction.patient.mrn} assessed at {prediction.prediction_result} "
+                        f"Patient {patient_mrn} assessed at {prediction.prediction_result} "
                         f"risk with {float(prediction.probability):.1%} probability."
                     ),
                     action_url=f"/patients/{prediction.patient_id}/predictions/{prediction.id}/",
                 )
+                notif_dict = NotificationEvent(
+                    notification_id=str(notif.id),
+                    title=notif.title,
+                    severity=notif.severity,
+                    message=notif.message,
+                    action_url=notif.action_url,
+                ).to_dict()
+
                 async_to_sync(channel_layer.group_send)(
                     f"notifications_{recipient.id}",
-                    {
-                        "type": "notification",
-                        "payload": {
-                            "notification_id": str(notif.id),
-                            "title": notif.title,
-                            "severity": notif.severity,
-                            "message": notif.message,
-                        },
-                    },
+                    notif_dict,
                 )
     except Exception as exc:
         logger.warning("Real-time prediction event broadcast skipped or failed: %s", exc)

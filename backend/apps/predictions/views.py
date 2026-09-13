@@ -17,6 +17,7 @@ from apps.predictions.models import Prediction
 from apps.predictions.serializers import (
     BatchPredictionRequestSerializer,
     ClinicalOverrideSerializer,
+    PredictionExplanationDetailSerializer,
     PredictionListSerializer,
     PredictionRequestSerializer,
     PredictionSerializer,
@@ -182,6 +183,49 @@ class PredictionViewSet(viewsets.ModelViewSet):
         )
 
     @action(
+        detail=False,
+        methods=["post"],
+        url_path="batch-async",
+        permission_classes=[permissions.IsAuthenticated, IsAdminOrClinician],
+    )
+    def batch_async(self, request: Request) -> Response:
+        """
+        Asynchronously process large batches of patient records using Celery.
+        Returns 202 Accepted immediately with task_id.
+        """
+        serializer = BatchPredictionRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        from apps.predictions.tasks import process_bulk_predictions_task
+        from config.celery import broadcast_task_status
+
+        task = process_bulk_predictions_task.delay(
+            records=data["records"],
+            model_name=data.get("model_name"),
+            requested_by_id=str(request.user.id),
+        )
+
+        broadcast_task_status(
+            task_id=task.id,
+            task_name="bulk_prediction_processing",
+            status="QUEUED",
+            progress=0,
+            result={"total_records": len(data["records"])},
+            recipient_user_id=str(request.user.id),
+        )
+
+        return Response(
+            {
+                "task_id": task.id,
+                "status": "QUEUED",
+                "total_records": len(data["records"]),
+                "message": "Bulk prediction job enqueued successfully.",
+            },
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+    @action(
         detail=True,
         methods=["post"],
         url_path="override",
@@ -204,3 +248,56 @@ class PredictionViewSet(viewsets.ModelViewSet):
         )
 
         return Response(PredictionSerializer(updated_prediction).data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="explanation",
+        permission_classes=[permissions.IsAuthenticated, HasPredictionAccess],
+    )
+    def explanation(self, request: Request, pk=None) -> Response:
+        """
+        Retrieve the explainable ML attribution for a specific prediction.
+
+        Returns a MODEL EXPLANATION (not a medical diagnosis) with:
+        - Per-feature contributions (signed SHAP values where available)
+        - Direction of contribution (INCREASES_RISK / DECREASES_RISK)
+        - Relative importance (normalized percentage)
+        - Medical non-causation disclaimer
+        """
+        from services.explanation_service import ExplanationService
+
+        # Fetch the prediction with RBAC enforcement via get_queryset
+        try:
+            prediction = self.get_queryset().select_related("explanation").get(id=pk)
+        except Exception:
+            return Response(
+                {
+                    "success": False,
+                    "error": {
+                        "code": "prediction_not_found",
+                        "message": "Prediction not found or access denied.",
+                    },
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        explanation_svc = ExplanationService()
+        result = explanation_svc.format_explanation_response(
+            prediction=prediction,
+            explanation=getattr(prediction, "explanation", None),
+        ) if hasattr(prediction, "explanation") and prediction.explanation else None
+
+        if result is None:
+            return Response(
+                {
+                    "success": False,
+                    "error": {
+                        "code": "explanation_not_available",
+                        "message": "No explanation is available for this prediction.",
+                    },
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return Response(result, status=status.HTTP_200_OK)

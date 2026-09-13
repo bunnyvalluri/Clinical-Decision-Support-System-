@@ -14,6 +14,7 @@ from channels.layers import get_channel_layer
 
 from apps.notifications.models import Notification, NotificationSeverity, NotificationChannel
 from apps.predictions.models import Prediction, RiskLevel
+from config.celery import BaseCDSSAsyncJob
 from services.prediction_service import PredictionService
 
 logger = logging.getLogger(__name__)
@@ -97,6 +98,7 @@ def _broadcast_prediction_events(prediction: Prediction) -> None:
 
 @shared_task(
     bind=True,
+    base=BaseCDSSAsyncJob,
     name="celery_tasks.ml_tasks.run_prediction",
     max_retries=3,
     default_retry_delay=5,
@@ -151,9 +153,12 @@ def run_prediction(
 
 @shared_task(
     bind=True,
+    base=BaseCDSSAsyncJob,
     name="celery_tasks.ml_tasks.train_model",
     max_retries=1,
     default_retry_delay=60,
+    time_limit=2400,
+    soft_time_limit=1800,
 )
 def train_model(
     self,

@@ -33,6 +33,9 @@ class AuditLogMiddleware:
         # Only log API requests
         if request.path.startswith("/api/"):
             user = getattr(request, "user", None)
+            from apps.core.metrics import metrics
+            metrics.record_request(elapsed_ms, response.status_code)
+
             logger.info(
                 "API %s %s -> %d [%dms] user=%s ip=%s",
                 request.method,

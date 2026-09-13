@@ -1,20 +1,10 @@
-"""Report generation Celery tasks — implemented in Stage 7."""
-import logging
+"""
+Report generation Celery tasks package interface.
+Re-exports tasks from apps.reports.tasks for modular discovery.
+"""
+from apps.reports.tasks import generate_pdf_report_task
 
-from celery import shared_task
+# Backward compatible alias
+generate_patient_report = generate_pdf_report_task
 
-logger = logging.getLogger(__name__)
-
-
-@shared_task(
-    name="celery_tasks.report_tasks.generate_patient_report",
-    bind=True,
-    max_retries=2,
-)
-def generate_patient_report(self, report_id: str) -> dict:
-    """
-    Generate a PDF/CSV patient report asynchronously.
-    Implementation: Stage 7.
-    """
-    logger.info("generate_patient_report triggered for report_id=%s", report_id)
-    return {"status": "pending", "report_id": report_id}
+__all__ = ("generate_pdf_report_task", "generate_patient_report")

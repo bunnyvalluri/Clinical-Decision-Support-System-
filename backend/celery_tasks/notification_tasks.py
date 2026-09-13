@@ -1,21 +1,16 @@
-"""Notification dispatch Celery tasks — implemented in Stage 7."""
-import logging
+"""
+Notification dispatch Celery tasks package interface.
+Re-exports tasks from apps.notifications.tasks for modular discovery.
+"""
+from apps.notifications.tasks import send_email_notification_task, send_notification_task
 
-from celery import shared_task
+# Backward compatible aliases
+send_risk_alert_notification = send_notification_task
+send_email_notification = send_email_notification_task
 
-logger = logging.getLogger(__name__)
-
-
-@shared_task(name="celery_tasks.notification_tasks.send_risk_alert_notification")
-def send_risk_alert_notification(prediction_id: str) -> None:
-    """
-    Dispatch a risk alert notification for a completed high-risk prediction.
-    Implementation: Stage 7.
-    """
-    logger.info("send_risk_alert_notification triggered for prediction_id=%s", prediction_id)
-
-
-@shared_task(name="celery_tasks.notification_tasks.send_email_notification")
-def send_email_notification(user_id: str, subject: str, message: str) -> None:
-    """Send an email notification to a user. Implementation: Stage 7."""
-    logger.info("send_email_notification triggered for user_id=%s", user_id)
+__all__ = (
+    "send_notification_task",
+    "send_email_notification_task",
+    "send_risk_alert_notification",
+    "send_email_notification",
+)

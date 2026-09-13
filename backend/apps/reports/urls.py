@@ -1,6 +1,13 @@
-"""Reports URL stubs — implemented in Stage 7."""
-from django.urls import path
+"""
+Reports routing configuration.
+"""
+from rest_framework.routers import DefaultRouter
+
+from apps.reports.views import ReportViewSet
 
 app_name = "reports"
 
-urlpatterns: list = []
+router = DefaultRouter()
+router.register(r"", ReportViewSet, basename="report")
+
+urlpatterns = router.urls

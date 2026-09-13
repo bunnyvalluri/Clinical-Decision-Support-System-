@@ -11,7 +11,6 @@ import numpy as np
 import pandas as pd
 
 from apps.predictions.models import RiskLevel
-from ml.explainability.explainer import explain_prediction
 from services.feature_preprocessor import FeaturePreprocessor
 from services.model_provider import IModelProvider, RegistryModelProvider
 from services.prediction_result import ExplanationResult, PredictionResult
@@ -76,19 +75,28 @@ class RiskPredictionEngine:
 
         risk_level = self.map_probability_to_risk(prob_float)
 
-        # 4. Explainability attributions (safe execution)
+        # 4. Explainability attributions via SHAP or fallback (safe execution)
         explanation_res: ExplanationResult | None = None
         try:
-            exp_dict = explain_prediction(
+            from services.explanation_service import ExplanationService
+            explanation_svc = ExplanationService()
+            explanation_payload = explanation_svc.generate_explanation(
                 pipeline=pipeline,
-                input_data=df,
+                input_df=df,
+                raw_record=snapshot,
                 predicted_class=risk_level,
             )
             explanation_res = ExplanationResult(
-                method=exp_dict.get("method", "FeatureImportance"),
-                feature_importances=exp_dict.get("feature_importances", {}),
-                top_risk_factors=exp_dict.get("top_risk_factors", []),
-                baseline_value=exp_dict.get("baseline_value"),
+                method=explanation_payload.method,
+                feature_importances={
+                    fc.feature: round(abs(fc.contribution), 6)
+                    for fc in explanation_payload.features
+                },
+                top_risk_factors=[fc.to_dict() for fc in explanation_payload.features],
+                baseline_value=explanation_payload.baseline_value,
+                features=[fc.to_dict() for fc in explanation_payload.features],
+                explanation_type=explanation_payload.explanation_type,
+                disclaimer=explanation_payload.disclaimer,
             )
         except Exception as exc:
             logger.warning("Explanation calculation skipped due to error: %s", exc)

@@ -22,6 +22,31 @@ class PredictionExplanationSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class FeatureContributionSerializer(serializers.Serializer):
+    """Individual feature contribution in a model explanation."""
+    feature = serializers.CharField(read_only=True)
+    value = serializers.FloatField(allow_null=True, read_only=True)
+    contribution = serializers.FloatField(read_only=True)
+    direction = serializers.CharField(read_only=True)
+    relative_importance = serializers.FloatField(read_only=True)
+
+
+class PredictionExplanationDetailSerializer(serializers.Serializer):
+    """
+    Full explanation response for GET /api/v1/predictions/{id}/explanation/.
+
+    IMPORTANT: This represents a MODEL EXPLANATION, not a medical diagnosis.
+    """
+    prediction_id = serializers.UUIDField(read_only=True)
+    risk_level = serializers.CharField(read_only=True)
+    probability = serializers.FloatField(read_only=True)
+    explanation_type = serializers.CharField(read_only=True, default="MODEL_EXPLANATION")
+    method = serializers.CharField(read_only=True)
+    baseline_value = serializers.FloatField(allow_null=True, read_only=True)
+    features = FeatureContributionSerializer(many=True, read_only=True)
+    disclaimer = serializers.CharField(read_only=True)
+
+
 class PredictionSerializer(serializers.ModelSerializer):
     """Full detail prediction response serializer including explanation and model info."""
 

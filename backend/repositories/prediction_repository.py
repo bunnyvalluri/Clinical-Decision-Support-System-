@@ -71,19 +71,19 @@ class DjangoPredictionRepository(IPredictionRepository):
 
         if clinical_record:
             vitals = {
-                "systolic_bp": float(clinical_record.systolic_bp),
-                "diastolic_bp": float(clinical_record.diastolic_bp),
-                "heart_rate": float(clinical_record.heart_rate),
-                "respiratory_rate": float(clinical_record.respiratory_rate),
-                "body_temperature": float(clinical_record.body_temperature),
-                "oxygen_saturation": float(clinical_record.oxygen_saturation),
-                "glucose_level": float(clinical_record.glucose_level),
-                "cholesterol_total": float(clinical_record.cholesterol_total),
-                "bmi": float(clinical_record.bmi),
-                "creatinine": float(clinical_record.creatinine) if clinical_record.creatinine else None,
-                "sodium": float(clinical_record.sodium) if clinical_record.sodium else None,
-                "calcium": float(clinical_record.calcium) if clinical_record.calcium else None,
-                "lactic_acid": float(clinical_record.lactic_acid) if clinical_record.lactic_acid else None,
+                "systolic_bp": float(clinical_record.systolic_bp) if clinical_record.systolic_bp is not None else 120.0,
+                "diastolic_bp": float(clinical_record.diastolic_bp) if clinical_record.diastolic_bp is not None else 80.0,
+                "heart_rate": float(clinical_record.heart_rate) if clinical_record.heart_rate is not None else 72.0,
+                "respiratory_rate": float(clinical_record.respiratory_rate) if clinical_record.respiratory_rate is not None else 16.0,
+                "body_temperature": float(clinical_record.body_temperature) if clinical_record.body_temperature is not None else 37.0,
+                "oxygen_saturation": float(clinical_record.oxygen_saturation) if clinical_record.oxygen_saturation is not None else 98.0,
+                "glucose_level": float(clinical_record.glucose_level) if clinical_record.glucose_level is not None else 100.0,
+                "cholesterol_total": float(clinical_record.cholesterol_total) if clinical_record.cholesterol_total is not None else 200.0,
+                "bmi": float(clinical_record.bmi) if clinical_record.bmi is not None else 24.5,
+                "creatinine": float(clinical_record.creatinine) if clinical_record.creatinine is not None else 1.0,
+                "sodium": float(clinical_record.sodium) if clinical_record.sodium is not None else 140.0,
+                "calcium": float(clinical_record.calcium) if clinical_record.calcium is not None else 9.5,
+                "lactic_acid": float(clinical_record.lactic_acid) if clinical_record.lactic_acid is not None else 1.0,
             }
 
         features: dict[str, Any] = {
