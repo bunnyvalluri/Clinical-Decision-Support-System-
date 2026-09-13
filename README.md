@@ -42,6 +42,7 @@
 
 ## 📋 Table of Contents
 
+- [Screenshots & Live Preview](#️-screenshots--live-preview)
 - [Executive Summary](#-executive-summary)
 - [Key Features](#-key-features)
 - [System Architecture](#-system-architecture)
@@ -64,6 +65,28 @@
 - [Environment Configuration](#-environment-configuration)
 - [Documentation Index](#-documentation-index)
 - [Contributing & Attribution](#-contributing--attribution)
+
+---
+
+## 🖼️ Screenshots & Live Preview
+
+<p align="center">
+  <a href="https://clinical-decision-support-system-2026.vercel.app">
+    <img src="frontend/public/landing-hero.png" alt="PatientRisk CDSS — Landing Page Hero" width="100%" style="border-radius: 12px; border: 1px solid #e5e7eb;" />
+  </a>
+</p>
+
+<p align="center">
+  <em>Live at <a href="https://clinical-decision-support-system-2026.vercel.app"><strong>clinical-decision-support-system-2026.vercel.app</strong></a></em>
+</p>
+
+<details>
+<summary>📸 Full Page Preview (click to expand)</summary>
+<br/>
+<p align="center">
+  <img src="frontend/public/landing-full.png" alt="PatientRisk CDSS — Full Landing Page" width="80%" style="border-radius: 8px; border: 1px solid #e5e7eb;" />
+</p>
+</details>
 
 ---
 
