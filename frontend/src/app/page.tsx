@@ -544,7 +544,7 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 2. Hero Section: Clinical Decision Support Platform */}
       {/* ------------------------------------------------------------------ */}
-      <section className="relative overflow-hidden pt-8 pb-14 sm:pt-16 sm:pb-20 lg:pt-20 lg:pb-24 border-b border-slate-200/90 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.08),rgba(2,132,199,0.04),transparent)]">
+      <section className="relative overflow-hidden pt-5 pb-10 sm:pt-12 sm:pb-16 lg:pt-16 lg:pb-20 border-b border-slate-200/90 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.08),rgba(2,132,199,0.04),transparent)]">
         {/* Subtle decorative clinical grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_35%,#000_70%,transparent_100%)] pointer-events-none opacity-40" />
 
@@ -565,173 +565,143 @@ export default function LandingPage() {
               </div>
 
               {/* Authoritative Main Headline */}
-              <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-[3.6rem] font-extrabold tracking-tight text-slate-950 leading-[1.14]">
-                Real-Time Clinical <br className="hidden xs:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-700 via-teal-600 to-cyan-600">
+              <h1 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-950 leading-[1.18] sm:leading-[1.12]">
+                Real-Time Clinical{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-700 via-teal-600 to-cyan-600 block sm:inline">
                   Decision Support System
                 </span>
               </h1>
 
               {/* Subtitle / Value Proposition */}
-              <p className="text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl leading-relaxed">
+              <p className="text-xs xs:text-sm sm:text-base text-slate-600 max-w-2xl leading-relaxed">
                 Empowering hospital cardiologists, emergency triage nurses, and ICU teams with
                 Platt-calibrated multi-class ML risk predictions, transparent TreeSHAP factor attributions,
                 and deterministic clinical safety overrides.
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-col xs:flex-row flex-wrap items-stretch xs:items-center gap-2.5 sm:gap-3 pt-2">
-                <Link href="/dashboard" className="w-full xs:w-auto">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 pt-1">
+                <Link href="/dashboard" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full xs:w-auto text-xs font-bold gap-2 shadow-md bg-teal-600 hover:bg-teal-700 text-white border border-teal-500 transition-all hover:shadow-lg"
+                    className="w-full sm:w-auto text-xs sm:text-sm font-bold gap-2 shadow-md bg-teal-600 hover:bg-teal-700 text-white border border-teal-500 transition-all hover:shadow-lg h-10 sm:h-11"
                   >
                     <HeartPulse className="h-4 w-4" />
                     Launch Live Portal
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <a href="#simulator" className="w-full xs:w-auto">
+                <a href="#simulator" className="w-full sm:w-auto">
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full xs:w-auto text-xs font-semibold gap-2 border-slate-300 hover:bg-slate-50 text-slate-700 shadow-2xs"
+                    className="w-full sm:w-auto text-xs sm:text-sm font-semibold gap-2 border-slate-300 hover:bg-slate-50 text-slate-700 shadow-2xs h-10 sm:h-11"
                   >
                     <Sliders className="h-4 w-4 text-teal-600" />
                     Explore Bedside Simulator
                   </Button>
                 </a>
-                <Link href="/admin/models" className="w-full xs:w-auto">
-                  <Button
-                    variant="ghost"
-                    size="lg"
-                    className="w-full xs:w-auto text-xs font-semibold gap-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                  >
-                    <Activity className="h-4 w-4 text-slate-500" />
-                    MLOps Registry
-                  </Button>
-                </Link>
               </div>
 
               {/* 1-Click Role Workspace Sandbox */}
               <div className="pt-2 sm:pt-4">
-                <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
-                  <UserCheck className="h-4 w-4 text-teal-600" />
-                  <span className="text-[11px] sm:text-xs uppercase tracking-wider text-slate-500 font-mono font-bold">
-                    1-Click Clinician Workspace Access:
+                <div className="flex items-center gap-1.5 mb-2">
+                  <UserCheck className="h-4 w-4 text-teal-600 shrink-0" />
+                  <span className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-500 font-mono font-bold">
+                    1-Click Clinician Workspace:
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 text-left">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
                   {/* Doctor */}
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("DOCTOR")}
-                    className="group p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-md transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="h-5 w-5 sm:h-6 sm:w-6 rounded-md bg-teal-50 text-teal-700 flex items-center justify-center font-bold text-[10px] sm:text-[11px] border border-teal-200/50">
-                          MD
-                        </span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-teal-50 text-teal-700 font-semibold truncate">
-                          Cardiology
-                        </span>
-                      </div>
-                      <p className="font-bold text-xs text-slate-900 group-hover:text-teal-700 transition-colors truncate">
-                        Dr. Elena Vance
-                      </p>
-                      <p className="text-[10px] text-slate-500 truncate">Cardiology & ICU</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                        MD
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Cardiology</span>
                     </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-teal-700 transition-colors truncate">
+                      Dr. Elena Vance
+                    </p>
                   </button>
 
                   {/* Nurse */}
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("NURSE")}
-                    className="group p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-md transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="h-5 w-5 sm:h-6 sm:w-6 rounded-md bg-sky-50 text-sky-700 flex items-center justify-center font-bold text-[10px] sm:text-[11px] border border-sky-200/50">
-                          RN
-                        </span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 font-semibold truncate">
-                          Triage
-                        </span>
-                      </div>
-                      <p className="font-bold text-xs text-slate-900 group-hover:text-sky-700 transition-colors truncate">
-                        Sarah Jenkins
-                      </p>
-                      <p className="text-[10px] text-slate-500 truncate">Emergency Ward</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                        RN
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Triage</span>
                     </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-sky-700 transition-colors truncate">
+                      Sarah Jenkins
+                    </p>
                   </button>
 
                   {/* Analyst */}
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("ANALYST")}
-                    className="group p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="h-5 w-5 sm:h-6 sm:w-6 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center font-bold text-[10px] sm:text-[11px] border border-amber-200/50">
-                          BI
-                        </span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-semibold truncate">
-                          Informatics
-                        </span>
-                      </div>
-                      <p className="font-bold text-xs text-slate-900 group-hover:text-amber-700 transition-colors truncate">
-                        Alex Rivera
-                      </p>
-                      <p className="text-[10px] text-slate-500 truncate">SHAP & Telemetry</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                        BI
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Informatics</span>
                     </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-amber-700 transition-colors truncate">
+                      Alex Rivera
+                    </p>
                   </button>
 
                   {/* Admin */}
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("ADMIN")}
-                    className="group p-2.5 sm:p-3 rounded-xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
-                    <div>
-                      <div className="flex items-center justify-between mb-1.5">
-                        <span className="h-5 w-5 sm:h-6 sm:w-6 rounded-md bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-[10px] sm:text-[11px] border border-purple-200/50">
-                          IT
-                        </span>
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 font-semibold truncate">
-                          Governance
-                        </span>
-                      </div>
-                      <p className="font-bold text-xs text-slate-900 group-hover:text-purple-700 transition-colors truncate">
-                        Hospital Admin
-                      </p>
-                      <p className="text-[10px] text-slate-500 truncate">Registry & Rollback</p>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                        IT
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Admin</span>
                     </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-purple-700 transition-colors truncate">
+                      Hospital Admin
+                    </p>
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Right Column: Clear Clinical Medical Frame */}
-            <div className="lg:col-span-5 relative flex justify-center items-center px-1 sm:px-0 mt-4 lg:mt-0">
+            <div className="lg:col-span-5 relative flex justify-center items-center px-1 sm:px-0 mt-3 lg:mt-0">
               <div className="relative w-full max-w-sm sm:max-w-md">
                 {/* Soft ambient glow behind console frame */}
                 <div className="absolute -inset-2 bg-gradient-to-tr from-teal-500/15 via-sky-500/15 to-purple-500/15 rounded-3xl blur-2xl opacity-60 pointer-events-none" />
 
                 {/* Main Clinical Frame */}
-                <div className="relative overflow-hidden rounded-3xl border border-slate-200/90 bg-white p-2.5 sm:p-3 shadow-2xl space-y-2.5 sm:space-y-3">
+                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white p-2.5 sm:p-3 shadow-2xl space-y-2 sm:space-y-3">
                   {/* Hospital Telemetry Top Status Header */}
                   <div className="px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-between text-[10px] sm:text-[11px] font-mono border border-slate-200">
                     <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                      <span className="text-slate-900 font-bold">NODE 04 • ICU TELEMETRY</span>
+                      <span className="text-slate-900 font-bold truncate">NODE 04 • ICU TELEMETRY</span>
                     </div>
-                    <span className="text-slate-500 truncate">ENC-88291</span>
+                    <span className="text-slate-500 truncate text-[10px]">ENC-88291</span>
                   </div>
 
                   {/* Doctor Image - Fully Unobstructed & Crystal Clear */}
-                  <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100 border border-slate-200 shadow-inner">
+                  <div className="relative aspect-square w-full overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100 border border-slate-200 shadow-inner">
                     <Image
                       src="/doctor-hero.jpg"
                       alt="Attending Cardiologist Dr. Elena Vance reviewing patient risk assessment on tablet"
@@ -742,16 +712,16 @@ export default function LandingPage() {
                     />
 
                     {/* Non-obstructive mini telemetry HUD badge at the bottom-right corner */}
-                    <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 flex items-center gap-1.5 shadow-sm">
+                    <div className="absolute bottom-2 right-2 px-2 py-1 rounded-lg bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 flex items-center gap-1.5 shadow-xs">
                       <Activity className="h-3 w-3 text-teal-600 animate-pulse" />
                       <span className="text-[9px] sm:text-[10px] font-mono text-teal-800 font-semibold">114 BPM • 98% SpO2</span>
                     </div>
                   </div>
 
                   {/* Attending Physician Profile Banner (Cleanly Placed Below Photo) */}
-                  <div className="p-2.5 sm:p-3 rounded-2xl bg-white text-slate-900 flex items-center justify-between border border-slate-200 shadow-sm">
-                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-white text-slate-900 flex items-center justify-between border border-slate-200 shadow-xs">
+                    <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                      <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                         EV
                       </div>
                       <div className="min-w-0">
@@ -759,40 +729,40 @@ export default function LandingPage() {
                           <h4 className="text-xs font-bold text-slate-900 truncate">Dr. Elena Vance, MD</h4>
                           <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
                         </div>
-                        <p className="text-[10px] text-slate-500 truncate">Chief of Cardiology & ICU</p>
+                        <p className="text-[10px] text-slate-500 truncate">Chief of Cardiology</p>
                       </div>
                     </div>
-                    <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full shrink-0">
+                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       On Duty
                     </span>
                   </div>
 
                   {/* Dual Telemetry Status Badges - Cleanly integrated below with zero text collision */}
-                  <div className="grid grid-cols-2 gap-2 pt-0.5">
-                    <div className="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
-                      <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
-                        <Activity className="h-3.5 w-3.5 animate-pulse" />
+                  <div className="grid grid-cols-2 gap-1.5 sm:gap-2 pt-0.5">
+                    <div className="flex items-center gap-1.5 sm:gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200 text-left">
+                      <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
+                        <Activity className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-pulse" />
                       </div>
                       <div className="min-w-0">
-                        <span className="text-[8px] sm:text-[9px] text-slate-500 font-mono font-semibold block uppercase leading-none">
-                          LIVE TELEMETRY
+                        <span className="text-[8px] text-slate-500 font-mono font-semibold block uppercase leading-none">
+                          TELEMETRY
                         </span>
-                        <span className="text-[11px] sm:text-xs font-bold text-slate-900 truncate block mt-1">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-900 truncate block mt-0.5">
                           0.136 ms Latency
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 p-2 sm:p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left">
-                      <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
-                        <ShieldCheck className="h-3.5 w-3.5" />
+                    <div className="flex items-center gap-1.5 sm:gap-2 p-2 rounded-xl bg-slate-50 border border-slate-200 text-left">
+                      <div className="h-5 w-5 sm:h-6 sm:w-6 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
+                        <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       </div>
                       <div className="min-w-0">
-                        <span className="text-[8px] sm:text-[9px] text-slate-500 font-mono font-semibold block uppercase leading-none">
-                          MODEL REGISTRY
+                        <span className="text-[8px] text-slate-500 font-mono font-semibold block uppercase leading-none">
+                          REGISTRY
                         </span>
-                        <span className="text-[11px] sm:text-xs font-bold text-emerald-700 font-mono truncate block mt-1">
+                        <span className="text-[10px] sm:text-xs font-bold text-emerald-700 font-mono truncate block mt-0.5">
                           SHA-256 Verified
                         </span>
                       </div>
@@ -803,53 +773,53 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Institutional KPI Metric Ribbon with Empirical Benchmark Numbers */}
-          <div className="pt-6 sm:pt-8 grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto text-left">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-slate-300 transition-all">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-slate-500">Active Champion</span>
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          {/* Institutional KPI Metric Ribbon (Clean 2x2 on mobile, 4 columns on desktop) */}
+          <div className="pt-4 sm:pt-8 grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 max-w-6xl mx-auto text-left">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-2xs hover:shadow-xs transition-all">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-500 truncate">Champion</span>
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               </div>
-              <p className="text-sm sm:text-base font-bold text-slate-900 truncate">Random Forest v1.0.0</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-teal-700 font-mono font-bold">Platt Calibrated</span>
-                <span className="text-[10px] text-slate-400 font-mono">Brier: 0.0027</span>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-slate-300 transition-all">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-slate-500">Inference Latency</span>
-                <Zap className="h-4 w-4 text-amber-500" />
-              </div>
-              <p className="text-sm sm:text-base font-bold text-slate-900">0.136 ms / sample</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-slate-600 font-mono font-semibold">In-Memory Scikit</span>
-                <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1 rounded">Monotonic</span>
+              <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">Random Forest</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-teal-700 font-mono font-bold">Calibrated</span>
+                <span className="text-[9px] text-slate-400 font-mono truncate">0.0027</span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-slate-300 transition-all">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-slate-500">Clinical Safety</span>
-                <ShieldCheck className="h-4 w-4 text-teal-600" />
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-2xs hover:shadow-xs transition-all">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-500 truncate">Latency</span>
+                <Zap className="h-3.5 w-3.5 text-amber-500 shrink-0" />
               </div>
-              <p className="text-sm sm:text-base font-bold text-slate-900">0 Missed Acute Cases</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-teal-700 font-mono font-bold">100% Sensitivity</span>
-                <span className="text-[10px] text-slate-400 font-mono">Held-Out Test</span>
+              <p className="text-xs sm:text-sm font-bold text-slate-900">0.136 ms</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-slate-600 font-mono font-semibold">Scikit</span>
+                <span className="text-[9px] text-emerald-700 font-semibold bg-emerald-50 px-1 rounded">Fast</span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs hover:shadow-md hover:border-slate-300 transition-all">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-slate-500">Ward Telemetry</span>
-                <Radio className="h-4 w-4 text-sky-600 animate-pulse" />
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-2xs hover:shadow-xs transition-all">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-500 truncate">Safety</span>
+                <ShieldCheck className="h-3.5 w-3.5 text-teal-600 shrink-0" />
               </div>
-              <p className="text-sm sm:text-base font-bold text-slate-900">WebSocket ASGI</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs text-sky-700 font-mono font-bold">Sub-Second Push</span>
-                <span className="text-[10px] text-slate-400 font-mono">Zero-Reload</span>
+              <p className="text-xs sm:text-sm font-bold text-slate-900">0 Missed</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-teal-700 font-mono font-bold">100% Rate</span>
+                <span className="text-[9px] text-slate-400 font-mono">Acute</span>
+              </div>
+            </div>
+
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-2xs hover:shadow-xs transition-all">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] sm:text-xs font-semibold text-slate-500 truncate">Telemetry</span>
+                <Radio className="h-3.5 w-3.5 text-sky-600 animate-pulse shrink-0" />
+              </div>
+              <p className="text-xs sm:text-sm font-bold text-slate-900">ASGI Live</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[10px] text-sky-700 font-mono font-bold">Sub-Second</span>
+                <span className="text-[9px] text-slate-400 font-mono">Push</span>
               </div>
             </div>
           </div>
@@ -859,10 +829,10 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 3. Interactive Bedside Risk & TreeSHAP Simulator */}
       {/* ------------------------------------------------------------------ */}
-      <section id="simulator" className="py-14 sm:py-20 bg-white border-b border-slate-200">
-        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="text-center max-w-3xl mx-auto space-y-2.5 sm:space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3.5 py-1 rounded-full border border-teal-200">
+      <section id="simulator" className="py-8 sm:py-16 bg-white border-b border-slate-200">
+        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-8">
+          <div className="text-center max-w-3xl mx-auto space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
               <Sliders className="h-3.5 w-3.5 text-teal-600" />
               <span>LIVE CLINICAL SIMULATOR</span>
             </div>
@@ -875,9 +845,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Quick Preset Selector Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
-            <span className="text-xs font-semibold text-slate-500 w-full sm:w-auto text-center sm:text-left mb-1 sm:mb-0 mr-1">
+          {/* Quick Preset Selector Buttons (Horizontal rail on mobile, centered flex on desktop) */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-1 sm:justify-center -mx-3.5 px-3.5 sm:mx-0">
+            <span className="text-xs font-semibold text-slate-500 shrink-0 mr-1 hidden sm:inline">
               Clinical Presets:
             </span>
             {PRESETS.map((preset, idx) => (
@@ -885,7 +855,7 @@ export default function LandingPage() {
                 key={idx}
                 type="button"
                 onClick={() => setVitals(preset.vitals)}
-                className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50/80 hover:bg-white hover:border-teal-400 hover:shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 bg-slate-50/90 hover:bg-white hover:border-teal-400 hover:shadow-xs transition-all cursor-pointer shrink-0"
               >
                 <span>{preset.name}</span>
                 <span className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md border ${preset.badgeColor}`}>
@@ -896,23 +866,26 @@ export default function LandingPage() {
           </div>
 
           {/* Main Simulator Container */}
-          <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50/70 p-3.5 xs:p-5 sm:p-8 shadow-sm">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50/70 p-3 sm:p-6 lg:p-8 shadow-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 items-start">
               {/* Left Column: Physiological Parameters */}
-              <div className="lg:col-span-6 space-y-4 sm:space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <HeartPulse className="h-5 w-5 text-teal-600 shrink-0" />
+              <div className="lg:col-span-6 space-y-3 sm:space-y-4">
+                <div className="flex items-center justify-between pb-2 sm:pb-3 border-b border-slate-200 gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <HeartPulse className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-teal-600 shrink-0" />
                     <h3 className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wide truncate">
                       Patient Physiological Parameters
                     </h3>
                   </div>
-                  <span className="text-[11px] sm:text-xs font-mono font-semibold text-slate-500 shrink-0">Live Inputs</span>
+                  <span className="text-[10px] sm:text-xs font-mono font-semibold text-slate-500 shrink-0 bg-slate-100 px-2 py-0.5 rounded-md">
+                    <span>Live</span>
+                    <span className="hidden xs:inline"> Inputs</span>
+                  </span>
                 </div>
 
                 {/* Biological Violation Notice */}
                 {isBiologicalViolation && (
-                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2.5">
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
                     <span>
                       <strong>Biological Contradiction:</strong> Systolic BP ({vitals.systolicBp}) must exceed Diastolic BP ({vitals.diastolicBp}).
@@ -921,10 +894,10 @@ export default function LandingPage() {
                 )}
 
                 {/* Slider 1: Systolic & Diastolic Blood Pressure */}
-                <div className="space-y-2.5 sm:space-y-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs">
+                <div className="space-y-2 sm:space-y-2.5 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
                   <div className="flex justify-between items-center text-xs gap-2">
-                    <span className="font-semibold text-slate-800 truncate">Resting Blood Pressure (SBP / DBP)</span>
-                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shrink-0">
+                    <span className="font-semibold text-slate-800 truncate">Resting BP (SBP / DBP)</span>
+                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
                       {vitals.systolicBp} / {vitals.diastolicBp} mmHg
                     </span>
                   </div>
@@ -948,10 +921,10 @@ export default function LandingPage() {
                 </div>
 
                 {/* Slider 2: ST-Segment Depression */}
-                <div className="space-y-2.5 sm:space-y-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs">
+                <div className="space-y-2 sm:space-y-2.5 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
                   <div className="flex justify-between items-center text-xs gap-2">
                     <span className="font-semibold text-slate-800 truncate">ST-Segment Depression (ECG)</span>
-                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shrink-0">
+                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
                       {vitals.stDepression.toFixed(1)} mm
                     </span>
                   </div>
@@ -974,10 +947,10 @@ export default function LandingPage() {
                 </div>
 
                 {/* Slider 3: Max Heart Rate */}
-                <div className="space-y-2.5 sm:space-y-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs">
+                <div className="space-y-2 sm:space-y-2.5 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
                   <div className="flex justify-between items-center text-xs gap-2">
-                    <span className="font-semibold text-slate-800 truncate">Maximum Exertion Heart Rate</span>
-                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shrink-0">
+                    <span className="font-semibold text-slate-800 truncate">Max Heart Rate</span>
+                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
                       {vitals.heartRate} bpm
                     </span>
                   </div>
@@ -1000,10 +973,10 @@ export default function LandingPage() {
                 </div>
 
                 {/* Slider 4: Serum Cholesterol */}
-                <div className="space-y-2.5 sm:space-y-3 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs">
+                <div className="space-y-2 sm:space-y-2.5 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
                   <div className="flex justify-between items-center text-xs gap-2">
-                    <span className="font-semibold text-slate-800 truncate">Serum Total Cholesterol</span>
-                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shrink-0">
+                    <span className="font-semibold text-slate-800 truncate">Serum Cholesterol</span>
+                    <span className="font-mono font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded-md shrink-0">
                       {vitals.cholesterol} mg/dL
                     </span>
                   </div>
@@ -1026,8 +999,8 @@ export default function LandingPage() {
                 </div>
 
                 {/* Chest Pain Selector */}
-                <div className="space-y-2 bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                  <span className="text-xs font-semibold text-slate-800 block">Chest Pain Symptom Classification</span>
+                <div className="space-y-2 bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
+                  <span className="text-xs font-semibold text-slate-800 block">Chest Pain Classification</span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
                     {[
                       { label: "Typical", val: 0 },
@@ -1039,7 +1012,7 @@ export default function LandingPage() {
                         key={item.val}
                         type="button"
                         onClick={() => setVitals({ ...vitals, chestPain: item.val })}
-                        className={`text-[11px] sm:text-xs py-2 px-1.5 rounded-xl font-medium transition-all text-center cursor-pointer truncate ${
+                        className={`text-[11px] sm:text-xs py-1.5 sm:py-2 px-1.5 rounded-xl font-medium transition-all text-center cursor-pointer truncate ${
                           vitals.chestPain === item.val
                             ? "bg-teal-600 text-white shadow-xs font-bold"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -1053,26 +1026,27 @@ export default function LandingPage() {
               </div>
 
               {/* Right Column: Inferred Risk & SHAP Attributions */}
-              <div className="lg:col-span-6 space-y-4 sm:space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-teal-600 shrink-0" />
+              <div className="lg:col-span-6 space-y-3 sm:space-y-4">
+                <div className="flex items-center justify-between pb-2 sm:pb-3 border-b border-slate-200 gap-2">
+                  <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    <Brain className="h-4 w-4 sm:h-4.5 sm:w-4.5 text-teal-600 shrink-0" />
                     <h3 className="text-xs sm:text-sm font-bold text-slate-900 uppercase tracking-wide truncate">
-                      Real-Time Model Inference & TreeSHAP
+                      Real-Time Inference & TreeSHAP
                     </h3>
                   </div>
-                  <span className="flex items-center gap-1.5 text-xs font-mono text-emerald-600 font-semibold shrink-0">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                    Live Calibrated
+                  <span className="flex items-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs font-mono text-emerald-600 font-semibold shrink-0 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+                    <span>Live</span>
+                    <span className="hidden xs:inline">Calibrated</span>
                   </span>
                 </div>
 
                 {/* High-Contrast ICU Telemetry Monitor Box (Medical Display Standard) */}
-                <div className="rounded-2xl border border-slate-800 bg-slate-950 p-4 sm:p-6 shadow-xl text-white space-y-3.5 sm:space-y-4">
+                <div className="rounded-xl sm:rounded-2xl border border-slate-800 bg-slate-950 p-3.5 sm:p-5 shadow-xl text-white space-y-3 sm:space-y-3.5">
                   {/* Lead II ECG Rhythm Banner */}
                   <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-mono text-emerald-400 pb-2 border-b border-slate-800">
                     <span className="flex items-center gap-1.5 truncate">
-                      <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-pulse text-emerald-400 shrink-0" />
+                      <Activity className="h-3.5 w-3.5 animate-pulse text-emerald-400 shrink-0" />
                       LEAD II • {vitals.heartRate} BPM
                     </span>
                     <span className="text-slate-400 font-semibold shrink-0">
@@ -1081,8 +1055,8 @@ export default function LandingPage() {
                   </div>
 
                   {/* SVG ECG Waveform Display */}
-                  <div className="relative w-full h-10 sm:h-12 overflow-hidden bg-slate-900/60 rounded-xl border border-slate-800/80 p-1 flex items-center">
-                    <svg className="w-full h-8 sm:h-10 stroke-emerald-400 fill-none" viewBox="0 0 500 40" preserveAspectRatio="none">
+                  <div className="relative w-full h-8 sm:h-10 overflow-hidden bg-slate-900/60 rounded-xl border border-slate-800/80 p-1 flex items-center">
+                    <svg className="w-full h-7 sm:h-8 stroke-emerald-400 fill-none" viewBox="0 0 500 40" preserveAspectRatio="none">
                       <path
                         d="M 0,20 L 50,20 L 58,22 L 66,18 L 74,20 L 88,20 L 92,6 L 98,36 L 104,12 L 110,24 L 116,20 L 130,20 L 150,20 L 168,14 L 180,20 L 250,20 L 258,22 L 266,18 L 274,20 L 288,20 L 292,6 L 298,36 L 304,12 L 310,24 L 316,20 L 330,20 L 350,20 L 368,14 L 380,20 L 500,20"
                         strokeWidth="2"
@@ -1093,32 +1067,32 @@ export default function LandingPage() {
                   </div>
 
                   {/* Probability Score & Risk Tier Badge */}
-                  <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2.5 pt-1">
+                  <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 pt-0.5">
                     <div>
-                      <span className="text-[11px] sm:text-xs text-slate-400 font-medium block">Calibrated Risk Probability</span>
-                      <div className="flex items-baseline gap-2 mt-0.5">
-                        <span className="text-3xl xs:text-4xl sm:text-5xl font-extrabold tracking-tight font-mono text-white">
+                      <span className="text-[10px] sm:text-xs text-slate-400 font-medium block">Calibrated Risk Probability</span>
+                      <div className="flex flex-wrap items-baseline gap-x-2 mt-0.5">
+                        <span className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white font-sans">
                           {simulationResult.probability}%
                         </span>
                         <span className="text-[10px] sm:text-xs text-slate-400 font-mono">Platt Sigmoid (Brier 0.0027)</span>
                       </div>
                     </div>
                     <div className="self-start xs:self-auto">
-                      <span className={`text-[11px] sm:text-xs font-mono font-bold px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl border ${simulationResult.tierBadgeClass}`}>
+                      <span className={`text-[10px] sm:text-xs font-mono font-bold px-2.5 py-1 rounded-xl border ${simulationResult.tierBadgeClass}`}>
                         {simulationResult.tier} RISK TIER
                       </span>
                     </div>
                   </div>
 
                   {/* Multi-Class Segmented Risk Bar */}
-                  <div className="space-y-1.5 pt-1">
-                    <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div className="space-y-1 pt-0.5">
+                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all duration-300 rounded-full bg-gradient-to-r ${simulationResult.tierColor}`}
                         style={{ width: `${simulationResult.probability}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-[8.5px] xs:text-[10px] text-slate-400 font-mono">
+                    <div className="flex justify-between text-[8px] xs:text-[9.5px] text-slate-400 font-mono">
                       <span>Low (&lt;25%)</span>
                       <span>Med (25-50%)</span>
                       <span>High (50-75%)</span>
@@ -1127,41 +1101,41 @@ export default function LandingPage() {
                   </div>
 
                   {/* Clinical Directive Recommendation */}
-                  <div className="p-3 sm:p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-start gap-2.5 sm:gap-3">
+                  <div className="p-2.5 sm:p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs flex items-start gap-2.5">
                     <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-bold text-slate-200 block mb-0.5">Clinical Protocol Directive:</span>
+                      <span className="font-bold text-slate-200 block mb-0.5 text-[11px] sm:text-xs">Clinical Directive:</span>
                       <span className="text-slate-300 leading-relaxed text-[11px] sm:text-xs">{simulationResult.recommendation}</span>
                     </div>
                   </div>
 
                   {/* Uncertainty & Abstention Banner */}
                   {simulationResult.isUncertain && (
-                    <div className="p-3 rounded-xl bg-purple-950/60 border border-purple-800/80 text-xs text-purple-200 flex items-center gap-2.5 font-mono">
+                    <div className="p-2.5 rounded-xl bg-purple-950/60 border border-purple-800/80 text-xs text-purple-200 flex items-center gap-2 font-mono">
                       <AlertCircle className="h-4 w-4 text-purple-400 shrink-0" />
-                      <span className="text-[11px] sm:text-xs">
-                        <strong>Abstention Alert:</strong> Prediction requires additional review (Entropy: {simulationResult.entropy}).
+                      <span className="text-[10px] sm:text-xs">
+                        <strong>Abstention:</strong> Prediction requires additional review (Entropy: {simulationResult.entropy}).
                       </span>
                     </div>
                   )}
                 </div>
 
                 {/* TreeSHAP Local Factor Attribution Breakdown */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs space-y-3">
+                <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4.5 shadow-xs space-y-2.5">
                   <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-1">
                     <span className="text-xs font-bold text-slate-900">TreeSHAP Factor Attributions</span>
-                    <span className="text-[10px] sm:text-[11px] font-mono text-slate-500">Baseline E[f(x)] = 0.350</span>
+                    <span className="text-[10px] font-mono text-slate-500">Baseline E[f(x)] = 0.350</span>
                   </div>
 
-                  <div className="space-y-2.5 text-xs">
+                  <div className="space-y-2 text-xs">
                     {simulationResult.shapDrivers.map((driver, index) => (
                       <div key={index} className="space-y-1">
-                        <div className="flex justify-between items-center text-[11px] sm:text-xs gap-2">
+                        <div className="flex justify-between items-center text-[10px] sm:text-xs gap-2">
                           <span className="font-semibold text-slate-700 truncate">{driver.factor}</span>
-                          <div className="flex items-center gap-2 font-mono shrink-0">
+                          <div className="flex items-center gap-1.5 font-mono shrink-0">
                             <span className="text-slate-500">{driver.value}</span>
                             <span
-                              className={`font-bold text-xs ${
+                              className={`font-bold ${
                                 driver.isPositive ? "text-rose-600" : "text-emerald-600"
                               }`}
                             >
@@ -1181,8 +1155,8 @@ export default function LandingPage() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-[10px] sm:text-[11px] text-slate-500 leading-relaxed pt-1">
-                    Red bars indicate positive risk contributors; green reflects protective clinical markers. All outputs are SaMD decision support and require clinician verification.
+                  <p className="text-[10px] text-slate-500 leading-relaxed pt-0.5">
+                    Red bars indicate positive risk contributors; green reflects protective clinical markers. All outputs require clinician verification.
                   </p>
                 </div>
               </div>
@@ -1194,10 +1168,10 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 4. Clinical Capabilities Section */}
       {/* ------------------------------------------------------------------ */}
-      <section id="features" className="py-14 sm:py-20 bg-slate-50/70 border-b border-slate-200">
-        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
-          <div className="text-center space-y-2.5 sm:space-y-3 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3.5 py-1 rounded-full border border-teal-200">
+      <section id="features" className="py-8 sm:py-16 bg-slate-50/70 border-b border-slate-200">
+        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-10">
+          <div className="text-center space-y-2 sm:space-y-3 max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
               <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
               <span>HIGH-ACUITY CLINICAL CAPABILITIES</span>
             </div>
@@ -1210,10 +1184,10 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {/* Feature 1 */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs hover:border-teal-300 hover:shadow-lg transition-all space-y-3">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs hover:border-teal-300 hover:shadow-md transition-all space-y-2.5 sm:space-y-3">
+              <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600">
                 <HeartPulse className="h-5 w-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">Live Risk Stratification</h3>
@@ -1233,8 +1207,8 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs hover:border-sky-300 hover:shadow-lg transition-all space-y-3">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs hover:border-sky-300 hover:shadow-md transition-all space-y-2.5 sm:space-y-3">
+              <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-600">
                 <Brain className="h-5 w-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">Interpretable TreeSHAP</h3>
@@ -1254,8 +1228,8 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs hover:border-purple-300 hover:shadow-lg transition-all space-y-3">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs hover:border-purple-300 hover:shadow-md transition-all space-y-2.5 sm:space-y-3">
+              <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600">
                 <AlertCircle className="h-5 w-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">Zero-Format Telemetry</h3>
@@ -1275,8 +1249,8 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 4 */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs hover:border-amber-300 hover:shadow-lg transition-all space-y-3">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs hover:border-amber-300 hover:shadow-md transition-all space-y-2.5 sm:space-y-3">
+              <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
                 <Layers className="h-5 w-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">Celery Async Architecture</h3>
@@ -1296,8 +1270,8 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 5 */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs hover:border-emerald-300 hover:shadow-lg transition-all space-y-3">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all space-y-2.5 sm:space-y-3">
+              <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">Physician-Attested Security</h3>
@@ -1317,8 +1291,8 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 6 */}
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-xs hover:border-blue-300 hover:shadow-lg transition-all space-y-3">
-              <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xs hover:border-blue-300 hover:shadow-md transition-all space-y-2.5 sm:space-y-3">
+              <div className="h-9 w-9 sm:h-11 sm:w-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
                 <Radio className="h-5 w-5" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-900">Model Registry & Governance</h3>
@@ -1343,10 +1317,10 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 5. Clinical Workflow Pathway */}
       {/* ------------------------------------------------------------------ */}
-      <section id="workflow" className="py-14 sm:py-20 bg-white border-b border-slate-200">
-        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="text-center max-w-2xl mx-auto space-y-2.5 sm:space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-purple-800 bg-purple-50 px-3.5 py-1 rounded-full border border-purple-200">
+      <section id="workflow" className="py-8 sm:py-16 bg-white border-b border-slate-200">
+        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-purple-800 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">
               <Activity className="h-3.5 w-3.5 text-purple-600" />
               <span>CARE PATHWAY INTEGRATION</span>
             </div>
@@ -1372,14 +1346,14 @@ export default function LandingPage() {
                   key={idx}
                   type="button"
                   onClick={() => setActiveWorkflowTab(idx)}
-                  className={`p-3 sm:p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                  className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border text-left transition-all cursor-pointer ${
                     activeWorkflowTab === idx
-                      ? "border-teal-600 bg-teal-50/80 text-teal-950 shadow-sm ring-1 ring-teal-500"
+                      ? "border-teal-600 bg-teal-50/80 text-teal-950 shadow-xs ring-1 ring-teal-500"
                       : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1.5 sm:mb-2">
-                    <span className="font-mono text-xs font-bold opacity-75">{step.num}</span>
+                  <div className="flex items-center justify-between mb-1 sm:mb-2">
+                    <span className="font-mono text-[11px] sm:text-xs font-bold opacity-75">{step.num}</span>
                     <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-80" />
                   </div>
                   <p className="text-[11px] sm:text-xs font-bold leading-snug truncate sm:whitespace-normal">{step.title}</p>
@@ -1389,12 +1363,12 @@ export default function LandingPage() {
           </div>
 
           {/* Stepper Content Display */}
-          <div className="max-w-4xl mx-auto rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50/70 p-4 xs:p-6 sm:p-8 shadow-xs">
+          <div className="max-w-4xl mx-auto rounded-xl sm:rounded-3xl border border-slate-200 bg-slate-50/70 p-3.5 xs:p-5 sm:p-8 shadow-xs">
             {activeWorkflowTab === 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="space-y-3">
-                  <span className="text-xs font-mono font-bold text-teal-700 uppercase">Phase 1: Ward Admission</span>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-950">Rapid Patient Intake & Biological Vital Capture</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-teal-700 uppercase">Phase 1: Ward Admission</span>
+                  <h3 className="text-base sm:text-xl font-bold text-slate-950">Rapid Patient Intake & Biological Vital Capture</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                     Triage nurses register incoming patients with Medical Record Numbers (MRN), capturing essential diagnostic measurements including systolic/diastolic blood pressure, resting heart rate, ECG ST slope, and serum biomarkers.
                   </p>
@@ -1403,7 +1377,7 @@ export default function LandingPage() {
                     <span>Validated against physiological bounds (SBP &gt; DBP)</span>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs space-y-2 text-xs font-mono overflow-x-auto">
+                <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs space-y-1.5 sm:space-y-2 text-xs font-mono overflow-x-auto">
                   <div className="text-slate-400 pb-1 border-b border-slate-100 break-all">POST /api/v1/patients/P-104/clinical-records/</div>
                   <div className="text-slate-700">MRN: ENC-88291 • Bed 4B (Cardiology Ward)</div>
                   <div className="text-teal-700 font-semibold">Vitals Encapsulated: BP 162/98, HR 114, ST -2.1mm</div>
@@ -1413,10 +1387,10 @@ export default function LandingPage() {
             )}
 
             {activeWorkflowTab === 1 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="space-y-3">
-                  <span className="text-xs font-mono font-bold text-sky-700 uppercase">Phase 2: Algorithmic Inference</span>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-950">Ensemble Model Execution in Sub-Millisecond Speed</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-sky-700 uppercase">Phase 2: Algorithmic Inference</span>
+                  <h3 className="text-base sm:text-xl font-bold text-slate-950">Ensemble Model Execution in Sub-Millisecond Speed</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                     The active champion pipeline processes the input vector through pre-fitted standard scalers, mapping multi-dimensional interactions into Platt-calibrated multi-class probability vectors.
                   </p>
@@ -1425,7 +1399,7 @@ export default function LandingPage() {
                     <span>In-memory pipeline caching eliminates cold-start overhead</span>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs space-y-2 text-xs font-mono overflow-x-auto">
+                <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs space-y-1.5 sm:space-y-2 text-xs font-mono overflow-x-auto">
                   <div className="text-slate-400 pb-1 border-b border-slate-100">ENGINE: RandomForestClassifier (v1.0.0)</div>
                   <div className="text-slate-700 break-all">Latency: 0.136ms • SHA-256: 66b020ec... Verified</div>
                   <div className="text-rose-700 font-bold">Predicted Tier: HIGH RISK (Prob: 0.684)</div>
@@ -1435,10 +1409,10 @@ export default function LandingPage() {
             )}
 
             {activeWorkflowTab === 2 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="space-y-3">
-                  <span className="text-xs font-mono font-bold text-teal-700 uppercase">Phase 3: Transparent Attribution</span>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-950">TreeSHAP Explainable Risk Drivers</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-teal-700 uppercase">Phase 3: Transparent Attribution</span>
+                  <h3 className="text-base sm:text-xl font-bold text-slate-950">TreeSHAP Explainable Risk Drivers</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                     Rather than presenting an opaque score, the system calculates exact mathematical Shapley values for all input features, ranking patient-specific positive contributors and protective markers.
                   </p>
@@ -1447,7 +1421,7 @@ export default function LandingPage() {
                     <span>Subordinated to deterministic qSOFA / NEWS2 clinical overrides</span>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs space-y-2 text-xs font-mono overflow-x-auto">
+                <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs space-y-1.5 sm:space-y-2 text-xs font-mono overflow-x-auto">
                   <div className="text-slate-400 pb-1 border-b border-slate-100">EXPLAINER: TreeExplainer (Runtime)</div>
                   <div className="text-rose-600 font-semibold">ST-Depression (2.4mm): +0.281 weight</div>
                   <div className="text-rose-600 font-semibold">Systolic BP (168 mmHg): +0.194 weight</div>
@@ -1457,10 +1431,10 @@ export default function LandingPage() {
             )}
 
             {activeWorkflowTab === 3 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-                <div className="space-y-3">
-                  <span className="text-xs font-mono font-bold text-purple-700 uppercase">Phase 4: Action & PDF Delivery</span>
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-950">Clinician Authority & Asynchronous PDF Generation</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-center">
+                <div className="space-y-2.5 sm:space-y-3">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-purple-700 uppercase">Phase 4: Action & PDF Delivery</span>
+                  <h3 className="text-base sm:text-xl font-bold text-slate-950">Clinician Authority & Asynchronous PDF Generation</h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
                     Attending cardiologists confirm or override recommendations with mandatory documented rationales. Celery background workers compile clinical discharge summaries and risk trajectory reports via ReportLab.
                   </p>
@@ -1469,7 +1443,7 @@ export default function LandingPage() {
                     <span>Permanent rationale audit logging stored in PostgreSQL</span>
                   </div>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 shadow-xs space-y-2 text-xs font-mono overflow-x-auto">
+                <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 shadow-xs space-y-1.5 sm:space-y-2 text-xs font-mono overflow-x-auto">
                   <div className="text-slate-400 pb-1 border-b border-slate-100">CELERY TASK: compile_clinical_pdf</div>
                   <div className="text-slate-700">Task Status: SUCCESS (0.42s) • Upstash Redis Queue</div>
                   <div className="text-teal-700 font-bold break-all">Artifact: patient_P104_discharge_summary.pdf</div>
@@ -1484,11 +1458,11 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 6. Live Cloud Backing Services */}
       {/* ------------------------------------------------------------------ */}
-      <section id="architecture" className="py-14 sm:py-20 border-b border-slate-200 bg-slate-50/50">
-        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
+      <section id="architecture" className="py-8 sm:py-16 border-b border-slate-200 bg-slate-50/50">
+        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 mb-2">
+              <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 mb-1.5">
                 <Radio className="h-3.5 w-3.5 text-teal-600" />
                 <span>ACTIVE CLOUD INFRASTRUCTURE</span>
               </div>
@@ -1501,64 +1475,65 @@ export default function LandingPage() {
             </Badge>
           </div>
 
-          <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {/* 2 columns on mobile, 4 columns on desktop */}
+          <div className="grid gap-2.5 sm:gap-5 grid-cols-2 lg:grid-cols-4">
             {/* Service 1 */}
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
+            <div className="p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 sm:space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <Database className="h-6 w-6 text-teal-600" />
-                <Badge variant="success" className="text-[10px]">Active</Badge>
+                <Database className="h-5 w-5 sm:h-6 sm:w-6 text-teal-600" />
+                <Badge variant="success" className="text-[9px] sm:text-[10px] px-1.5 py-0.5">Active</Badge>
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900">Neon PostgreSQL 16</h4>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">AWS us-east-2 • Serverless</p>
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Neon PostgreSQL 16</h4>
+                <p className="text-[10px] sm:text-xs text-slate-500 font-mono mt-0.5 truncate">AWS us-east-2 • Serverless</p>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Serverless Lakebase Postgres with instant branch replication, autoscaling, and automated connection pooling.
+              <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed line-clamp-3 sm:line-clamp-none">
+                Serverless Lakebase Postgres with instant branch replication, autoscaling, and automated pooling.
               </p>
             </div>
 
             {/* Service 2 */}
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
+            <div className="p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 sm:space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <Zap className="h-6 w-6 text-amber-600" />
-                <Badge variant="success" className="text-[10px]">Active</Badge>
+                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-amber-600" />
+                <Badge variant="success" className="text-[9px] sm:text-[10px] px-1.5 py-0.5">Active</Badge>
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900">Upstash Serverless Redis</h4>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">rediss:// channel layer (TLS)</p>
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Upstash Redis</h4>
+                <p className="text-[10px] sm:text-xs text-slate-500 font-mono mt-0.5 truncate">TLS Broker Channel</p>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Encrypted TLS broker powering Celery background queues and Django Channels WebSocket pub/sub distribution.
+              <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed line-clamp-3 sm:line-clamp-none">
+                Encrypted TLS broker powering Celery background queues and Django Channels WebSocket pub/sub.
               </p>
             </div>
 
             {/* Service 3 */}
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
+            <div className="p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 sm:space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <Server className="h-6 w-6 text-blue-600" />
-                <Badge variant="success" className="text-[10px]">Active</Badge>
+                <Server className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
+                <Badge variant="success" className="text-[9px] sm:text-[10px] px-1.5 py-0.5">Active</Badge>
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900">Django 5 + Channels ASGI</h4>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">Daphne 4.1.2</p>
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Django 5 + ASGI</h4>
+                <p className="text-[10px] sm:text-xs text-slate-500 font-mono mt-0.5 truncate">Daphne 4.1.2</p>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed line-clamp-3 sm:line-clamp-none">
                 Asynchronous request handling with JWT WebSocket middleware and strict HIPAA audit event logging.
               </p>
             </div>
 
             {/* Service 4 */}
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
+            <div className="p-3.5 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2 sm:space-y-3.5 hover:border-slate-300 hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <Cpu className="h-6 w-6 text-purple-600" />
-                <Badge variant="success" className="text-[10px]">Active</Badge>
+                <Cpu className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                <Badge variant="success" className="text-[9px] sm:text-[10px] px-1.5 py-0.5">Active</Badge>
               </div>
               <div>
-                <h4 className="font-bold text-sm text-slate-900">Celery Distributed Worker</h4>
-                <p className="text-xs text-slate-500 font-mono mt-0.5">Celery 5.4.0</p>
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Celery Worker</h4>
+                <p className="text-[10px] sm:text-xs text-slate-500 font-mono mt-0.5 truncate">Celery 5.4.0</p>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Dedicated asynchronous queues for PDF reports, telemetry notifications, and ML model drift evaluations.
+              <p className="text-[11px] sm:text-xs text-slate-600 leading-relaxed line-clamp-3 sm:line-clamp-none">
+                Dedicated asynchronous queues for PDF reports, telemetry notifications, and ML drift evaluations.
               </p>
             </div>
           </div>
@@ -1568,10 +1543,10 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 7. HIPAA & Institutional Governance */}
       {/* ------------------------------------------------------------------ */}
-      <section id="security" className="py-14 sm:py-20 border-b border-slate-200 bg-white">
+      <section id="security" className="py-8 sm:py-16 border-b border-slate-200 bg-white">
         <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 items-center">
-            <div className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 items-center">
+            <div className="space-y-3 sm:space-y-4">
               <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800">
                 <ShieldCheck className="h-4 w-4 text-teal-600" />
                 <span>SECURITY & PATIENT PRIVACY</span>
@@ -1583,20 +1558,20 @@ export default function LandingPage() {
                 Hospital environments demand uncompromising standards of data segregation. The CDSS architecture enforces
                 medical record masking, audit logging for all prediction inspections, and strict role permissions.
               </p>
-              <div className="space-y-3 pt-2">
-                <div className="flex items-start gap-3">
+              <div className="space-y-2.5 sm:space-y-3 pt-1">
+                <div className="flex items-start gap-2.5 sm:gap-3">
                   <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-slate-700">
                     Encrypted Medical Record Numbers (MRN) with masked display across telemetry feeds.
                   </span>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5 sm:gap-3">
                   <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-slate-700">
                     Mandatory physician override justifications permanently bound to model decision logs.
                   </span>
                 </div>
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5 sm:gap-3">
                   <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
                   <span className="text-xs text-slate-700">
                     Automatic JWT session expiration with silent refresh and instant local storage purging.
@@ -1605,25 +1580,25 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50/70 p-4 xs:p-6 sm:p-8 space-y-4 shadow-xs">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div className="rounded-xl sm:rounded-3xl border border-slate-200 bg-slate-50/70 p-3.5 xs:p-5 sm:p-8 space-y-3 sm:space-y-4 shadow-xs">
+              <div className="flex items-center justify-between pb-2.5 sm:pb-3 border-b border-slate-200">
                 <span className="text-xs font-bold text-slate-900 uppercase tracking-wide">Role-Based Access Control (RBAC)</span>
-                <Badge variant="outline" className="text-[11px] bg-white text-slate-700 border-slate-200">Enforced</Badge>
+                <Badge variant="outline" className="text-[10px] sm:text-[11px] bg-white text-slate-700 border-slate-200">Enforced</Badge>
               </div>
-              <div className="space-y-3 text-xs">
-                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-2 border-b border-slate-200/70 gap-0.5">
+              <div className="space-y-2.5 sm:space-y-3 text-xs">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1.5 sm:py-2 border-b border-slate-200/70 gap-0.5">
                   <span className="font-semibold text-slate-800">Physicians / Cardiologists</span>
                   <span className="text-teal-700 font-mono font-medium text-[11px] sm:text-xs">Full EHR, Predictions, Overrides</span>
                 </div>
-                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-2 border-b border-slate-200/70 gap-0.5">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1.5 sm:py-2 border-b border-slate-200/70 gap-0.5">
                   <span className="font-semibold text-slate-800">Triage Nurses</span>
                   <span className="text-sky-700 font-mono font-medium text-[11px] sm:text-xs">Vitals Entry, Telemetry Alerts</span>
                 </div>
-                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-2 border-b border-slate-200/70 gap-0.5">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1.5 sm:py-2 border-b border-slate-200/70 gap-0.5">
                   <span className="font-semibold text-slate-800">Medical Informaticists</span>
                   <span className="text-amber-700 font-mono font-medium text-[11px] sm:text-xs">SHAP Analytics, Evaluation</span>
                 </div>
-                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-2 gap-0.5">
+                <div className="flex flex-col xs:flex-row xs:items-center justify-between py-1.5 sm:py-2 gap-0.5">
                   <span className="font-semibold text-slate-800">Hospital Administrators</span>
                   <span className="text-purple-700 font-mono font-medium text-[11px] sm:text-xs">Model Registry, Rollback, Audit</span>
                 </div>
@@ -1636,10 +1611,10 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 8. Peer-Reviewed Medical Guidelines */}
       {/* ------------------------------------------------------------------ */}
-      <section className="py-14 sm:py-20 border-b border-slate-200 bg-slate-50/50">
-        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="text-center max-w-2xl mx-auto space-y-2.5 sm:space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3.5 py-1 rounded-full border border-teal-200">
+      <section className="py-8 sm:py-16 border-b border-slate-200 bg-slate-50/50">
+        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
               <BookOpen className="h-3.5 w-3.5 text-teal-600" />
               <span>PEER-REVIEWED CONSENSUS</span>
             </div>
@@ -1651,8 +1626,8 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2.5 sm:space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">
                   SSC-2021-SEPSIS
@@ -1665,7 +1640,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3">
+            <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2.5 sm:space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
                   KDIGO-2022-AKI
@@ -1678,7 +1653,7 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <div className="p-5 sm:p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-3 sm:col-span-2 lg:col-span-1">
+            <div className="p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-slate-200 bg-white shadow-xs space-y-2.5 sm:space-y-3 sm:col-span-2 lg:col-span-1">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">
                   AHA-ACC-2017-HTN
@@ -1697,10 +1672,10 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 9. Clinical & Institutional FAQ */}
       {/* ------------------------------------------------------------------ */}
-      <section id="faq" className="py-14 sm:py-20 border-b border-slate-200 bg-white">
-        <div className="container mx-auto max-w-4xl px-3.5 sm:px-6 lg:px-8 space-y-8 sm:space-y-10">
-          <div className="text-center space-y-2.5 sm:space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3.5 py-1 rounded-full border border-teal-200">
+      <section id="faq" className="py-8 sm:py-16 border-b border-slate-200 bg-white">
+        <div className="container mx-auto max-w-4xl px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
+          <div className="text-center space-y-2 sm:space-y-3">
+            <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-800 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
               <HelpCircle className="h-3.5 w-3.5 text-teal-600" />
               <span>FREQUENTLY ASKED QUESTIONS</span>
             </div>
@@ -1712,7 +1687,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="space-y-2.5 sm:space-y-3">
+          <div className="space-y-2 sm:space-y-2.5">
             {[
               {
                 q: "How does the system ensure licensed physicians retain final diagnostic authority?",
@@ -1737,12 +1712,12 @@ export default function LandingPage() {
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl border border-slate-200 bg-slate-50/50 overflow-hidden transition-all shadow-2xs"
+                className="rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50/50 overflow-hidden transition-all shadow-2xs"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between text-xs sm:text-sm font-bold text-slate-900 hover:text-teal-700 transition-colors cursor-pointer gap-2"
+                  className="w-full p-3.5 sm:p-5 text-left flex items-center justify-between text-xs sm:text-sm font-bold text-slate-900 hover:text-teal-700 transition-colors cursor-pointer gap-2"
                 >
                   <span className="leading-snug">{item.q}</span>
                   <ChevronDown
@@ -1752,7 +1727,7 @@ export default function LandingPage() {
                   />
                 </button>
                 {openFaq === idx && (
-                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-200/60 bg-white">
+                  <div className="px-3.5 pb-3.5 sm:px-5 sm:pb-5 pt-1 text-xs text-slate-600 leading-relaxed border-t border-slate-200/60 bg-white">
                     {item.a}
                   </div>
                 )}
@@ -1765,9 +1740,9 @@ export default function LandingPage() {
       {/* ------------------------------------------------------------------ */}
       {/* 10. Institutional Footer */}
       {/* ------------------------------------------------------------------ */}
-      <footer className="bg-white py-10 sm:py-12 border-t border-slate-200">
-        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      <footer className="bg-white py-8 sm:py-12 border-t border-slate-200">
+        <div className="container mx-auto max-w-7xl px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5 text-center md:text-left">
             <div className="flex items-center gap-3">
               <div className="relative h-9 w-9 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5">
                 <Image src="/logo.png" alt="PatientRisk CDSS Logo" width={40} height={40} className="rounded-lg object-contain" />
@@ -1778,7 +1753,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 sm:gap-6 text-xs font-semibold text-slate-600">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 sm:gap-6 text-xs font-semibold text-slate-600">
               <Link href="/dashboard" className="hover:text-teal-700 transition-colors">
                 Clinician Portal
               </Link>
@@ -1800,7 +1775,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="border-t border-slate-100 pt-6 text-[10px] sm:text-[11px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <div className="border-t border-slate-100 pt-5 text-[10px] sm:text-[11px] text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2.5 text-center sm:text-left">
             <div className="flex items-center gap-1.5 justify-center sm:justify-start">
               <HeartPulse className="h-3.5 w-3.5 text-teal-600 shrink-0" />
               <span>BPY-CSE-2666 Patient Risk Level Prediction System © 2026. All rights reserved.</span>
@@ -1814,3 +1789,4 @@ export default function LandingPage() {
     </div>
   );
 }
+
