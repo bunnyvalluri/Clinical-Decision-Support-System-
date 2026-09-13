@@ -1,0 +1,48 @@
+Django>=5.0.9,<5.1
+djangorestframework>=3.15.2,<3.16
+djangorestframework-simplejwt>=5.3.1,<5.4
+django-cors-headers>=4.4.0,<4.5
+django-extensions>=3.2.3,<3.3
+django-filter>=24.3,<25
+
+# Channels / WebSockets
+channels>=4.1.0,<4.2
+channels-redis>=4.2.0,<4.3
+daphne>=4.1.2,<4.2
+
+# Celery / Background tasks
+celery>=5.4.0,<5.5
+django-celery-beat>=2.7.0,<2.8
+django-celery-results>=2.5.1,<2.6
+
+# Redis
+redis>=5.1.1,<5.2
+
+# Database
+psycopg2-binary>=2.9.9,<3.0
+dj-database-url>=2.2.0,<3.0
+
+# Environment / config
+python-decouple>=3.8,<4.0
+
+# ML stack
+pandas>=2.2.3,<3.0
+numpy>=2.0.0,<3.0
+scikit-learn>=1.5.2,<2.0
+imbalanced-learn>=0.12.3,<1.0
+shap>=0.45.1,<1.0
+joblib>=1.4.2,<2.0
+
+# Serialization / files
+Pillow>=10.4.0,<11.0
+openpyxl>=3.1.5,<3.2
+
+# Report generation
+reportlab>=4.2.4,<4.3
+
+# Static files
+whitenoise>=6.7.0,<6.8
+
+# Production server
+gunicorn>=23.0.0,<24.0
+uvicorn[standard]>=0.31.0,<0.32

@@ -1,0 +1,7 @@
+-r base.txt
+
+# Production monitoring / observability (add Sentry etc. here)
+# sentry-sdk>=2.14.0,<2.15
+
+# Production hardening
+django-ratelimit>=4.1.0,<4.2

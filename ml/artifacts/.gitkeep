@@ -1,0 +1,4 @@
+# ML artifacts directory
+# Trained model .pkl/.joblib files are stored here
+# This directory is gitignored (models can be large)
+# In production, use a shared volume or object storage

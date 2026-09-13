@@ -1,0 +1,71 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment files (NEVER commit secrets)
+.env
+.env.*
+*.env
+backend/.env
+frontend/.env
+frontend/.env.local
+!.env.example
+!*.env.example
+!frontend/.env.example
+
+# Neon local state
+.neon/
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+backend/venv/
+backend/env/
+
+# Django & runtime
+*.log
+logs/
+backend/logs/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+backend/staticfiles/
+media/
+backend/media/
+
+# ML artifacts (can be large)
+ml/artifacts/*.pkl
+ml/artifacts/*.joblib
+ml/artifacts/*.h5
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+docker-compose.override.yml
