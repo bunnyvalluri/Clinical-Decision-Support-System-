@@ -366,144 +366,180 @@ export default function LandingPage() {
             {/* Mobile / Tablet Menu Button */}
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
               className="lg:hidden touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors"
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <Menu className="h-5 w-5" />
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile & Tablet Full Screen Slide-Down Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden fixed inset-x-0 top-16 bottom-0 z-50 bg-slate-900/40 backdrop-blur-xs flex flex-col justify-start animate-in fade-in duration-200">
-            <div
-              className="bg-white border-b border-slate-200 shadow-2xl p-5 space-y-5 max-h-[calc(100vh-4rem)] overflow-y-auto"
-              onClick={(e) => e.stopPropagation()}
+      {/* Mobile & Tablet Full Screen Slide-Over Navigation Drawer (Rendered outside header to escape backdrop-filter containing block) */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-[100] flex flex-col bg-white animate-in fade-in duration-200">
+          {/* Mobile Drawer Top Bar with Dedicated Close Button */}
+          <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 pt-safe bg-white shrink-0">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2.5 group"
             >
-              {/* Telemetry Status Banner */}
-              <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-semibold">
-                <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                  <span>NODE 04 • CLOUD TELEMETRY ONLINE</span>
-                </div>
-                <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full">
-                  SUB-20MS
+              <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5">
+                <Image
+                  src="/logo.png"
+                  alt="PatientRisk CDSS Logo"
+                  width={36}
+                  height={36}
+                  className="h-full w-full object-contain rounded-lg"
+                />
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-extrabold text-slate-950">PatientRisk</span>
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
+                  CDSS
                 </span>
               </div>
+            </Link>
 
-              {/* Navigation Anchor Links */}
-              <div className="space-y-1 text-sm font-semibold text-slate-700">
-                <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 mb-1">
-                  Navigation
-                </p>
-                {[
-                  { href: "#simulator", label: "Risk Simulator" },
-                  { href: "#features", label: "Capabilities & Algorithms" },
-                  { href: "#workflow", label: "Care Pathway Integration" },
-                  { href: "#architecture", label: "Cloud Backing Stack" },
-                  { href: "#security", label: "Governance & HIPAA Security" },
-                  { href: "#faq", label: "Evidence & FAQ" },
-                ].map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="touch-target flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-100 hover:text-teal-700 transition-colors text-slate-800"
-                  >
-                    <span>{link.label}</span>
-                    <ChevronRight className="h-4 w-4 text-slate-400" />
-                  </a>
-                ))}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close navigation menu"
+              className="touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Scrollable Mobile Drawer Content */}
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5 pb-safe">
+            {/* Live Operational Status Banner */}
+            <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-semibold">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping shrink-0" />
+                <span className="truncate">NODE 04 • CLOUD TELEMETRY ONLINE</span>
               </div>
+              <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full shrink-0">
+                SUB-20MS
+              </span>
+            </div>
 
-              {/* 1-Click Clinician Sandboxes in Mobile Drawer */}
-              <div className="space-y-2 border-t border-slate-100 pt-4">
-                <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-1">
-                  1-Click Role Workspaces:
-                </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleQuickDemo("DOCTOR");
-                    }}
-                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-teal-400 transition-colors"
-                  >
-                    <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
-                      MD • Doctor
-                    </span>
-                    <p className="text-xs font-bold text-slate-900 mt-1 truncate">Physician Portal</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleQuickDemo("NURSE");
-                    }}
-                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-sky-400 transition-colors"
-                  >
-                    <span className="text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
-                      RN • Nurse
-                    </span>
-                    <p className="text-xs font-bold text-slate-900 mt-1 truncate">Triage & Bedside</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleQuickDemo("ANALYST");
-                    }}
-                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 transition-colors"
-                  >
-                    <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                      BI • Analyst
-                    </span>
-                    <p className="text-xs font-bold text-slate-900 mt-1 truncate">Informatics / SHAP</p>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleQuickDemo("ADMIN");
-                    }}
-                    className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-purple-400 transition-colors"
-                  >
-                    <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
-                      IT • Admin
-                    </span>
-                    <p className="text-xs font-bold text-slate-900 mt-1 truncate">Governance</p>
-                  </button>
-                </div>
-              </div>
-
-              {/* Bottom Action CTAs in Mobile Drawer */}
-              <div className="pt-2 space-y-2">
-                <Link
-                  href="/dashboard"
+            {/* Navigation Section Anchor Links */}
+            <div className="space-y-1">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 mb-1">
+                Sections
+              </p>
+              {[
+                { href: "#simulator", label: "Risk Simulator" },
+                { href: "#features", label: "Capabilities & Algorithms" },
+                { href: "#workflow", label: "Care Pathway Integration" },
+                { href: "#architecture", label: "Cloud Backing Stack" },
+                { href: "#security", label: "Governance & HIPAA Security" },
+                { href: "#faq", label: "Evidence & FAQ" },
+              ].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="touch-target w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-teal-600 text-white font-bold text-sm shadow-md"
+                  className="touch-target flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-slate-50 hover:text-teal-700 transition-colors text-slate-800 font-semibold text-sm"
                 >
-                  <HeartPulse className="h-4 w-4" />
-                  Launch Live Clinical Portal
-                </Link>
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="touch-target w-full flex items-center justify-center py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50"
+                  <span>{link.label}</span>
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
+                </a>
+              ))}
+            </div>
+
+            {/* 1-Click Clinician Role Sandboxes */}
+            <div className="space-y-2 border-t border-slate-100 pt-4">
+              <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-1">
+                1-Click Role Workspaces:
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleQuickDemo("DOCTOR");
+                  }}
+                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-teal-400 hover:bg-teal-50/40 transition-colors"
                 >
-                  Sign In with Credentials
-                </Link>
+                  <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                    MD • Doctor
+                  </span>
+                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Physician Portal</p>
+                  <p className="text-[10px] text-slate-500 truncate">Cardiology & ICU</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleQuickDemo("NURSE");
+                  }}
+                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-sky-400 hover:bg-sky-50/40 transition-colors"
+                >
+                  <span className="text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                    RN • Nurse
+                  </span>
+                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Triage & Bedside</p>
+                  <p className="text-[10px] text-slate-500 truncate">Emergency Ward</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleQuickDemo("ANALYST");
+                  }}
+                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-amber-400 hover:bg-amber-50/40 transition-colors"
+                >
+                  <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                    BI • Analyst
+                  </span>
+                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Informatics / SHAP</p>
+                  <p className="text-[10px] text-slate-500 truncate">Telemetry Audit</p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleQuickDemo("ADMIN");
+                  }}
+                  className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-left hover:border-purple-400 hover:bg-purple-50/40 transition-colors"
+                >
+                  <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                    IT • Admin
+                  </span>
+                  <p className="text-xs font-bold text-slate-900 mt-1.5 truncate">Governance</p>
+                  <p className="text-[10px] text-slate-500 truncate">Model Registry</p>
+                </button>
               </div>
             </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-2 pb-6 space-y-2.5">
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="touch-target w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-md transition-colors"
+              >
+                <HeartPulse className="h-4 w-4" />
+                Launch Live Clinical Portal
+              </Link>
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="touch-target w-full flex items-center justify-center py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors"
+              >
+                Sign In with Credentials
+              </Link>
+            </div>
           </div>
-        )}
-      </header>
+        </div>
+      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* 2. Hero Section: Clinical Decision Support Platform */}
