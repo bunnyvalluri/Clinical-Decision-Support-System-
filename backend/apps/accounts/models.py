@@ -27,6 +27,40 @@ class UserRole(models.TextChoices):
     ANALYST = "ANALYST", "Analyst"
 
 
+class Role(models.Model):
+    """
+    Normalized relational role model for clinical permissions and access management.
+    """
+
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+        help_text="Unique identifier (UUID v4).",
+    )
+    name = models.CharField(
+        max_length=50,
+        unique=True,
+        db_index=True,
+        help_text="Role name (e.g. ADMIN, DOCTOR, NURSE, ANALYST).",
+    )
+    description = models.TextField(
+        blank=True,
+        help_text="Detailed description of clinical responsibilities and access level.",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "roles"
+        verbose_name = "Role"
+        verbose_name_plural = "Roles"
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class User(AbstractUser):
     """
     Custom user model for BPY-CSE-2666.
@@ -56,6 +90,14 @@ class User(AbstractUser):
         default=UserRole.DOCTOR,
         db_index=True,
         help_text="Clinical role determining access permissions.",
+    )
+    role_obj = models.ForeignKey(
+        Role,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="assigned_users",
+        help_text="Normalized relational role foreign key.",
     )
     phone_number = models.CharField(
         max_length=20,
