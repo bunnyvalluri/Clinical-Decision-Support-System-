@@ -30,6 +30,7 @@ import { Alert } from "@/components/ui/alert";
 import { ShapWaterChart } from "@/components/ui/chart";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
 import { useAuthStore } from "@/features/auth/authStore";
+import { ClinicalIntelligencePanel } from "@/features/ai/ClinicalIntelligencePanel";
 import type { RiskLevel } from "@/types";
 
 export default function PredictionExplanationPage() {
@@ -226,6 +227,13 @@ export default function PredictionExplanationPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Advanced Clinical AI Intelligence: Deterministic Rules & Grounded RAG */}
+        <ClinicalIntelligencePanel
+          patientMrn={prediction.patient_mrn}
+          requiresHumanReview={prediction.risk_level === "HIGH" || prediction.risk_level === "CRITICAL"}
+          correlationId={`trace-pred-${prediction.id.slice(0, 8)}`}
+        />
 
         {/* Evidence-Based Clinical Recommendations */}
         <Card className="bg-white border-slate-200 shadow-sm">

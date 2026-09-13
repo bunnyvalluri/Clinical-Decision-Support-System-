@@ -24,6 +24,7 @@ urlpatterns = [
     path("api/v1/ml/", include("apps.ml_engine.urls", namespace="ml_engine")),
     path("api/v1/models/", include("apps.model_registry.urls", namespace="model_registry")),
     path("api/v1/audit/", include("apps.audit.urls", namespace="audit")),
+    path("api/v1/ai/", include("apps.ai_orchestrator.urls", namespace="ai_orchestrator")),
 ]
 
 # Debug toolbar (development only)
