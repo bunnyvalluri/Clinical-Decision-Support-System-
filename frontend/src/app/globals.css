@@ -174,17 +174,3 @@ body {
     scroll-behavior: auto !important;
   }
 }
-
-/* Hide Vercel Feedback & Preview Toolbar Widget */
-vercel-live-feedback,
-#vercel-live-feedback,
-[data-vercel-toolbar],
-[data-vercel-feedback],
-#vercel-toolbar,
-.__vercel-toolbar {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
