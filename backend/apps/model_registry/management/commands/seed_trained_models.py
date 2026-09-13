@@ -46,9 +46,9 @@ class Command(BaseCommand):
                     with open(eval_path, "r", encoding="utf-8") as f:
                         eval_data = json.load(f)
 
-                model_name = meta.get("name", model_dir.name)
+                model_name = meta.get("model_name", meta.get("name", model_dir.name))
                 version = meta.get("version", version_dir.name)
-                algorithm = meta.get("model_type", "UNKNOWN")
+                algorithm = meta.get("algorithm", meta.get("model_type", "UNKNOWN"))
 
                 rel_artifact_path = str(pipeline_path.relative_to(repo_root)).replace("\\", "/")
 

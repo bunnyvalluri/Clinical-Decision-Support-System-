@@ -171,3 +171,59 @@ class TaskStatusEvent:
             "timestamp": self.timestamp,
         }
 
+
+@dataclass(frozen=True)
+class ModelLifecycleEvent:
+    model_name: str
+    version: str
+    status: str
+    event_type: str  # "model.status.changed" | "model.activated" | "model.validation.failed"
+    actor: str = ""
+    reason: str = ""
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": self.event_type.upper().replace(".", "_"),
+            "type": "model_lifecycle",
+            "model_name": self.model_name,
+            "version": self.version,
+            "status": self.status,
+            "event_type": self.event_type,
+            "actor": self.actor,
+            "reason": self.reason,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class DriftAlertEvent:
+    drift_type: str  # "FEATURE_DRIFT" | "PREDICTION_DRIFT"
+    feature_or_class: str
+    metric_name: str
+    metric_value: float
+    severity: str  # "MODERATE" | "SEVERE"
+    message: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "DRIFT_DETECTED",
+            "type": "drift_detected",
+            "drift_type": self.drift_type,
+            "feature_or_class": self.feature_or_class,
+            "metric_name": self.metric_name,
+            "metric_value": round(float(self.metric_value), 4),
+            "severity": self.severity,
+            "message": self.message,
+            "timestamp": self.timestamp,
+        }
+

@@ -1,73 +1,365 @@
 {
-  "accuracy": 0.464,
-  "precision_macro": 0.2771,
-  "precision_weighted": 0.2771,
-  "recall_macro": 0.464,
-  "recall_weighted": 0.464,
-  "f1_macro": 0.3232,
-  "f1_weighted": 0.3232,
-  "roc_auc": 0.9173,
+  "accuracy": 0.796,
+  "precision_macro": 0.8464,
+  "precision_weighted": 0.8464,
+  "recall_macro": 0.796,
+  "recall_weighted": 0.796,
+  "f1_macro": 0.7861,
+  "f1_weighted": 0.7861,
+  "roc_auc_macro": 0.9139,
+  "roc_auc_weighted": 0.9139,
+  "roc_auc": 0.9139,
+  "pr_auc_macro": 0.8152,
+  "pr_auc_weighted": 0.8152,
+  "brier_score": 0.3869,
   "confusion_matrix": [
     [
-      0,
       125,
       0,
+      0,
       0
     ],
     [
+      51,
+      71,
       0,
-      124,
-      1,
-      0
-    ],
-    [
-      0,
-      4,
-      105,
-      16
-    ],
-    [
-      0,
-      0,
-      122,
       3
+    ],
+    [
+      0,
+      0,
+      125,
+      0
+    ],
+    [
+      0,
+      1,
+      47,
+      77
+    ]
+  ],
+  "confusion_matrix_normalized": [
+    [
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.408,
+      0.568,
+      0.0,
+      0.024
+    ],
+    [
+      0.0,
+      0.0,
+      1.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.008,
+      0.376,
+      0.616
     ]
   ],
   "class_labels": [
-    "LOW",
-    "MEDIUM",
+    "CRITICAL",
     "HIGH",
-    "CRITICAL"
+    "LOW",
+    "MEDIUM"
   ],
   "class_wise_metrics": {
-    "LOW": {
-      "precision": 0.0,
-      "recall": 0.0,
-      "f1_score": 0.0,
+    "CRITICAL": {
+      "precision": 0.7102,
+      "recall": 1.0,
+      "sensitivity": 1.0,
+      "specificity": 0.864,
+      "f1_score": 0.8306,
       "support": 125,
-      "roc_auc": 0.9949013333333333
-    },
-    "MEDIUM": {
-      "precision": 0.4901185770750988,
-      "recall": 0.992,
-      "f1_score": 0.656084656084656,
-      "support": 125,
-      "roc_auc": 0.9225813333333334
+      "roc_auc": 0.9335,
+      "pr_auc": 0.7806,
+      "confusion_breakdown": {
+        "true_positives": 125,
+        "false_positives": 51,
+        "false_negatives": 0,
+        "true_negatives": 324,
+        "sensitivity": 1.0,
+        "recall": 1.0,
+        "specificity": 0.864,
+        "precision": 0.7102,
+        "npv": 1.0
+      }
     },
     "HIGH": {
-      "precision": 0.4605263157894737,
-      "recall": 0.84,
-      "f1_score": 0.5949008498583569,
+      "precision": 0.9861,
+      "recall": 0.568,
+      "sensitivity": 0.568,
+      "specificity": 0.9973,
+      "f1_score": 0.7208,
       "support": 125,
-      "roc_auc": 0.839904
+      "roc_auc": 0.877,
+      "pr_auc": 0.7953,
+      "confusion_breakdown": {
+        "true_positives": 71,
+        "false_positives": 1,
+        "false_negatives": 54,
+        "true_negatives": 374,
+        "sensitivity": 0.568,
+        "recall": 0.568,
+        "specificity": 0.9973,
+        "precision": 0.9861,
+        "npv": 0.8738
+      }
     },
-    "CRITICAL": {
-      "precision": 0.15789473684210525,
-      "recall": 0.024,
-      "f1_score": 0.041666666666666664,
+    "LOW": {
+      "precision": 0.7267,
+      "recall": 1.0,
+      "sensitivity": 1.0,
+      "specificity": 0.8747,
+      "f1_score": 0.8418,
       "support": 125,
-      "roc_auc": 0.9119039999999999
+      "roc_auc": 0.9475,
+      "pr_auc": 0.8521,
+      "confusion_breakdown": {
+        "true_positives": 125,
+        "false_positives": 47,
+        "false_negatives": 0,
+        "true_negatives": 328,
+        "sensitivity": 1.0,
+        "recall": 1.0,
+        "specificity": 0.8747,
+        "precision": 0.7267,
+        "npv": 1.0
+      }
+    },
+    "MEDIUM": {
+      "precision": 0.9625,
+      "recall": 0.616,
+      "sensitivity": 0.616,
+      "specificity": 0.992,
+      "f1_score": 0.7512,
+      "support": 125,
+      "roc_auc": 0.8977,
+      "pr_auc": 0.8327,
+      "confusion_breakdown": {
+        "true_positives": 77,
+        "false_positives": 3,
+        "false_negatives": 48,
+        "true_negatives": 372,
+        "sensitivity": 0.616,
+        "recall": 0.616,
+        "specificity": 0.992,
+        "precision": 0.9625,
+        "npv": 0.8857
+      }
     }
   },
-  "test_sample_count": 500
+  "clinical_error_impact": {
+    "missed_critical_cases": 0,
+    "missed_high_risk_cases": 54,
+    "critical_false_alarms": 51,
+    "critical_sensitivity": 1.0,
+    "high_risk_sensitivity": 0.568,
+    "clinical_safety_assessment": "MONITOR: 54 high/critical cases were under-classified. Human physician oversight is required.",
+    "asymmetric_risk_notice": "False negatives in HIGH/CRITICAL categories carry severe risks of delayed therapeutic intervention. Optimization must prioritize recall on high-severity classes over simple overall accuracy."
+  },
+  "latency_per_sample_ms": 0.044,
+  "model_size_kb": 97.8,
+  "test_sample_count": 500,
+  "averaging_methodology": {
+    "multiclass_strategy": "One-vs-Rest (OvR)",
+    "macro_averaging": "Unweighted mean across classes (equal class importance)",
+    "weighted_averaging": "Support-weighted mean across classes"
+  },
+  "calibration_tuning": {
+    "method": "sigmoid",
+    "baseline_brier_score": 0.6983,
+    "calibrated_brier_score": 0.379,
+    "improvement": 0.3193,
+    "curves": {
+      "CRITICAL": {
+        "mean_predicted_probability": [
+          0.0021,
+          0.6357
+        ],
+        "fraction_of_positives": [
+          0.0,
+          0.753
+        ],
+        "brier_score": 0.0673
+      },
+      "HIGH": {
+        "mean_predicted_probability": [
+          0.0,
+          0.3628,
+          0.5256,
+          0.6403
+        ],
+        "fraction_of_positives": [
+          0.0,
+          0.1839,
+          0.6515,
+          1.0
+        ],
+        "brier_score": 0.1201
+      },
+      "LOW": {
+        "mean_predicted_probability": [
+          0.0003,
+          0.6353
+        ],
+        "fraction_of_positives": [
+          0.0,
+          0.7353
+        ],
+        "brier_score": 0.0695
+      },
+      "MEDIUM": {
+        "mean_predicted_probability": [
+          0.0,
+          0.3622,
+          0.471,
+          0.6373
+        ],
+        "fraction_of_positives": [
+          0.0,
+          0.2133,
+          0.3485,
+          1.0
+        ],
+        "brier_score": 0.1222
+      }
+    }
+  },
+  "fairness_evaluation": {
+    "evaluated_demographics": [
+      "gender",
+      "encounter_type"
+    ],
+    "cohort_analyses": {
+      "gender": {
+        "FEMALE": {
+          "sample_count": 252,
+          "sample_percentage": 50.4,
+          "accuracy": 0.8095,
+          "recall_macro": 0.805,
+          "precision_macro": 0.8596,
+          "high_critical_recall": 0.5344,
+          "false_negative_rate_high_risk": 0.4656,
+          "brier_score": 0.3829
+        },
+        "OTHER": {
+          "sample_count": 24,
+          "sample_percentage": 4.8,
+          "accuracy": 0.7083,
+          "recall_macro": 0.7604,
+          "precision_macro": 0.8036,
+          "high_critical_recall": 0.8333,
+          "false_negative_rate_high_risk": 0.1667,
+          "brier_score": 0.4361
+        },
+        "MALE": {
+          "sample_count": 222,
+          "sample_percentage": 44.4,
+          "accuracy": 0.7883,
+          "recall_macro": 0.7896,
+          "precision_macro": 0.8363,
+          "high_critical_recall": 0.503,
+          "false_negative_rate_high_risk": 0.497,
+          "brier_score": 0.3875
+        }
+      },
+      "encounter_type": {
+        "INPATIENT": {
+          "sample_count": 97,
+          "sample_percentage": 19.4,
+          "accuracy": 0.6082,
+          "recall_macro": 0.3041,
+          "precision_macro": 0.4762,
+          "high_critical_recall": 0.2029,
+          "false_negative_rate_high_risk": 0.7971,
+          "brier_score": 0.4949
+        },
+        "ROUTINE": {
+          "sample_count": 93,
+          "sample_percentage": 18.6,
+          "accuracy": 1.0,
+          "recall_macro": 1.0,
+          "precision_macro": 1.0,
+          "high_critical_recall": 1.0,
+          "false_negative_rate_high_risk": 0.0,
+          "brier_score": 0.2644
+        },
+        "OUTPATIENT": {
+          "sample_count": 106,
+          "sample_percentage": 21.2,
+          "accuracy": 0.7358,
+          "recall_macro": 0.8108,
+          "precision_macro": 0.7667,
+          "high_critical_recall": 1.0,
+          "false_negative_rate_high_risk": 0.0,
+          "brier_score": 0.4185
+        },
+        "ICU": {
+          "sample_count": 94,
+          "sample_percentage": 18.8,
+          "accuracy": 1.0,
+          "recall_macro": 1.0,
+          "precision_macro": 1.0,
+          "high_critical_recall": 1.0,
+          "false_negative_rate_high_risk": 0.0,
+          "brier_score": 0.2687
+        },
+        "EMERGENCY": {
+          "sample_count": 110,
+          "sample_percentage": 22.0,
+          "accuracy": 0.6727,
+          "recall_macro": 0.5148,
+          "precision_macro": 0.4899,
+          "high_critical_recall": 0.5148,
+          "false_negative_rate_high_risk": 0.4852,
+          "brier_score": 0.4659
+        }
+      },
+      "age_cohorts": {
+        "AGE_<40": {
+          "sample_count": 84,
+          "sample_percentage": 16.8,
+          "accuracy": 0.9048,
+          "recall_macro": 0.8095,
+          "precision_macro": 0.9437,
+          "high_critical_recall": 1.0,
+          "false_negative_rate_high_risk": 0.0,
+          "brier_score": 0.3208
+        },
+        "AGE_40-65": {
+          "sample_count": 268,
+          "sample_percentage": 53.6,
+          "accuracy": 0.7537,
+          "recall_macro": 0.7827,
+          "precision_macro": 0.8041,
+          "high_critical_recall": 0.5111,
+          "false_negative_rate_high_risk": 0.4889,
+          "brier_score": 0.4106
+        },
+        "AGE_65+": {
+          "sample_count": 148,
+          "sample_percentage": 29.6,
+          "accuracy": 0.8108,
+          "recall_macro": 0.5717,
+          "precision_macro": 0.6972,
+          "high_critical_recall": 0.81,
+          "false_negative_rate_high_risk": 0.19,
+          "brier_score": 0.3817
+        }
+      }
+    },
+    "disparities": {
+      "gender_recall_disparity_ratio": 0.9447,
+      "encounter_type_recall_disparity_ratio": 0.3041
+    },
+    "limitations": "Fairness evaluation is performed across documented demographic and encounter parameters. It does not account for unmeasured social determinants of health, institutional referral biases, or intersectional disparities not reflected in the clinical feature set."
+  }
 }

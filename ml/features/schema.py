@@ -84,5 +84,9 @@ def validate_features(data: dict[str, Any] | list[dict[str, Any]] | pd.DataFrame
     for col in CATEGORICAL_FEATURES:
         df[col] = df[col].astype(str).replace({"None": "UNKNOWN", "nan": "UNKNOWN", "": "UNKNOWN"}).str.upper()
 
+    if "gender" in df.columns:
+        gender_map = {"M": "MALE", "MALE": "MALE", "F": "FEMALE", "FEMALE": "FEMALE", "OTHER": "OTHER"}
+        df["gender"] = df["gender"].map(lambda g: gender_map.get(str(g).upper(), "UNKNOWN"))
+
     # Reorder columns to the canonical feature ordering
     return df[FEATURE_NAMES]

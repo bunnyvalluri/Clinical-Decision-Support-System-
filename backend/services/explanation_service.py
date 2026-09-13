@@ -20,6 +20,7 @@ from ml.explainability.explainer import (
     EXPLANATION_DISCLAIMER,
     compute_feature_importance_values,
     compute_shap_values,
+    extract_pipeline_steps,
     get_feature_names_from_preprocessor,
     _is_tree_shap_compatible,
     _sanitize_value,
@@ -219,7 +220,7 @@ class ExplanationService:
 
     def _select_explainer(self, pipeline: Pipeline) -> IExplainer:
         """Choose SHAP or fallback based on classifier compatibility."""
-        classifier = pipeline.named_steps.get("classifier")
+        _, classifier = extract_pipeline_steps(pipeline)
         if _is_tree_shap_compatible(classifier):
             return self._shap_explainer
         return self._fallback_explainer
@@ -245,10 +246,13 @@ class ExplanationService:
         Returns:
             ExplanationPayload with per-feature contributions and directions.
         """
-        preprocessor = pipeline.named_steps.get("preprocessor")
+        preprocessor, _ = extract_pipeline_steps(pipeline)
         feature_names = get_feature_names_from_preprocessor(pipeline)
 
-        X_transformed = preprocessor.transform(input_df)
+        if preprocessor is not None:
+            X_transformed = preprocessor.transform(input_df)
+        else:
+            X_transformed = input_df.to_numpy()
 
         explainer = self._select_explainer(pipeline)
 

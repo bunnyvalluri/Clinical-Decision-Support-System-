@@ -1,10 +1,24 @@
 {
-  "name": "svm_risk_model",
+  "model_name": "svm_risk_model",
   "version": "1.0.0",
+  "algorithm": "SVM",
   "model_type": "SVM",
+  "status": "VALIDATED",
+  "training_timestamp": "2026-09-13T16:23:37.310687+00:00",
+  "saved_at": "2026-09-13T16:23:37.310701+00:00",
+  "author": "automated_training_pipeline",
   "dataset_name": "clinical_risk_v1",
-  "saved_at": "2026-09-13T06:28:00.189797+00:00",
-  "hyperparameters": {},
+  "dataset_version": "1.0.0",
+  "feature_schema_version": "v1.0",
+  "preprocessing_version": "v1.0",
+  "artifact_hash": "3ac17576aced1e73aaf814a96b3e5c27f68441b68a764cbdede04f17d5cf4644",
+  "artifact_file": "pipeline.joblib",
+  "hyperparameters": {
+    "kernel": "rbf",
+    "C": 1.0,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
   "feature_names": [
     "age",
     "systolic_bp",
@@ -23,5 +37,13 @@
     "gender",
     "encounter_type"
   ],
-  "status": "ACTIVE"
+  "approval_history": [
+    {
+      "from_status": null,
+      "to_status": "VALIDATED",
+      "timestamp": "2026-09-13T16:23:37.310709+00:00",
+      "actor": "automated_training_pipeline",
+      "reason": "Initial model build registration."
+    }
+  ]
 }

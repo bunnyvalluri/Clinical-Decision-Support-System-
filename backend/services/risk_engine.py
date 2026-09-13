@@ -1,6 +1,7 @@
 """
 RiskPredictionEngine — Core inference engine coordinating preprocessing, ML execution,
-latency benchmarking, and explainability attributions.
+latency benchmarking, multi-class probabilities, deterministic safety overrides,
+and explainability attributions.
 """
 import logging
 import time
@@ -21,7 +22,8 @@ logger = logging.getLogger(__name__)
 class RiskPredictionEngine:
     """
     Dedicated clinical risk prediction engine.
-    Orchestrates feature validation, model retrieval, inference, and explainability.
+    Orchestrates feature validation, model retrieval, multi-class inference,
+    clinical safety rules override, and explainability.
     """
 
     def __init__(
@@ -34,7 +36,7 @@ class RiskPredictionEngine:
 
     @staticmethod
     def map_probability_to_risk(probability: float) -> str:
-        """Categorize continuous risk probability into clinical severity levels."""
+        """Categorize continuous risk probability into clinical severity levels (fallback)."""
         if probability < 0.25:
             return RiskLevel.LOW
         if probability < 0.50:
@@ -62,20 +64,51 @@ class RiskPredictionEngine:
         # 3. High-precision execution timing
         start_time = time.perf_counter()
 
+        classes = list(getattr(pipeline, "classes_", [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.CRITICAL]))
+
         if hasattr(pipeline, "predict_proba"):
-            proba_arr = np.asarray(pipeline.predict_proba(df))
-            prob_float = float(proba_arr[0][1]) if proba_arr.shape[1] > 1 else float(proba_arr[0][0])
-            confidence = float(np.max(proba_arr[0]))
+            proba_raw = np.asarray(pipeline.predict_proba(df))[0]
+            if len(proba_raw) == 2:
+                prob_float = float(proba_raw[1])
+                raw_pred_class = self.map_probability_to_risk(prob_float)
+                confidence = float(np.max(proba_raw))
+            else:
+                classes = list(getattr(pipeline, "classes_", [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.CRITICAL]))
+                best_idx = int(np.argmax(proba_raw))
+                raw_pred_class = str(classes[best_idx])
+                prob_float = float(proba_raw[best_idx])
+                confidence = float(np.max(proba_raw))
         else:
-            pred_class = pipeline.predict(df)[0]
-            prob_float = 1.0 if pred_class == 1 else 0.0
+            pred_val = pipeline.predict(df)[0]
+            raw_pred_class = str(pred_val)
+            prob_float = 1.0 if pred_val == 1 else 0.0
             confidence = 1.0
 
         latency_ms = (time.perf_counter() - start_time) * 1000.0
 
-        risk_level = self.map_probability_to_risk(prob_float)
+        # Resolve discrete risk level
+        if raw_pred_class.upper() in RiskLevel.values:
+            risk_level = raw_pred_class.upper()
+        else:
+            risk_level = self.map_probability_to_risk(prob_float)
 
-        # 4. Explainability attributions via SHAP or fallback (safe execution)
+        # 4. Clinical Safety Layer: Evaluate deterministic clinical rules override
+        try:
+            from services.clinical_rules_engine import ClinicalRulesEngine
+            rules_engine = ClinicalRulesEngine()
+            alerts = rules_engine.evaluate(snapshot)
+            critical_alerts = [a for a in alerts if getattr(a, "severity", "") == "CRITICAL_EMERGENCY"]
+            if critical_alerts and risk_level not in (RiskLevel.HIGH, RiskLevel.CRITICAL):
+                logger.warning(
+                    "Clinical safety rule override: escalating %s to HIGH due to critical alert criteria: %s",
+                    risk_level,
+                    [a.trigger_criteria for a in critical_alerts],
+                )
+                risk_level = RiskLevel.HIGH
+        except Exception as rule_err:
+            logger.debug("Clinical safety rule check skipped: %s", rule_err)
+
+        # 5. Explainability attributions via SHAP or fallback
         explanation_res: ExplanationResult | None = None
         try:
             from services.explanation_service import ExplanationService
@@ -133,16 +166,20 @@ class RiskPredictionEngine:
 
         # 2. Retrieve active model
         pipeline, model_ver = self.model_provider.get_model(model_name=model_name)
+        classes = list(getattr(pipeline, "classes_", [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.HIGH, RiskLevel.CRITICAL]))
 
         # 3. Time vectorized batch inference
         start_time = time.perf_counter()
         if hasattr(pipeline, "predict_proba"):
             proba_arr = np.asarray(pipeline.predict_proba(df))
-            probs = proba_arr[:, 1] if proba_arr.shape[1] > 1 else proba_arr[:, 0]
+            best_indices = np.argmax(proba_arr, axis=1)
+            raw_classes = [str(classes[idx]) for idx in best_indices]
+            probs = [float(proba_arr[i, best_indices[i]]) for i in range(len(best_indices))]
             confidences = np.max(proba_arr, axis=1)
         else:
             preds = pipeline.predict(df)
-            probs = np.where(preds == 1, 1.0, 0.0)
+            raw_classes = [str(p) for p in preds]
+            probs = [1.0 if p == 1 or p in RiskLevel.values else 0.0 for p in preds]
             confidences = np.ones(len(df))
 
         total_latency_ms = (time.perf_counter() - start_time) * 1000.0
@@ -152,7 +189,11 @@ class RiskPredictionEngine:
         for idx, item in enumerate(batch_items):
             p_float = float(probs[idx])
             c_float = float(confidences[idx])
-            r_level = self.map_probability_to_risk(p_float)
+            pred_cls = raw_classes[idx]
+            if pred_cls.upper() in RiskLevel.values:
+                r_level = pred_cls.upper()
+            else:
+                r_level = self.map_probability_to_risk(p_float)
 
             results.append(
                 PredictionResult(
@@ -167,7 +208,7 @@ class RiskPredictionEngine:
                     inference_latency_ms=avg_latency_ms,
                     feature_snapshot=snapshots[idx],
                     feature_schema_version=getattr(model_ver, "feature_schema_version", "v1.0"),
-                    explanation=None,  # Explanations omitted in high-volume batch mode for maximum speed
+                    explanation=None,
                 )
             )
 

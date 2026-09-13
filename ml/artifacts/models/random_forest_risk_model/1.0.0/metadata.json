@@ -1,10 +1,24 @@
 {
-  "name": "random_forest_risk_model",
+  "model_name": "random_forest_risk_model",
   "version": "1.0.0",
+  "algorithm": "RANDOM_FOREST",
   "model_type": "RANDOM_FOREST",
+  "status": "VALIDATED",
+  "training_timestamp": "2026-09-13T16:23:38.244092+00:00",
+  "saved_at": "2026-09-13T16:23:38.244108+00:00",
+  "author": "automated_training_pipeline",
   "dataset_name": "clinical_risk_v1",
-  "saved_at": "2026-09-13T06:28:00.543255+00:00",
-  "hyperparameters": {},
+  "dataset_version": "1.0.0",
+  "feature_schema_version": "v1.0",
+  "preprocessing_version": "v1.0",
+  "artifact_hash": "66b020ecfa083f7c1a2979eb95670d6ea6f9dce99f6791c9406a44efc0d8fe74",
+  "artifact_file": "pipeline.joblib",
+  "hyperparameters": {
+    "n_estimators": 100,
+    "max_depth": 12,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
   "feature_names": [
     "age",
     "systolic_bp",
@@ -23,5 +37,13 @@
     "gender",
     "encounter_type"
   ],
-  "status": "ACTIVE"
+  "approval_history": [
+    {
+      "from_status": null,
+      "to_status": "VALIDATED",
+      "timestamp": "2026-09-13T16:23:38.244113+00:00",
+      "actor": "automated_training_pipeline",
+      "reason": "Initial model build registration."
+    }
+  ]
 }

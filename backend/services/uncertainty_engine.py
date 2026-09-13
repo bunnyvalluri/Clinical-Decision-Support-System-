@@ -86,7 +86,7 @@ class UncertaintyEngine(BaseService, IUncertaintyDetector):
 
         if should_abstain:
             recommendation = (
-                f"ABSTAIN RECOMMENDED: Model confidence is insufficient for an automated risk assessment "
+                f"Prediction requires additional review. Model confidence is insufficient for an automated risk assessment "
                 f"({'; '.join(reasons)}). Immediate clinical review is recommended."
             )
         else:

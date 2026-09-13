@@ -31,15 +31,35 @@ EXPLANATION_DISCLAIMER = (
 )
 
 
-def get_feature_names_from_preprocessor(pipeline: Pipeline) -> list[str]:
+def extract_pipeline_steps(pipeline: Any) -> tuple[Any, Any]:
+    """Extract (preprocessor, classifier) from Pipeline, FrozenEstimator, or CalibratedClassifierCV."""
+    inner = pipeline
+    if hasattr(inner, "estimator"):
+        inner = inner.estimator
+    if hasattr(inner, "estimator"):  # FrozenEstimator
+        inner = inner.estimator
+
+    if hasattr(inner, "named_steps"):
+        return inner.named_steps.get("preprocessor"), inner.named_steps.get("classifier")
+
+    if hasattr(pipeline, "calibrated_classifiers_") and len(pipeline.calibrated_classifiers_) > 0:
+        base = getattr(pipeline.calibrated_classifiers_[0], "estimator", None)
+        if hasattr(base, "named_steps"):
+            return base.named_steps.get("preprocessor"), base.named_steps.get("classifier")
+
+    return None, inner
+
+
+def get_feature_names_from_preprocessor(pipeline: Any) -> list[str]:
     """Retrieve output feature names from the fitted preprocessor inside the pipeline."""
-    preprocessor = pipeline.named_steps.get("preprocessor")
+    preprocessor, _ = extract_pipeline_steps(pipeline)
     if preprocessor is not None and hasattr(preprocessor, "get_feature_names_out"):
         try:
             return list(preprocessor.get_feature_names_out())
         except Exception:
             pass
     return NUMERICAL_FEATURES
+
 
 
 def _is_tree_shap_compatible(classifier: Any) -> bool:
@@ -71,8 +91,14 @@ def compute_shap_values(
     """
     import shap
 
-    classifier = pipeline.named_steps.get("classifier")
-    explainer = shap.TreeExplainer(classifier)
+    _, classifier = extract_pipeline_steps(pipeline)
+    explainer = getattr(classifier, "_cached_tree_explainer", None)
+    if explainer is None:
+        explainer = shap.TreeExplainer(classifier)
+        try:
+            setattr(classifier, "_cached_tree_explainer", explainer)
+        except Exception:
+            pass
     shap_values = explainer.shap_values(X_transformed)
 
     # shap_values shape can be (n_samples, n_features, n_classes) or list of arrays
@@ -111,7 +137,7 @@ def compute_feature_importance_values(
     Fallback feature attribution using global feature_importances_ or coef_.
     Returns uniform-like attributions when intrinsic importances are unavailable.
     """
-    classifier = pipeline.named_steps.get("classifier")
+    _, classifier = extract_pipeline_steps(pipeline)
     n_features = len(feature_names)
 
     if hasattr(classifier, "feature_importances_"):
@@ -135,7 +161,7 @@ def _sanitize_value(val: Any) -> Any:
 
 
 def explain_prediction(
-    pipeline: Pipeline,
+    pipeline: Any,
     input_data: dict[str, Any] | pd.DataFrame,
     predicted_class: str,
     top_n: int = 10,
@@ -156,18 +182,22 @@ def explain_prediction(
     else:
         raw_record = dict(input_data)
 
-    classifier = pipeline.named_steps.get("classifier")
-    preprocessor = pipeline.named_steps.get("preprocessor")
+    preprocessor, classifier = extract_pipeline_steps(pipeline)
     feature_names = get_feature_names_from_preprocessor(pipeline)
 
     # Transform input through the preprocessor to get the same encoding used for training
-    if isinstance(input_data, pd.DataFrame):
-        X_transformed = preprocessor.transform(input_data)
-    elif isinstance(input_data, dict):
-        df_temp = pd.DataFrame([input_data])
-        X_transformed = preprocessor.transform(df_temp)
+    if preprocessor is not None:
+        if isinstance(input_data, pd.DataFrame):
+            X_transformed = preprocessor.transform(input_data)
+        elif isinstance(input_data, dict):
+            df_temp = pd.DataFrame([input_data])
+            X_transformed = preprocessor.transform(df_temp)
+        else:
+            X_transformed = preprocessor.transform(pd.DataFrame([input_data]))
     else:
-        X_transformed = preprocessor.transform(pd.DataFrame([input_data]))
+        from ml.features.schema import validate_features
+        X_transformed = validate_features(input_data).values
+
 
     # Choose explanation method based on model compatibility
     use_shap = _is_tree_shap_compatible(classifier)
