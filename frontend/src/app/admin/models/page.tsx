@@ -208,7 +208,7 @@ export default function ModelManagementPage() {
         {telemetry?.active_alerts && telemetry.active_alerts.length > 0 && (
           <div className="space-y-2">
             {telemetry.active_alerts.map((alt, i) => (
-              <Alert key={i} variant={alt.severity === "SEVERE" ? "destructive" : "warning"} title={`Alert: ${alt.type}`}>
+              <Alert key={i} variant={alt.severity === "SEVERE" ? "critical" : "warning"} title={`Alert: ${alt.type}`}>
                 {alt.message}
               </Alert>
             ))}
