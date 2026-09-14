@@ -233,55 +233,55 @@ export default function AuditLogsPage() {
       </div>
 
       {/* KPI Stats Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100">
-              <FileCheck className="h-5 w-5 text-purple-700" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100">
+              <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-purple-700" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Total Signed Events</p>
-              <p className="text-xl font-bold text-slate-900">84,200</p>
-              <p className="text-[11px] text-purple-700 font-medium">100% Merkle anchored</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
-              <ShieldCheck className="h-5 w-5 text-emerald-700" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Tamper Integrity</p>
-              <p className="text-xl font-bold text-slate-900">0 Tamper Flags</p>
-              <p className="text-[11px] text-emerald-700 font-medium">SHA-256 chain verified</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Total Signed Events</p>
+              <p className="text-base sm:text-xl font-bold text-slate-900 truncate">84,200</p>
+              <p className="text-[10px] sm:text-[11px] text-purple-700 font-medium truncate">100% Merkle anchored</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100">
-              <Clock className="h-5 w-5 text-sky-700" />
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+              <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">HIPAA Retention</p>
-              <p className="text-xl font-bold text-slate-900">7 Years</p>
-              <p className="text-[11px] text-sky-700 font-medium">Append-only guaranteed</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Tamper Integrity</p>
+              <p className="text-base sm:text-xl font-bold text-slate-900 truncate">0 Flags</p>
+              <p className="text-[10px] sm:text-[11px] text-emerald-700 font-medium truncate">SHA-256 chain verified</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100">
-              <Hash className="h-5 w-5 text-amber-700" />
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-sky-700" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Current Block Root</p>
-              <p className="text-xl font-bold text-slate-900 font-mono text-sm sm:text-base">0x89f2...a12c</p>
-              <p className="text-[11px] text-amber-700 font-medium">Block #1,492,019</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">HIPAA Retention</p>
+              <p className="text-base sm:text-xl font-bold text-slate-900 truncate">7 Years</p>
+              <p className="text-[10px] sm:text-[11px] text-sky-700 font-medium truncate">Append-only</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100">
+              <Hash className="h-4 w-4 sm:h-5 sm:w-5 text-amber-700" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Current Block</p>
+              <p className="text-xs sm:text-sm md:text-base font-bold text-slate-900 font-mono truncate" title="0x89f2...a12c">0x89f2…a12c</p>
+              <p className="text-[10px] sm:text-[11px] text-amber-700 font-medium truncate">#1,492,019</p>
             </div>
           </CardContent>
         </Card>

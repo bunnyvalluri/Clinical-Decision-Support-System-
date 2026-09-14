@@ -179,55 +179,55 @@ export default function AdminConfigurationPage() {
       </div>
 
       {/* KPI Stats Strip */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100">
-              <Server className="h-5 w-5 text-purple-700" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0 border border-purple-100">
+              <Server className="h-4 w-4 sm:h-5 sm:w-5 text-purple-700" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Isolation Profile</p>
-              <p className="text-base sm:text-lg font-bold text-slate-900 truncate">Production</p>
-              <p className="text-[11px] text-purple-700 font-medium">HIPAA Tier 3</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
-              <Shield className="h-5 w-5 text-emerald-700" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Secrets Vault</p>
-              <p className="text-base sm:text-lg font-bold text-slate-900 truncate">AES-256 GCM</p>
-              <p className="text-[11px] text-emerald-700 font-medium">Auto-rotated monthly</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Isolation Profile</p>
+              <p className="text-sm sm:text-lg font-bold text-slate-900 truncate">Production</p>
+              <p className="text-[10px] sm:text-[11px] text-purple-700 font-medium truncate">HIPAA Tier 3</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100">
-              <Sliders className="h-5 w-5 text-sky-700" />
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+              <Shield className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-700" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Active Parameters</p>
-              <p className="text-base sm:text-lg font-bold text-slate-900 truncate">{CONFIG_DATA.length} Variables</p>
-              <p className="text-[11px] text-sky-700 font-medium">Zero drift detected</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Secrets Vault</p>
+              <p className="text-sm sm:text-lg font-bold text-slate-900 truncate">AES-256 GCM</p>
+              <p className="text-[10px] sm:text-[11px] text-emerald-700 font-medium truncate">Auto-rotated</p>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-white border-slate-200 shadow-sm">
-          <CardContent className="p-4 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100">
-              <FileCheck className="h-5 w-5 text-amber-700" />
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100">
+              <Sliders className="h-4 w-4 sm:h-5 sm:w-5 text-sky-700" />
             </div>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold text-slate-500 truncate">Configuration Build</p>
-              <p className="text-base sm:text-lg font-bold text-slate-900 truncate">v4.2.1-prod</p>
-              <p className="text-[11px] text-amber-700 font-medium">Sep 14, 2026</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Active Parameters</p>
+              <p className="text-sm sm:text-lg font-bold text-slate-900 truncate">{CONFIG_DATA.length} Vars</p>
+              <p className="text-[10px] sm:text-[11px] text-sky-700 font-medium truncate">Zero drift</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white border-slate-200 shadow-sm overflow-hidden">
+          <CardContent className="p-3 sm:p-4 flex items-center gap-2.5 sm:gap-3">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100">
+              <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-amber-700" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Config Build</p>
+              <p className="text-sm sm:text-lg font-bold text-slate-900 truncate">v4.2.1-prod</p>
+              <p className="text-[10px] sm:text-[11px] text-amber-700 font-medium truncate">Sep 14, 2026</p>
             </div>
           </CardContent>
         </Card>
@@ -270,16 +270,16 @@ export default function AdminConfigurationPage() {
           const displayValue = isSecret && !isRevealed ? (item.maskedValue || "••••••••••••") : item.value;
 
           return (
-            <Card key={item.key} className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                <div className="space-y-1 max-w-xl">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-bold text-slate-900">{item.key}</span>
-                    <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-600 bg-slate-50 border-slate-200">
+            <Card key={item.key} className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow overflow-hidden">
+              <CardContent className="p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div className="space-y-1 max-w-xl min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                    <span className="text-xs font-mono font-bold text-slate-900 break-all">{item.key}</span>
+                    <Badge variant="outline" className="text-[10px] uppercase font-bold text-slate-600 bg-slate-50 border-slate-200 shrink-0">
                       {item.category}
                     </Badge>
                     {isSecret && (
-                      <Badge className="bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-bold flex items-center gap-1">
+                      <Badge className="bg-amber-50 text-amber-800 border-amber-200 text-[10px] font-bold flex items-center gap-1 shrink-0">
                         <Lock className="h-2.5 w-2.5" /> VAULT SECRET
                       </Badge>
                     )}
@@ -287,32 +287,36 @@ export default function AdminConfigurationPage() {
                   <p className="text-xs text-slate-500">{item.description}</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 self-start lg:self-center">
-                  <code className="text-xs font-mono bg-slate-50 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 max-w-sm sm:max-w-md truncate">
-                    {displayValue}
-                  </code>
+                <div className="flex items-center gap-2 w-full lg:w-auto min-w-0 mt-1 lg:mt-0">
+                  <div className="relative min-w-0 flex-1 lg:flex-initial">
+                    <code className="block text-xs font-mono bg-slate-50 text-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 truncate w-full max-w-full lg:max-w-md select-all">
+                      {displayValue}
+                    </code>
+                  </div>
 
-                  {isSecret && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    {isSecret && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleShowSecret(item.key)}
+                        className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 shrink-0"
+                        title={isRevealed ? "Hide Secret" : "Reveal Secret"}
+                      >
+                        {isRevealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </Button>
+                    )}
+
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => toggleShowSecret(item.key)}
-                      className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900"
-                      title={isRevealed ? "Hide Secret" : "Reveal Secret"}
+                      onClick={() => handleCopy(item.value, item.key)}
+                      className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900 shrink-0"
+                      title="Copy Value"
                     >
-                      {isRevealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      <Copy className="h-3.5 w-3.5" />
                     </Button>
-                  )}
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleCopy(item.value, item.key)}
-                    className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900"
-                    title="Copy Value"
-                  >
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
