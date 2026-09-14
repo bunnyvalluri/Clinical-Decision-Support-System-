@@ -336,38 +336,46 @@ export function InformaticsWorkspace() {
 
       {/* Active Champion Model Spotlight Card */}
       <Card className="bg-white border-slate-200 shadow-xs overflow-hidden">
-        <div className="bg-linear-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 text-white">
+        <div className="relative p-6 bg-gradient-to-br from-white via-slate-50/70 to-teal-50/30 border-b border-slate-200/80 text-slate-900">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-sky-500" />
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-mono text-xs font-semibold">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold shadow-2xs">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   CHAMPION MODEL ACTIVE
                 </span>
-                <span className="text-xs text-slate-300">Target: Inpatient Sepsis &amp; Hemodynamic Risk</span>
+                <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
+                  <span>•</span>
+                  <span>Target: Inpatient Sepsis &amp; Hemodynamic Risk</span>
+                </span>
               </div>
-              <h2 className="text-2xl font-bold tracking-tight">RandomForestClassifier v1.0.0</h2>
-              <p className="text-xs text-slate-300 max-w-2xl">
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">RandomForestClassifier v1.0.0</h2>
+              <p className="text-xs sm:text-sm text-slate-600 max-w-2xl leading-relaxed">
                 Ensemble of 150 Calibrated Decision Trees with Isotonic Probability Mapping. Deployed with sub-millisecond scoring SLA and continuous SHAP attribution explanations.
               </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-                <p className="text-[10px] uppercase font-semibold text-slate-300">ROC-AUC</p>
-                <p className="text-xl font-bold text-emerald-400 mt-0.5">98.5%</p>
+              <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-emerald-300 transition-colors">
+                <p className="text-[10px] font-mono uppercase font-bold tracking-wider text-slate-500">ROC-AUC</p>
+                <p className="text-xl sm:text-2xl font-black font-mono text-emerald-700">98.5%</p>
+                <span className="inline-block text-[9px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">Optimal</span>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-                <p className="text-[10px] uppercase font-semibold text-slate-300">PR-AUC</p>
-                <p className="text-xl font-bold text-sky-400 mt-0.5">98.1%</p>
+              <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-sky-300 transition-colors">
+                <p className="text-[10px] font-mono uppercase font-bold tracking-wider text-slate-500">PR-AUC</p>
+                <p className="text-xl sm:text-2xl font-black font-mono text-sky-700">98.1%</p>
+                <span className="inline-block text-[9px] font-semibold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-100">Top Precision</span>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-                <p className="text-[10px] uppercase font-semibold text-slate-300">Brier Score</p>
-                <p className="text-xl font-bold text-amber-300 mt-0.5">0.0027</p>
+              <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-amber-300 transition-colors">
+                <p className="text-[10px] font-mono uppercase font-bold tracking-wider text-slate-500">Brier Score</p>
+                <p className="text-xl sm:text-2xl font-black font-mono text-amber-700">0.0027</p>
+                <span className="inline-block text-[9px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">Calibrated</span>
               </div>
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-                <p className="text-[10px] uppercase font-semibold text-slate-300">Latency</p>
-                <p className="text-xl font-bold text-purple-300 mt-0.5">0.136 ms</p>
+              <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-purple-300 transition-colors">
+                <p className="text-[10px] font-mono uppercase font-bold tracking-wider text-slate-500">Latency</p>
+                <p className="text-xl sm:text-2xl font-black font-mono text-purple-700">0.136 ms</p>
+                <span className="inline-block text-[9px] font-semibold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-100">Sub-ms SLA</span>
               </div>
             </div>
           </div>

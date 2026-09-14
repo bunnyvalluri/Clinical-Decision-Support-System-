@@ -39,29 +39,30 @@ export default function InformaticistProfilePage() {
     <div className="p-4 sm:p-6 space-y-6 max-w-5xl mx-auto">
       {/* Profile Header Card */}
       <Card className="bg-white border-slate-200 shadow-xs overflow-hidden">
-        <div className="bg-linear-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 text-white">
+        <div className="relative p-6 bg-gradient-to-br from-white via-slate-50/70 to-teal-50/30 border-b border-slate-200/80 text-slate-900">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-sky-500" />
           <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-            <div className="h-20 w-20 rounded-2xl bg-amber-500/20 border-2 border-amber-400/40 flex items-center justify-center shrink-0 text-amber-300">
+            <div className="h-20 w-20 rounded-2xl bg-teal-50 border-2 border-teal-200 flex items-center justify-center shrink-0 text-teal-700 shadow-2xs">
               <Brain className="h-10 w-10" />
             </div>
 
             <div className="space-y-1">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-2xl font-bold tracking-tight">{user?.full_name || "Alex Rivera, MSc"}</h1>
-                <Badge variant="outline" className="bg-amber-500/20 text-amber-300 border-amber-400/40 text-xs">
+                <h1 className="text-2xl font-black tracking-tight text-slate-950">{user?.full_name || "Alex Rivera, MSc"}</h1>
+                <Badge variant="outline" className="bg-teal-50 text-teal-800 border-teal-200 text-xs font-semibold">
                   Lead Clinical Informaticist
                 </Badge>
-                <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-400/40 text-xs">
+                <Badge variant="outline" className="bg-emerald-50 text-emerald-800 border-emerald-200 text-xs font-semibold">
                   SaMD Level 2 Officer
                 </Badge>
               </div>
-              <p className="text-xs text-slate-300">
+              <p className="text-xs text-slate-600">
                 Department of Clinical Informatics &amp; Machine Learning Engineering · St. Jude Medical Center
               </p>
-              <div className="flex items-center gap-4 text-xs text-slate-400 pt-1 flex-wrap">
-                <span>License: <strong className="text-slate-200 font-mono">{user?.license_number || "BIO-10923"}</strong></span>
-                <span>Role: <strong className="text-slate-200">Lead Informaticist &amp; Data Scientist</strong></span>
-                <span>Session: <strong className="text-emerald-400">Authenticated (2FA Enforced)</strong></span>
+              <div className="flex items-center gap-4 text-xs text-slate-500 pt-1 flex-wrap font-mono">
+                <span>License: <strong className="text-slate-900 font-bold">{user?.license_number || "BIO-10923"}</strong></span>
+                <span>Role: <strong className="text-slate-900 font-bold">Lead Informaticist &amp; Data Scientist</strong></span>
+                <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /><strong className="text-emerald-700 font-bold">Authenticated (2FA Enforced)</strong></span>
               </div>
             </div>
           </div>
