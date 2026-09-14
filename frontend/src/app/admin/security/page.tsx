@@ -225,45 +225,45 @@ export default function AdminSecurityPage() {
       </div>
 
       {/* Security Posture Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-purple-950 rounded-2xl p-5 sm:p-6 text-white shadow-md border border-slate-700 relative overflow-hidden">
-        <div className="absolute right-0 top-0 bottom-0 w-80 bg-gradient-to-l from-purple-500/10 to-transparent pointer-events-none" />
+      <div className="relative rounded-2xl p-5 sm:p-6 bg-gradient-to-br from-white via-slate-50/80 to-teal-50/30 border border-slate-200 text-slate-900 shadow-xs overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-purple-500" />
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-[11px] font-bold tracking-wider uppercase text-emerald-400">
-                All Defense Shields Active
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-mono text-xs font-bold shadow-2xs">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                ALL DEFENSE SHIELDS ACTIVE
               </span>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold tracking-tight text-white">
+            <h2 className="text-lg sm:text-xl font-black tracking-tight text-slate-950">
               Institutional Security Posture: Grade A+ (99.2% Zero-Trust Compliance)
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300">
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               HIPAA Privacy Rule § 164.312, 21 CFR Part 11, and NIST SP 800-53 Rev. 5 controls are actively monitored.
               Zero standing root credentials detected; cryptographic envelope encryption active on all clinical telemetry.
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-              <p className="text-[10px] uppercase font-bold text-slate-300">Blocked Probes</p>
-              <p className="text-xl font-bold text-white mt-0.5">142</p>
-              <p className="text-[10px] text-emerald-300 font-medium mt-0.5">Last 24h (100% neutralized)</p>
+            <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-slate-300 transition-colors">
+              <p className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-500">Blocked Probes</p>
+              <p className="text-xl font-black text-slate-900 font-mono mt-0.5">142</p>
+              <p className="text-[10px] text-emerald-700 font-semibold mt-0.5">100% neutralized</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-              <p className="text-[10px] uppercase font-bold text-slate-300">Active MFA Enrolment</p>
-              <p className="text-xl font-bold text-emerald-400 mt-0.5">100%</p>
-              <p className="text-[10px] text-slate-300 font-medium mt-0.5">5/5 Staff with FIDO2/TOTP</p>
+            <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-emerald-300 transition-colors">
+              <p className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-500">Active MFA Enrolment</p>
+              <p className="text-xl font-black text-emerald-700 font-mono mt-0.5">100%</p>
+              <p className="text-[10px] text-slate-600 font-medium mt-0.5">5/5 Staff FIDO2/TOTP</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-              <p className="text-[10px] uppercase font-bold text-slate-300">Audit Ledger Integrity</p>
-              <p className="text-xl font-bold text-purple-300 mt-0.5">SHA-256</p>
-              <p className="text-[10px] text-slate-300 font-medium mt-0.5">Immutable Merkle Tree</p>
+            <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-purple-300 transition-colors">
+              <p className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-500">Audit Integrity</p>
+              <p className="text-xl font-black text-purple-700 font-mono mt-0.5">SHA-256</p>
+              <p className="text-[10px] text-slate-600 font-medium mt-0.5">Immutable Merkle Tree</p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10 text-center">
-              <p className="text-[10px] uppercase font-bold text-slate-300">Quarantined IPs</p>
-              <p className="text-xl font-bold text-amber-300 mt-0.5">2</p>
-              <p className="text-[10px] text-slate-300 font-medium mt-0.5">Firewall drop-list</p>
+            <div className="bg-white rounded-xl p-3.5 border border-slate-200 shadow-2xs text-center space-y-0.5 hover:border-amber-300 transition-colors">
+              <p className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-500">Quarantined IPs</p>
+              <p className="text-xl font-black text-amber-700 font-mono mt-0.5">2</p>
+              <p className="text-[10px] text-slate-600 font-medium mt-0.5">Firewall drop-list</p>
             </div>
           </div>
         </div>
