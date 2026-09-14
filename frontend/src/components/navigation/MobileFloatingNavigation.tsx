@@ -359,8 +359,75 @@ export function resolveActiveNavItemId(
  * - Minimum 44x44px touch targets (Apple HIG compliant)
  * - Safe area support (calc(base + env(safe-area-inset-bottom)))
  * - Full keyboard, touch, and screen reader accessibility
- * - Real-time WebSocket badge integration without exposing clinical details
  */
+export interface RoleThemeConfig {
+  pillBg: string;
+  pillBorder: string;
+  pillShadow: string;
+  pillDot: string;
+  activeText: string;
+  activeIcon: string;
+}
+
+export const ROLE_THEMES: Record<RoleType, RoleThemeConfig> = {
+  ADMIN: {
+    pillBg: "bg-purple-500/10",
+    pillBorder: "border-purple-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(168,85,247,0.14)]",
+    pillDot: "bg-purple-600 shadow-[0_1px_4px_rgba(168,85,247,0.4)]",
+    activeText: "text-purple-900",
+    activeIcon: "text-purple-600",
+  },
+  IT_ADMIN: {
+    pillBg: "bg-purple-500/10",
+    pillBorder: "border-purple-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(168,85,247,0.14)]",
+    pillDot: "bg-purple-600 shadow-[0_1px_4px_rgba(168,85,247,0.4)]",
+    activeText: "text-purple-900",
+    activeIcon: "text-purple-600",
+  },
+  DOCTOR: {
+    pillBg: "bg-emerald-500/10",
+    pillBorder: "border-emerald-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(16,185,129,0.14)]",
+    pillDot: "bg-emerald-600 shadow-[0_1px_4px_rgba(16,185,129,0.4)]",
+    activeText: "text-emerald-900",
+    activeIcon: "text-emerald-600",
+  },
+  NURSE: {
+    pillBg: "bg-sky-500/10",
+    pillBorder: "border-sky-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(14,165,233,0.14)]",
+    pillDot: "bg-sky-600 shadow-[0_1px_4px_rgba(14,165,233,0.4)]",
+    activeText: "text-sky-900",
+    activeIcon: "text-sky-600",
+  },
+  MEDICAL_INFORMATICIST: {
+    pillBg: "bg-amber-500/10",
+    pillBorder: "border-amber-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(245,158,11,0.14)]",
+    pillDot: "bg-amber-600 shadow-[0_1px_4px_rgba(245,158,11,0.4)]",
+    activeText: "text-amber-900",
+    activeIcon: "text-amber-600",
+  },
+  ANALYST: {
+    pillBg: "bg-amber-500/10",
+    pillBorder: "border-amber-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(245,158,11,0.14)]",
+    pillDot: "bg-amber-600 shadow-[0_1px_4px_rgba(245,158,11,0.4)]",
+    activeText: "text-amber-900",
+    activeIcon: "text-amber-600",
+  },
+  PATIENT: {
+    pillBg: "bg-teal-500/10",
+    pillBorder: "border-teal-200/80",
+    pillShadow: "shadow-[0_2px_12px_rgba(20,184,166,0.14)]",
+    pillDot: "bg-teal-600 shadow-[0_1px_4px_rgba(20,184,166,0.4)]",
+    activeText: "text-teal-900",
+    activeIcon: "text-teal-600",
+  },
+};
+
 export function MobileFloatingNavigation({
   role: propRole,
   items: propItems,
@@ -428,11 +495,13 @@ export function MobileFloatingNavigation({
     return resolveActiveNavItemId(pathname, navItems);
   }, [pathname, navItems]);
 
-  // Active item index for moving liquid glass pill
+  // Active item index for moving cute indicator pill
   const activeIndex = React.useMemo(() => {
     const idx = navItems.findIndex((item) => item.id === activeItemId);
     return idx >= 0 ? idx : 0;
   }, [navItems, activeItemId]);
+
+  const currentTheme = ROLE_THEMES[effectiveRole] || ROLE_THEMES.DOCTOR;
 
   return (
     <nav
@@ -446,30 +515,25 @@ export function MobileFloatingNavigation({
     >
       <div className="relative bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_10px_35px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.04),inset_0_1px_1.5px_rgba(255,255,255,1)] px-1 sm:px-1.5 py-1.5 flex items-center justify-between overflow-hidden">
         {/* ================================================================ */}
-        {/* Liquid Glass Moving Part (Light Mode Dedicated Active Indicator) */}
+        {/* Cute Animated Floating Pill (Role-Themed Active Indicator)         */}
         {/* ================================================================ */}
         <div
           aria-hidden="true"
-          className="absolute top-1.5 bottom-1.5 transition-all duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] pointer-events-none rounded-xl sm:rounded-2xl z-0"
+          className="absolute top-1.5 bottom-1.5 transition-all duration-350 ease-[cubic-bezier(0.34,1.56,0.64,1)] pointer-events-none rounded-xl sm:rounded-2xl z-0"
           style={{
             width: `calc(${100 / navItems.length}% - 6px)`,
             left: `calc(${activeIndex * (100 / navItems.length)}% + 3px)`,
           }}
         >
-          {/* Liquid Glass Pill Body */}
-          <div className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden liquid-glass-indicator">
-            {/* Top Specular Reflection Highlight Arc */}
-            <div className="absolute inset-x-0 top-0 h-[48%] bg-gradient-to-b from-white/95 via-white/40 to-transparent pointer-events-none" />
-
-            {/* Diagonal Moving Glass Shimmer */}
-            <div className="absolute -inset-full top-0 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/60 to-transparent pointer-events-none liquid-glass-shimmer-effect" />
-
-            {/* Refractive Cyan/Teal Liquid Caustic Underglow */}
-            <div className="absolute -bottom-1 inset-x-2 h-3.5 bg-gradient-to-r from-teal-400/35 via-sky-400/35 to-emerald-400/35 rounded-full blur-xs pointer-events-none" />
+          {/* Cute Soft Pill Body with Role-Colored Tint & Outline */}
+          <div
+            className={`w-full h-full rounded-xl sm:rounded-2xl border ${currentTheme.pillBg} ${currentTheme.pillBorder} ${currentTheme.pillShadow} transition-colors duration-300 relative flex flex-col justify-end items-center pb-1`}
+          >
+            {/* Cute bottom indicator pill dot with spring */}
+            <span
+              className={`w-3.5 sm:w-4 h-1 rounded-full ${currentTheme.pillDot} transition-all duration-300`}
+            />
           </div>
-
-          {/* Liquid Droplet Pill Accent */}
-          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4 sm:w-5 h-1 rounded-full bg-gradient-to-r from-teal-600 via-teal-500 to-sky-600 shadow-[0_2px_6px_rgba(13,148,136,0.45)] pointer-events-none liquid-droplet-glow" />
         </div>
 
         {navItems.map((item) => {
@@ -488,19 +552,19 @@ export function MobileFloatingNavigation({
                   : item.label
               }
               data-testid={`mobile-nav-${item.label.toLowerCase()}`}
-              className={`touch-target flex-1 min-w-0 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl sm:rounded-2xl transition-all duration-200 relative z-10 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-1 active:scale-95 ${
+              className={`flex-1 min-w-0 flex flex-col items-center justify-center py-1.5 px-0.5 rounded-xl sm:rounded-2xl transition-all duration-200 relative z-10 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-1 active:scale-90 select-none ${
                 isActive
-                  ? "text-slate-950 font-bold"
+                  ? `${currentTheme.activeText} font-bold`
                   : "text-slate-500 hover:text-slate-800 font-medium"
               }`}
             >
-              {/* Icon Container with Badge */}
+              {/* Icon Container with Badge and Cute Scale Bounce */}
               <div className="relative flex items-center justify-center">
                 <Icon
                   strokeWidth={isActive ? 2.3 : 1.75}
-                  className={`h-5 w-5 transition-all duration-200 ${
+                  className={`h-5 w-5 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
                     isActive
-                      ? "text-teal-950 scale-105 drop-shadow-xs"
+                      ? `${currentTheme.activeIcon} scale-110 -translate-y-0.5 drop-shadow-xs`
                       : "text-slate-500 group-hover:text-slate-800"
                   }`}
                   aria-hidden="true"
@@ -531,7 +595,7 @@ export function MobileFloatingNavigation({
               <span
                 className={`text-[10px] xs:text-[11px] leading-tight mt-1 truncate max-w-full text-center tracking-tight transition-all duration-200 ${
                   isActive
-                    ? "text-slate-950 font-bold drop-shadow-2xs"
+                    ? `${currentTheme.activeText} font-bold`
                     : "text-slate-500 group-hover:text-slate-800 font-medium"
                 }`}
               >
