@@ -331,40 +331,18 @@ export default function AuditLogsPage() {
             Algorithm: SHA-256 + HMAC-SHA512
           </Badge>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50/80">
-                <TableHead className="w-36 font-bold text-slate-700">Timestamp</TableHead>
-                <TableHead className="w-44 font-bold text-slate-700">Actor / Role</TableHead>
-                <TableHead className="w-48 font-bold text-slate-700">Action / Event</TableHead>
-                <TableHead className="font-bold text-slate-700">Target Resource</TableHead>
-                <TableHead className="w-32 font-bold text-slate-700">Source IP</TableHead>
-                <TableHead className="w-24 font-bold text-slate-700">Outcome</TableHead>
-                <TableHead className="w-24 text-right font-bold text-slate-700">Proof</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredLogs.map((log) => (
-                <TableRow key={log.id} className="hover:bg-slate-50/60 transition-colors">
-                  <TableCell className="text-xs font-mono text-slate-500 whitespace-nowrap">
-                    {log.timestamp}
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-bold text-slate-900 text-xs">{log.actor}</div>
-                    <span className="text-[10px] font-mono text-slate-500">{log.actor_role}</span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-xs font-mono font-bold text-purple-900 block">{log.action}</span>
-                    <span className="text-[10px] text-slate-500">{log.category}</span>
-                  </TableCell>
-                  <TableCell className="text-xs text-slate-700 font-medium max-w-xs truncate">
-                    {log.resource}
-                  </TableCell>
-                  <TableCell className="text-xs font-mono text-slate-500">
-                    {log.ip_address}
-                  </TableCell>
-                  <TableCell>
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredLogs.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                No audit entries match your criteria.
+              </div>
+            ) : (
+              filteredLogs.map((log) => (
+                <div key={log.id} className="p-4 space-y-2.5 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono text-[11px] text-slate-500">{log.timestamp}</span>
                     <Badge
                       variant={
                         log.status === "SUCCESS"
@@ -377,22 +355,110 @@ export default function AuditLogsPage() {
                     >
                       {log.status}
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
+                  </div>
+
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="font-mono font-bold text-xs text-purple-900 block">{log.action}</span>
+                      <span className="text-[11px] text-slate-500">{log.category}</span>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className="font-bold text-slate-900 text-xs block">{log.actor}</span>
+                      <span className="text-[10px] font-mono text-slate-500">{log.actor_role}</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100 space-y-1 text-xs">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block">Resource</span>
+                      <p className="font-mono text-slate-800 text-[11px] break-all">{log.resource}</p>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+                      <span>IP: <strong className="font-mono text-slate-700">{log.ip_address}</strong></span>
+                      <span>Hash: <strong className="font-mono text-slate-700">{log.sha256.substring(0, 10)}...</strong></span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end pt-1">
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() => setSelectedEntry(log)}
-                      className="text-xs h-7 text-purple-700 hover:bg-purple-50"
+                      className="text-xs h-7 px-2.5 text-purple-700 border-purple-200 hover:bg-purple-50 font-semibold"
                     >
                       <Eye className="h-3 w-3 mr-1" />
-                      Verify
+                      Verify Signature
                     </Button>
-                  </TableCell>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50/80">
+                  <TableHead className="w-36 font-bold text-slate-700">Timestamp</TableHead>
+                  <TableHead className="w-44 font-bold text-slate-700">Actor / Role</TableHead>
+                  <TableHead className="w-48 font-bold text-slate-700">Action / Event</TableHead>
+                  <TableHead className="font-bold text-slate-700">Target Resource</TableHead>
+                  <TableHead className="w-32 font-bold text-slate-700">Source IP</TableHead>
+                  <TableHead className="w-24 font-bold text-slate-700">Outcome</TableHead>
+                  <TableHead className="w-24 text-right font-bold text-slate-700">Proof</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredLogs.map((log) => (
+                  <TableRow key={log.id} className="hover:bg-slate-50/60 transition-colors">
+                    <TableCell className="text-xs font-mono text-slate-500 whitespace-nowrap">
+                      {log.timestamp}
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-bold text-slate-900 text-xs">{log.actor}</div>
+                      <span className="text-[10px] font-mono text-slate-500">{log.actor_role}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs font-mono font-bold text-purple-900 block">{log.action}</span>
+                      <span className="text-[10px] text-slate-500">{log.category}</span>
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-700 font-medium max-w-xs truncate">
+                      {log.resource}
+                    </TableCell>
+                    <TableCell className="text-xs font-mono text-slate-500">
+                      {log.ip_address}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          log.status === "SUCCESS"
+                            ? "success"
+                            : log.status === "WARNING"
+                            ? "warning"
+                            : "destructive"
+                        }
+                        className="text-[10px] font-bold"
+                      >
+                        {log.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedEntry(log)}
+                        className="text-xs h-7 text-purple-700 hover:bg-purple-50"
+                      >
+                        <Eye className="h-3 w-3 mr-1" />
+                        Verify
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

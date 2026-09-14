@@ -296,31 +296,30 @@ export default function AdminWebSocketsPage() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200">
-                <th className="p-3 font-bold text-slate-700">Client ID</th>
-                <th className="p-3 font-bold text-slate-700">Staff Account</th>
-                <th className="p-3 font-bold text-slate-700">Role</th>
-                <th className="p-3 font-bold text-slate-700">Remote IP</th>
-                <th className="p-3 font-bold text-slate-700">Subscribed Topics</th>
-                <th className="p-3 font-bold text-slate-700">Connected Since</th>
-                <th className="p-3 font-bold text-right text-slate-700">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredClients.map((client) => (
-                <tr key={client.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-3 font-mono font-semibold text-purple-900">{client.id}</td>
-                  <td className="p-3 font-medium text-slate-800">{client.email}</td>
-                  <td className="p-3">
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredClients.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                No active WebSocket connections found.
+              </div>
+            ) : (
+              filteredClients.map((client) => (
+                <div key={client.id} className="p-4 space-y-2.5 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-xs text-purple-900">{client.id}</span>
                     <Badge variant="outline" className="text-[10px] font-bold">
                       {client.role}
                     </Badge>
-                  </td>
-                  <td className="p-3 font-mono text-slate-600">{client.ip}</td>
-                  <td className="p-3">
+                  </div>
+
+                  <div>
+                    <span className="text-xs font-semibold text-slate-900 block">{client.email}</span>
+                    <span className="text-[11px] font-mono text-slate-500">{client.ip}</span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Subscribed Topics</span>
                     <div className="flex flex-wrap gap-1">
                       {client.groups.map((grp) => (
                         <span key={grp} className="font-mono text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
@@ -328,23 +327,76 @@ export default function AdminWebSocketsPage() {
                         </span>
                       ))}
                     </div>
-                  </td>
-                  <td className="p-3 text-slate-500">{client.connectedSince}</td>
-                  <td className="p-3 text-right">
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
+                    <span className="text-[11px] text-slate-400">Connected: {client.connectedSince}</span>
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={() => handleDisconnect(client.id, client.email)}
-                      className="text-xs h-7 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                      className="text-xs h-7 px-2.5 text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 font-semibold"
                     >
                       <UserX className="h-3 w-3 mr-1" />
                       Disconnect
                     </Button>
-                  </td>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="p-3 font-bold text-slate-700">Client ID</th>
+                  <th className="p-3 font-bold text-slate-700">Staff Account</th>
+                  <th className="p-3 font-bold text-slate-700">Role</th>
+                  <th className="p-3 font-bold text-slate-700">Remote IP</th>
+                  <th className="p-3 font-bold text-slate-700">Subscribed Topics</th>
+                  <th className="p-3 font-bold text-slate-700">Connected Since</th>
+                  <th className="p-3 font-bold text-right text-slate-700">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredClients.map((client) => (
+                  <tr key={client.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="p-3 font-mono font-semibold text-purple-900">{client.id}</td>
+                    <td className="p-3 font-medium text-slate-800">{client.email}</td>
+                    <td className="p-3">
+                      <Badge variant="outline" className="text-[10px] font-bold">
+                        {client.role}
+                      </Badge>
+                    </td>
+                    <td className="p-3 font-mono text-slate-600">{client.ip}</td>
+                    <td className="p-3">
+                      <div className="flex flex-wrap gap-1">
+                        {client.groups.map((grp) => (
+                          <span key={grp} className="font-mono text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">
+                            {grp}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="p-3 text-slate-500">{client.connectedSince}</td>
+                    <td className="p-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDisconnect(client.id, client.email)}
+                        className="text-xs h-7 text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                      >
+                        <UserX className="h-3 w-3 mr-1" />
+                        Disconnect
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

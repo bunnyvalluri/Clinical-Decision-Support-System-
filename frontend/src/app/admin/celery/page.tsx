@@ -276,39 +276,74 @@ export default function AdminCeleryPage() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200">
-                <th className="p-3 font-bold text-slate-700">Task Name</th>
-                <th className="p-3 font-bold text-slate-700">Queue</th>
-                <th className="p-3 font-bold text-slate-700">Runtime</th>
-                <th className="p-3 font-bold text-slate-700">Finished At</th>
-                <th className="p-3 font-bold text-slate-700">Result Summary</th>
-                <th className="p-3 font-bold text-right text-slate-700">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredTasks.map((t) => (
-                <tr key={t.id} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-3 font-mono font-semibold text-slate-900">{t.name}</td>
-                  <td className="p-3">
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredTasks.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                No tasks match your search.
+              </div>
+            ) : (
+              filteredTasks.map((t) => (
+                <div key={t.id} className="p-4 space-y-2.5 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-mono font-bold text-xs text-slate-900 break-all">{t.name}</span>
+                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold shrink-0">
+                      {t.status}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap text-xs">
                     <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
                       {t.queue}
                     </span>
-                  </td>
-                  <td className="p-3 font-semibold text-emerald-700">{t.runtime}</td>
-                  <td className="p-3 font-mono text-slate-500">{t.completedAt}</td>
-                  <td className="p-3 text-slate-600 max-w-sm">{t.details}</td>
-                  <td className="p-3 text-right">
-                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
-                      {t.status}
-                    </Badge>
-                  </td>
+                    <span className="font-semibold text-emerald-700 font-mono">{t.runtime}</span>
+                    <span className="text-[11px] text-slate-400 font-mono">Finished: {t.completedAt}</span>
+                  </div>
+
+                  <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed">
+                    {t.details}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="p-3 font-bold text-slate-700">Task Name</th>
+                  <th className="p-3 font-bold text-slate-700">Queue</th>
+                  <th className="p-3 font-bold text-slate-700">Runtime</th>
+                  <th className="p-3 font-bold text-slate-700">Finished At</th>
+                  <th className="p-3 font-bold text-slate-700">Result Summary</th>
+                  <th className="p-3 font-bold text-right text-slate-700">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredTasks.map((t) => (
+                  <tr key={t.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="p-3 font-mono font-semibold text-slate-900">{t.name}</td>
+                    <td className="p-3">
+                      <span className="font-mono text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                        {t.queue}
+                      </span>
+                    </td>
+                    <td className="p-3 font-semibold text-emerald-700">{t.runtime}</td>
+                    <td className="p-3 font-mono text-slate-500">{t.completedAt}</td>
+                    <td className="p-3 text-slate-600 max-w-sm">{t.details}</td>
+                    <td className="p-3 text-right">
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
+                        {t.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>
