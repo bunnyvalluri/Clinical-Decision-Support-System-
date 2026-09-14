@@ -495,7 +495,14 @@ export default function PatientDashboardPage() {
         const res = await apiClient.get("/user/dashboard/");
         if (!isMounted) return;
         if (res.data) {
-          setData(res.data);
+          const dashboardData = res.data?.data || res.data;
+          if (user?.full_name && dashboardData.patient) {
+            dashboardData.patient.full_name = user.full_name;
+            if (user.license_number) {
+              dashboardData.patient.mrn = user.license_number;
+            }
+          }
+          setData(dashboardData);
           return;
         }
       } catch {
@@ -509,7 +516,7 @@ export default function PatientDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, [getFallbackData]);
+  }, [getFallbackData, user]);
 
   const handleCopyMrn = (mrn: string) => {
     navigator.clipboard.writeText(mrn);
@@ -670,7 +677,7 @@ export default function PatientDashboardPage() {
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900">
                 {greeting},{" "}
                 <span className="text-teal-700">
-                  {patient?.full_name || user?.full_name || "Eleanor"}
+                  {user?.full_name || patient?.full_name || "Eleanor"}
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
@@ -682,11 +689,11 @@ export default function PatientDashboardPage() {
             {/* Patient Meta Badges (Light clinical chips) */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               <button
-                onClick={() => handleCopyMrn(patient?.mrn || "MRN-PA-90241")}
+                onClick={() => handleCopyMrn(user?.license_number || patient?.mrn || "MRN-PA-90241")}
                 title="Click to copy MRN"
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-mono font-semibold transition-colors shadow-2xs shrink-0"
               >
-                <span>MRN: {patient?.mrn || "MRN-PA-90241"}</span>
+                <span>MRN: {user?.license_number || patient?.mrn || "MRN-PA-90241"}</span>
                 {copiedMrn ? (
                   <Check className="h-3.5 w-3.5 text-emerald-600" />
                 ) : (

@@ -13,12 +13,18 @@ export default function PatientProfilePage() {
   const { user } = useAuthStore();
   const [saved, setSaved] = React.useState(false);
   const [formData, setFormData] = React.useState({
-    phone: "(555) 234-8901",
+    phone: user?.phone_number || "(555) 234-8901",
     address: "742 Evergreen Terrace, Sector 4, Springfield",
     emergencyName: "Robert Ward",
     emergencyRelation: "Spouse",
     emergencyPhone: "(555) 234-8902",
   });
+
+  React.useEffect(() => {
+    if (user?.phone_number) {
+      setFormData((prev) => ({ ...prev, phone: user.phone_number || prev.phone }));
+    }
+  }, [user?.phone_number]);
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -76,7 +82,7 @@ export default function PatientProfilePage() {
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-left space-y-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-slate-400">MRN:</span>
-                <span className="font-mono font-bold text-slate-800">MRN-90241</span>
+                <span className="font-mono font-bold text-slate-800">{user?.license_number || "MRN-PA-90241"}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Date of Birth:</span>

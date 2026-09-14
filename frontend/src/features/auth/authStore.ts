@@ -25,7 +25,7 @@ interface AuthState {
   setAuth: (user: UserProfile, tokens: { access: string; refresh: string }) => void;
   logout: () => void;
   loginWithCredentials: (email: string, password: string) => Promise<UserProfile>;
-  loginAsRole: (role: RoleType) => void;
+  loginAsRole: (role: RoleType, customProfile?: Partial<UserProfile>) => void;
   initFromStorage: () => Promise<void>;
 }
 
@@ -255,8 +255,9 @@ export const useAuthStore = create<AuthState>((set) => {
     }
   },
 
-  loginAsRole: (role) => {
-    const profile = EVALUATOR_PROFILES[role] || EVALUATOR_PROFILES.DOCTOR;
+  loginAsRole: (role, customProfile) => {
+    const defaultProfile = EVALUATOR_PROFILES[role] || EVALUATOR_PROFILES.DOCTOR;
+    const profile: UserProfile = customProfile ? { ...defaultProfile, ...customProfile } : defaultProfile;
     const mockTokens = {
       access: `eval-${role.toLowerCase()}-jwt-access-token`,
       refresh: `eval-${role.toLowerCase()}-jwt-refresh-token`,

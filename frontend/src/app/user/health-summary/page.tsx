@@ -26,12 +26,17 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuthStore } from "@/features/auth/authStore";
 
 export default function PatientHealthSummaryPage() {
+  const { user } = useAuthStore();
   const [copied, setCopied] = React.useState(false);
 
+  const mrn = user?.license_number || "MRN-PA-90241";
+  const patientName = user?.full_name || "Eleanor Vance";
+
   const handleCopyMrn = () => {
-    navigator.clipboard.writeText("MRN-PA-90241");
+    navigator.clipboard.writeText(mrn);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -61,11 +66,11 @@ export default function PatientHealthSummaryPage() {
                 onClick={handleCopyMrn}
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-mono font-semibold transition-colors"
               >
-                <span>MRN: MRN-PA-90241</span>
+                <span>MRN: {mrn}</span>
                 {copied ? <Check className="h-3 w-3 text-emerald-600" /> : null}
               </button>
               <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium">
-                Patient: <strong className="text-slate-900">Eleanor Vance</strong> (68F)
+                Patient: <strong className="text-slate-900">{patientName}</strong> (68F)
               </span>
               <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium">
                 Blood Group: <strong className="text-slate-900">A+</strong>

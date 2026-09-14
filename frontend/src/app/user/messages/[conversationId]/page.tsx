@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import apiClient from "@/services/apiClient";
+import { useAuthStore } from "@/features/auth/authStore";
 
 interface ChatMessage {
   id: string;
@@ -48,6 +49,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
 ];
 
 export default function ConversationDetailPage() {
+  const { user } = useAuthStore();
   const params = useParams();
   const router = useRouter();
   const conversationId = params?.conversationId as string;
@@ -109,7 +111,7 @@ export default function ConversationDetailPage() {
     const messageId = `m-${Date.now()}`;
     const patientMsg: ChatMessage = {
       id: messageId,
-      sender: "User / Patient",
+      sender: user?.full_name || "Patient",
       is_patient: true,
       timestamp: "Just now",
       text: trimmed,
