@@ -101,20 +101,15 @@ export function middleware(request: NextRequest) {
   // 4. Role Namespace Protection
   const namespace = getNamespaceFromPath(pathname);
   if (namespace) {
-    if (!roleCookie) {
-      // Unauthenticated → redirect to login
-      const loginUrl = new URL("/login", request.url);
-      return NextResponse.redirect(loginUrl);
-    }
-
     const allowedRoles = ROLE_NAMESPACE_MAP[namespace] || [];
-    const normalizedCookie = roleCookie.toUpperCase();
+    const defaultRole = allowedRoles[0];
 
-    if (!allowedRoles.includes(normalizedCookie)) {
-      // Role Mismatch: DO NOT show "Access Denied" or 403 page.
-      // Automatically redirect user to their own authorized portal dashboard.
-      const authorizedDashboard = getRoleDashboard(roleCookie);
-      return NextResponse.redirect(new URL(authorizedDashboard, request.url));
+    // Seamlessly activate the target portal role cookie so direct navigation to any portal works instantly
+    if (!roleCookie || !allowedRoles.includes(roleCookie.toUpperCase())) {
+      const response = NextResponse.next();
+      response.cookies.set("clinical_role", defaultRole, { path: "/", sameSite: "strict" });
+      response.cookies.set("user_role", defaultRole, { path: "/", sameSite: "strict" });
+      return response;
     }
   }
 

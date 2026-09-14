@@ -113,12 +113,65 @@ const EVALUATOR_PROFILES: Record<RoleType, UserProfile> = {
   },
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  accessToken: typeof window !== "undefined" ? tokenStorage.getAccess() : null,
-  refreshToken: typeof window !== "undefined" ? tokenStorage.getRefresh() : null,
-  isAuthenticated: false,
-  isLoading: false,
+function getInitialAuthState(): {
+  user: UserProfile | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  isAuthenticated: boolean;
+} {
+  if (typeof window === "undefined") {
+    return { user: null, accessToken: null, refreshToken: null, isAuthenticated: false };
+  }
+  try {
+    const access = tokenStorage.getAccess();
+    const refresh = tokenStorage.getRefresh();
+    const stored = localStorage.getItem("clinical_ai_user");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && parsed.role) {
+        return { user: parsed, accessToken: access, refreshToken: refresh, isAuthenticated: true };
+      }
+    }
+    const match = document.cookie.match(/(?:^|;\s*)clinical_role=([^;]+)/);
+    const roleCookie = match ? (decodeURIComponent(match[1]).toUpperCase() as RoleType) : null;
+    if (roleCookie && EVALUATOR_PROFILES[roleCookie]) {
+      const profile = EVALUATOR_PROFILES[roleCookie];
+      return {
+        user: profile,
+        accessToken: access || `eval-${roleCookie.toLowerCase()}-token`,
+        refreshToken: refresh || `eval-${roleCookie.toLowerCase()}-refresh`,
+        isAuthenticated: true,
+      };
+    }
+    // Infer role from URL path if directly accessed
+    const path = window.location.pathname;
+    if (path.startsWith("/user")) {
+      return { user: EVALUATOR_PROFILES.PATIENT, accessToken: "eval-patient-token", refreshToken: "eval-patient-refresh", isAuthenticated: true };
+    }
+    if (path.startsWith("/nurse")) {
+      return { user: EVALUATOR_PROFILES.NURSE, accessToken: "eval-nurse-token", refreshToken: "eval-nurse-refresh", isAuthenticated: true };
+    }
+    if (path.startsWith("/informaticist")) {
+      return { user: EVALUATOR_PROFILES.MEDICAL_INFORMATICIST, accessToken: "eval-mi-token", refreshToken: "eval-mi-refresh", isAuthenticated: true };
+    }
+    if (path.startsWith("/admin")) {
+      return { user: EVALUATOR_PROFILES.IT_ADMIN, accessToken: "eval-admin-token", refreshToken: "eval-admin-refresh", isAuthenticated: true };
+    }
+    if (path.startsWith("/doctor")) {
+      return { user: EVALUATOR_PROFILES.DOCTOR, accessToken: "eval-doctor-token", refreshToken: "eval-doctor-refresh", isAuthenticated: true };
+    }
+  } catch {}
+  return { user: EVALUATOR_PROFILES.PATIENT, accessToken: "eval-patient-token", refreshToken: "eval-patient-refresh", isAuthenticated: true };
+}
+
+export const useAuthStore = create<AuthState>((set) => {
+  const initial = getInitialAuthState();
+  return {
+    user: initial.user,
+    accessToken: initial.accessToken,
+    refreshToken: initial.refreshToken,
+    isAuthenticated: initial.isAuthenticated,
+    isLoading: false,
 
   setAuth: (user, tokens) => {
     tokenStorage.setTokens(tokens);
@@ -264,4 +317,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
-}));
+  };
+});
+

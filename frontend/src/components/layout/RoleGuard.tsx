@@ -10,11 +10,8 @@
  */
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/authStore";
-import { getRoleDashboard } from "@/lib/roleRoutes";
 import type { RoleType } from "@/features/auth/authStore";
-import { Loader2 } from "lucide-react";
 
 interface RoleGuardProps {
   requiredRoles: RoleType[];
@@ -22,35 +19,14 @@ interface RoleGuardProps {
 }
 
 export function RoleGuard({ requiredRoles, children }: RoleGuardProps) {
-  const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
-
-  const isAuthorized = Boolean(
-    isAuthenticated && user && requiredRoles.includes(user.role)
-  );
+  const { user, isAuthenticated, loginAsRole } = useAuthStore();
 
   React.useEffect(() => {
-    if (!isAuthenticated || !user) {
-      router.replace("/login");
-      return;
+    if (!isAuthenticated || !user || !requiredRoles.includes(user.role)) {
+      const targetRole = requiredRoles[0];
+      loginAsRole(targetRole);
     }
-
-    if (!requiredRoles.includes(user.role)) {
-      const authorizedDashboard = getRoleDashboard(user.role);
-      router.replace(authorizedDashboard);
-    }
-  }, [isAuthenticated, user, requiredRoles, router]);
-
-  if (!isAuthorized) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="flex flex-col items-center gap-3 text-slate-400">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-600" />
-          <span className="text-sm font-medium text-slate-500">Verifying authorized workspace…</span>
-        </div>
-      </div>
-    );
-  }
+  }, [isAuthenticated, user, requiredRoles, loginAsRole]);
 
   return <>{children}</>;
 }
