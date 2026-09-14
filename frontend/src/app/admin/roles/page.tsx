@@ -414,12 +414,12 @@ export default function AdminRolesPage() {
 
         {activeTab === "matrix" && (
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center rounded-lg bg-slate-100 p-0.5">
+            <div className="flex items-center rounded-lg bg-slate-100 p-0.5 overflow-x-auto max-w-full">
               {(["ALL", "Clinical Core", "AI Diagnostics", "MLOps & Informatics", "IT & System Governance"] as const).map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors ${
+                  className={`px-2.5 py-1 text-[11px] font-bold rounded-md transition-colors shrink-0 ${
                     selectedCategory === cat
                       ? "bg-white text-slate-900 shadow-sm"
                       : "text-slate-500 hover:text-slate-900"
@@ -454,46 +454,91 @@ export default function AdminRolesPage() {
               Strict boundary enforcement preventing cross-privilege pollution. All API routes require verified token matching these scopes.
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200">
-                  <th className="p-3 font-bold text-slate-700 min-w-[220px]">Permission Scope</th>
-                  <th className="p-3 font-bold text-slate-700 min-w-[140px]">Domain</th>
-                  <th className="p-3 font-bold text-emerald-800 text-center min-w-[120px] bg-emerald-50/40">DOCTOR</th>
-                  <th className="p-3 font-bold text-sky-800 text-center min-w-[120px] bg-sky-50/40">NURSE</th>
-                  <th className="p-3 font-bold text-purple-800 text-center min-w-[120px] bg-purple-50/40">INFORMATICIST</th>
-                  <th className="p-3 font-bold text-slate-800 text-center min-w-[120px] bg-slate-100/60">IT ADMIN</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredScopes.map((scope) => (
-                  <tr key={scope.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-3">
-                      <p className="font-semibold text-slate-900">{scope.name}</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{scope.description}</p>
-                    </td>
-                    <td className="p-3">
-                      <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 bg-white">
+          <CardContent className="p-0">
+            {/* Mobile Card View (< md) */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {filteredScopes.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-500">
+                  No permissions match the selected filter.
+                </div>
+              ) : (
+                filteredScopes.map((scope) => (
+                  <div key={scope.id} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h4 className="font-bold text-xs text-slate-900 leading-snug">{scope.name}</h4>
+                        <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{scope.description}</p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 bg-white shrink-0">
                         {scope.category}
                       </Badge>
-                    </td>
-                    <td className="p-3 text-center bg-emerald-50/20">
-                      {renderPermissionBadge(scope.doctor)}
-                    </td>
-                    <td className="p-3 text-center bg-sky-50/20">
-                      {renderPermissionBadge(scope.nurse)}
-                    </td>
-                    <td className="p-3 text-center bg-purple-50/20">
-                      {renderPermissionBadge(scope.informaticist)}
-                    </td>
-                    <td className="p-3 text-center bg-slate-100/30">
-                      {renderPermissionBadge(scope.itAdmin)}
-                    </td>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-xs">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-emerald-800 uppercase block">Doctor</span>
+                        <div>{renderPermissionBadge(scope.doctor)}</div>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-sky-800 uppercase block">Nurse</span>
+                        <div>{renderPermissionBadge(scope.nurse)}</div>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-purple-800 uppercase block">Informaticist</span>
+                        <div>{renderPermissionBadge(scope.informaticist)}</div>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-slate-800 uppercase block">IT Admin</span>
+                        <div>{renderPermissionBadge(scope.itAdmin)}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Desktop Table View (>= md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-200">
+                    <th className="p-3 font-bold text-slate-700 min-w-[220px]">Permission Scope</th>
+                    <th className="p-3 font-bold text-slate-700 min-w-[140px]">Domain</th>
+                    <th className="p-3 font-bold text-emerald-800 text-center min-w-[120px] bg-emerald-50/40">DOCTOR</th>
+                    <th className="p-3 font-bold text-sky-800 text-center min-w-[120px] bg-sky-50/40">NURSE</th>
+                    <th className="p-3 font-bold text-purple-800 text-center min-w-[120px] bg-purple-50/40">INFORMATICIST</th>
+                    <th className="p-3 font-bold text-slate-800 text-center min-w-[120px] bg-slate-100/60">IT ADMIN</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredScopes.map((scope) => (
+                    <tr key={scope.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-3">
+                        <p className="font-semibold text-slate-900">{scope.name}</p>
+                        <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1">{scope.description}</p>
+                      </td>
+                      <td className="p-3">
+                        <Badge variant="outline" className="text-[10px] font-semibold text-slate-600 bg-white">
+                          {scope.category}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-center bg-emerald-50/20">
+                        {renderPermissionBadge(scope.doctor)}
+                      </td>
+                      <td className="p-3 text-center bg-sky-50/20">
+                        {renderPermissionBadge(scope.nurse)}
+                      </td>
+                      <td className="p-3 text-center bg-purple-50/20">
+                        {renderPermissionBadge(scope.informaticist)}
+                      </td>
+                      <td className="p-3 text-center bg-slate-100/30">
+                        {renderPermissionBadge(scope.itAdmin)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
       )}

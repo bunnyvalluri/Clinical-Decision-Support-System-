@@ -227,33 +227,67 @@ export default function AdminRedisPage() {
             />
           </div>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200">
-                <th className="p-3 font-bold text-slate-700">Key Pattern</th>
-                <th className="p-3 font-bold text-slate-700">Keys Count</th>
-                <th className="p-3 font-bold text-slate-700">Memory</th>
-                <th className="p-3 font-bold text-slate-700">TTL Policy</th>
-                <th className="p-3 font-bold text-slate-700">Operational Purpose</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredNamespaces.map((ns) => (
-                <tr key={ns.prefix} className="hover:bg-slate-50/60 transition-colors">
-                  <td className="p-3 font-mono font-bold text-purple-900">{ns.prefix}</td>
-                  <td className="p-3 font-semibold text-slate-800">{ns.count}</td>
-                  <td className="p-3 font-medium text-slate-700">~{ns.sizeKb} KB</td>
-                  <td className="p-3">
-                    <Badge variant="outline" className="text-[10px] font-mono bg-slate-50 text-slate-700">
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredNamespaces.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                No namespaces match your search.
+              </div>
+            ) : (
+              filteredNamespaces.map((ns) => (
+                <div key={ns.prefix} className="p-4 space-y-2 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-xs text-purple-900 break-all">{ns.prefix}</span>
+                    <Badge variant="outline" className="text-[10px] font-mono bg-slate-50 text-slate-700 shrink-0">
                       {ns.avgTtl}
                     </Badge>
-                  </td>
-                  <td className="p-3 text-slate-600 max-w-md">{ns.purpose}</td>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">{ns.purpose}</p>
+
+                  <div className="flex items-center justify-between text-xs bg-slate-50/80 rounded-lg p-2 border border-slate-100">
+                    <span className="text-slate-600 font-medium">
+                      Keys: <strong className="text-slate-900 font-mono">{ns.count}</strong>
+                    </span>
+                    <span className="text-slate-600 font-medium">
+                      Memory: <strong className="text-slate-900 font-mono">~{ns.sizeKb} KB</strong>
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200">
+                  <th className="p-3 font-bold text-slate-700">Key Pattern</th>
+                  <th className="p-3 font-bold text-slate-700">Keys Count</th>
+                  <th className="p-3 font-bold text-slate-700">Memory</th>
+                  <th className="p-3 font-bold text-slate-700">TTL Policy</th>
+                  <th className="p-3 font-bold text-slate-700">Operational Purpose</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {filteredNamespaces.map((ns) => (
+                  <tr key={ns.prefix} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="p-3 font-mono font-bold text-purple-900">{ns.prefix}</td>
+                    <td className="p-3 font-semibold text-slate-800">{ns.count}</td>
+                    <td className="p-3 font-medium text-slate-700">~{ns.sizeKb} KB</td>
+                    <td className="p-3">
+                      <Badge variant="outline" className="text-[10px] font-mono bg-slate-50 text-slate-700">
+                        {ns.avgTtl}
+                      </Badge>
+                    </td>
+                    <td className="p-3 text-slate-600 max-w-md">{ns.purpose}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
@@ -272,29 +306,57 @@ export default function AdminRedisPage() {
             </Badge>
           </div>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse font-mono">
-            <thead>
-              <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-600">
-                <th className="p-2.5">Time</th>
-                <th className="p-2.5">Command</th>
-                <th className="p-2.5">Key Target</th>
-                <th className="p-2.5">Client ID</th>
-                <th className="p-2.5 text-right">Latency</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-800">
-              {RECENT_COMMANDS.map((c, i) => (
-                <tr key={i} className="hover:bg-slate-50/60">
-                  <td className="p-2.5 text-slate-500">{c.time}</td>
-                  <td className="p-2.5 font-bold text-purple-700">{c.cmd}</td>
-                  <td className="p-2.5 text-slate-900">{c.key}</td>
-                  <td className="p-2.5 text-slate-600">{c.client}</td>
-                  <td className="p-2.5 text-right font-semibold text-emerald-700">{c.latency}</td>
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100 font-mono">
+            {RECENT_COMMANDS.map((c, i) => (
+              <div key={i} className="p-3 space-y-1.5 hover:bg-slate-50/50 transition-colors text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-purple-700 px-1.5 py-0.5 rounded bg-purple-50 text-[11px]">
+                      {c.cmd}
+                    </span>
+                    <span className="text-[11px] text-slate-400">{c.time}</span>
+                  </div>
+                  <span className="font-semibold text-emerald-700 text-xs">{c.latency}</span>
+                </div>
+
+                <div className="bg-slate-50 p-2 rounded border border-slate-100 text-slate-900 break-all text-[11px]">
+                  {c.key}
+                </div>
+
+                <div className="text-[10px] text-slate-500">
+                  Client: <span className="text-slate-700">{c.client}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse font-mono">
+              <thead>
+                <tr className="bg-slate-50/80 border-b border-slate-200 text-slate-600">
+                  <th className="p-2.5">Time</th>
+                  <th className="p-2.5">Command</th>
+                  <th className="p-2.5">Key Target</th>
+                  <th className="p-2.5">Client ID</th>
+                  <th className="p-2.5 text-right">Latency</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-slate-800">
+                {RECENT_COMMANDS.map((c, i) => (
+                  <tr key={i} className="hover:bg-slate-50/60">
+                    <td className="p-2.5 text-slate-500">{c.time}</td>
+                    <td className="p-2.5 font-bold text-purple-700">{c.cmd}</td>
+                    <td className="p-2.5 text-slate-900">{c.key}</td>
+                    <td className="p-2.5 text-slate-600">{c.client}</td>
+                    <td className="p-2.5 text-right font-semibold text-emerald-700">{c.latency}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

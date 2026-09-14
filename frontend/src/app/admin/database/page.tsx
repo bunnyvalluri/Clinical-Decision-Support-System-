@@ -238,10 +238,10 @@ export default function AdminDatabasePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-xl w-fit">
+      <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-xl w-fit overflow-x-auto max-w-full">
         <button
           onClick={() => setActiveTab("tables")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
             activeTab === "tables"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-600 hover:text-slate-900"
@@ -251,7 +251,7 @@ export default function AdminDatabasePage() {
         </button>
         <button
           onClick={() => setActiveTab("topology")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
             activeTab === "topology"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-600 hover:text-slate-900"
@@ -261,7 +261,7 @@ export default function AdminDatabasePage() {
         </button>
         <button
           onClick={() => setActiveTab("queries")}
-          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
             activeTab === "queries"
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-600 hover:text-slate-900"
@@ -291,25 +291,38 @@ export default function AdminDatabasePage() {
               />
             </div>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200">
-                  <th className="p-3 font-bold text-slate-700">Table Name</th>
-                  <th className="p-3 font-bold text-slate-700">Rows</th>
-                  <th className="p-3 font-bold text-slate-700">Size</th>
-                  <th className="p-3 font-bold text-slate-700">Indexes</th>
-                  <th className="p-3 font-bold text-slate-700">Purpose / Role</th>
-                  <th className="p-3 font-bold text-right text-slate-700">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredTables.map((tbl) => (
-                  <tr key={tbl.name} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-3 font-mono font-bold text-purple-900">{tbl.name}</td>
-                    <td className="p-3 font-semibold text-slate-800">{tbl.rowCount.toLocaleString()}</td>
-                    <td className="p-3 font-semibold text-slate-800">{tbl.sizeMb} MB</td>
-                    <td className="p-3">
+          <CardContent className="p-0">
+            {/* Mobile Card View (< md) */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {filteredTables.length === 0 ? (
+                <div className="p-8 text-center text-xs text-slate-500">
+                  No database tables match your filter.
+                </div>
+              ) : (
+                filteredTables.map((tbl) => (
+                  <div key={tbl.name} className="p-4 space-y-2.5 hover:bg-slate-50/50 transition-colors">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono font-bold text-xs text-purple-900 break-all">{tbl.name}</span>
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold shrink-0">
+                        {tbl.health}
+                      </Badge>
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed">{tbl.purpose}</p>
+
+                    <div className="grid grid-cols-2 gap-2 bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">Row Count</span>
+                        <span className="font-mono font-bold text-slate-800">{tbl.rowCount.toLocaleString()}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">Table Size</span>
+                        <span className="font-mono font-bold text-slate-800">{tbl.sizeMb} MB</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Configured Indexes</span>
                       <div className="flex flex-wrap gap-1">
                         {tbl.indexes.map((idx) => (
                           <span key={idx} className="font-mono text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
@@ -317,17 +330,51 @@ export default function AdminDatabasePage() {
                           </span>
                         ))}
                       </div>
-                    </td>
-                    <td className="p-3 text-slate-600 max-w-xs">{tbl.purpose}</td>
-                    <td className="p-3 text-right">
-                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
-                        {tbl.health}
-                      </Badge>
-                    </td>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Desktop Table View (>= md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-200">
+                    <th className="p-3 font-bold text-slate-700">Table Name</th>
+                    <th className="p-3 font-bold text-slate-700">Rows</th>
+                    <th className="p-3 font-bold text-slate-700">Size</th>
+                    <th className="p-3 font-bold text-slate-700">Indexes</th>
+                    <th className="p-3 font-bold text-slate-700">Purpose / Role</th>
+                    <th className="p-3 font-bold text-right text-slate-700">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredTables.map((tbl) => (
+                    <tr key={tbl.name} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-3 font-mono font-bold text-purple-900">{tbl.name}</td>
+                      <td className="p-3 font-semibold text-slate-800">{tbl.rowCount.toLocaleString()}</td>
+                      <td className="p-3 font-semibold text-slate-800">{tbl.sizeMb} MB</td>
+                      <td className="p-3">
+                        <div className="flex flex-wrap gap-1">
+                          {tbl.indexes.map((idx) => (
+                            <span key={idx} className="font-mono text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">
+                              {idx}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="p-3 text-slate-600 max-w-xs">{tbl.purpose}</td>
+                      <td className="p-3 text-right">
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
+                          {tbl.health}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -368,24 +415,24 @@ export default function AdminDatabasePage() {
             <CardHeader className="pb-3 border-b border-slate-100">
               <CardTitle className="text-base font-bold text-slate-900">Branching & Point-in-Time Recovery</CardTitle>
               <CardDescription className="text-xs text-slate-500">
-                Isolated copy-on-write database branches for zero-impact migration testing.
+                Instant copy-on-write database branches for safe staging migrations and preview testing.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-4 space-y-3 text-xs">
-              <div className="flex items-center justify-between p-3 rounded-lg border border-purple-200 bg-purple-50/50">
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-2">
-                  <GitBranch className="h-4 w-4 text-purple-700" />
+                  <GitBranch className="h-4 w-4 text-purple-600" />
                   <div>
                     <span className="font-bold text-slate-900 font-mono">main (production)</span>
-                    <span className="text-[11px] text-slate-500 block">Current active parent branch (HEAD)</span>
+                    <span className="text-[11px] text-slate-500 block">Current active HEAD (8 branches available)</span>
                   </div>
                 </div>
-                <Badge className="bg-purple-100 text-purple-800 border-0 text-[10px] font-bold">PRIMARY</Badge>
+                <Badge className="bg-purple-50 text-purple-700 border-purple-200 text-[10px]">PRIMARY</Badge>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between p-2.5 rounded-lg bg-slate-50 border border-slate-100">
                 <div className="flex items-center gap-2">
-                  <GitBranch className="h-4 w-4 text-slate-500" />
+                  <GitBranch className="h-4 w-4 text-slate-400" />
                   <div>
                     <span className="font-bold text-slate-700 font-mono">staging</span>
                     <span className="text-[11px] text-slate-500 block">Synced 2 hours ago from parent</span>
@@ -419,44 +466,79 @@ export default function AdminDatabasePage() {
               Live pg_stat_statements telemetry showing latency percentiles and sequential scan prevention.
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="bg-slate-50/80 border-b border-slate-200">
-                  <th className="p-3 font-bold text-slate-700">Query Template</th>
-                  <th className="p-3 font-bold text-slate-700">Avg Latency</th>
-                  <th className="p-3 font-bold text-slate-700">24h Calls</th>
-                  <th className="p-3 font-bold text-slate-700">Index Hit</th>
-                  <th className="p-3 font-bold text-right text-slate-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {SLOW_QUERIES.map((q) => (
-                  <tr key={q.id} className="hover:bg-slate-50/60 transition-colors">
-                    <td className="p-3 font-mono text-slate-800 max-w-md">
-                      <p className="line-clamp-1">{q.query}</p>
-                    </td>
-                    <td className="p-3 font-semibold text-emerald-700">{q.avgMs} ms</td>
-                    <td className="p-3 font-medium text-slate-700">{q.calls.toLocaleString()}</td>
-                    <td className="p-3">
-                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
-                        {q.indexHitRate}
-                      </Badge>
-                    </td>
-                    <td className="p-3 text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSelectedQuery(q)}
-                        className="text-xs h-7 text-purple-700 hover:bg-purple-50"
-                      >
-                        Explain Plan
-                      </Button>
-                    </td>
+          <CardContent className="p-0">
+            {/* Mobile Card View (< md) */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {SLOW_QUERIES.map((q) => (
+                <div key={q.id} className="p-4 space-y-2.5 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-xs text-emerald-700">{q.avgMs} ms avg</span>
+                    <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
+                      {q.indexHitRate} Hit
+                    </Badge>
+                  </div>
+
+                  <div className="bg-slate-900 text-emerald-400 p-2.5 rounded-lg text-xs font-mono overflow-x-auto whitespace-pre-wrap">
+                    {q.query}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      24h Calls: <strong className="text-slate-800 font-mono">{q.calls.toLocaleString()}</strong>
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSelectedQuery(q)}
+                      className="text-xs h-7 px-2.5 text-purple-700 border-purple-200 hover:bg-purple-50 font-semibold"
+                    >
+                      Explain Plan
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-200">
+                    <th className="p-3 font-bold text-slate-700">Query Template</th>
+                    <th className="p-3 font-bold text-slate-700">Avg Latency</th>
+                    <th className="p-3 font-bold text-slate-700">24h Calls</th>
+                    <th className="p-3 font-bold text-slate-700">Index Hit</th>
+                    <th className="p-3 font-bold text-right text-slate-700">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {SLOW_QUERIES.map((q) => (
+                    <tr key={q.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="p-3 font-mono text-slate-800 max-w-md">
+                        <p className="line-clamp-1">{q.query}</p>
+                      </td>
+                      <td className="p-3 font-semibold text-emerald-700">{q.avgMs} ms</td>
+                      <td className="p-3 font-medium text-slate-700">{q.calls.toLocaleString()}</td>
+                      <td className="p-3">
+                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] font-bold">
+                          {q.indexHitRate}
+                        </Badge>
+                      </td>
+                      <td className="p-3 text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setSelectedQuery(q)}
+                          className="text-xs h-7 text-purple-700 hover:bg-purple-50"
+                        >
+                          Explain Plan
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </CardContent>
         </Card>
       )}
