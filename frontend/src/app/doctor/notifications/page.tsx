@@ -209,10 +209,108 @@ const CATEGORY_FILTERS = [
   { label: "System", value: "SYSTEM" },
 ];
 
+function NotifCard({
+  n,
+  onMarkRead,
+  onDismiss,
+}: {
+  n: ClinicalNotification;
+  onMarkRead: (id: string) => void;
+  onDismiss: (id: string) => void;
+}) {
+  const cfg = TYPE_CONFIG[n.type];
+  const Icon = cfg.icon;
+  const CatIcon = CATEGORY_ICON[n.category];
+  return (
+    <div
+      className={`relative rounded-xl border transition-all group ${
+        !n.read
+          ? `${cfg.border} ${cfg.unreadBg} hover:shadow-sm`
+          : "border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm"
+      }`}
+    >
+      {/* Unread indicator */}
+      {!n.read && (
+        <span className={`absolute top-4 right-4 h-2 w-2 rounded-full ${cfg.dot}`} />
+      )}
+
+      <div className="p-4 flex gap-3">
+        {/* Icon */}
+        <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${cfg.iconBg}`}>
+          <Icon className={`h-5 w-5 ${cfg.iconColor}`} />
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0 pr-6">
+          <div className="flex items-start gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => onMarkRead(n.id)}
+              className={`text-left text-sm font-semibold leading-snug hover:underline cursor-pointer ${
+                !n.read ? "text-slate-900" : "text-slate-700"
+              }`}
+            >
+              {n.title}
+            </button>
+            {!n.read && (
+              <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-bold ${cfg.iconBg} ${cfg.iconColor} shrink-0`}>
+                NEW
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 mt-1 leading-relaxed">{n.body}</p>
+
+          <div className="flex items-center gap-3 mt-2.5 flex-wrap">
+            {/* Category chip */}
+            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 font-medium">
+              <CatIcon className="h-3 w-3" />
+              {n.category.replace("_", " ")}
+            </span>
+            {n.patientMrn && (
+              <>
+                <span className="text-slate-300">·</span>
+                <span className="text-[10px] font-mono text-slate-400">{n.patientMrn}</span>
+              </>
+            )}
+            <span className="text-slate-300">·</span>
+            <span className="text-[10px] text-slate-400 flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {n.time}
+            </span>
+
+            {/* Action */}
+            {n.actionLabel && (
+              <a
+                href={n.actionHref || "#"}
+                onClick={(e) => e.stopPropagation()}
+                className={`ml-auto text-[11px] font-semibold flex items-center gap-0.5 ${cfg.iconColor} hover:underline`}
+              >
+                {n.actionLabel}
+                <ChevronRight className="h-3 w-3" />
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Dismiss */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onDismiss(n.id); }}
+          className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center focus:opacity-100"
+          title="Dismiss"
+          aria-label="Dismiss notification"
+        >
+          <X className="h-3 w-3 text-slate-500" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function DoctorNotificationsPage() {
   const [notifications, setNotifications] = React.useState(INITIAL_NOTIFICATIONS);
   const [categoryFilter, setCategoryFilter] = React.useState("ALL");
   const [showUnreadOnly, setShowUnreadOnly] = React.useState(false);
+  const [referenceTime] = React.useState(() => Date.now());
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -227,91 +325,8 @@ export default function DoctorNotificationsPage() {
   const dismiss = (id: string) => setNotifications((prev) => prev.filter((n) => n.id !== id));
 
   // Group by today vs older
-  const todayNotifs = filtered.filter((n) => Date.now() - n.timestamp.getTime() < 24 * 60 * 60 * 1000);
-  const olderNotifs = filtered.filter((n) => Date.now() - n.timestamp.getTime() >= 24 * 60 * 60 * 1000);
-
-  const NotifCard = ({ n }: { n: ClinicalNotification }) => {
-    const cfg = TYPE_CONFIG[n.type];
-    const Icon = cfg.icon;
-    const CatIcon = CATEGORY_ICON[n.category];
-    return (
-      <div
-        onClick={() => markRead(n.id)}
-        className={`relative rounded-xl border transition-all cursor-pointer group ${
-          !n.read
-            ? `${cfg.border} ${cfg.unreadBg} hover:shadow-sm`
-            : "border-slate-100 bg-white hover:border-slate-200 hover:shadow-sm"
-        }`}
-      >
-        {/* Unread indicator */}
-        {!n.read && (
-          <span className={`absolute top-4 right-4 h-2 w-2 rounded-full ${cfg.dot}`} />
-        )}
-
-        <div className="p-4 flex gap-3">
-          {/* Icon */}
-          <div className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${cfg.iconBg}`}>
-            <Icon className={`h-5 w-5 ${cfg.iconColor}`} />
-          </div>
-
-          {/* Content */}
-          <div className="flex-1 min-w-0 pr-6">
-            <div className="flex items-start gap-2 flex-wrap">
-              <p className={`text-sm font-semibold leading-snug ${!n.read ? "text-slate-900" : "text-slate-700"}`}>
-                {n.title}
-              </p>
-              {!n.read && (
-                <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[9px] font-bold ${cfg.iconBg} ${cfg.iconColor} shrink-0`}>
-                  NEW
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-slate-500 mt-1 leading-relaxed">{n.body}</p>
-
-            <div className="flex items-center gap-3 mt-2.5 flex-wrap">
-              {/* Category chip */}
-              <span className="inline-flex items-center gap-1 text-[10px] text-slate-400 font-medium">
-                <CatIcon className="h-3 w-3" />
-                {n.category.replace("_", " ")}
-              </span>
-              {n.patientMrn && (
-                <>
-                  <span className="text-slate-300">·</span>
-                  <span className="text-[10px] font-mono text-slate-400">{n.patientMrn}</span>
-                </>
-              )}
-              <span className="text-slate-300">·</span>
-              <span className="text-[10px] text-slate-400 flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {n.time}
-              </span>
-
-              {/* Action */}
-              {n.actionLabel && (
-                <a
-                  href={n.actionHref || "#"}
-                  onClick={(e) => e.stopPropagation()}
-                  className={`ml-auto text-[11px] font-semibold flex items-center gap-0.5 ${cfg.iconColor} hover:underline`}
-                >
-                  {n.actionLabel}
-                  <ChevronRight className="h-3 w-3" />
-                </a>
-              )}
-            </div>
-          </div>
-
-          {/* Dismiss */}
-          <button
-            onClick={(e) => { e.stopPropagation(); dismiss(n.id); }}
-            className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity h-5 w-5 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center"
-            title="Dismiss"
-          >
-            <X className="h-3 w-3 text-slate-500" />
-          </button>
-        </div>
-      </div>
-    );
-  };
+  const todayNotifs = filtered.filter((n) => referenceTime - n.timestamp.getTime() < 24 * 60 * 60 * 1000);
+  const olderNotifs = filtered.filter((n) => referenceTime - n.timestamp.getTime() >= 24 * 60 * 60 * 1000);
 
   return (
     <ResponsivePageContainer
@@ -439,7 +454,9 @@ export default function DoctorNotificationsPage() {
                 Today
               </p>
               <div className="space-y-2">
-                {todayNotifs.map((n) => <NotifCard key={n.id} n={n} />)}
+                {todayNotifs.map((n) => (
+                  <NotifCard key={n.id} n={n} onMarkRead={markRead} onDismiss={dismiss} />
+                ))}
               </div>
             </div>
           )}
@@ -451,7 +468,9 @@ export default function DoctorNotificationsPage() {
                 Earlier
               </p>
               <div className="space-y-2">
-                {olderNotifs.map((n) => <NotifCard key={n.id} n={n} />)}
+                {olderNotifs.map((n) => (
+                  <NotifCard key={n.id} n={n} onMarkRead={markRead} onDismiss={dismiss} />
+                ))}
               </div>
             </div>
           )}

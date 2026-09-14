@@ -51,8 +51,8 @@ const CONFIG_DATA: ConfigItem[] = [
   },
   {
     key: "NEON_DATABASE_URL",
-    value: "postgres://neondb_owner:npg_8F3aK1@ep-divine-credit-a589ua8g.us-east-2.aws.neon.tech/neondb?sslmode=require",
-    maskedValue: "postgres://neondb_owner:••••••••••••••••@ep-divine-credit-a589ua8g.us-east-2.aws.neon.tech/neondb",
+    value: "Managed via backend vault (Vault: secret/cdss/database/neon)",
+    maskedValue: "•••••••••••••••••••••••••••••••••••••••••••••••••••••••••",
     category: "DATABASE",
     description: "Serverless Neon Lakebase PostgreSQL connection pool endpoint with SSL strict mode.",
     isSecret: true,
@@ -65,8 +65,8 @@ const CONFIG_DATA: ConfigItem[] = [
   },
   {
     key: "UPSTASH_REDIS_URL",
-    value: "rediss://default:AXy1ASQgZGRmMTc2NzctYTRmMS00MG...=@global-vital-cougar-12345.upstash.io:6379",
-    maskedValue: "rediss://default:••••••••••••••••••••••••••@global-vital-cougar-12345.upstash.io:6379",
+    value: "Managed via backend vault (Vault: secret/cdss/redis/upstash)",
+    maskedValue: "•••••••••••••••••••••••••••••••••••••••••••••••••••••••••",
     category: "CORE",
     description: "Encrypted broker connection channel for Celery task workers and ASGI Daphne.",
     isSecret: true,

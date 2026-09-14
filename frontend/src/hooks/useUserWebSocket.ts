@@ -29,68 +29,56 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
 
   React.useEffect(() => {
     if (!isAuthenticated || !user) {
-      return;
+      queueMicrotask(() => setStatus("offline"));
+      return () => {};
     }
 
     let isMounted = true;
+    const protocol = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss:" : "ws:";
+    const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
+    const port = "8000"; // Django ASGI backend
+    const url = `${protocol}//${host}:${port}/ws/user/?token=${accessToken || ""}`;
 
-    const connect = () => {
+    queueMicrotask(() => {
+      if (isMounted) setStatus("connecting");
+    });
+
+    const socket = new WebSocket(url);
+    wsRef.current = socket;
+
+    socket.onopen = () => {
+      if (!isMounted) return;
+      setStatus("connected");
+    };
+
+    socket.onmessage = (msgEvent) => {
+      if (!isMounted) return;
       try {
-        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        const host = window.location.hostname;
-        const port = "8000"; // Django ASGI backend
-        const url = `${protocol}//${host}:${port}/ws/user/?token=${accessToken || ""}`;
-
-        queueMicrotask(() => {
-          if (isMounted) setStatus("connecting");
-        });
-
-        const socket = new WebSocket(url);
-        wsRef.current = socket;
-
-        socket.onopen = () => {
-          if (!isMounted) return;
-          setStatus("connected");
-        };
-
-        socket.onmessage = (msgEvent) => {
-          if (!isMounted) return;
-          try {
-            const data: UserRealtimeEvent = JSON.parse(msgEvent.data);
-            setLastEvent(data);
-            if (onEventRef.current) {
-              onEventRef.current(data);
-            }
-          } catch (e) {
-            console.error("Failed to parse WebSocket event:", e);
-          }
-        };
-
-        socket.onerror = () => {
-          if (!isMounted) return;
-          setStatus("reconnecting");
-        };
-
-        socket.onclose = () => {
-          if (!isMounted) return;
-          setStatus("reconnecting");
-          // Reconnect with 3s backoff
-          reconnectTimeoutRef.current = setTimeout(() => {
-            if (isMounted) connect();
-          }, 3000);
-        };
-      } catch {
-        if (isMounted) setStatus("offline");
+        const data: UserRealtimeEvent = JSON.parse(msgEvent.data);
+        setLastEvent(data);
+        if (onEventRef.current) {
+          onEventRef.current(data);
+        }
+      } catch (e) {
+        console.error("Failed to parse WebSocket event:", e);
       }
     };
 
-    connect();
+    socket.onerror = () => {
+      if (!isMounted) return;
+      setStatus("reconnecting");
+    };
+
+    socket.onclose = () => {
+      if (!isMounted) return;
+      setStatus("reconnecting");
+    };
 
     return () => {
       isMounted = false;
-      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
-      if (wsRef.current) {
-        wsRef.current.close();
+      socket.close();
+      if (wsRef.current === socket) {
+        wsRef.current = null;
       }
     };
   }, [isAuthenticated, user, accessToken]);

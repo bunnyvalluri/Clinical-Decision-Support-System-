@@ -5,36 +5,24 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Activity,
-  AlertCircle,
   ArrowRight,
-  BarChart3,
   Check,
   CheckCircle2,
-  ChevronRight,
   Eye,
   EyeOff,
-  HeartPulse,
   Lock,
   Mail,
   Phone,
-  Shield,
   ShieldCheck,
   Sparkles,
   Stethoscope,
   User,
-  UserCheck,
-  Users,
   X,
-  Zap,
-  Building2,
-  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Alert } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import apiClient from "@/services/apiClient";
 import { useAuthStore } from "@/features/auth/authStore";
 

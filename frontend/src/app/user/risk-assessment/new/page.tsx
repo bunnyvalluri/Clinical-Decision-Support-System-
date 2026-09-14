@@ -66,6 +66,7 @@ export default function NewRiskAssessmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (step === "PROCESSING" || step === "COMPLETED") return;
     setStep("PROCESSING");
     setProgressStage("Transmitting to backend CDS pipeline...");
 

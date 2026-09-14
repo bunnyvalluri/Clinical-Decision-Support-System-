@@ -52,7 +52,7 @@ export interface MobileFloatingNavigationProps {
  * MEDICAL INFORMATICIST: Home, Data, Models, Analytics, Profile
  * IT ADMIN: Home, Users, Services, Security, Profile
  */
-export function getAuthorizedMobileNavItems(
+function getAuthorizedMobileNavItems(
   role: RoleType,
   badges: {
     alertsCount?: number;
@@ -312,7 +312,7 @@ export function getAuthorizedMobileNavItems(
  * Longest-prefix matching to determine which mobile navigation item is active.
  * Handles nested routes seamlessly (e.g. /doctor/patients/123 highlights Patients).
  */
-export function resolveActiveNavItemId(
+function resolveActiveNavItemId(
   pathname: string,
   items: MobileNavItem[]
 ): string | null {
@@ -369,7 +369,7 @@ export interface RoleThemeConfig {
   activeIcon: string;
 }
 
-export const ROLE_THEMES: Record<RoleType, RoleThemeConfig> = {
+const ROLE_THEMES: Record<RoleType, RoleThemeConfig> = {
   ADMIN: {
     pillBg: "bg-purple-500/10",
     pillBorder: "border-purple-200/80",
@@ -505,7 +505,6 @@ export function MobileFloatingNavigation({
 
   return (
     <nav
-      role="navigation"
       aria-label="Mobile Bottom Navigation"
       data-testid="mobile-floating-nav"
       className={`lg:hidden fixed left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.25rem)] max-w-[440px] pointer-events-auto select-none ${className}`}

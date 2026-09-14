@@ -27,19 +27,36 @@ export default function PrivacyPage() {
   const [requestProgress, setRequestProgress] = React.useState(0);
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
 
+  const exportTimerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const toastTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (exportTimerRef.current) clearInterval(exportTimerRef.current);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
   const handleExportData = () => {
+    if (downloadRequested) return;
     setDownloadRequested(true);
     setRequestProgress(15);
-    const interval = setInterval(() => {
-      setRequestProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setToastMessage("EHI Patient Health Dossier generated successfully (3.4 MB)");
-          setTimeout(() => setToastMessage(null), 4000);
-          return 100;
+    if (exportTimerRef.current) clearInterval(exportTimerRef.current);
+    let progress = 15;
+    exportTimerRef.current = setInterval(() => {
+      progress += 25;
+      if (progress >= 100) {
+        if (exportTimerRef.current) {
+          clearInterval(exportTimerRef.current);
+          exportTimerRef.current = null;
         }
-        return prev + 25;
-      });
+        setRequestProgress(100);
+        setToastMessage("EHI Patient Health Dossier generated successfully (3.4 MB)");
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = setTimeout(() => setToastMessage(null), 4000);
+      } else {
+        setRequestProgress(progress);
+      }
     }, 400);
   };
 

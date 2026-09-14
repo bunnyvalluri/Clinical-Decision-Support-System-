@@ -519,24 +519,29 @@ export default function PatientDashboardPage() {
   };
 
   const handleToggleTask = (taskId: string) => {
+    const target = tasks.find((t) => t.id === taskId);
+    if (!target) return;
+    const willBeDone = target.status !== "COMPLETED";
+
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id === taskId) {
-          const isDone = t.status === "COMPLETED";
-          const updated = {
+          return {
             ...t,
-            status: isDone ? "PENDING" : "COMPLETED",
-            completed_at: isDone ? undefined : new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            status: willBeDone ? "COMPLETED" : "PENDING",
+            completed_at: willBeDone
+              ? new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+              : undefined,
           };
-          if (!isDone) {
-            showToast(`Completed: "${t.title}"`);
-            userApi.completeTask(taskId).catch(() => {});
-          }
-          return updated;
         }
         return t;
       })
     );
+
+    if (willBeDone) {
+      showToast(`Completed: "${target.title}"`);
+      userApi.completeTask(taskId).catch(() => {});
+    }
   };
 
   const handleAddNewTask = (e: React.FormEvent) => {

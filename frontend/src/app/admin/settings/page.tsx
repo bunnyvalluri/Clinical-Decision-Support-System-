@@ -31,8 +31,8 @@ export default function AdminSettingsPage() {
     smsDegraded: true,
     latencyWarning: true,
     unrecognizedDevice: true,
-    slackWebhook: "https://hooks.slack.com/services/T000/B000/XXXXXX",
-    pagerDutyKey: "pd_live_sec_89f2a1b94c2e",
+    slackWebhook: process.env.NEXT_PUBLIC_SLACK_WEBHOOK_URL || "",
+    pagerDutyKey: "",
   });
 
   const [securitySettings, setSecuritySettings] = React.useState({
@@ -88,10 +88,11 @@ export default function AdminSettingsPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             onClick={handleSave}
+            disabled={saved}
             className="text-xs font-semibold gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
           >
             <Save className="h-3.5 w-3.5" />
-            Save Policies
+            {saved ? "Saved" : "Save Policies"}
           </Button>
         </div>
       </div>

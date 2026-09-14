@@ -114,6 +114,7 @@ export function NurseWorkspace() {
   const [temp, setTemp] = React.useState("37.0");
   const [vitalsError, setVitalsError] = React.useState<string | null>(null);
   const [vitalsSuccess, setVitalsSuccess] = React.useState(false);
+  const [isSubmittingVitals, setIsSubmittingVitals] = React.useState(false);
 
   // Escalation Modal State
   const [escalateModalOpen, setEscalateModalOpen] = React.useState(false);
@@ -285,6 +286,7 @@ export function NurseWorkspace() {
 
   const handleSubmitVitals = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingVitals) return;
     setVitalsError(null);
 
     if (isPhysiologicalContradiction) {
@@ -300,6 +302,7 @@ export function NurseWorkspace() {
       return;
     }
 
+    setIsSubmittingVitals(true);
     try {
       if (selectedPatientForVitals) {
         const vitalsRes = await apiClient.post("/clinical/vitals/", {
@@ -336,6 +339,8 @@ export function NurseWorkspace() {
     } catch (err: unknown) {
       const apiErr = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
       setVitalsError(apiErr ?? "Failed to record vital signs.");
+    } finally {
+      setIsSubmittingVitals(false);
     }
   };
 

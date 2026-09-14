@@ -131,33 +131,48 @@ export default function AdminSecurityPage() {
     wafStrictInspection: true,
   });
 
+  const scanIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const toastTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setToastMessage(null), 3500);
   };
 
   const handleRunSecurityScan = () => {
+    if (isScanning) return;
     setIsScanning(true);
     setScanProgress(0);
-    const interval = setInterval(() => {
-      setScanProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsScanning(false);
-          showToast("Vulnerability & Perimeter Penetration Scan completed: 0 critical CVEs detected. Grade A+ intact.");
-          return 100;
+    if (scanIntervalRef.current) clearInterval(scanIntervalRef.current);
+    let currentProgress = 0;
+    scanIntervalRef.current = setInterval(() => {
+      currentProgress += 25;
+      if (currentProgress >= 100) {
+        if (scanIntervalRef.current) {
+          clearInterval(scanIntervalRef.current);
+          scanIntervalRef.current = null;
         }
-        return prev + 25;
-      });
+        setScanProgress(100);
+        setIsScanning(false);
+        showToast("Vulnerability & Perimeter Penetration Scan completed: 0 critical CVEs detected. Grade A+ intact.");
+      } else {
+        setScanProgress(currentProgress);
+      }
     }, 350);
   };
 
   const togglePolicy = (key: keyof typeof policies, label: string) => {
-    setPolicies((prev) => {
-      const next = !prev[key];
-      showToast(`Security Policy "${label}" is now ${next ? "ENFORCED" : "SUSPENDED"}.`);
-      return { ...prev, [key]: next };
-    });
+    const nextVal = !policies[key];
+    setPolicies((prev) => ({ ...prev, [key]: nextVal }));
+    showToast(`Security Policy "${label}" is now ${nextVal ? "ENFORCED" : "SUSPENDED"}.`);
   };
 
   const handleQuarantineIp = (evtId: string, ip: string) => {

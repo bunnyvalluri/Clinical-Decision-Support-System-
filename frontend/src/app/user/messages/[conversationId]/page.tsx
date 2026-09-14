@@ -66,12 +66,18 @@ export default function ConversationDetailPage() {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Normalize any legacy messages without status
-          const normalized = parsed.map((m: any) => ({
-            ...m,
-            status: m.status || (m.is_patient ? "reported" : "read"),
+          const normalized: ChatMessage[] = parsed.map((m: Partial<ChatMessage>) => ({
+            id: m.id || String(Date.now()),
+            sender: m.sender || "User",
+            is_patient: !!m.is_patient,
+            timestamp: m.timestamp || new Date().toISOString(),
+            text: m.text || "",
+            status: (m.status as ChatMessage["status"]) || (m.is_patient ? "reported" : "read"),
+            reportedAt: m.reportedAt,
           }));
-          setMessages(normalized);
-          return;
+          queueMicrotask(() => {
+            setMessages(normalized);
+          });
         }
       }
     } catch {

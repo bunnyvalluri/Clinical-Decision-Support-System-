@@ -108,20 +108,19 @@ export default function PatientVitalsPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const handleLogVital = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError(null);
     const numSbp = parseInt(sbp, 10);
     const numDbp = parseInt(dbp, 10);
     const numHr = parseInt(hr, 10);
     const numSpo2 = parseInt(spo2, 10);
 
-    if (isNaN(numSbp) || numSbp < 50 || numSbp > 260) {
-      setError("Systolic pressure must be between 50 and 260 mmHg.");
-      return;
-    }
-    if (isNaN(numDbp) || numDbp < 30 || numDbp > 160) {
-      setError("Diastolic pressure must be between 30 and 160 mmHg.");
+    if (isNaN(numSbp) || isNaN(numDbp) || isNaN(numHr) || isNaN(numSpo2)) {
+      setError("Please ensure all vital sign measurements are valid numeric values.");
       return;
     }
     if (numSbp <= numDbp) {
@@ -129,6 +128,7 @@ export default function PatientVitalsPage() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await apiClient.post("/user/vitals/", {
         systolic_bp: numSbp,
@@ -136,7 +136,9 @@ export default function PatientVitalsPage() {
         heart_rate: numHr,
         spo2: numSpo2,
       }).catch(() => {});
-    } catch {}
+    } catch {} finally {
+      setIsSubmitting(false);
+    }
 
     const newEntry: PatientVitalItem = {
       id: `v-${Date.now()}`,

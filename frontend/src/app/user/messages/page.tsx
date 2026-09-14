@@ -347,7 +347,7 @@ export default function PatientMessagesPage() {
             <label className="text-xs font-bold text-slate-700">Message Category</label>
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value as any)}
+              onChange={(e) => setCategory(e.target.value as "Prescription" | "Lab Results" | "General Inquiry" | "Telemetry")}
               className="w-full h-10 px-3 rounded-xl border border-slate-200 text-xs font-medium bg-white text-slate-800"
             >
               <option value="General Inquiry">General Clinical Inquiry</option>

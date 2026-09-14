@@ -83,19 +83,18 @@ export default function PatientTasksPage() {
   const [celebrationToast, setCelebrationToast] = React.useState<string | null>(null);
 
   const toggleTask = (id: string) => {
+    const target = tasks.find((t) => t.id === id);
+    if (!target) return;
+    const willBeDone = target.status !== "COMPLETED";
+
     setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id === id) {
-          const nextStatus = t.status === "COMPLETED" ? "PENDING" : "COMPLETED";
-          if (nextStatus === "COMPLETED") {
-            setCelebrationToast(`Completed: "${t.title}"`);
-            setTimeout(() => setCelebrationToast(null), 3000);
-          }
-          return { ...t, status: nextStatus };
-        }
-        return t;
-      })
+      prev.map((t) => (t.id === id ? { ...t, status: willBeDone ? "COMPLETED" : "PENDING" } : t))
     );
+
+    if (willBeDone) {
+      setCelebrationToast(`Completed: "${target.title}"`);
+      setTimeout(() => setCelebrationToast(null), 3000);
+    }
   };
 
   const handleAddTask = (e: React.FormEvent) => {

@@ -147,9 +147,14 @@ export function ResponsiveAppShell({
 
   // Auto-collapse sidebar rail on medium viewports (1024px to 1279px) so main content has ample width
   React.useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth >= 1024 && window.innerWidth < 1280) {
-      setTabletRailCollapsed(true);
-    }
+    const checkWidth = () => {
+      if (typeof window !== "undefined" && window.innerWidth >= 1024 && window.innerWidth < 1280) {
+        setTabletRailCollapsed(true);
+      }
+    };
+    queueMicrotask(checkWidth);
+    window.addEventListener("resize", checkWidth);
+    return () => window.removeEventListener("resize", checkWidth);
   }, []);
 
   const handleLogout = async () => {

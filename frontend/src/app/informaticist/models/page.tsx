@@ -178,7 +178,7 @@ const REGISTRY_STAGES = [
 
 export default function InformaticistModelsPage() {
   const { models, promoteModel } = useClinicalStore();
-  const [modelList, setModelList] = React.useState<ExtendedModel[]>(DEFAULT_MODELS);
+  const [promotedModelId, setPromotedModelId] = React.useState<string | null>(null);
   const [selectedTab, setSelectedTab] = React.useState<"REGISTRY" | "COMPARE" | "STAGES" | "EVALUATIONS">("REGISTRY");
   const [statusFilter, setStatusFilter] = React.useState<string>("ALL");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
@@ -187,16 +187,20 @@ export default function InformaticistModelsPage() {
   const [notification, setNotification] = React.useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = React.useState(false);
 
-  // Merge store models if populated
-  React.useEffect(() => {
-    if (models && models.length > 0) {
-      const merged = DEFAULT_MODELS.map(dm => {
-        const found = models.find(m => m.id === dm.id);
-        return found ? { ...dm, ...found } : dm;
-      });
-      setModelList(merged);
-    }
-  }, [models]);
+  // Derived models combining default catalog, store models, and local promotion
+  const modelList = React.useMemo<ExtendedModel[]>(() => {
+    return DEFAULT_MODELS.map((dm) => {
+      const found = models?.find((m) => m.id === dm.id);
+      const base = found ? { ...dm, ...found } : dm;
+      if (promotedModelId) {
+        return {
+          ...base,
+          status: base.id === promotedModelId ? "ACTIVE" : base.status === "ACTIVE" ? "CANDIDATE" : base.status,
+        };
+      }
+      return base;
+    });
+  }, [models, promotedModelId]);
 
   const championModel = modelList.find(m => m.status === "ACTIVE") || modelList[0];
   const challengerModel = modelList.find(m => m.id === compareModelId) || modelList[1];
@@ -209,6 +213,7 @@ export default function InformaticistModelsPage() {
       statusFilter === "ARCHIVED" ? m.status === "ARCHIVED" : true;
 
     const matchesSearch =
+      searchQuery.trim() === "" ? true :
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.algorithm.toLowerCase().includes(searchQuery.toLowerCase()) ||
       m.version.toLowerCase().includes(searchQuery.toLowerCase());
@@ -218,12 +223,7 @@ export default function InformaticistModelsPage() {
 
   const handlePromote = (model: ExtendedModel) => {
     promoteModel(model.id);
-    setModelList(prev =>
-      prev.map(m => ({
-        ...m,
-        status: m.id === model.id ? "ACTIVE" : m.status === "ACTIVE" ? "CANDIDATE" : m.status,
-      }))
-    );
+    setPromotedModelId(model.id);
     setNotification(`${model.name} has been promoted to Active Production Champion.`);
     setTimeout(() => setNotification(null), 3500);
   };

@@ -108,8 +108,12 @@ export default function PatientAppointmentsPage() {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
+  const [isBooking, setIsBooking] = React.useState(false);
+
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBooking) return;
+    setIsBooking(true);
     const isTele = visitType === "telehealth";
     const newAppt: AppointmentItem = {
       id: `appt-${Date.now()}`,
@@ -133,7 +137,9 @@ export default function PatientAppointmentsPage() {
         scheduled_time: new Date(dateStr).toISOString(),
         reason_for_visit: reason || "Routine Follow-up",
       }).catch(() => {});
-    } catch {}
+    } catch {} finally {
+      setIsBooking(false);
+    }
 
     setAppointments([newAppt, ...appointments]);
     setShowBookModal(false);

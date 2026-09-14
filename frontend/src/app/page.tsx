@@ -352,6 +352,16 @@ export default function LandingPage() {
               </Button>
             </Link>
 
+            <Link href="/register" className="hidden md:inline-flex">
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-xs font-semibold border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-slate-50"
+              >
+                Register
+              </Button>
+            </Link>
+
             <Link href="/dashboard">
               <Button
                 size="sm"
@@ -609,6 +619,13 @@ export default function LandingPage() {
                 className="touch-target w-full flex items-center justify-center py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors"
               >
                 Sign In with Credentials
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMobileMenuOpen(false)}
+                className="touch-target w-full flex items-center justify-center py-2.5 rounded-xl border border-teal-200 bg-teal-50/60 text-teal-800 font-semibold text-xs hover:bg-teal-100/70 transition-colors"
+              >
+                Create Account / Register
               </Link>
             </div>
           </div>

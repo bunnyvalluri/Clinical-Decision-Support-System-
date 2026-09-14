@@ -143,6 +143,9 @@ jobs:
       - name: Run TypeScript check
         run: npm run type-check
 
+      - name: Run React Doctor (Advisory Gate)
+        run: npm run doctor:ci
+
   frontend-build:
     name: Frontend — Build
     runs-on: ubuntu-latest

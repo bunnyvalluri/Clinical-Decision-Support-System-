@@ -93,10 +93,10 @@ export default function PatientPredictionsPage() {
       .get("/user/predictions/")
       .then((res) => {
         if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          const merged = res.data.map((item: any, idx: number) => ({
+          const merged = res.data.map((item: Partial<PatientPredictionItem> & Record<string, unknown>, idx: number) => ({
             ...INITIAL_PREDICTIONS[idx % INITIAL_PREDICTIONS.length],
             ...item,
-            id: item.id || `pred-api-${idx}`,
+            id: (item.id as string) || `pred-api-${idx}`,
           }));
           setPredictions(merged);
         }

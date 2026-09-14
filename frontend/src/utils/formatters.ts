@@ -50,16 +50,18 @@ export function getRiskLevelColor(level: string): {
   }
 }
 
+const defaultDateTimeFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
 export function formatDateTime(isoString: string): string {
   if (!isoString) return "—";
   try {
     const d = new Date(isoString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(d);
+    return defaultDateTimeFormatter.format(d);
   } catch {
     return isoString;
   }

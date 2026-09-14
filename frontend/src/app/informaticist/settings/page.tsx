@@ -24,7 +24,7 @@ export default function InformaticistSettingsPage() {
   const [driftWarningThreshold, setDriftWarningThreshold] = React.useState(0.10);
   const [driftCriticalThreshold, setDriftCriticalThreshold] = React.useState(0.25);
   const [latencyThresholdMs, setLatencyThresholdMs] = React.useState(5.0);
-  const [webhookUrl, setWebhookUrl] = React.useState("https://hooks.slack.com/services/T00/B00/mlops-alerts");
+  const [webhookUrl, setWebhookUrl] = React.useState(process.env.NEXT_PUBLIC_SLACK_WEBHOOK_URL || "");
 
   // Toggles
   const [driftAlerts, setDriftAlerts] = React.useState(true);

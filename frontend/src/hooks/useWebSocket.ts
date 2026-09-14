@@ -48,7 +48,6 @@ export function useWebSocket({
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartbeatTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const handlersRef = useRef(handlers);
-  const connectRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     handlersRef.current = handlers;
@@ -77,17 +76,20 @@ export function useWebSocket({
     }, heartbeatInterval);
   }, [heartbeatInterval, stopHeartbeat]);
 
-  const connect = useCallback(() => {
+  const [reconnectTrigger, setReconnectTrigger] = useState(0);
+
+  useEffect(() => {
+    let isMounted = true;
     const token = tokenStorage.getAccess();
     if (!token) {
       queueMicrotask(() => {
-        setState((s) => ({ ...s, error: "No auth token — cannot connect." }));
+        if (isMounted) setState((s) => ({ ...s, error: "No auth token — cannot connect." }));
       });
       return;
     }
 
     queueMicrotask(() => {
-      setState((s) => ({ ...s, isConnecting: true, error: null }));
+      if (isMounted) setState((s) => ({ ...s, isConnecting: true, error: null }));
     });
 
     // Append token as query parameter (JWTAuthMiddleware validates it)
@@ -97,12 +99,14 @@ export function useWebSocket({
     wsRef.current = ws;
 
     ws.onopen = () => {
+      if (!isMounted) return;
       retryCountRef.current = 0;
       setState({ isConnected: true, isConnecting: false, error: null, retryCount: 0 });
       startHeartbeat();
     };
 
     ws.onmessage = (event: MessageEvent) => {
+      if (!isMounted) return;
       try {
         const message: WSEvent = JSON.parse(event.data as string);
 
@@ -127,11 +131,13 @@ export function useWebSocket({
     };
 
     ws.onerror = () => {
+      if (!isMounted) return;
       setState((s) => ({ ...s, error: "WebSocket connection error.", isConnecting: false }));
     };
 
     ws.onclose = (event: CloseEvent) => {
       stopHeartbeat();
+      if (!isMounted) return;
 
       let errorMessage: string | null = null;
       let shouldRetry = autoReconnect;
@@ -162,24 +168,23 @@ export function useWebSocket({
         setState((s) => ({ ...s, retryCount: retryCountRef.current }));
 
         retryTimerRef.current = setTimeout(() => {
-          connectRef.current();
+          if (isMounted) {
+            setReconnectTrigger((prev) => prev + 1);
+          }
         }, delay);
       }
     };
-  }, [path, autoReconnect, maxRetries, startHeartbeat, stopHeartbeat]);
 
-  useEffect(() => {
-    connectRef.current = connect;
-  }, [connect]);
-
-  useEffect(() => {
-    connect();
     return () => {
+      isMounted = false;
       stopHeartbeat();
       if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
-      wsRef.current?.close(1000, "Component unmounted");
+      ws.close(1000, "Component unmounted");
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
     };
-  }, [connect, stopHeartbeat]);
+  }, [path, autoReconnect, maxRetries, startHeartbeat, stopHeartbeat, reconnectTrigger]);
 
   return state;
 }

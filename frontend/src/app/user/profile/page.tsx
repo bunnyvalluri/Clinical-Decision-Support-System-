@@ -20,8 +20,12 @@ export default function PatientProfilePage() {
     emergencyPhone: "(555) 234-8902",
   });
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       await apiClient.put("/user/profile/", {
         phone_number: formData.phone,
@@ -30,11 +34,13 @@ export default function PatientProfilePage() {
         emergency_contact_phone: formData.emergencyPhone,
         emergency_contact_relation: formData.emergencyRelation,
       });
-    } catch (err) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {
       // preview graceful handling
+    } finally {
+      setIsSubmitting(false);
     }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
   };
 
   return (

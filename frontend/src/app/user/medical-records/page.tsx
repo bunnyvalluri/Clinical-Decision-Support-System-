@@ -138,11 +138,11 @@ export default function PatientMedicalRecordsPage() {
       .then((res) => {
         if (res.data && Array.isArray(res.data) && res.data.length > 0) {
           // Merge API data with baseline fields if necessary
-          const merged: MedicalRecordItem[] = res.data.map((item: any, idx: number) => ({
+          const merged: MedicalRecordItem[] = res.data.map((item: Partial<MedicalRecordItem> & Record<string, unknown>, idx: number) => ({
             ...INITIAL_RECORDS[idx % INITIAL_RECORDS.length],
             ...item,
             id: item.id || `rec-api-${idx}`,
-            encounter_date: item.encounter_date || item.recorded_at?.split(" ")[0] || "2026-09-10",
+            encounter_date: item.encounter_date || (typeof item.recorded_at === "string" ? item.recorded_at.split(" ")[0] : "2026-09-10"),
           }));
           setRecords(merged);
         }

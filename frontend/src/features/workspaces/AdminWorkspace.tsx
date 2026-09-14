@@ -3,30 +3,17 @@
 import * as React from "react";
 import {
   Activity,
-  AlertCircle,
-  AlertTriangle,
-  ArrowUpRight,
   CheckCircle2,
   Clock,
   Cpu,
   Database,
   Download,
-  KeyRound,
-  Layers,
   Lock,
-  Play,
   RefreshCw,
   Server,
-  Shield,
   ShieldAlert,
   ShieldCheck,
-  Terminal,
-  Trash2,
-  UserCheck,
-  UserCog,
   Users,
-  UserX,
-  X,
   Zap,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -170,6 +157,32 @@ const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   },
 ];
 
+const getActionBadgeClass = (action: string) => {
+  if (action.includes("DENIED") || action.includes("RATE_LIMIT")) {
+    return "bg-rose-50 text-rose-700 border-rose-200 font-bold";
+  }
+  if (action.includes("OVERRIDE")) {
+    return "bg-purple-50 text-purple-700 border-purple-200 font-bold";
+  }
+  if (action.includes("ESCALATION") || action.includes("PROMOTION")) {
+    return "bg-amber-50 text-amber-700 border-amber-200 font-bold";
+  }
+  return "bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold";
+};
+
+const getRoleBadgeClass = (role: string) => {
+  switch (role) {
+    case "DOCTOR":
+      return "bg-emerald-50 text-emerald-800 border-emerald-200";
+    case "NURSE":
+      return "bg-sky-50 text-sky-800 border-sky-200";
+    case "MEDICAL_INFORMATICIST":
+      return "bg-purple-50 text-purple-800 border-purple-200";
+    default:
+      return "bg-slate-100 text-slate-800 border-slate-300";
+  }
+};
+
 export function AdminWorkspace() {
   const { user } = useAuthStore();
   const [users, setUsers] = React.useState<ManagedUser[]>(INITIAL_USERS);
@@ -201,39 +214,41 @@ export function AdminWorkspace() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 max-w-full overflow-hidden">
       {/* Administrator Header Bar */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex items-start sm:items-center gap-3.5">
-          <div className="h-11 w-11 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center shrink-0">
-            <Server className="h-6 w-6 text-purple-600" />
+      <div className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3 sm:gap-3.5 min-w-0">
+          <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center shrink-0">
+            <Server className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
           </div>
-          <div>
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl font-bold tracking-tight text-slate-900">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 break-words">
                 IT System Administration &amp; Infrastructure
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-emerald-500 animate-pulse" />
                 Cluster Online
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Administrator: <span className="font-semibold text-slate-800">{user?.full_name || "Marcus Chen"}</span> ·
-              Role: <span className="font-semibold text-slate-800">IT_ADMIN</span> ·
-              FDA SaMD Class II Aligned
+            <p className="text-[11px] sm:text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span>Admin: <strong className="text-slate-800">{user?.full_name || "Marcus Chen"}</strong></span>
+              <span>·</span>
+              <span>Role: <strong className="text-slate-800">IT_ADMIN</strong></span>
+              <span>·</span>
+              <span className="text-emerald-700 font-medium">FDA SaMD Class II Aligned</span>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full lg:w-auto">
           <Button
             size="sm"
             variant="outline"
             onClick={() => triggerAdminAction("Upstash Redis key cache cleared across 12 distributed nodes.")}
-            className="text-xs h-8 border-slate-200 hover:border-purple-300"
+            className="text-xs h-8 border-slate-200 hover:border-purple-300 justify-center"
           >
-            <Zap className="h-3.5 w-3.5 mr-1 text-purple-600" />
+            <Zap className="h-3.5 w-3.5 mr-1 text-purple-600 shrink-0" />
             Flush Cache
           </Button>
 
@@ -241,102 +256,102 @@ export function AdminWorkspace() {
             size="sm"
             variant="outline"
             onClick={() => triggerAdminAction("Celery async worker pool heartbeat refreshed.")}
-            className="text-xs h-8 border-slate-200 hover:border-purple-300"
+            className="text-xs h-8 border-slate-200 hover:border-purple-300 justify-center"
           >
-            <RefreshCw className="h-3.5 w-3.5 mr-1" />
+            <RefreshCw className="h-3.5 w-3.5 mr-1 shrink-0" />
             Ping Workers
           </Button>
 
           <Button
             size="sm"
             onClick={() => triggerAdminAction("Full IT infrastructure audit dossier downloaded.")}
-            className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8"
+            className="col-span-2 sm:col-span-1 bg-slate-900 hover:bg-slate-800 text-white text-xs h-8 justify-center"
           >
-            <Download className="h-3.5 w-3.5 mr-1.5" />
-            Export Cluster Audit
+            <Download className="h-3.5 w-3.5 mr-1.5 shrink-0" />
+            Export Audit
           </Button>
         </div>
       </div>
 
       {actionFeedback && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-xs flex items-center justify-between animate-in fade-in">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl text-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 animate-in fade-in">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            {actionFeedback}
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+            <span>{actionFeedback}</span>
           </span>
-          <span className="text-[10px] text-emerald-600 font-mono">21 CFR Part 11 Logged</span>
+          <span className="text-[10px] text-emerald-600 font-mono shrink-0">21 CFR Part 11 Logged</span>
         </div>
       )}
 
       {/* Navigation Sub-Tabs */}
-      <div className="flex border-b border-slate-200 bg-white px-4 rounded-xl shadow-xs overflow-x-auto">
+      <div className="flex border-b border-slate-200 bg-white px-2 sm:px-4 rounded-xl shadow-xs overflow-x-auto scrollbar-none gap-1 sm:gap-2">
         <button
           onClick={() => setActiveTab("HEALTH")}
-          className={`px-4 py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+          className={`px-3 sm:px-4 py-2.5 sm:py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "HEALTH"
               ? "border-purple-600 text-purple-700"
               : "border-transparent text-slate-600 hover:text-slate-900"
           }`}
         >
-          <Activity className="h-4 w-4" />
+          <Activity className="h-4 w-4 shrink-0" />
           Infrastructure Health
         </button>
         <button
           onClick={() => setActiveTab("USERS")}
-          className={`px-4 py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+          className={`px-3 sm:px-4 py-2.5 sm:py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "USERS"
               ? "border-purple-600 text-purple-700"
               : "border-transparent text-slate-600 hover:text-slate-900"
           }`}
         >
-          <Users className="h-4 w-4" />
+          <Users className="h-4 w-4 shrink-0" />
           User &amp; Role Governance ({users.length})
         </button>
         <button
           onClick={() => setActiveTab("AUDIT")}
-          className={`px-4 py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+          className={`px-3 sm:px-4 py-2.5 sm:py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "AUDIT"
               ? "border-purple-600 text-purple-700"
               : "border-transparent text-slate-600 hover:text-slate-900"
           }`}
         >
-          <ShieldCheck className="h-4 w-4" />
+          <ShieldCheck className="h-4 w-4 shrink-0" />
           Audit Trail Viewer
         </button>
         <button
           onClick={() => setActiveTab("SECURITY")}
-          className={`px-4 py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+          className={`px-3 sm:px-4 py-2.5 sm:py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap shrink-0 ${
             activeTab === "SECURITY"
               ? "border-purple-600 text-purple-700"
               : "border-transparent text-slate-600 hover:text-slate-900"
           }`}
         >
-          <ShieldAlert className="h-4 w-4" />
+          <ShieldAlert className="h-4 w-4 shrink-0" />
           Cybersecurity &amp; Telemetry
         </button>
       </div>
 
       {/* TAB 1: Infrastructure Health */}
       {activeTab === "HEALTH" && (
-        <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {/* Neon Postgres */}
             <Card className="bg-white border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="flex items-center justify-between text-xs font-semibold text-slate-500">
                   <span>Neon PostgreSQL</span>
-                  <Database className="h-4 w-4 text-emerald-600" />
+                  <Database className="h-4 w-4 text-emerald-600 shrink-0" />
                 </CardDescription>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 mt-1">
                   <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
                     CONNECTED
                   </CardTitle>
                   <span className="text-xs text-emerald-600 font-mono">32ms</span>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-[11px] text-slate-500 font-mono">
+              <CardContent className="pt-0 p-4 sm:p-6 sm:pt-0">
+                <p className="text-[11px] text-slate-500 font-mono truncate">
                   Pool: 14/100 · PgBouncer Active
                 </p>
                 <div className="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -347,21 +362,21 @@ export function AdminWorkspace() {
 
             {/* Upstash Redis */}
             <Card className="bg-white border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="flex items-center justify-between text-xs font-semibold text-slate-500">
                   <span>Upstash Redis Broker</span>
-                  <Zap className="h-4 w-4 text-emerald-600" />
+                  <Zap className="h-4 w-4 text-emerald-600 shrink-0" />
                 </CardDescription>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 mt-1">
                   <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
                     ONLINE
                   </CardTitle>
                   <span className="text-xs text-emerald-600 font-mono">18ms</span>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-[11px] text-slate-500 font-mono">
+              <CardContent className="pt-0 p-4 sm:p-6 sm:pt-0">
+                <p className="text-[11px] text-slate-500 font-mono truncate">
                   Queue depth: 0 · 24MB RAM used
                 </p>
                 <div className="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -372,21 +387,21 @@ export function AdminWorkspace() {
 
             {/* Celery Worker */}
             <Card className="bg-white border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="flex items-center justify-between text-xs font-semibold text-slate-500">
                   <span>Celery Async Worker</span>
-                  <Cpu className="h-4 w-4 text-emerald-600" />
+                  <Cpu className="h-4 w-4 text-emerald-600 shrink-0" />
                 </CardDescription>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 mt-1">
                   <CardTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
                     ACTIVE (solo)
                   </CardTitle>
                   <span className="text-xs text-slate-500 font-mono">18 tasks</span>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-[11px] text-slate-500 font-mono">
+              <CardContent className="pt-0 p-4 sm:p-6 sm:pt-0">
+                <p className="text-[11px] text-slate-500 font-mono truncate">
                   Retries: 0 · Heartbeat active
                 </p>
                 <div className="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -397,20 +412,20 @@ export function AdminWorkspace() {
 
             {/* API Latency */}
             <Card className="bg-white border-slate-200 shadow-xs hover:border-emerald-300 transition-all">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="flex items-center justify-between text-xs font-semibold text-slate-500">
                   <span>API Latency (p95)</span>
-                  <Clock className="h-4 w-4 text-emerald-600" />
+                  <Clock className="h-4 w-4 text-emerald-600 shrink-0" />
                 </CardDescription>
-                <div className="flex items-baseline gap-2">
+                <div className="flex items-baseline gap-2 mt-1">
                   <CardTitle className="text-xl font-bold text-emerald-700">
                     48 ms
                   </CardTitle>
                   <span className="text-xs text-emerald-600 font-bold">0.0% Error</span>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <p className="text-[11px] text-slate-500 font-mono">
+              <CardContent className="pt-0 p-4 sm:p-6 sm:pt-0">
+                <p className="text-[11px] text-slate-500 font-mono truncate">
                   p50: 12ms · p99: 110ms · SLA pass
                 </p>
                 <div className="mt-2 w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
@@ -421,69 +436,69 @@ export function AdminWorkspace() {
           </div>
 
           <Card className="bg-white border-slate-200 shadow-xs">
-            <CardHeader className="pb-3 border-b border-slate-100">
+            <CardHeader className="p-4 sm:p-5 border-b border-slate-100">
               <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Server className="h-4 w-4 text-emerald-600" />
+                <Server className="h-4 w-4 text-emerald-600 shrink-0" />
                 Live Distributed Subsystem Nodes
               </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-slate-500 mt-0.5">
                 Detailed telemetry across serverless database, caching, web server, and worker daemon nodes.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 pt-4 text-xs">
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <div>
+            <CardContent className="space-y-3 p-3.5 sm:p-5 text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-2.5">
+                <div className="flex items-start sm:items-center gap-3 min-w-0">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 mt-1 sm:mt-0 shrink-0" />
+                  <div className="min-w-0">
                     <div className="font-bold text-slate-900 text-xs sm:text-sm">Neon Serverless PostgreSQL (us-east-2)</div>
-                    <div className="text-[11px] text-slate-500 font-mono">ep-divine-credit-a589ua8g-pooler.us-east-2.aws.neon.tech</div>
+                    <div className="text-[11px] text-slate-500 font-mono break-all">ep-divine-credit-a589ua8g-pooler.us-east-2.aws.neon.tech</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center justify-between sm:block sm:text-right shrink-0">
                   <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">HEALTHY</Badge>
-                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">SSL require · PgBouncer Active</div>
+                  <div className="text-[10px] text-slate-400 font-mono sm:mt-0.5">SSL require · PgBouncer Active</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-2.5">
+                <div className="flex items-start sm:items-center gap-3 min-w-0">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 mt-1 sm:mt-0 shrink-0" />
+                  <div className="min-w-0">
                     <div className="font-bold text-slate-900 text-xs sm:text-sm">Django ASGI Channels &amp; WebSocket Gateway</div>
-                    <div className="text-[11px] text-slate-500 font-mono">daphne / uvicorn listening on port 8000 (ws://localhost:8000/ws)</div>
+                    <div className="text-[11px] text-slate-500 font-mono break-all">daphne / uvicorn listening on port 8000 (ws://localhost:8000/ws)</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center justify-between sm:block sm:text-right shrink-0">
                   <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">RUNNING</Badge>
-                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">0 disconnected sessions · 12 active</div>
+                  <div className="text-[10px] text-slate-400 font-mono sm:mt-0.5">0 disconnected sessions · 12 active</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-2.5">
+                <div className="flex items-start sm:items-center gap-3 min-w-0">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 mt-1 sm:mt-0 shrink-0" />
+                  <div className="min-w-0">
                     <div className="font-bold text-slate-900 text-xs sm:text-sm">Celery Background Asynchronous Daemon</div>
-                    <div className="text-[11px] text-slate-500 font-mono">pool=solo · concurrency=1 · heartbeat active</div>
+                    <div className="text-[11px] text-slate-500 font-mono break-all">pool=solo · concurrency=1 · heartbeat active</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center justify-between sm:block sm:text-right shrink-0">
                   <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">READY</Badge>
-                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">Prompt 18 retraining &amp; drift worker</div>
+                  <div className="text-[10px] text-slate-400 font-mono sm:mt-0.5">Prompt 18 retraining &amp; drift worker</div>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                  <div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200 gap-2.5">
+                <div className="flex items-start sm:items-center gap-3 min-w-0">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 mt-1 sm:mt-0 shrink-0" />
+                  <div className="min-w-0">
                     <div className="font-bold text-slate-900 text-xs sm:text-sm">Machine Learning Inference Engine</div>
-                    <div className="text-[11px] text-slate-500 font-mono">ONNX Runtime 1.17 · Champion RandomForestClassifier v1.0.0</div>
+                    <div className="text-[11px] text-slate-500 font-mono break-all">ONNX Runtime 1.17 · Champion RandomForestClassifier v1.0.0</div>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center justify-between sm:block sm:text-right shrink-0">
                   <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">ONLINE</Badge>
-                  <div className="text-[10px] text-slate-400 font-mono mt-0.5">0.136ms mean latency · 14.8k scored</div>
+                  <div className="text-[10px] text-slate-400 font-mono sm:mt-0.5">0.136ms mean latency · 14.8k scored</div>
                 </div>
               </div>
             </CardContent>
@@ -493,231 +508,321 @@ export function AdminWorkspace() {
 
       {/* TAB 2: User & Role Governance */}
       {activeTab === "USERS" && (
-        <Card className="bg-white border-slate-200 shadow-xs">
-          <CardHeader className="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <Card className="bg-white border-slate-200 shadow-xs overflow-hidden">
+          <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Users className="h-4 w-4 text-emerald-600" />
+                <Users className="h-4 w-4 text-emerald-600 shrink-0" />
                 Hospital User Accounts &amp; Role Governance
               </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-slate-500 mt-0.5">
                 Manage user active status and assigned clinical roles. Plaintext passwords are strictly suppressed across all API views.
               </CardDescription>
             </div>
-            <div className="flex items-center gap-1.5 text-xs text-slate-500">
-              <Lock className="h-3.5 w-3.5 text-emerald-600" />
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 shrink-0">
+              <Lock className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
               <span>Zero-Knowledge Password Masking</span>
             </div>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Clinician / User</TableHead>
-                  <TableHead>Assigned Role</TableHead>
-                  <TableHead>Department</TableHead>
-                  <TableHead>Clinical License</TableHead>
-                  <TableHead>Account Status</TableHead>
-                  <TableHead>Last Session</TableHead>
-                  <TableHead className="text-right">Admin Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((u) => (
-                  <TableRow key={u.id} className="hover:bg-slate-50/70 transition-colors">
-                    <TableCell>
-                      <div className="font-bold text-slate-900 text-xs">{u.full_name}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">{u.email}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] font-semibold ${
-                          u.role === "DOCTOR"
-                            ? "bg-emerald-50 text-emerald-800 border-emerald-200"
-                            : u.role === "NURSE"
-                            ? "bg-sky-50 text-sky-800 border-sky-200"
-                            : u.role === "MEDICAL_INFORMATICIST"
-                            ? "bg-purple-50 text-purple-800 border-purple-200"
-                            : "bg-slate-100 text-slate-800 border-slate-300"
-                        }`}
-                      >
+
+          <CardContent className="p-0">
+            {/* Mobile Stacked Card View (< md) */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {users.map((u) => (
+                <div key={u.id} className="p-4 space-y-3 hover:bg-slate-50/70 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-bold text-slate-900 text-sm">{u.full_name}</div>
+                      <div className="text-[11px] text-slate-500 font-mono truncate">{u.email}</div>
+                    </div>
+                    {u.is_active ? (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
+                        <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                        ACTIVE
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200 shrink-0">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-600" />
+                        DISABLED
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase font-semibold">Role</span>
+                      <Badge variant="outline" className={`text-[10px] font-semibold mt-0.5 ${getRoleBadgeClass(u.role)}`}>
                         {u.role}
                       </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs text-slate-600">{u.department}</TableCell>
-                    <TableCell className="text-xs font-mono text-slate-500">{u.license_number || "N/A"}</TableCell>
-                    <TableCell>
-                      {u.is_active ? (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
-                          ACTIVE
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600">
-                          <span className="h-1.5 w-1.5 rounded-full bg-rose-600" />
-                          DISABLED
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-xs text-slate-500">{u.last_login || "Active"}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={togglingUserId === u.id || u.role === "IT_ADMIN"}
-                        onClick={() => handleToggleUser(u.id)}
-                        className={`h-7 text-xs font-medium border ${
-                          u.is_active
-                            ? "border-rose-200 text-rose-700 hover:bg-rose-50"
-                            : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                        }`}
-                      >
-                        {u.is_active ? "Deactivate" : "Activate"}
-                      </Button>
-                    </TableCell>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase font-semibold">License</span>
+                      <span className="font-mono text-slate-600 text-xs block mt-0.5 truncate">{u.license_number || "N/A"}</span>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-[10px] text-slate-400 block uppercase font-semibold">Department</span>
+                      <span className="text-slate-700 text-xs block mt-0.5">{u.department}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 gap-2">
+                    <span className="text-[11px] text-slate-500">
+                      Session: <strong className="text-slate-700 font-medium">{u.last_login || "Active"}</strong>
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={togglingUserId === u.id || u.role === "IT_ADMIN"}
+                      onClick={() => handleToggleUser(u.id)}
+                      className={`h-7 text-xs font-medium border px-3 ${
+                        u.is_active
+                          ? "border-rose-200 text-rose-700 hover:bg-rose-50"
+                          : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                      }`}
+                    >
+                      {u.is_active ? "Deactivate" : "Activate"}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table className="min-w-[800px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Clinician / User</TableHead>
+                    <TableHead>Assigned Role</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Clinical License</TableHead>
+                    <TableHead>Account Status</TableHead>
+                    <TableHead>Last Session</TableHead>
+                    <TableHead className="text-right">Admin Action</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {users.map((u) => (
+                    <TableRow key={u.id} className="hover:bg-slate-50/70 transition-colors">
+                      <TableCell>
+                        <div className="font-bold text-slate-900 text-xs">{u.full_name}</div>
+                        <div className="text-[11px] text-slate-500 font-mono">{u.email}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-semibold ${getRoleBadgeClass(u.role)}`}
+                        >
+                          {u.role}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-slate-600">{u.department}</TableCell>
+                      <TableCell className="text-xs font-mono text-slate-500">{u.license_number || "N/A"}</TableCell>
+                      <TableCell>
+                        {u.is_active ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                            ACTIVE
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-rose-600">
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-600" />
+                            DISABLED
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-xs text-slate-500">{u.last_login || "Active"}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={togglingUserId === u.id || u.role === "IT_ADMIN"}
+                          onClick={() => handleToggleUser(u.id)}
+                          className={`h-7 text-xs font-medium border ${
+                            u.is_active
+                              ? "border-rose-200 text-rose-700 hover:bg-rose-50"
+                              : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                          }`}
+                        >
+                          {u.is_active ? "Deactivate" : "Activate"}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* TAB 3: Audit Trail Viewer */}
       {activeTab === "AUDIT" && (
-        <Card className="bg-white border-slate-200 shadow-xs">
-          <CardHeader className="pb-3 border-b border-slate-100">
-            <div className="flex items-center justify-between flex-wrap gap-2">
+        <Card className="bg-white border-slate-200 shadow-xs overflow-hidden">
+          <CardHeader className="p-4 sm:p-5 border-b border-slate-100">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5">
               <div>
                 <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                  <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
                   Tamper-Evident Clinical Audit Trail
                 </CardTitle>
-                <CardDescription className="text-xs text-slate-500">
+                <CardDescription className="text-xs text-slate-500 mt-0.5">
                   Immutable record of user actions, clinical reviews, nurse escalations, and security authorization boundaries.
                 </CardDescription>
               </div>
-              <Badge variant="outline" className="text-xs bg-slate-50 text-slate-700 border-slate-200">
-                21 CFR Part 11 Compliant
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="text-xs bg-slate-50 text-slate-700 border-slate-200 shrink-0">
+                  21 CFR Part 11 Compliant
+                </Badge>
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="p-0 overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Timestamp</TableHead>
-                  <TableHead>User / Role</TableHead>
-                  <TableHead>Event Type</TableHead>
-                  <TableHead>Resource Target</TableHead>
-                  <TableHead>Client IP</TableHead>
-                  <TableHead>Audit Detail Description</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {auditLogs.map((log) => (
-                  <TableRow key={log.id} className="hover:bg-slate-50/70 transition-colors">
-                    <TableCell className="text-xs font-mono text-slate-500 whitespace-nowrap">
+
+          <CardContent className="p-0">
+            {/* Mobile Stacked Card View (< md) */}
+            <div className="md:hidden divide-y divide-slate-100">
+              {auditLogs.map((log) => (
+                <div key={log.id} className="p-4 space-y-2.5 hover:bg-slate-50/70 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-mono text-slate-500">
                       {log.timestamp}
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-bold text-slate-900 text-xs">{log.user}</div>
-                      <div className="text-[10px] text-slate-500 font-mono">{log.role}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] font-mono ${
-                          log.action.includes("DENIED") || log.action.includes("RATE_LIMIT")
-                            ? "bg-rose-50 text-rose-700 border-rose-200 font-bold"
-                            : log.action.includes("OVERRIDE")
-                            ? "bg-purple-50 text-purple-700 border-purple-200 font-bold"
-                            : log.action.includes("ESCALATION") || log.action.includes("PROMOTION")
-                            ? "bg-amber-50 text-amber-700 border-amber-200 font-bold"
-                            : "bg-emerald-50 text-emerald-700 border-emerald-200"
-                        }`}
-                      >
-                        {log.action}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs font-mono text-slate-700">{log.resource}</TableCell>
-                    <TableCell className="text-xs font-mono text-slate-500">{log.ip_address}</TableCell>
-                    <TableCell className="text-xs text-slate-600 max-w-sm truncate" title={log.details}>
-                      {log.details}
-                    </TableCell>
+                    </span>
+                    <Badge variant="outline" className={`text-[10px] font-mono shrink-0 ${getActionBadgeClass(log.action)}`}>
+                      {log.action}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs gap-2">
+                    <div>
+                      <span className="font-bold text-slate-900">{log.user}</span>
+                      <span className="text-[10px] text-slate-500 font-mono ml-2">({log.role})</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded shrink-0">
+                      {log.ip_address}
+                    </span>
+                  </div>
+
+                  <div className="text-xs font-mono text-slate-700 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-md break-all">
+                    <span className="text-slate-400 mr-1.5 font-sans text-[11px]">Target:</span>
+                    {log.resource}
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed bg-slate-50/50 p-2.5 rounded-lg border border-slate-100">
+                    {log.details}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table View (>= md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table className="min-w-[850px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[170px]">Timestamp</TableHead>
+                    <TableHead className="w-[160px]">User / Role</TableHead>
+                    <TableHead className="w-[170px]">Event Type</TableHead>
+                    <TableHead className="w-[180px]">Resource Target</TableHead>
+                    <TableHead className="w-[120px]">Client IP</TableHead>
+                    <TableHead>Audit Detail Description</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {auditLogs.map((log) => (
+                    <TableRow key={log.id} className="hover:bg-slate-50/70 transition-colors">
+                      <TableCell className="text-xs font-mono text-slate-500 whitespace-nowrap">
+                        {log.timestamp}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-bold text-slate-900 text-xs">{log.user}</div>
+                        <div className="text-[10px] text-slate-500 font-mono">{log.role}</div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="outline"
+                          className={`text-[10px] font-mono ${getActionBadgeClass(log.action)}`}
+                        >
+                          {log.action}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs font-mono text-slate-700 break-all">{log.resource}</TableCell>
+                      <TableCell className="text-xs font-mono text-slate-500">{log.ip_address}</TableCell>
+                      <TableCell className="text-xs text-slate-600 max-w-sm truncate" title={log.details}>
+                        {log.details}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* TAB 4: Cybersecurity & Telemetry */}
       {activeTab === "SECURITY" && (
-        <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             <Card className="bg-emerald-50/50 border-emerald-200 shadow-xs">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="text-xs font-bold text-emerald-900">
                   Failed Login Attempts (24h)
                 </CardDescription>
-                <CardTitle className="text-2xl font-bold text-emerald-700">0</CardTitle>
+                <CardTitle className="text-2xl font-bold text-emerald-700 mt-1">0</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
                 <p className="text-[11px] text-emerald-800">No active brute-force vectors</p>
               </CardContent>
             </Card>
 
             <Card className="bg-emerald-50/50 border-emerald-200 shadow-xs">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="text-xs font-bold text-emerald-900">
                   Rate Limit Violations
                 </CardDescription>
-                <CardTitle className="text-2xl font-bold text-emerald-700">1</CardTitle>
+                <CardTitle className="text-2xl font-bold text-emerald-700 mt-1">1</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
                 <p className="text-[11px] text-emerald-800">192.168.1.104 temporarily throttled</p>
               </CardContent>
             </Card>
 
             <Card className="bg-blue-50/50 border-blue-200 shadow-xs">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="text-xs font-bold text-blue-900">
                   Blocked Cross-Role Probes
                 </CardDescription>
-                <CardTitle className="text-2xl font-bold text-blue-700">3</CardTitle>
+                <CardTitle className="text-2xl font-bold text-blue-700 mt-1">3</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
                 <p className="text-[11px] text-blue-800">HTTP 403 Forbidden properly enforced</p>
               </CardContent>
             </Card>
 
             <Card className="bg-purple-50/50 border-purple-200 shadow-xs">
-              <CardHeader className="pb-2">
+              <CardHeader className="pb-2 p-4 sm:p-6 sm:pb-2">
                 <CardDescription className="text-xs font-bold text-purple-900">
                   SQL Injection Defense
                 </CardDescription>
-                <CardTitle className="text-2xl font-bold text-purple-700">100%</CardTitle>
+                <CardTitle className="text-2xl font-bold text-purple-700 mt-1">100%</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
                 <p className="text-[11px] text-purple-800">Parameterized ORM queries enforced</p>
               </CardContent>
             </Card>
           </div>
 
           <Card className="bg-white border-slate-200 shadow-xs">
-            <CardHeader className="pb-3 border-b border-slate-100">
+            <CardHeader className="p-4 sm:p-5 border-b border-slate-100">
               <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <ShieldAlert className="h-4 w-4 text-emerald-600" />
+                <ShieldAlert className="h-4 w-4 text-emerald-600 shrink-0" />
                 Security Policies &amp; SaMD Boundaries Enforced
               </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
+              <CardDescription className="text-xs text-slate-500 mt-0.5">
                 Core system constraints active in this environment.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3 pt-4 text-xs">
+            <CardContent className="space-y-3 p-3.5 sm:p-5 text-xs">
               <div className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" />
                 <div>
