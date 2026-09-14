@@ -270,9 +270,9 @@ export default function LoginPage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                      Dr. Elena Vance
+                      Doctor
                     </h4>
-                    <p className="text-[10px] text-slate-500">Cardiology & ICU</p>
+                    <p className="text-[10px] text-slate-500">Cardiology, ICU & Clinical Reviews</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-teal-600 transition-colors" />
@@ -290,15 +290,15 @@ export default function LoginPage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
-                      Sarah Jenkins
+                      Nurse
                     </h4>
-                    <p className="text-[10px] text-slate-500">Emergency Triage</p>
+                    <p className="text-[10px] text-slate-500">Bedside Care & Emergency Triage</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-sky-600 transition-colors" />
               </button>
 
-              {/* Informaticist */}
+              {/* Medical Informaticist */}
               <button
                 type="button"
                 onClick={() => handleQuickDemo("ANALYST")}
@@ -306,19 +306,19 @@ export default function LoginPage() {
               >
                 <div className="flex items-center gap-2.5">
                   <div className="h-8 w-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold text-xs">
-                    BI
+                    MI
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
-                      Alex Rivera
+                      Medical Informaticist
                     </h4>
-                    <p className="text-[10px] text-slate-500">SHAP & Telemetry</p>
+                    <p className="text-[10px] text-slate-500">Data Quality, Models & Drift</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-amber-600 transition-colors" />
               </button>
 
-              {/* IT Admin */}
+              {/* IT Administrator */}
               <button
                 type="button"
                 onClick={() => handleQuickDemo("ADMIN")}
@@ -330,15 +330,15 @@ export default function LoginPage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                      Hospital Admin
+                      IT Administrator
                     </h4>
-                    <p className="text-[10px] text-slate-500">Registry & Audit</p>
+                    <p className="text-[10px] text-slate-500">System Infrastructure, RBAC & Audit</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-purple-600 transition-colors" />
               </button>
 
-              {/* Patient */}
+              {/* User / Patient */}
               <button
                 type="button"
                 onClick={() => handleQuickDemo("PATIENT")}
@@ -351,13 +351,13 @@ export default function LoginPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                        Eleanor Ward
+                        User / Patient
                       </h4>
                       <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-teal-100 text-teal-800 font-semibold">
-                        MRN-90241
+                        Patient Portal
                       </span>
                     </div>
-                    <p className="text-[10px] text-slate-500">Patient Portal • Risk History, Telemetry & Encounters</p>
+                    <p className="text-[10px] text-slate-500">Risk Assessment, Health Summary, Appointments & Vitals</p>
                   </div>
                 </div>
                 <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-teal-600 transition-colors" />

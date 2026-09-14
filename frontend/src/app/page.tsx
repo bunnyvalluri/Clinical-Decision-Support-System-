@@ -526,7 +526,7 @@ export default function LandingPage() {
                     <HeartPulse className="h-3.5 w-3.5 text-teal-600" />
                   </div>
                   <p className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors truncate">
-                    Dr. Elena Vance
+                    Doctor
                   </p>
                   <p className="text-[10px] text-slate-500 truncate">Cardiology & ICU</p>
                 </button>
@@ -546,7 +546,7 @@ export default function LandingPage() {
                     <Activity className="h-3.5 w-3.5 text-sky-600" />
                   </div>
                   <p className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors truncate">
-                    Sarah Jenkins
+                    Nurse
                   </p>
                   <p className="text-[10px] text-slate-500 truncate">Triage & Bedside</p>
                 </button>
@@ -561,12 +561,12 @@ export default function LandingPage() {
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                      BI
+                      MI
                     </span>
                     <Brain className="h-3.5 w-3.5 text-amber-600" />
                   </div>
                   <p className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors truncate">
-                    Alex Rivera
+                    Medical Informaticist
                   </p>
                   <p className="text-[10px] text-slate-500 truncate">Informatics / SHAP</p>
                 </button>
@@ -586,7 +586,7 @@ export default function LandingPage() {
                     <ShieldCheck className="h-3.5 w-3.5 text-purple-600" />
                   </div>
                   <p className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors truncate">
-                    Hospital Admin
+                    IT Administrator
                   </p>
                   <p className="text-[10px] text-slate-500 truncate">Governance & Audit</p>
                 </button>
@@ -699,7 +699,7 @@ export default function LandingPage() {
                       <span className="text-[9px] font-mono text-slate-400 truncate">Cardiology</span>
                     </div>
                     <p className="font-bold text-xs text-slate-900 group-hover:text-teal-700 transition-colors truncate">
-                      Dr. Elena Vance
+                      Doctor
                     </p>
                   </button>
 
@@ -716,7 +716,7 @@ export default function LandingPage() {
                       <span className="text-[9px] font-mono text-slate-400 truncate">Triage</span>
                     </div>
                     <p className="font-bold text-xs text-slate-900 group-hover:text-sky-700 transition-colors truncate">
-                      Sarah Jenkins
+                      Nurse
                     </p>
                   </button>
 
@@ -728,12 +728,12 @@ export default function LandingPage() {
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[9px] sm:text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                        BI
+                        MI
                       </span>
                       <span className="text-[9px] font-mono text-slate-400 truncate">Informatics</span>
                     </div>
                     <p className="font-bold text-xs text-slate-900 group-hover:text-amber-700 transition-colors truncate">
-                      Alex Rivera
+                      Medical Informaticist
                     </p>
                   </button>
 
@@ -750,7 +750,7 @@ export default function LandingPage() {
                       <span className="text-[9px] font-mono text-slate-400 truncate">Admin</span>
                     </div>
                     <p className="font-bold text-xs text-slate-900 group-hover:text-purple-700 transition-colors truncate">
-                      Hospital Admin
+                      IT Administrator
                     </p>
                   </button>
                 </div>
