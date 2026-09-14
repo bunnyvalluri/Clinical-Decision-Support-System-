@@ -56,8 +56,20 @@ const MOCK_APPTS = [
   },
 ];
 
+interface AppointmentItem {
+  id: string;
+  clinician_name: string;
+  department: string;
+  scheduled_time: string;
+  duration_minutes: number;
+  status: string;
+  location_or_link: string;
+  reason_for_visit: string;
+  is_telehealth: boolean;
+}
+
 export default function PatientAppointmentsPage() {
-  const [appointments, setAppointments] = React.useState<any[]>(MOCK_APPTS);
+  const [appointments, setAppointments] = React.useState<AppointmentItem[]>(MOCK_APPTS);
   const [showBookModal, setShowBookModal] = React.useState(false);
   const [reason, setReason] = React.useState("");
   const [dept, setDept] = React.useState("Cardiology Clinic");
@@ -67,12 +79,28 @@ export default function PatientAppointmentsPage() {
     try {
       const res = await apiClient.get("/user/appointments/");
       if (res.data && res.data.length > 0) setAppointments(res.data);
-    } catch (e) {}
+    } catch {
+      // Retain fallback data on network error
+    }
   }, []);
 
   React.useEffect(() => {
-    fetchAppointments();
-  }, [fetchAppointments]);
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const res = await apiClient.get("/user/appointments/");
+        if (isMounted && res.data && res.data.length > 0) {
+          setAppointments(res.data);
+        }
+      } catch {
+        // Retain fallback data on network error
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useUserWebSocket((evt) => {
     if (evt.event_type === "user.appointment.created" || evt.event_type === "user.appointment.cancelled") {
@@ -88,9 +116,11 @@ export default function PatientAppointmentsPage() {
         scheduled_time: new Date(dateStr).toISOString(),
         reason_for_visit: reason || "Routine Follow-up",
       });
-    } catch (e) {}
+    } catch (err) {
+      console.warn("Could not save appointment to backend, saving locally:", err);
+    }
 
-    const newAppt = {
+    const newAppt: AppointmentItem = {
       id: `appt-${Date.now()}`,
       clinician_name: "Dr. Elena Vance, MD",
       department: dept,
@@ -99,6 +129,7 @@ export default function PatientAppointmentsPage() {
       status: "SCHEDULED",
       location_or_link: "Suite 402 - Heart & Vascular Pavilion",
       reason_for_visit: reason || "Routine Follow-up",
+      is_telehealth: false,
     };
 
     setAppointments([newAppt, ...appointments]);
@@ -109,7 +140,9 @@ export default function PatientAppointmentsPage() {
   const handleCancel = async (id: string) => {
     try {
       await apiClient.patch(`/user/appointments/${id}/`, { status: "CANCELLED" });
-    } catch (e) {}
+    } catch (err) {
+      console.warn("Could not cancel appointment on backend, updating locally:", err);
+    }
     setAppointments((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: "CANCELLED" } : a))
     );

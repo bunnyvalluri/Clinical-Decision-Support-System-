@@ -4,6 +4,8 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, Home } from "lucide-react";
+import { useAuthStore } from "@/features/auth/authStore";
+import { getRoleDashboard } from "@/lib/roleRoutes";
 
 /** Maps URL segments to human-readable labels */
 const SEGMENT_LABELS: Record<string, string> = {
@@ -66,6 +68,8 @@ function formatSegment(segment: string): string {
 
 export function Breadcrumbs() {
   const pathname = usePathname();
+  const { user } = useAuthStore();
+  const homeHref = getRoleDashboard(user?.role);
 
   const segments = pathname.split("/").filter(Boolean);
 
@@ -81,8 +85,9 @@ export function Breadcrumbs() {
   return (
     <nav aria-label="Breadcrumb" className="flex items-center gap-1 text-sm text-slate-500 flex-wrap">
       <Link
-        href="/"
+        href={homeHref}
         className="flex items-center gap-1 hover:text-slate-800 transition-colors"
+        title="Authorized Dashboard"
       >
         <Home className="h-3.5 w-3.5" />
       </Link>

@@ -293,13 +293,31 @@ def enter_vital_signs_view(request: Request) -> Response:
     }, status=status.HTTP_201_CREATED)
 
 
-@api_view(["POST"])
-@permission_classes([IsNurse])
+@api_view(["GET", "POST"])
+@permission_classes([IsClinicianOrStaff])
 def escalate_patient_view(request: Request) -> Response:
     """
     Direct nurse-to-physician patient escalation workflow.
-    Triggers high-priority notifications and an immutable audit trail.
+    GET: List active escalation events.
+    POST: Create escalation, triggers high-priority notifications and audit trail.
     """
+    if request.method == "GET":
+        qs = Escalation.objects.select_related("patient", "escalated_by", "assigned_doctor").order_by("-created_at")[:50]
+        results = []
+        for esc in qs:
+            results.append({
+                "id": str(esc.id),
+                "patient_name": f"{esc.patient.first_name} {esc.patient.last_name}",
+                "patient_mrn": esc.patient.mrn,
+                "reason": esc.reason,
+                "status": esc.status,
+                "priority": esc.priority,
+                "escalated_by": esc.escalated_by.full_name if esc.escalated_by else "Clinical Staff",
+                "assigned_doctor": esc.assigned_doctor.full_name if esc.assigned_doctor else "On-Call Physician",
+                "created_at": esc.created_at.isoformat(),
+            })
+        return Response({"success": True, "count": len(results), "data": results})
+
     patient_id = request.data.get("patient_id")
     reason = request.data.get("reason", "")
     priority = request.data.get("priority", EscalationPriority.HIGH)

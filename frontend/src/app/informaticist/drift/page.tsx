@@ -4,6 +4,15 @@ import { TrendingDown, AlertTriangle, Activity, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
 
+interface DriftMonitorRecord {
+  id?: string;
+  feature_name?: string;
+  drift_type?: string;
+  drift_score?: number;
+  detection_method?: string;
+  drift_detected?: boolean;
+}
+
 export default function DriftMonitorPage() {
   const { driftMonitors } = useClinicalStore();
 
@@ -29,7 +38,7 @@ export default function DriftMonitorPage() {
 
       {driftMonitors && driftMonitors.length > 0 ? (
         <div className="space-y-3">
-          {driftMonitors.map((d: any, i: number) => (
+          {(driftMonitors as DriftMonitorRecord[]).map((d: DriftMonitorRecord, i: number) => (
             <Card key={d.id ?? i}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between flex-wrap gap-3">

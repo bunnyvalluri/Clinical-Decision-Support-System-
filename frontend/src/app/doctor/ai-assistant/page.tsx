@@ -25,7 +25,7 @@ const DEMO_RESPONSE =
   "Based on the authorized patient data, I can provide a summary. This assessment is generated from the approved ML model outputs and clinical knowledge base. All AI-generated content must be reviewed by the treating physician before clinical action.\n\nPlease note: I cannot provide autonomous medical diagnosis. My role is to synthesize available information to support your clinical decision-making.";
 
 export default function DoctorAIAssistantPage() {
-  const [messages, setMessages] = React.useState<Message[]>([
+  const [messages, setMessages] = React.useState<Message[]>(() => [
     {
       id: "welcome",
       role: "assistant",
@@ -38,24 +38,26 @@ export default function DoctorAIAssistantPage() {
   const [isTyping, setIsTyping] = React.useState(false);
   const bottomRef = React.useRef<HTMLDivElement>(null);
 
-  const sendMessage = (content: string) => {
+  const sendMessage = React.useCallback((content: string) => {
     if (!content.trim()) return;
-    const userMsg: Message = { id: Date.now().toString(), role: "user", content, timestamp: new Date() };
+    const now = new Date();
+    const userMsg: Message = { id: `msg-user-${now.getTime()}`, role: "user", content, timestamp: now };
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
 
     setTimeout(() => {
+      const responseTime = new Date();
       const aiMsg: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `msg-ai-${responseTime.getTime()}`,
         role: "assistant",
         content: DEMO_RESPONSE,
-        timestamp: new Date(),
+        timestamp: responseTime,
       };
       setMessages((prev) => [...prev, aiMsg]);
       setIsTyping(false);
     }, 1200);
-  };
+  }, []);
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

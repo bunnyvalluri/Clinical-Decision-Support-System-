@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:routes": "node --test tests/roleRoutes.test.mjs",
+    "test": "node --test tests/roleRoutes.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.102.8",

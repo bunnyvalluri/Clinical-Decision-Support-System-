@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Explicitly configure Turbopack root to eliminate parent lockfile inference warnings
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+
   // Output standalone for Docker multi-stage build
   output: "standalone",
 
@@ -26,7 +32,7 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // Type-checking during builds
+  // Strict type-checking during builds
   typescript: {
     ignoreBuildErrors: false,
   },

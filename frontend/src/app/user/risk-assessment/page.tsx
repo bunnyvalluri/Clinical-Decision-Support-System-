@@ -39,8 +39,18 @@ const INITIAL_ASSESSMENTS = [
   },
 ];
 
+interface RiskAssessmentItem {
+  id: string;
+  created_at: string;
+  status: string;
+  risk_level: string;
+  probability: number;
+  prediction_id: string;
+  symptoms: string[];
+}
+
 export default function PatientRiskAssessmentListPage() {
-  const [assessments, setAssessments] = React.useState<any[]>(INITIAL_ASSESSMENTS);
+  const [assessments, setAssessments] = React.useState<RiskAssessmentItem[]>(INITIAL_ASSESSMENTS);
 
   const fetchAssessments = React.useCallback(async () => {
     try {
@@ -48,12 +58,28 @@ export default function PatientRiskAssessmentListPage() {
       if (res.data && res.data.length > 0) {
         setAssessments(res.data);
       }
-    } catch (e) {}
+    } catch {
+      // Retain fallback data on network error
+    }
   }, []);
 
   React.useEffect(() => {
-    fetchAssessments();
-  }, [fetchAssessments]);
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const res = await apiClient.get("/user/risk-assessments/");
+        if (isMounted && res.data && res.data.length > 0) {
+          setAssessments(res.data);
+        }
+      } catch {
+        // Retain fallback data on network error
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Real-time listener
   useUserWebSocket((evt) => {

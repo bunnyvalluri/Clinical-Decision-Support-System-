@@ -61,8 +61,25 @@ const MOCK_RECORDS = [
   },
 ];
 
+interface MedicalRecordItem {
+  id: string;
+  encounter_date?: string;
+  recorded_at?: string;
+  encounter_type: string;
+  department: string;
+  clinician_name?: string;
+  clinician?: string;
+  summary: string;
+  clinical_notes?: string;
+  systolic_bp?: number;
+  diastolic_bp?: number;
+  heart_rate?: number;
+  oxygen_saturation?: number;
+  status: string;
+}
+
 export default function PatientMedicalRecordsPage() {
-  const [records, setRecords] = React.useState<any[]>(MOCK_RECORDS);
+  const [records, setRecords] = React.useState<MedicalRecordItem[]>(MOCK_RECORDS);
   const [searchTerm, setSearchTerm] = React.useState("");
 
   React.useEffect(() => {
@@ -129,7 +146,7 @@ export default function PatientMedicalRecordsPage() {
                     {rec.encounter_type}
                   </Badge>
                   <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                    <Calendar className="h-3 w-3" /> {new Date(rec.recorded_at).toLocaleDateString()}
+                    <Calendar className="h-3 w-3" /> {new Date(rec.recorded_at || rec.encounter_date || "").toLocaleDateString()}
                   </span>
                   <span className="text-xs text-slate-500 font-medium truncate">
                     · {rec.department || "Cardiology Clinic"}

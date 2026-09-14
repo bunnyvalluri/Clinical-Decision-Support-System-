@@ -4,6 +4,14 @@ import { Sparkles, BarChart3, Info } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
 
+interface LlmEvaluationRecord {
+  id?: string;
+  evaluation_type?: string;
+  model_name?: string;
+  evaluation_date?: string;
+  overall_score?: number;
+}
+
 export default function AIEvaluationPage() {
   const { llmEvaluations } = useClinicalStore();
   return (
@@ -11,7 +19,7 @@ export default function AIEvaluationPage() {
       <h1 className="text-2xl font-bold text-slate-900">AI Evaluation</h1>
       {llmEvaluations && llmEvaluations.length > 0 ? (
         <div className="space-y-3">
-          {llmEvaluations.map((ev: any, i: number) => (
+          {(llmEvaluations as LlmEvaluationRecord[]).map((ev: LlmEvaluationRecord, i: number) => (
             <Card key={ev.id ?? i}>
               <CardContent className="p-4">
                 <div className="flex justify-between flex-wrap gap-3">

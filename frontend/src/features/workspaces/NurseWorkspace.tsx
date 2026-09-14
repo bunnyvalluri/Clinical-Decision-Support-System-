@@ -35,10 +35,11 @@ interface TriagePatient {
   id: string;
   mrn: string;
   name: string;
-  age: number;
-  gender: string;
+  age?: number;
+  gender?: string;
   acuity: "IMMEDIATE" | "EMERGENCY" | "URGENT" | "SEMI_URGENT" | "NON_URGENT";
-  state: "INTAKE" | "VITALS_TAKEN" | "TRIAGED" | "UNDER_REVIEW" | "DISCHARGED";
+  acuity_level?: number;
+  state: "INTAKE" | "VITALS_TAKEN" | "TRIAGED" | "UNDER_REVIEW" | "DISCHARGED" | "WAITING" | "TRIAGE_IN_PROGRESS" | "ESCALATED" | "COMPLETED";
   arrivalTime: string;
   chiefComplaint: string;
   assignedBed: string;
@@ -61,108 +62,48 @@ interface BedsideTask {
   priority: "STAT" | "HIGH" | "ROUTINE";
   completed: boolean;
 }
+// ─── Helper: map ESI numeric level to acuity label ───────────────────────────
+function esiToAcuity(level: number): TriagePatient["acuity"] {
+  if (level === 1) return "IMMEDIATE";
+  if (level === 2) return "EMERGENCY";
+  if (level === 3) return "URGENT";
+  if (level === 4) return "SEMI_URGENT";
+  return "NON_URGENT";
+}
 
-const INITIAL_QUEUE: TriagePatient[] = [
-  {
-    id: "tr-01",
-    mrn: "MRN-90241",
-    name: "Arthur Pendleton",
-    age: 68,
-    gender: "MALE",
-    acuity: "IMMEDIATE",
-    state: "UNDER_REVIEW",
-    arrivalTime: "14:15",
-    chiefComplaint: "Acute substernal chest pressure, radiation to left shoulder, diaphoresis",
-    assignedBed: "Resus-01",
-    vitals: { sbp: 178, dbp: 108, hr: 118, rr: 24, spo2: 93.0, temp: 37.4 },
-  },
-  {
-    id: "tr-02",
-    mrn: "MRN-84192",
-    name: "Elena Rostova",
-    age: 72,
-    gender: "FEMALE",
-    acuity: "EMERGENCY",
-    state: "TRIAGED",
-    arrivalTime: "14:32",
-    chiefComplaint: "Severe orthopnea, bilateral crackles, peripheral pitting edema",
-    assignedBed: "Bay-04",
-    vitals: { sbp: 158, dbp: 96, hr: 98, rr: 22, spo2: 94.0, temp: 36.9 },
-  },
-  {
-    id: "tr-03",
-    mrn: "MRN-78103",
-    name: "David K. Miller",
-    age: 54,
-    gender: "MALE",
-    acuity: "URGENT",
-    state: "VITALS_TAKEN",
-    arrivalTime: "14:50",
-    chiefComplaint: "Abdominal cramping, persistent emesis, mild tachycardia",
-    assignedBed: "Waiting-02",
-    vitals: { sbp: 134, dbp: 86, hr: 92, rr: 18, spo2: 98.0, temp: 38.1 },
-  },
-  {
-    id: "tr-04",
-    mrn: "MRN-67290",
-    name: "Fatima Al-Hassan",
-    age: 41,
-    gender: "FEMALE",
-    acuity: "SEMI_URGENT",
-    state: "INTAKE",
-    arrivalTime: "15:05",
-    chiefComplaint: "Left ankle swelling following inversion injury during recreation",
-    assignedBed: "Chairs-08",
-  },
-];
+// ─── Helper: map backend state strings to local state type ───────────────────
+function normaliseState(s: string): TriagePatient["state"] {
+  const map: Record<string, TriagePatient["state"]> = {
+    WAITING: "INTAKE",
+    TRIAGE_IN_PROGRESS: "VITALS_TAKEN",
+    TRIAGED: "TRIAGED",
+    ESCALATED: "UNDER_REVIEW",
+    COMPLETED: "DISCHARGED",
+  };
+  return (map[s] as TriagePatient["state"]) ?? (s as TriagePatient["state"]);
+}
 
-const INITIAL_TASKS: BedsideTask[] = [
-  {
-    id: "task-01",
-    patientName: "Arthur Pendleton",
-    mrn: "MRN-90241",
-    task: "Draw STAT high-sensitivity cardiac troponin (0h)",
-    dueTime: "STAT",
-    priority: "STAT",
-    completed: true,
-  },
-  {
-    id: "task-02",
-    patientName: "Arthur Pendleton",
-    mrn: "MRN-90241",
-    task: "Re-check blood pressure post IV nitrate infusion",
-    dueTime: "in 10 mins",
-    priority: "HIGH",
-    completed: false,
-  },
-  {
-    id: "task-03",
-    patientName: "Elena Rostova",
-    mrn: "MRN-84192",
-    task: "Administer 40mg IV Furosemide per physician order",
-    dueTime: "in 15 mins",
-    priority: "HIGH",
-    completed: false,
-  },
-  {
-    id: "task-04",
-    patientName: "David K. Miller",
-    mrn: "MRN-78103",
-    task: "Collect blood cultures x2 prior to IV antibiotics",
-    dueTime: "in 30 mins",
-    priority: "ROUTINE",
-    completed: false,
-  },
-];
+// ─── Helper: map backend task priority to local priority ─────────────────────
+function normaliseTaskPriority(p: string): BedsideTask["priority"] {
+  if (p === "STAT" || p === "CRITICAL") return "STAT";
+  if (p === "HIGH" || p === "URGENT") return "HIGH";
+  return "ROUTINE";
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 export function NurseWorkspace() {
   const { user } = useAuthStore();
   const { notifications } = useClinicalStore();
 
-  const [queue, setQueue] = React.useState<TriagePatient[]>(INITIAL_QUEUE);
-  const [tasks, setTasks] = React.useState<BedsideTask[]>(INITIAL_TASKS);
+  const [queue, setQueue] = React.useState<TriagePatient[]>([]);
+  const [tasks, setTasks] = React.useState<BedsideTask[]>([]);
+  const [loadingQueue, setLoadingQueue] = React.useState(true);
+  const [loadingTasks, setLoadingTasks] = React.useState(true);
+  const [queueError, setQueueError] = React.useState<string | null>(null);
+  const [tasksError, setTasksError] = React.useState<string | null>(null);
 
-  // Vitals Entry Modal State
+  // Vitals Modal State
   const [vitalsModalOpen, setVitalsModalOpen] = React.useState(false);
   const [selectedPatientForVitals, setSelectedPatientForVitals] = React.useState<TriagePatient | null>(null);
   const [sbp, setSbp] = React.useState("135");
@@ -182,14 +123,139 @@ export function NurseWorkspace() {
   const [escalateSubmitting, setEscalateSubmitting] = React.useState(false);
   const [escalateSuccess, setEscalateSuccess] = React.useState(false);
 
-  // Toggle Task Completion
-  const toggleTask = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t))
-    );
+  // ── Fetch triage queue from backend ─────────────────────────────────────────
+  const fetchQueue = React.useCallback(async () => {
+    setLoadingQueue(true);
+    setQueueError(null);
+    try {
+      const res = await apiClient.get("/clinical/triage/queue/");
+      const raw: Array<Record<string, unknown>> = res.data?.data ?? [];
+      setQueue(
+        raw.map((item) => ({
+          id: String(item.id),
+          mrn: String(item.mrn ?? ""),
+          name: String(item.patient_name ?? ""),
+          acuity: esiToAcuity(Number(item.acuity_level ?? 3)),
+          acuity_level: Number(item.acuity_level ?? 3),
+          state: normaliseState(String(item.state ?? "WAITING")),
+          arrivalTime: item.arrival_time
+            ? new Date(String(item.arrival_time)).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+            : "—",
+          chiefComplaint: String(item.chief_complaint ?? ""),
+          assignedBed: String(item.bed_assignment ?? "Unassigned"),
+        }))
+      );
+    } catch {
+      setQueueError("Unable to load triage queue. Ensure the backend is running and you have the Nurse role.");
+    } finally {
+      setLoadingQueue(false);
+    }
+  }, []);
+
+  // ── Fetch bedside tasks from backend ─────────────────────────────────────────
+  const fetchTasks = React.useCallback(async () => {
+    setLoadingTasks(true);
+    setTasksError(null);
+    try {
+      const res = await apiClient.get("/clinical/triage/tasks/");
+      const raw: Array<Record<string, unknown>> = res.data?.data ?? [];
+      setTasks(
+        raw.map((item) => ({
+          id: String(item.id),
+          patientName: String(item.patient_name ?? ""),
+          mrn: String(item.patient_mrn ?? ""),
+          task: String(item.title ?? ""),
+          dueTime: item.due_at
+            ? new Date(String(item.due_at)).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+            : "—",
+          priority: normaliseTaskPriority(String(item.priority ?? "ROUTINE")),
+          completed: String(item.status) === "COMPLETED",
+        }))
+      );
+    } catch {
+      setTasksError("Unable to load tasks.");
+    } finally {
+      setLoadingTasks(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    let isMounted = true;
+    const loadInitialData = async () => {
+      try {
+        const res = await apiClient.get("/clinical/triage/queue/");
+        if (!isMounted) return;
+        const raw: Array<Record<string, unknown>> = res.data?.data ?? [];
+        setQueue(
+          raw.map((item) => ({
+            id: String(item.id),
+            mrn: String(item.mrn ?? ""),
+            name: String(item.patient_name ?? ""),
+            acuity: esiToAcuity(Number(item.acuity_level ?? 3)),
+            acuity_level: Number(item.acuity_level ?? 3),
+            state: normaliseState(String(item.state ?? "WAITING")),
+            arrivalTime: item.arrival_time
+              ? new Date(String(item.arrival_time)).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+              : "—",
+            chiefComplaint: String(item.chief_complaint ?? ""),
+            assignedBed: String(item.bed_assignment ?? "Unassigned"),
+          }))
+        );
+      } catch {
+        if (isMounted) setQueueError("Unable to load triage queue. Ensure the backend is running and you have the Nurse role.");
+      } finally {
+        if (isMounted) setLoadingQueue(false);
+      }
+
+      try {
+        const res = await apiClient.get("/clinical/triage/tasks/");
+        if (!isMounted) return;
+        const raw: Array<Record<string, unknown>> = res.data?.data ?? [];
+        setTasks(
+          raw.map((item) => ({
+            id: String(item.id),
+            patientName: String(item.patient_name ?? ""),
+            mrn: String(item.patient_mrn ?? ""),
+            task: String(item.title ?? ""),
+            dueTime: item.due_at
+              ? new Date(String(item.due_at)).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+              : "—",
+            priority: normaliseTaskPriority(String(item.priority ?? "ROUTINE")),
+            completed: String(item.status) === "COMPLETED",
+          }))
+        );
+      } catch {
+        if (isMounted) setTasksError("Unable to load tasks.");
+      } finally {
+        if (isMounted) setLoadingTasks(false);
+      }
+    };
+
+    loadInitialData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // ── Toggle Task Completion (optimistic + backend PATCH) ──────────────────────
+  const toggleTask = async (taskId: string) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+    const newCompleted = !task.completed;
+    // Optimistic update
+    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, completed: newCompleted } : t)));
+    try {
+      await apiClient.patch("/clinical/triage/tasks/", {
+        task_id: taskId,
+        status: newCompleted ? "COMPLETED" : "PENDING",
+      });
+    } catch {
+      // Roll back on failure
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, completed: !newCompleted } : t)));
+    }
   };
 
-  // Immediate Biological Range Validation
+  // ── Biological range validation ──────────────────────────────────────────────
   const sbpNum = Number(sbp);
   const dbpNum = Number(dbp);
   const hrNum = Number(hr);
@@ -210,12 +276,7 @@ export function NurseWorkspace() {
       setSpo2(p.vitals.spo2.toString());
       setTemp(p.vitals.temp.toString());
     } else {
-      setSbp("125");
-      setDbp("80");
-      setHr("76");
-      setRr("16");
-      setSpo2("98.0");
-      setTemp("36.8");
+      setSbp("125"); setDbp("80"); setHr("76"); setRr("16"); setSpo2("98.0"); setTemp("36.8");
     }
     setVitalsError(null);
     setVitalsSuccess(false);
@@ -226,7 +287,6 @@ export function NurseWorkspace() {
     e.preventDefault();
     setVitalsError(null);
 
-    // Physiological checks
     if (isPhysiologicalContradiction) {
       setVitalsError("Biological contradiction: Systolic BP must strictly exceed Diastolic BP.");
       return;
@@ -242,8 +302,7 @@ export function NurseWorkspace() {
 
     try {
       if (selectedPatientForVitals) {
-        // Send to backend endpoint
-        await apiClient.post("/clinical/vitals/", {
+        const vitalsRes = await apiClient.post("/clinical/vitals/", {
           patient_id: selectedPatientForVitals.id,
           systolic_bp: sbpNum,
           diastolic_bp: dbpNum,
@@ -251,25 +310,21 @@ export function NurseWorkspace() {
           respiratory_rate: Number(rr),
           oxygen_saturation: spo2Num,
           body_temperature: tempNum,
-        }).catch(() => {
-          // Graceful fallback for mock IDs
         });
 
-        // Update local state
+        if (vitalsRes.data?.success === false) {
+          setVitalsError(vitalsRes.data.error ?? "Failed to record vital signs.");
+          return;
+        }
+
+        // Update local queue state with new vitals
         setQueue((prev) =>
           prev.map((p) =>
             p.id === selectedPatientForVitals.id
               ? {
                   ...p,
-                  state: p.state === "INTAKE" ? "VITALS_TAKEN" : p.state,
-                  vitals: {
-                    sbp: sbpNum,
-                    dbp: dbpNum,
-                    hr: hrNum,
-                    rr: Number(rr),
-                    spo2: spo2Num,
-                    temp: tempNum,
-                  },
+                  state: p.state === "INTAKE" || p.state === "WAITING" ? "VITALS_TAKEN" : p.state,
+                  vitals: { sbp: sbpNum, dbp: dbpNum, hr: hrNum, rr: Number(rr), spo2: spo2Num, temp: tempNum },
                 }
               : p
           )
@@ -277,11 +332,10 @@ export function NurseWorkspace() {
       }
 
       setVitalsSuccess(true);
-      setTimeout(() => {
-        setVitalsModalOpen(false);
-      }, 700);
-    } catch {
-      setVitalsError("Failed to record vital signs.");
+      setTimeout(() => setVitalsModalOpen(false), 700);
+    } catch (err: unknown) {
+      const apiErr = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setVitalsError(apiErr ?? "Failed to record vital signs.");
     }
   };
 
@@ -299,32 +353,38 @@ export function NurseWorkspace() {
 
     try {
       if (selectedPatientForEscalate) {
-        await apiClient.post("/clinical/triage/escalate/", {
+        const res = await apiClient.post("/clinical/triage/escalate/", {
           patient_id: selectedPatientForEscalate.id,
           reason: escalateReason.trim(),
           priority: escalatePriority,
-        }).catch(() => {
-          // Fallback gracefully
         });
 
-        // Update patient state
+        if (res.data?.success === false) {
+          return;
+        }
+
         setQueue((prev) =>
           prev.map((p) =>
-            p.id === selectedPatientForEscalate.id
-              ? { ...p, state: "UNDER_REVIEW" }
-              : p
+            p.id === selectedPatientForEscalate.id ? { ...p, state: "UNDER_REVIEW" } : p
           )
         );
       }
 
       setEscalateSuccess(true);
-      setTimeout(() => {
-        setEscalateModalOpen(false);
-      }, 700);
+      setTimeout(() => setEscalateModalOpen(false), 700);
     } finally {
       setEscalateSubmitting(false);
     }
   };
+
+  // ── Derive ESI counts from live queue ────────────────────────────────────────
+  const esiCounts = React.useMemo(() => ({
+    1: queue.filter((p) => p.acuity_level === 1 || p.acuity === "IMMEDIATE").length,
+    2: queue.filter((p) => p.acuity_level === 2 || p.acuity === "EMERGENCY").length,
+    3: queue.filter((p) => p.acuity_level === 3 || p.acuity === "URGENT").length,
+    4: queue.filter((p) => p.acuity_level === 4 || p.acuity === "SEMI_URGENT").length,
+    5: queue.filter((p) => p.acuity_level === 5 || p.acuity === "NON_URGENT").length,
+  }), [queue]);
 
   return (
     <div className="space-y-6">
@@ -336,11 +396,11 @@ export function NurseWorkspace() {
           </div>
           <div>
             <h1 className="text-xl font-bold tracking-tight text-slate-900">
-              Triage & Bedside Nursing Center
+              Triage &amp; Bedside Nursing Center
             </h1>
             <p className="text-xs text-slate-500">
-              Active Nurse: <span className="font-semibold text-slate-800">{user?.full_name || "Sarah Jenkins, RN"}</span> •{" "}
-              Unit: <span className="font-semibold text-slate-800">{user?.department || "Emergency Triage & Bedside"}</span>
+              Active Nurse: <span className="font-semibold text-slate-800">{user?.full_name || "—"}</span> •{" "}
+              Unit: <span className="font-semibold text-slate-800">{user?.department || "Emergency Triage &amp; Bedside"}</span>
             </p>
           </div>
         </div>
@@ -349,69 +409,57 @@ export function NurseWorkspace() {
           <Badge variant="outline" className="bg-sky-50 text-sky-800 border-sky-200 text-xs px-2.5 py-1">
             Emergency Severity Index (ESI) Active
           </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { fetchQueue(); fetchTasks(); }}
+            className="text-xs border-slate-200 text-slate-600 hover:bg-slate-50"
+          >
+            Refresh
+          </Button>
         </div>
       </div>
 
-      {/* Nursing Triage Acuity Metrics */}
+      {/* Nursing Triage Acuity Metrics — live counts */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Card className="bg-rose-50/70 border-rose-200 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold text-rose-900">
-              ESI 1 • Immediate (Red)
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-rose-700">1</CardTitle>
+            <CardDescription className="text-xs font-bold text-rose-900">ESI 1 • Immediate (Red)</CardDescription>
+            <CardTitle className="text-2xl font-bold text-rose-700">{loadingQueue ? "…" : esiCounts[1]}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-[11px] text-rose-800 font-medium">Life-threatening / STAT review</p>
-          </CardContent>
+          <CardContent><p className="text-[11px] text-rose-800 font-medium">Life-threatening / STAT review</p></CardContent>
         </Card>
 
         <Card className="bg-orange-50/70 border-orange-200 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold text-orange-900">
-              ESI 2 • Emergency (Orange)
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-orange-700">1</CardTitle>
+            <CardDescription className="text-xs font-bold text-orange-900">ESI 2 • Emergency (Orange)</CardDescription>
+            <CardTitle className="text-2xl font-bold text-orange-700">{loadingQueue ? "…" : esiCounts[2]}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-[11px] text-orange-800 font-medium">High risk / Severe pain or distress</p>
-          </CardContent>
+          <CardContent><p className="text-[11px] text-orange-800 font-medium">High risk / Severe pain or distress</p></CardContent>
         </Card>
 
         <Card className="bg-amber-50/70 border-amber-200 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold text-amber-900">
-              ESI 3 • Urgent (Yellow)
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-amber-700">1</CardTitle>
+            <CardDescription className="text-xs font-bold text-amber-900">ESI 3 • Urgent (Yellow)</CardDescription>
+            <CardTitle className="text-2xl font-bold text-amber-700">{loadingQueue ? "…" : esiCounts[3]}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-[11px] text-amber-800 font-medium">Multiple diagnostic resources</p>
-          </CardContent>
+          <CardContent><p className="text-[11px] text-amber-800 font-medium">Multiple diagnostic resources</p></CardContent>
         </Card>
 
         <Card className="bg-blue-50/70 border-blue-200 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold text-blue-900">
-              ESI 4 • Semi-Urgent (Blue)
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-blue-700">1</CardTitle>
+            <CardDescription className="text-xs font-bold text-blue-900">ESI 4 • Semi-Urgent (Blue)</CardDescription>
+            <CardTitle className="text-2xl font-bold text-blue-700">{loadingQueue ? "…" : esiCounts[4]}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-[11px] text-blue-800 font-medium">Single diagnostic resource</p>
-          </CardContent>
+          <CardContent><p className="text-[11px] text-blue-800 font-medium">Single diagnostic resource</p></CardContent>
         </Card>
 
         <Card className="bg-emerald-50/70 border-emerald-200 shadow-sm">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold text-emerald-900">
-              ESI 5 • Non-Urgent (Green)
-            </CardDescription>
-            <CardTitle className="text-2xl font-bold text-emerald-700">0</CardTitle>
+            <CardDescription className="text-xs font-bold text-emerald-900">ESI 5 • Non-Urgent (Green)</CardDescription>
+            <CardTitle className="text-2xl font-bold text-emerald-700">{loadingQueue ? "…" : esiCounts[5]}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-[11px] text-emerald-800 font-medium">Routine outpatient care</p>
-          </CardContent>
+          <CardContent><p className="text-[11px] text-emerald-800 font-medium">Routine outpatient care</p></CardContent>
         </Card>
       </div>
 
@@ -430,99 +478,115 @@ export function NurseWorkspace() {
               </CardDescription>
             </div>
             <Badge variant="outline" className="text-xs bg-slate-50 text-slate-700 border-slate-200">
-              {queue.length} Total Patients
+              {loadingQueue ? "…" : `${queue.length} Total`}
             </Badge>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Acuity / Time</TableHead>
-                  <TableHead>Patient / MRN</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Latest Vitals</TableHead>
-                  <TableHead>Triage State</TableHead>
-                  <TableHead className="text-right">Nursing Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {queue.map((p) => (
-                  <TableRow key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                    <TableCell>
-                      <Badge
-                        variant={
-                          p.acuity === "IMMEDIATE"
-                            ? "critical"
-                            : p.acuity === "EMERGENCY"
-                            ? "high"
-                            : p.acuity === "URGENT"
-                            ? "medium"
-                            : "low"
-                        }
-                        className="text-[10px]"
-                      >
-                        {p.acuity}
-                      </Badge>
-                      <div className="text-[10px] text-slate-400 font-mono mt-1 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {p.arrivalTime}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-bold text-slate-900 text-xs">{p.name}</div>
-                      <div className="text-[11px] text-slate-500 font-mono">
-                        {p.mrn} • {p.age}y / {p.gender}
-                      </div>
-                      <p className="text-[10px] text-slate-600 line-clamp-1 mt-0.5">{p.chiefComplaint}</p>
-                    </TableCell>
-                    <TableCell className="text-xs font-medium text-slate-700">
-                      {p.assignedBed}
-                    </TableCell>
-                    <TableCell>
-                      {p.vitals ? (
-                        <div className="text-[11px] font-mono space-y-0.5">
-                          <div className="text-slate-900 font-semibold">
-                            BP: {p.vitals.sbp}/{p.vitals.dbp}
-                          </div>
-                          <div className="text-slate-500 text-[10px]">
-                            HR: {p.vitals.hr} | SpO2: {p.vitals.spo2}%
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-[11px] text-slate-400 italic">No vitals yet</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-700 border-slate-200">
-                        {p.state.replace("_", " ")}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleOpenVitalsModal(p)}
-                          className="h-7 text-xs border-sky-200 text-sky-700 bg-white hover:bg-sky-50 font-medium"
-                        >
-                          <HeartPulse className="h-3 w-3 mr-1" />
-                          Vitals
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenEscalateModal(p)}
-                          className="h-7 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-semibold"
-                        >
-                          <PhoneCall className="h-3 w-3 mr-1" />
-                          Escalate
-                        </Button>
-                      </div>
-                    </TableCell>
+            {loadingQueue ? (
+              <div className="flex items-center justify-center py-16 text-slate-400 text-sm gap-2">
+                <Activity className="h-4 w-4 animate-spin" />
+                Loading triage queue…
+              </div>
+            ) : queueError ? (
+              <div className="flex items-center gap-2 m-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {queueError}
+              </div>
+            ) : queue.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-slate-400 gap-2">
+                <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+                <p className="text-sm font-medium text-slate-500">No active patients in triage queue</p>
+                <p className="text-xs text-slate-400">New admissions will appear here automatically.</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Acuity / Time</TableHead>
+                    <TableHead>Patient / MRN</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Latest Vitals</TableHead>
+                    <TableHead>Triage State</TableHead>
+                    <TableHead className="text-right">Nursing Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {queue.map((p) => (
+                    <TableRow key={p.id} className="hover:bg-slate-50/70 transition-colors">
+                      <TableCell>
+                        <Badge
+                          variant={
+                            p.acuity === "IMMEDIATE"
+                              ? "critical"
+                              : p.acuity === "EMERGENCY"
+                              ? "high"
+                              : p.acuity === "URGENT"
+                              ? "medium"
+                              : "low"
+                          }
+                          className="text-[10px]"
+                        >
+                          {p.acuity}
+                        </Badge>
+                        <div className="text-[10px] text-slate-400 font-mono mt-1 flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {p.arrivalTime}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-bold text-slate-900 text-xs">{p.name}</div>
+                        <div className="text-[11px] text-slate-500 font-mono">{p.mrn}</div>
+                        <p className="text-[10px] text-slate-600 line-clamp-1 mt-0.5">{p.chiefComplaint}</p>
+                      </TableCell>
+                      <TableCell className="text-xs font-medium text-slate-700">
+                        {p.assignedBed}
+                      </TableCell>
+                      <TableCell>
+                        {p.vitals ? (
+                          <div className="text-[11px] font-mono space-y-0.5">
+                            <div className="text-slate-900 font-semibold">
+                              BP: {p.vitals.sbp}/{p.vitals.dbp}
+                            </div>
+                            <div className="text-slate-500 text-[10px]">
+                              HR: {p.vitals.hr} | SpO2: {p.vitals.spo2}%
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] text-slate-400 italic">No vitals yet</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-700 border-slate-200">
+                          {p.state.replace(/_/g, " ")}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenVitalsModal(p)}
+                            className="h-7 text-xs border-sky-200 text-sky-700 bg-white hover:bg-sky-50 font-medium"
+                          >
+                            <HeartPulse className="h-3 w-3 mr-1" />
+                            Vitals
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenEscalateModal(p)}
+                            className="h-7 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-semibold"
+                          >
+                            <PhoneCall className="h-3 w-3 mr-1" />
+                            Escalate
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
 
@@ -535,54 +599,71 @@ export function NurseWorkspace() {
                 Bedside Task Checklist
               </CardTitle>
               <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
-                {tasks.filter((t) => t.completed).length}/{tasks.length} Done
+                {loadingTasks ? "…" : `${tasks.filter((t) => t.completed).length}/${tasks.length} Done`}
               </Badge>
             </div>
             <CardDescription className="text-xs text-slate-500">
-              Protocol orders & monitoring milestones.
+              Protocol orders &amp; monitoring milestones.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 pt-4 flex-1">
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                onClick={() => toggleTask(task.id)}
-                className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                  task.completed
-                    ? "bg-slate-50 border-slate-200 text-slate-400 line-through"
-                    : task.priority === "STAT"
-                    ? "bg-rose-50/50 border-rose-200 text-slate-900"
-                    : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
-                }`}
-              >
-                <div className="flex items-start gap-2.5">
-                  <button className="mt-0.5 shrink-0 text-slate-500">
-                    {task.completed ? (
-                      <CheckSquare className="h-4 w-4 text-emerald-600" />
-                    ) : (
-                      <Square className="h-4 w-4 text-slate-400" />
-                    )}
-                  </button>
-                  <div className="flex-1 text-xs">
-                    <div className="font-semibold flex items-center justify-between">
-                      <span>{task.patientName}</span>
-                      <span
-                        className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                          task.priority === "STAT"
-                            ? "bg-rose-100 text-rose-700 font-bold"
-                            : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {task.dueTime}
-                      </span>
+            {loadingTasks ? (
+              <div className="flex items-center justify-center py-8 text-slate-400 text-sm gap-2">
+                <Activity className="h-4 w-4 animate-spin" />
+                Loading tasks…
+              </div>
+            ) : tasksError ? (
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {tasksError}
+              </div>
+            ) : tasks.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-slate-400 gap-2">
+                <CheckCircle2 className="h-7 w-7 text-emerald-400" />
+                <p className="text-xs font-medium text-slate-500">No pending tasks</p>
+              </div>
+            ) : (
+              tasks.map((task) => (
+                <div
+                  key={task.id}
+                  onClick={() => toggleTask(task.id)}
+                  className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                    task.completed
+                      ? "bg-slate-50 border-slate-200 text-slate-400 line-through"
+                      : task.priority === "STAT"
+                      ? "bg-rose-50/50 border-rose-200 text-slate-900"
+                      : "bg-white border-slate-200 text-slate-900 hover:bg-slate-50"
+                  }`}
+                >
+                  <div className="flex items-start gap-2.5">
+                    <button className="mt-0.5 shrink-0 text-slate-500">
+                      {task.completed ? (
+                        <CheckSquare className="h-4 w-4 text-emerald-600" />
+                      ) : (
+                        <Square className="h-4 w-4 text-slate-400" />
+                      )}
+                    </button>
+                    <div className="flex-1 text-xs">
+                      <div className="font-semibold flex items-center justify-between">
+                        <span>{task.patientName}</span>
+                        <span
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
+                            task.priority === "STAT"
+                              ? "bg-rose-100 text-rose-700 font-bold"
+                              : "bg-slate-100 text-slate-600"
+                          }`}
+                        >
+                          {task.dueTime}
+                        </span>
+                      </div>
+                      <p className={`mt-0.5 text-[11px] ${task.completed ? "text-slate-400" : "text-slate-600"}`}>
+                        {task.task}
+                      </p>
                     </div>
-                    <p className={`mt-0.5 text-[11px] ${task.completed ? "text-slate-400" : "text-slate-600"}`}>
-                      {task.task}
-                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
@@ -597,9 +678,7 @@ export function NurseWorkspace() {
                   <HeartPulse className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900">
-                    Bedside Vital Signs Entry
-                  </h3>
+                  <h3 className="font-bold text-sm text-slate-900">Bedside Vital Signs Entry</h3>
                   <p className="text-xs text-slate-500">
                     Patient: <span className="font-semibold text-slate-800">{selectedPatientForVitals.name}</span> ({selectedPatientForVitals.mrn})
                   </p>
@@ -615,135 +694,53 @@ export function NurseWorkspace() {
 
             <form onSubmit={handleSubmitVitals} className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                {/* Systolic BP */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Systolic BP (mmHg)
-                  </label>
-                  <input
-                    type="number"
-                    value={sbp}
-                    onChange={(e) => setSbp(e.target.value)}
-                    required
-                    min={50}
-                    max={260}
-                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${
-                      isPhysiologicalContradiction
-                        ? "border-rose-400 bg-rose-50 text-rose-900"
-                        : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"
-                    }`}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Systolic BP (mmHg)</label>
+                  <input type="number" value={sbp} onChange={(e) => setSbp(e.target.value)} required min={50} max={260}
+                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${isPhysiologicalContradiction ? "border-rose-400 bg-rose-50 text-rose-900" : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"}`}
                   />
                 </div>
-
-                {/* Diastolic BP */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Diastolic BP (mmHg)
-                  </label>
-                  <input
-                    type="number"
-                    value={dbp}
-                    onChange={(e) => setDbp(e.target.value)}
-                    required
-                    min={30}
-                    max={160}
-                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${
-                      isPhysiologicalContradiction
-                        ? "border-rose-400 bg-rose-50 text-rose-900"
-                        : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"
-                    }`}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Diastolic BP (mmHg)</label>
+                  <input type="number" value={dbp} onChange={(e) => setDbp(e.target.value)} required min={30} max={160}
+                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${isPhysiologicalContradiction ? "border-rose-400 bg-rose-50 text-rose-900" : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"}`}
                   />
                 </div>
-
-                {/* Heart Rate */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Heart Rate (bpm)
-                  </label>
-                  <input
-                    type="number"
-                    value={hr}
-                    onChange={(e) => setHr(e.target.value)}
-                    required
-                    min={30}
-                    max={240}
-                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${
-                      isHrOutOfRange
-                        ? "border-rose-400 bg-rose-50 text-rose-900"
-                        : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"
-                    }`}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Heart Rate (bpm)</label>
+                  <input type="number" value={hr} onChange={(e) => setHr(e.target.value)} required min={30} max={240}
+                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${isHrOutOfRange ? "border-rose-400 bg-rose-50 text-rose-900" : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"}`}
                   />
                 </div>
-
-                {/* Respiratory Rate */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Respiratory Rate (bpm)
-                  </label>
-                  <input
-                    type="number"
-                    value={rr}
-                    onChange={(e) => setRr(e.target.value)}
-                    required
-                    min={6}
-                    max={60}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Respiratory Rate (bpm)</label>
+                  <input type="number" value={rr} onChange={(e) => setRr(e.target.value)} required min={6} max={60}
                     className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-mono text-slate-900 focus:border-sky-500 focus:bg-white focus:outline-none"
                   />
                 </div>
-
-                {/* Oxygen Saturation */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    SpO2 (%)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={spo2}
-                    onChange={(e) => setSpo2(e.target.value)}
-                    required
-                    min={50}
-                    max={100}
-                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${
-                      isSpo2OutOfRange
-                        ? "border-rose-400 bg-rose-50 text-rose-900"
-                        : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"
-                    }`}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">SpO2 (%)</label>
+                  <input type="number" step="0.1" value={spo2} onChange={(e) => setSpo2(e.target.value)} required min={50} max={100}
+                    className={`w-full rounded-lg border px-3 py-2 text-xs font-mono focus:outline-none ${isSpo2OutOfRange ? "border-rose-400 bg-rose-50 text-rose-900" : "border-slate-200 bg-slate-50 text-slate-900 focus:border-sky-500 focus:bg-white"}`}
                   />
                 </div>
-
-                {/* Body Temperature */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Temperature (°C)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={temp}
-                    onChange={(e) => setTemp(e.target.value)}
-                    required
-                    min={30}
-                    max={45}
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Temperature (°C)</label>
+                  <input type="number" step="0.1" value={temp} onChange={(e) => setTemp(e.target.value)} required min={30} max={45}
                     className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-mono text-slate-900 focus:border-sky-500 focus:bg-white focus:outline-none"
                   />
                 </div>
               </div>
 
-              {/* Real-time Biological Warning Feedback */}
               {isPhysiologicalContradiction && (
                 <div className="rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-xs text-rose-800 flex items-center gap-2">
                   <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
                   <span>Biological contradiction: Systolic BP ({sbpNum}) must exceed Diastolic BP ({dbpNum}).</span>
                 </div>
               )}
-
               {vitalsError && (
-                <div className="rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-xs text-rose-800">
-                  {vitalsError}
-                </div>
+                <div className="rounded-lg bg-rose-50 border border-rose-200 p-2.5 text-xs text-rose-800">{vitalsError}</div>
               )}
-
               {vitalsSuccess && (
                 <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-2.5 text-xs text-emerald-800 flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -752,23 +749,12 @@ export function NurseWorkspace() {
               )}
 
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setVitalsModalOpen(false)}
-                  className="text-xs"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  variant="default"
-                  size="sm"
+                <Button type="button" variant="outline" size="sm" onClick={() => setVitalsModalOpen(false)} className="text-xs">Cancel</Button>
+                <Button type="submit" variant="default" size="sm"
                   disabled={isPhysiologicalContradiction || isHrOutOfRange || isSpo2OutOfRange}
                   className="text-xs bg-sky-600 hover:bg-sky-700 text-white shadow-sm font-semibold"
                 >
-                  Save & Validate Vitals
+                  Save &amp; Validate Vitals
                 </Button>
               </div>
             </form>
@@ -786,47 +772,28 @@ export function NurseWorkspace() {
                   <PhoneCall className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900">
-                    Escalate to Attending Physician
-                  </h3>
+                  <h3 className="font-bold text-sm text-slate-900">Escalate to Attending Physician</h3>
                   <p className="text-xs text-slate-500">
                     Patient: <span className="font-semibold text-slate-800">{selectedPatientForEscalate.name}</span> ({selectedPatientForEscalate.mrn})
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setEscalateModalOpen(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-              >
+              <button onClick={() => setEscalateModalOpen(false)} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
-                  Escalation Urgency Tier:
-                </label>
+                <label className="block font-semibold text-slate-700 mb-1">Escalation Urgency Tier:</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setEscalatePriority("HIGH")}
-                    className={`rounded-lg border p-2 text-center font-semibold transition-colors ${
-                      escalatePriority === "HIGH"
-                        ? "border-orange-600 bg-orange-50 text-orange-800"
-                        : "border-slate-200 bg-white text-slate-600"
-                    }`}
+                  <button type="button" onClick={() => setEscalatePriority("HIGH")}
+                    className={`rounded-lg border p-2 text-center font-semibold transition-colors ${escalatePriority === "HIGH" ? "border-orange-600 bg-orange-50 text-orange-800" : "border-slate-200 bg-white text-slate-600"}`}
                   >
                     High (Urgent)
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setEscalatePriority("CRITICAL")}
-                    className={`rounded-lg border p-2 text-center font-semibold transition-colors ${
-                      escalatePriority === "CRITICAL"
-                        ? "border-rose-600 bg-rose-50 text-rose-800 ring-1 ring-rose-600"
-                        : "border-slate-200 bg-white text-slate-600"
-                    }`}
+                  <button type="button" onClick={() => setEscalatePriority("CRITICAL")}
+                    className={`rounded-lg border p-2 text-center font-semibold transition-colors ${escalatePriority === "CRITICAL" ? "border-rose-600 bg-rose-50 text-rose-800 ring-1 ring-rose-600" : "border-slate-200 bg-white text-slate-600"}`}
                   >
                     STAT (Immediate Bedside)
                   </button>
@@ -834,9 +801,7 @@ export function NurseWorkspace() {
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">
-                  Clinical Escalation Rationale:
-                </label>
+                <label className="block font-semibold text-slate-700 mb-1">Clinical Escalation Rationale:</label>
                 <textarea
                   value={escalateReason}
                   onChange={(e) => setEscalateReason(e.target.value)}
@@ -849,28 +814,18 @@ export function NurseWorkspace() {
               {escalateSuccess && (
                 <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-2 text-xs text-emerald-800 flex items-center gap-1.5">
                   <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <span>Notification dispatched to Dr. Vance and recorded in audit log.</span>
+                  <span>Escalation dispatched and recorded in audit log.</span>
                 </div>
               )}
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-200">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setEscalateModalOpen(false)}
-                className="text-xs"
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleSubmitEscalation}
+              <Button variant="outline" size="sm" onClick={() => setEscalateModalOpen(false)} className="text-xs">Cancel</Button>
+              <Button variant="default" size="sm" onClick={handleSubmitEscalation}
                 disabled={escalateSubmitting || !escalateReason.trim()}
                 className="text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-sm font-semibold"
               >
-                {escalateSubmitting ? "Dispatching Alert..." : "Dispatch Escalation"}
+                {escalateSubmitting ? "Dispatching Alert…" : "Dispatch Escalation"}
               </Button>
             </div>
           </div>

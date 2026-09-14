@@ -40,7 +40,7 @@ interface ModelVersionDto {
   precision: number | null;
   created_at: string;
   activated_at: string | null;
-  metrics?: any;
+  metrics?: Record<string, unknown>;
 }
 
 interface TelemetryDto {
@@ -86,7 +86,6 @@ export default function ModelManagementPage() {
   const isAuthorized = user?.role === "ADMIN" || user?.role === "DOCTOR" || user?.role === "ANALYST";
 
   const fetchRegistryData = React.useCallback(async () => {
-    setIsLoading(true);
     try {
       const [modelsRes, telemetryRes] = await Promise.allSettled([
         apiClient.get("/models/"),
@@ -109,17 +108,42 @@ export default function ModelManagementPage() {
   }, []);
 
   React.useEffect(() => {
-    fetchRegistryData();
-  }, [fetchRegistryData]);
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const [modelsRes, telemetryRes] = await Promise.allSettled([
+          apiClient.get("/models/"),
+          apiClient.get("/models/monitoring-telemetry/"),
+        ]);
+        if (!isMounted) return;
+        if (modelsRes.status === "fulfilled") {
+          const raw = modelsRes.value.data;
+          setModels(Array.isArray(raw) ? raw : raw.results || []);
+        }
+        if (telemetryRes.status === "fulfilled") {
+          setTelemetry(telemetryRes.value.data);
+        }
+      } catch (err) {
+        console.warn("Failed to fetch live model telemetry:", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const handlePromote = async (modelId: string) => {
+  const handlePromote = React.useCallback(async (modelId: string) => {
     setActionLoadingId(modelId);
     try {
       await apiClient.post(`/models/${modelId}/activate/`, {
         reason: "Promoted to production via Model Governance Dashboard",
       });
+      const stamp = new Date().toISOString();
       addNotification({
-        id: `notif-promote-${Date.now()}`,
+        id: `notif-promote-${stamp}`,
         title: "Model Activated",
         message: "Model promoted to production ACTIVE status. In-memory cache invalidated.",
         severity: "INFO",
@@ -128,12 +152,13 @@ export default function ModelManagementPage() {
         action_url: "/admin/models",
       });
       await fetchRegistryData();
-    } catch (err: any) {
-      alert(`Activation failed: ${err?.response?.data?.message || err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Activation failed";
+      alert(`Activation failed: ${msg}`);
     } finally {
       setActionLoadingId(null);
     }
-  };
+  }, [addNotification, fetchRegistryData]);
 
   const handleTriggerRetraining = () => {
     setIsRetraining(true);

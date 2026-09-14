@@ -28,11 +28,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { useAuthStore } from "@/features/auth/authStore";
+import { useAuthStore, getRoleHomeRoute } from "@/features/auth/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { loginAsRole } = useAuthStore();
+  const { loginWithCredentials, loginAsRole } = useAuthStore();
 
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -43,42 +43,32 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!email || !password) {
+      setError("Please enter your registered hospital email and password.");
+      return;
+    }
+
     setIsLoading(true);
 
-    setTimeout(() => {
-      if (!email || !password) {
-        setError("Please enter your registered hospital email and password.");
-        setIsLoading(false);
-        return;
-      }
-
-      // Check role based on email or default to Doctor
-      if (email.toLowerCase().includes("patient") || email.toLowerCase().includes("user") || email.toLowerCase().includes("eleanor")) {
-        loginAsRole("PATIENT");
-        router.push("/user/dashboard");
-      } else if (email.toLowerCase().includes("nurse")) {
-        loginAsRole("NURSE");
-        router.push("/nurse/dashboard");
-      } else if (email.toLowerCase().includes("admin")) {
-        loginAsRole("ADMIN");
-        router.push("/admin/dashboard");
-      } else if (email.toLowerCase().includes("analyst") || email.toLowerCase().includes("informaticist")) {
-        loginAsRole("ANALYST");
-        router.push("/informaticist/dashboard");
-      } else {
-        loginAsRole("DOCTOR");
-        router.push("/doctor/dashboard");
-      }
-    }, 500);
+    try {
+      const profile = await loginWithCredentials(email.trim(), password);
+      router.push(getRoleHomeRoute(profile.role));
+    } catch (err: unknown) {
+      const apiErr = err as { response?: { data?: { detail?: string; error?: string } } };
+      setError(
+        apiErr?.response?.data?.detail ||
+        apiErr?.response?.data?.error ||
+        "Authentication failed. Please verify your hospital email credentials."
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleQuickDemo = (role: "DOCTOR" | "NURSE" | "ANALYST" | "ADMIN" | "PATIENT") => {
     loginAsRole(role);
-    if (role === "NURSE") router.push("/nurse/dashboard");
-    else if (role === "ADMIN") router.push("/admin/dashboard");
-    else if (role === "ANALYST") router.push("/informaticist/dashboard");
-    else if (role === "PATIENT") router.push("/user/dashboard");
-    else router.push("/doctor/dashboard");
+    router.push(getRoleHomeRoute(role));
   };
 
   return (

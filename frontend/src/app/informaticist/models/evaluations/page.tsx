@@ -5,6 +5,14 @@ import { BarChart3, ChevronRight, Brain } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 
+interface ModelEvaluationRecord {
+  id?: string;
+  model_name?: string;
+  roc_auc?: number;
+  f1_score?: number;
+  evaluation_date?: string;
+}
+
 export default function ModelEvaluationsPage() {
   const { modelEvaluations } = useClinicalStore();
   return (
@@ -12,7 +20,7 @@ export default function ModelEvaluationsPage() {
       <h1 className="text-2xl font-bold text-slate-900">Model Evaluations</h1>
       <div className="space-y-3">
         {modelEvaluations && modelEvaluations.length > 0 ? (
-          modelEvaluations.map((ev: any, i: number) => (
+          (modelEvaluations as ModelEvaluationRecord[]).map((ev: ModelEvaluationRecord, i: number) => (
             <Link key={ev.id ?? i} href={`/informaticist/models/evaluations/${ev.id ?? i}`} className="block">
               <div className="bg-white border border-slate-200 rounded-xl p-4 hover:border-purple-300 hover:shadow-sm transition-all flex items-center gap-4">
                 <div className="h-10 w-10 rounded-xl bg-purple-50 flex items-center justify-center shrink-0">

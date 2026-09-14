@@ -41,8 +41,20 @@ const MOCK_PREDICTIONS = [
   },
 ];
 
+interface PatientPredictionItem {
+  id: string;
+  model_name: string;
+  model_version_str: string;
+  prediction_result: string;
+  probability: number;
+  confidence_interval?: number[];
+  created_at: string;
+  explanation: string;
+  review_status: string;
+}
+
 export default function PatientPredictionsPage() {
-  const [predictions, setPredictions] = React.useState<any[]>(MOCK_PREDICTIONS);
+  const [predictions, setPredictions] = React.useState<PatientPredictionItem[]>(MOCK_PREDICTIONS);
 
   React.useEffect(() => {
     apiClient.get("/user/predictions/")

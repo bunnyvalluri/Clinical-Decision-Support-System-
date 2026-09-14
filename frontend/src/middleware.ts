@@ -1,16 +1,16 @@
 /**
- * Next.js Middleware — Role-Based Route Guard
+ * Next.js Middleware — Role-Based Route Guard & Seamless Redirector
  *
  * Runs on the Edge Runtime before every request.
- * Enforces that /doctor/*, /nurse/*, /informaticist/*, /admin/*
- * are only accessible to users holding the correct role.
+ * Enforces role isolation across /doctor/*, /nurse/*, /informaticist/*, /admin/*, /user/*
  *
  * Strategy:
- *  - Role is stored in localStorage (client) which is NOT accessible in
- *    Edge middleware. We persist the role in a cookie (`clinical_role`)
- *    set by the auth store on login. Middleware reads this cookie.
- *  - Unauthenticated → redirect to /login
- *  - Wrong role → redirect to /forbidden
+ *  - Role is read from `clinical_role` cookie set upon authentication.
+ *  - Unauthenticated accessing protected role paths → redirect to /login
+ *  - Authenticated accessing another role's route → immediately redirect to own authorized dashboard
+ *  - Direct access to /forbidden → immediately redirect to own authorized dashboard (or /login)
+ *  - Authenticated accessing /login or /register → redirect to own authorized dashboard
+ *  - NEVER render an Access Denied / 403 screen for role route mismatches.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -29,7 +29,6 @@ const PUBLIC_PATHS = [
   "/register",
   "/forgot-password",
   "/reset-password",
-  "/forbidden",
 ];
 
 function getNamespaceFromPath(pathname: string): string | null {
@@ -42,14 +41,13 @@ function getNamespaceFromPath(pathname: string): string | null {
 }
 
 function getRoleDashboard(role: string): string {
-  switch (role) {
+  const r = (role || "").toUpperCase();
+  switch (r) {
     case "PATIENT":
     case "ROLE_PATIENT":
     case "USER":
     case "ROLE_USER":
       return "/user/dashboard";
-    case "DOCTOR":
-      return "/doctor/dashboard";
     case "NURSE":
       return "/nurse/dashboard";
     case "MEDICAL_INFORMATICIST":
@@ -58,18 +56,14 @@ function getRoleDashboard(role: string): string {
     case "IT_ADMIN":
     case "ADMIN":
       return "/admin/dashboard";
+    case "DOCTOR":
     default:
-      return "/login";
+      return "/doctor/dashboard";
   }
 }
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  // Allow public paths
-  if (PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ) {
-    return NextResponse.next();
-  }
 
   // Allow Next.js internals and static assets
   if (
@@ -81,32 +75,51 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const roleCookie = request.cookies.get("clinical_role")?.value;
+
+  // 1. Intercept any legacy or direct /forbidden attempts -> immediately redirect to role dashboard or login
+  if (pathname === "/forbidden" || pathname.startsWith("/forbidden/")) {
+    if (roleCookie) {
+      return NextResponse.redirect(new URL(getRoleDashboard(roleCookie), request.url));
+    }
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // 2. Redirect authenticated users away from public auth pages to their authorized dashboard
+  if (["/login", "/register", "/forgot-password", "/reset-password"].includes(pathname)) {
+    if (roleCookie) {
+      return NextResponse.redirect(new URL(getRoleDashboard(roleCookie), request.url));
+    }
+    return NextResponse.next();
+  }
+
+  // 3. Allow other public paths (e.g. root landing page)
+  if (PUBLIC_PATHS.some((p) => pathname === p)) {
+    return NextResponse.next();
+  }
+
+  // 4. Role Namespace Protection
   const namespace = getNamespaceFromPath(pathname);
-
-  // If navigating into a role namespace, check role cookie
   if (namespace) {
-    const roleCookie = request.cookies.get("clinical_role")?.value;
-
     if (!roleCookie) {
-      // Not authenticated → redirect to login
+      // Unauthenticated → redirect to login
       const loginUrl = new URL("/login", request.url);
-      loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    const allowedRoles = ROLE_NAMESPACE_MAP[namespace];
-    if (!allowedRoles.includes(roleCookie)) {
-      // Wrong role → redirect to /forbidden
-      const forbiddenUrl = new URL("/forbidden", request.url);
-      forbiddenUrl.searchParams.set("from", pathname);
-      forbiddenUrl.searchParams.set("role", roleCookie);
-      return NextResponse.redirect(forbiddenUrl);
+    const allowedRoles = ROLE_NAMESPACE_MAP[namespace] || [];
+    const normalizedCookie = roleCookie.toUpperCase();
+
+    if (!allowedRoles.includes(normalizedCookie)) {
+      // Role Mismatch: DO NOT show "Access Denied" or 403 page.
+      // Automatically redirect user to their own authorized portal dashboard.
+      const authorizedDashboard = getRoleDashboard(roleCookie);
+      return NextResponse.redirect(new URL(authorizedDashboard, request.url));
     }
   }
 
-  // For /dashboard → redirect to role-specific dashboard
-  if (pathname === "/dashboard") {
-    const roleCookie = request.cookies.get("clinical_role")?.value;
+  // 5. Generic /dashboard → redirect to role-specific dashboard
+  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
     if (roleCookie) {
       return NextResponse.redirect(new URL(getRoleDashboard(roleCookie), request.url));
     }

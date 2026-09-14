@@ -1,17 +1,13 @@
 "use client";
 
 import { create } from "zustand";
+import apiClient from "@/services/apiClient";
 import {
   Patient,
   PredictionRecord,
   ClinicalNotification,
   ReportItem,
   MLModelDetail,
-  INITIAL_PATIENTS,
-  INITIAL_PREDICTIONS,
-  INITIAL_NOTIFICATIONS,
-  INITIAL_REPORTS,
-  INITIAL_MODELS,
 } from "@/services/clinicalData";
 import type { RiskLevel } from "@/types";
 
@@ -34,6 +30,13 @@ export interface ActivityTimelinePoint {
   criticalAlerts: number;
 }
 
+export interface DataQualityMetric {
+  id: string;
+  metric_name: string;
+  score: number;
+  status: string;
+}
+
 interface ClinicalStoreState {
   patients: Patient[];
   predictions: PredictionRecord[];
@@ -43,12 +46,12 @@ interface ClinicalStoreState {
   activityTimeline: ActivityTimelinePoint[];
   stats: DashboardStats;
   unreadAlertsCount: number;
-  llmEvaluations?: any[];
-  auditLogs?: any[];
-  dataQualityMetrics?: any[];
-  driftMonitors?: any[];
-  modelEvaluations?: any[];
-  mlModels?: any[];
+  llmEvaluations?: Record<string, unknown>[];
+  auditLogs?: Record<string, unknown>[];
+  dataQualityMetrics?: DataQualityMetric[];
+  driftMonitors?: Record<string, unknown>[];
+  modelEvaluations?: Record<string, unknown>[];
+  mlModels?: MLModelDetail[];
 
   // Actions
   setPatients: (patients: Patient[]) => void;
@@ -73,6 +76,7 @@ interface ClinicalStoreState {
 
   setModels: (models: MLModelDetail[]) => void;
   promoteModel: (id: string) => void;
+  fetchClinicalData: () => Promise<void>;
 
   // Real-time WebSocket Ingestion
   handleWebSocketPrediction: (payload: {
@@ -102,15 +106,7 @@ interface ClinicalStoreState {
   }) => void;
 }
 
-const INITIAL_TIMELINE: ActivityTimelinePoint[] = [
-  { time: "09:00", predictions: 4, criticalAlerts: 0 },
-  { time: "10:00", predictions: 8, criticalAlerts: 1 },
-  { time: "11:00", predictions: 12, criticalAlerts: 0 },
-  { time: "12:00", predictions: 7, criticalAlerts: 1 },
-  { time: "13:00", predictions: 15, criticalAlerts: 2 },
-  { time: "14:00", predictions: 18, criticalAlerts: 1 },
-  { time: "15:00", predictions: 11, criticalAlerts: 1 },
-];
+const INITIAL_TIMELINE: ActivityTimelinePoint[] = [];
 
 function calculateStats(patients: Patient[], predictions: PredictionRecord[], models: MLModelDetail[]): DashboardStats {
   const activeModel = models.find((m) => m.status === "ACTIVE") || models[0];
@@ -134,80 +130,28 @@ function calculateStats(patients: Patient[], predictions: PredictionRecord[], mo
     mediumRiskCount: med,
     highRiskCount: high,
     criticalRiskCount: crit,
-    activeModelName: activeModel ? activeModel.name : "CardioEnsemble-RF",
-    activeModelVersion: activeModel ? activeModel.version : "v1.4.2",
-    activeModelAccuracy: activeModel ? activeModel.accuracy : 0.924,
-    activeModelLatencyMs: activeModel ? activeModel.avg_latency_ms : 22,
+    activeModelName: activeModel ? activeModel.name : "None",
+    activeModelVersion: activeModel ? activeModel.version : "N/A",
+    activeModelAccuracy: activeModel ? activeModel.accuracy : 0,
+    activeModelLatencyMs: activeModel ? activeModel.avg_latency_ms : 0,
   };
 }
 
 export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
-  patients: INITIAL_PATIENTS,
-  predictions: INITIAL_PREDICTIONS,
-  notifications: INITIAL_NOTIFICATIONS,
-  reports: INITIAL_REPORTS,
-  models: INITIAL_MODELS,
+  patients: [],
+  predictions: [],
+  notifications: [],
+  reports: [],
+  models: [],
   activityTimeline: INITIAL_TIMELINE,
-  stats: calculateStats(INITIAL_PATIENTS, INITIAL_PREDICTIONS, INITIAL_MODELS),
-  unreadAlertsCount: INITIAL_NOTIFICATIONS.filter((n) => !n.read).length,
-  llmEvaluations: [
-    {
-      id: "llm-01",
-      evaluation_type: "Groundedness & Hallucination Check",
-      model_name: "Claude 3.5 Sonnet / Azure OpenAI",
-      evaluation_date: "2026-09-13T12:00:00Z",
-      overall_score: 0.982,
-    },
-    {
-      id: "llm-02",
-      evaluation_type: "Prompt Injection & Safety Boundary",
-      model_name: "Claude 3.5 Sonnet / Azure OpenAI",
-      evaluation_date: "2026-09-13T10:30:00Z",
-      overall_score: 1.0,
-    },
-  ],
-  auditLogs: [
-    {
-      id: "aud-01",
-      action: "PREDICTION_EVALUATED",
-      actor: "Dr. Elena Vance, MD",
-      timestamp: "2026-09-13T16:42:10Z",
-      status: "SUCCESS",
-    },
-  ],
-  dataQualityMetrics: [
-    {
-      id: "dq-01",
-      metric_name: "Vital Signs Completeness",
-      score: 0.994,
-      status: "PASSED",
-    },
-  ],
-  driftMonitors: [
-    {
-      id: "drift-01",
-      feature_name: "Systolic Blood Pressure (Resting)",
-      drift_score: 0.042,
-      detection_method: "Population Stability Index (PSI)",
-      drift_detected: false,
-    },
-    {
-      id: "drift-02",
-      feature_name: "ST Depression Distribution",
-      drift_score: 0.061,
-      detection_method: "Kolmogorov-Smirnov (KS)",
-      drift_detected: false,
-    },
-  ],
-  modelEvaluations: [
-    {
-      id: "eval-01",
-      model_name: "CardioEnsemble-RF v1.4.2",
-      metric: "AUROC",
-      value: 0.914,
-    },
-  ],
-  mlModels: INITIAL_MODELS,
+  stats: calculateStats([], [], []),
+  unreadAlertsCount: 0,
+  llmEvaluations: [],
+  auditLogs: [],
+  dataQualityMetrics: [],
+  driftMonitors: [],
+  modelEvaluations: [],
+  mlModels: [],
 
   setPatients: (patients) =>
     set((state) => ({
@@ -346,6 +290,41 @@ export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
         stats: calculateStats(state.patients, state.predictions, updated),
       };
     }),
+
+  fetchClinicalData: async () => {
+    try {
+      const [patientsRes, predsRes, modelsRes] = await Promise.allSettled([
+        apiClient.get("/patients/"),
+        apiClient.get("/predictions/records/"),
+        apiClient.get("/models/versions/"),
+      ]);
+
+      const patients: Patient[] =
+        patientsRes.status === "fulfilled"
+          ? (patientsRes.value.data?.results || patientsRes.value.data?.data || patientsRes.value.data || [])
+          : [];
+
+      const predictions: PredictionRecord[] =
+        predsRes.status === "fulfilled"
+          ? (predsRes.value.data?.results || predsRes.value.data?.data || predsRes.value.data || [])
+          : [];
+
+      const models: MLModelDetail[] =
+        modelsRes.status === "fulfilled"
+          ? (modelsRes.value.data?.results || modelsRes.value.data?.data || modelsRes.value.data || [])
+          : [];
+
+      set((state) => ({
+        patients,
+        predictions,
+        models,
+        mlModels: models,
+        stats: calculateStats(patients, predictions, models),
+      }));
+    } catch (err) {
+      console.warn("Could not fetch clinical data from backend:", err);
+    }
+  },
 
   // Real-time WebSocket Ingestion WITHOUT page refresh
   handleWebSocketPrediction: (payload) => {

@@ -10,7 +10,7 @@ export interface UserRealtimeEvent {
   user_id: string;
   resource_type: string;
   resource_id: string;
-  payload: any;
+  payload: Record<string, unknown>;
 }
 
 export type ConnectionStatus = "connected" | "connecting" | "reconnecting" | "offline";
@@ -21,10 +21,14 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
   const [lastEvent, setLastEvent] = React.useState<UserRealtimeEvent | null>(null);
   const wsRef = React.useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const onEventRef = React.useRef(onEvent);
+
+  React.useEffect(() => {
+    onEventRef.current = onEvent;
+  }, [onEvent]);
 
   React.useEffect(() => {
     if (!isAuthenticated || !user) {
-      setStatus("offline");
       return;
     }
 
@@ -37,7 +41,10 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
         const port = "8000"; // Django ASGI backend
         const url = `${protocol}//${host}:${port}/ws/user/?token=${accessToken || ""}`;
 
-        setStatus("connecting");
+        queueMicrotask(() => {
+          if (isMounted) setStatus("connecting");
+        });
+
         const socket = new WebSocket(url);
         wsRef.current = socket;
 
@@ -51,8 +58,8 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
           try {
             const data: UserRealtimeEvent = JSON.parse(msgEvent.data);
             setLastEvent(data);
-            if (onEvent) {
-              onEvent(data);
+            if (onEventRef.current) {
+              onEventRef.current(data);
             }
           } catch (e) {
             console.error("Failed to parse WebSocket event:", e);
@@ -64,7 +71,7 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
           setStatus("reconnecting");
         };
 
-        socket.onclose = (e) => {
+        socket.onclose = () => {
           if (!isMounted) return;
           setStatus("reconnecting");
           // Reconnect with 3s backoff
@@ -72,8 +79,8 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
             if (isMounted) connect();
           }, 3000);
         };
-      } catch (err) {
-        setStatus("offline");
+      } catch {
+        if (isMounted) setStatus("offline");
       }
     };
 

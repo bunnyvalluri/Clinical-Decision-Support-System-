@@ -11,6 +11,8 @@ from apps.core.models import AuditLog
 from apps.clinical.models import ClinicalRecord
 from apps.notifications.models import Notification
 from apps.predictions.models import Prediction
+from apps.reports.models import Report
+from apps.reports.serializers import ReportSerializer
 from .permissions import IsPatientUser, get_patient_from_request
 from .models import (
     UserRiskAssessment,
@@ -420,3 +422,22 @@ class PatientSecurityView(views.APIView):
             "mfa_enabled": False,
             "last_password_change": "2026-08-15T10:00:00Z",
         })
+
+
+class PatientReportsView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated, IsPatientUser]
+
+    def get(self, request):
+        patient = get_patient_from_request(request)
+        reports = Report.objects.filter(patient=patient).order_by("-created_at")
+        return response.Response(ReportSerializer(reports, many=True).data)
+
+
+class PatientReportDetailView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated, IsPatientUser]
+
+    def get(self, request, pk):
+        patient = get_patient_from_request(request)
+        report = get_object_or_404(Report, id=pk, patient=patient)
+        return response.Response(ReportSerializer(report).data)
+

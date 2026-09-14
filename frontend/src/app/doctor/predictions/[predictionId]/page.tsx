@@ -50,7 +50,7 @@ export default function PredictionDetailPage() {
       : "bg-emerald-50 text-emerald-700 border-emerald-200";
 
   const features: Record<string, number> =
-    (pred.feature_contributions as any) ||
+    (pred.feature_contributions as Record<string, number> | undefined) ||
     pred.shap_attributions?.reduce((acc: Record<string, number>, s) => {
       acc[s.feature] = s.attribution;
       return acc;

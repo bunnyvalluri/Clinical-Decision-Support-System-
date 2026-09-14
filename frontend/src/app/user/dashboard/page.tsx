@@ -27,11 +27,105 @@ import { useAuthStore } from "@/features/auth/authStore";
 import { useUserWebSocket } from "@/hooks/useUserWebSocket";
 import apiClient from "@/services/apiClient";
 
+interface DashboardPatient {
+  full_name: string;
+  mrn: string;
+  age: number;
+  gender: string;
+  blood_group: string;
+}
+
+interface DashboardVitals {
+  systolic_bp: number;
+  diastolic_bp: number;
+  heart_rate: number;
+  spo2: number;
+  recorded_at: string;
+  source: string;
+}
+
+interface DashboardPrediction {
+  id: string;
+  model_name: string;
+  model_version_str: string;
+  prediction_result: string;
+  probability: number;
+  created_at: string;
+  explanation: string;
+  disclaimer: string;
+}
+
+interface DashboardAppointment {
+  id: string;
+  clinician_name: string;
+  department: string;
+  scheduled_time: string;
+  location_or_link: string;
+  reason_for_visit: string;
+}
+
+interface DashboardTask {
+  id: string;
+  title: string;
+  due_date: string;
+  status: string;
+}
+
+interface DashboardData {
+  patient: DashboardPatient;
+  latest_vitals: DashboardVitals;
+  latest_prediction: DashboardPrediction;
+  next_appointment: DashboardAppointment;
+  pending_tasks: DashboardTask[];
+  unread_notification_count: number;
+}
+
 export default function PatientDashboardPage() {
   const { user } = useAuthStore();
-  const [data, setData] = React.useState<any>(null);
-  const [loading, setLoading] = React.useState(true);
-  const [activeTab, setActiveTab] = React.useState("overview");
+  const [data, setData] = React.useState<DashboardData | null>(null);
+
+  const getFallbackData = React.useCallback((): DashboardData => {
+    return {
+      patient: {
+        full_name: user?.full_name || "Eleanor Ward",
+        mrn: user?.license_number || "MRN-90241",
+        age: 68,
+        gender: "Female",
+        blood_group: "A+",
+      },
+      latest_vitals: {
+        systolic_bp: 134,
+        diastolic_bp: 86,
+        heart_rate: 76,
+        spo2: 97,
+        recorded_at: new Date().toISOString(),
+        source: "USER_ENTERED",
+      },
+      latest_prediction: {
+        id: "pred-demo-01",
+        model_name: "CardioEnsemble-RF",
+        model_version_str: "v1.4.2",
+        prediction_result: "MEDIUM",
+        probability: 0.42,
+        created_at: new Date().toISOString(),
+        explanation: "The model estimates a moderate risk category based on recent blood pressure measurements and age. Regular monitoring is advised.",
+        disclaimer: "Notice: This prediction is a model-generated estimate for clinical decision support. It is not an autonomous diagnosis.",
+      },
+      next_appointment: {
+        id: "appt-demo-01",
+        clinician_name: "Dr. Elena Vance, MD",
+        department: "Cardiology Outpatient Clinic",
+        scheduled_time: new Date(Date.now() + 86400000 * 3).toISOString(),
+        location_or_link: "Suite 402 - Heart & Vascular Pavilion",
+        reason_for_visit: "Quarterly Cardiovascular Review & Holter Follow-up",
+      },
+      pending_tasks: [
+        { id: "task-01", title: "Log Morning Blood Pressure & Pulse", due_date: "Today, 10:00 AM", status: "PENDING" },
+        { id: "task-02", title: "Review Potassium & Electrolyte Lab Report", due_date: "Tomorrow", status: "PENDING" },
+      ],
+      unread_notification_count: 2,
+    };
+  }, [user]);
 
   const fetchDashboard = React.useCallback(async () => {
     try {
@@ -39,56 +133,30 @@ export default function PatientDashboardPage() {
       if (res.data) {
         setData(res.data);
       }
-    } catch (e) {
-      // Fallback demo data for immediate rich UX preview
-      setData({
-        patient: {
-          full_name: user?.full_name || "Eleanor Ward",
-          mrn: user?.license_number || "MRN-90241",
-          age: 68,
-          gender: "Female",
-          blood_group: "A+",
-        },
-        latest_vitals: {
-          systolic_bp: 134,
-          diastolic_bp: 86,
-          heart_rate: 76,
-          spo2: 97,
-          recorded_at: new Date().toISOString(),
-          source: "USER_ENTERED",
-        },
-        latest_prediction: {
-          id: "pred-demo-01",
-          model_name: "CardioEnsemble-RF",
-          model_version_str: "v1.4.2",
-          prediction_result: "MEDIUM",
-          probability: 0.42,
-          created_at: new Date().toISOString(),
-          explanation: "The model estimates a moderate risk category based on recent blood pressure measurements and age. Regular monitoring is advised.",
-          disclaimer: "Notice: This prediction is a model-generated estimate for clinical decision support. It is not an autonomous diagnosis.",
-        },
-        next_appointment: {
-          id: "appt-demo-01",
-          clinician_name: "Dr. Elena Vance, MD",
-          department: "Cardiology Outpatient Clinic",
-          scheduled_time: new Date(Date.now() + 86400000 * 3).toISOString(),
-          location_or_link: "Suite 402 - Heart & Vascular Pavilion",
-          reason_for_visit: "Quarterly Cardiovascular Review & Holter Follow-up",
-        },
-        pending_tasks: [
-          { id: "task-01", title: "Log Morning Blood Pressure & Pulse", due_date: "Today, 10:00 AM", status: "PENDING" },
-          { id: "task-02", title: "Review Potassium & Electrolyte Lab Report", due_date: "Tomorrow", status: "PENDING" },
-        ],
-        unread_notification_count: 2,
-      });
-    } finally {
-      setLoading(false);
+    } catch {
+      setData(getFallbackData());
     }
-  }, [user]);
+  }, [getFallbackData]);
 
   React.useEffect(() => {
-    fetchDashboard();
-  }, [fetchDashboard]);
+    let isMounted = true;
+    const load = async () => {
+      try {
+        const res = await apiClient.get("/user/dashboard/");
+        if (!isMounted) return;
+        if (res.data) {
+          setData(res.data);
+        }
+      } catch {
+        if (!isMounted) return;
+        setData(getFallbackData());
+      }
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [getFallbackData]);
 
   // Handle live WebSocket events seamlessly
   useUserWebSocket((event) => {
@@ -335,7 +403,7 @@ export default function PatientDashboardPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-3 space-y-2.5">
-              {tasks.map((task: any) => (
+              {tasks.map((task: DashboardTask) => (
                 <div
                   key={task.id}
                   className="p-2.5 rounded-xl border border-slate-100 bg-slate-50/60 flex items-start gap-2.5 hover:bg-slate-50 transition-colors"
@@ -368,7 +436,7 @@ export default function PatientDashboardPage() {
                   <span className="text-[10px] text-slate-400">Yesterday</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  "Eleanor, your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs."
+                  &quot;Eleanor, your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs.&quot;
                 </p>
               </div>
 

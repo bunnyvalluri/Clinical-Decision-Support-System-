@@ -145,11 +145,6 @@ export function ResponsiveAppShell({
     };
   }, [mobileDrawerOpen]);
 
-  // Close mobile drawer on route change
-  React.useEffect(() => {
-    setMobileDrawerOpen(false);
-  }, [pathname]);
-
   const handleLogout = () => {
     logout();
     router.push("/login");
@@ -463,6 +458,7 @@ export function ResponsiveAppShell({
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setMobileDrawerOpen(false)}
                     className={`touch-target flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-colors ${
                       active ? colors.activeNav : `text-slate-700 ${colors.hoverNav}`
                     }`}
@@ -491,6 +487,7 @@ export function ResponsiveAppShell({
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setMobileDrawerOpen(false)}
                     className={`touch-target flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-medium ${
                       active ? colors.activeNav : "text-slate-600 hover:bg-slate-100"
                     }`}

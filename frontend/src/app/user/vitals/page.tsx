@@ -19,6 +19,16 @@ import { Input } from "@/components/ui/input";
 import apiClient from "@/services/apiClient";
 import { ResponsivePageContainer, ResponsiveModal } from "@/components/responsive";
 
+interface PatientVitalItem {
+  id: string;
+  systolic_bp: number;
+  diastolic_bp: number;
+  heart_rate: number;
+  spo2: number;
+  recorded_at: string;
+  source: string;
+}
+
 export default function PatientVitalsPage() {
   const [showLogModal, setShowLogModal] = React.useState(false);
   const [sbp, setSbp] = React.useState("130");
@@ -27,7 +37,7 @@ export default function PatientVitalsPage() {
   const [spo2, setSpo2] = React.useState("98");
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
-  const [vitalsList, setVitalsList] = React.useState<any[]>([
+  const [vitalsList, setVitalsList] = React.useState<PatientVitalItem[]>([
     {
       id: "v-01",
       systolic_bp: 134,

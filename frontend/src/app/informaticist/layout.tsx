@@ -36,7 +36,7 @@ const INFORMATICIST_BOTTOM_ITEMS: NavItem[] = [
 
 export default function InformaticistLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RoleGuard requiredRoles={["ANALYST"]}>
+    <RoleGuard requiredRoles={["MEDICAL_INFORMATICIST", "ANALYST"]}>
       <ResponsiveAppShell
         role="ANALYST"
         workspaceName="Medical Informatics"

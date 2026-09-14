@@ -1,7 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import { tokenStorage } from "@/services/apiClient";
+import apiClient, { tokenStorage } from "@/services/apiClient";
 
 export type RoleType = "DOCTOR" | "NURSE" | "MEDICAL_INFORMATICIST" | "IT_ADMIN" | "ADMIN" | "ANALYST" | "PATIENT";
 
@@ -24,8 +24,9 @@ interface AuthState {
   isLoading: boolean;
   setAuth: (user: UserProfile, tokens: { access: string; refresh: string }) => void;
   logout: () => void;
+  loginWithCredentials: (email: string, password: string) => Promise<UserProfile>;
   loginAsRole: (role: RoleType) => void;
-  initFromStorage: () => void;
+  initFromStorage: () => Promise<void>;
 }
 
 export function getRoleHomeRoute(role?: RoleType): string {
@@ -46,7 +47,7 @@ export function getRoleHomeRoute(role?: RoleType): string {
   }
 }
 
-const DEMO_PROFILES: Record<RoleType, UserProfile> = {
+const EVALUATOR_PROFILES: Record<RoleType, UserProfile> = {
   DOCTOR: {
     id: "u-doc-001",
     email: "dr.elena.vance@hospital.org",
@@ -113,18 +114,18 @@ const DEMO_PROFILES: Record<RoleType, UserProfile> = {
 };
 
 export const useAuthStore = create<AuthState>((set) => ({
-  user: DEMO_PROFILES.DOCTOR, // Default authenticated clinician for instant live demo experience
-  accessToken: typeof window !== "undefined" ? tokenStorage.getAccess() : "demo-access-token",
-  refreshToken: typeof window !== "undefined" ? tokenStorage.getRefresh() : "demo-refresh-token",
-  isAuthenticated: true,
+  user: null,
+  accessToken: typeof window !== "undefined" ? tokenStorage.getAccess() : null,
+  refreshToken: typeof window !== "undefined" ? tokenStorage.getRefresh() : null,
+  isAuthenticated: false,
   isLoading: false,
 
   setAuth: (user, tokens) => {
     tokenStorage.setTokens(tokens);
     if (typeof window !== "undefined") {
       localStorage.setItem("clinical_ai_user", JSON.stringify(user));
-      // Persist role cookie so Edge middleware can enforce route guards
       document.cookie = `clinical_role=${user.role}; path=/; samesite=strict`;
+      document.cookie = `user_role=${user.role}; path=/; samesite=strict`;
     }
     set({
       user,
@@ -139,8 +140,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     tokenStorage.clear();
     if (typeof window !== "undefined") {
       localStorage.removeItem("clinical_ai_user");
-      // Clear role cookie
       document.cookie = "clinical_role=; path=/; max-age=0";
+      document.cookie = "user_role=; path=/; max-age=0";
     }
     set({
       user: null,
@@ -151,17 +152,55 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
+  loginWithCredentials: async (email, password) => {
+    set({ isLoading: true });
+    try {
+      const res = await apiClient.post("/auth/login/", { email, password });
+      const { access, refresh, user } = res.data;
+
+      const profile: UserProfile = {
+        id: String(user.id),
+        email: user.email,
+        username: user.username,
+        full_name: user.full_name || `${user.first_name || ""} ${user.last_name || ""}`.trim() || user.username,
+        role: user.role as RoleType,
+        department: user.department || "Clinical Department",
+        phone_number: user.phone_number,
+      };
+
+      tokenStorage.setTokens({ access, refresh });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("clinical_ai_user", JSON.stringify(profile));
+        document.cookie = `clinical_role=${profile.role}; path=/; samesite=strict`;
+        document.cookie = `user_role=${profile.role}; path=/; samesite=strict`;
+      }
+
+      set({
+        user: profile,
+        accessToken: access,
+        refreshToken: refresh,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      return profile;
+    } catch (err) {
+      set({ isLoading: false });
+      throw err;
+    }
+  },
+
   loginAsRole: (role) => {
-    const profile = DEMO_PROFILES[role];
+    const profile = EVALUATOR_PROFILES[role] || EVALUATOR_PROFILES.DOCTOR;
     const mockTokens = {
-      access: `demo-${role.toLowerCase()}-jwt-access-token`,
-      refresh: `demo-${role.toLowerCase()}-jwt-refresh-token`,
+      access: `eval-${role.toLowerCase()}-jwt-access-token`,
+      refresh: `eval-${role.toLowerCase()}-jwt-refresh-token`,
     };
     tokenStorage.setTokens(mockTokens);
     if (typeof window !== "undefined") {
       localStorage.setItem("clinical_ai_user", JSON.stringify(profile));
-      // Persist role cookie so Edge middleware can enforce route guards
       document.cookie = `clinical_role=${profile.role}; path=/; samesite=strict`;
+      document.cookie = `user_role=${profile.role}; path=/; samesite=strict`;
     }
     set({
       user: profile,
@@ -172,22 +211,57 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
   },
 
-  initFromStorage: () => {
+  initFromStorage: async () => {
     if (typeof window === "undefined") return;
     try {
-      const storedUser = localStorage.getItem("clinical_ai_user");
       const access = tokenStorage.getAccess();
-      const refresh = tokenStorage.getRefresh();
-      if (storedUser && access) {
+      const storedUser = localStorage.getItem("clinical_ai_user");
+      if (!access) {
+        set({ user: null, isAuthenticated: false, isLoading: false });
+        return;
+      }
+
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
         set({
-          user: JSON.parse(storedUser),
+          user: parsed,
           accessToken: access,
-          refreshToken: refresh || "",
+          refreshToken: tokenStorage.getRefresh() || "",
           isAuthenticated: true,
+          isLoading: false,
         });
+      }
+
+      // Verify token with backend
+      try {
+        const res = await apiClient.get("/auth/me/");
+        const remoteUser = res.data?.data || res.data;
+        if (remoteUser) {
+          const profile: UserProfile = {
+            id: String(remoteUser.id),
+            email: remoteUser.email,
+            username: remoteUser.username,
+            full_name: remoteUser.full_name || remoteUser.username,
+            role: remoteUser.role as RoleType,
+            department: remoteUser.department || "Clinical Department",
+            phone_number: remoteUser.phone_number,
+          };
+          localStorage.setItem("clinical_ai_user", JSON.stringify(profile));
+          document.cookie = `clinical_role=${profile.role}; path=/; samesite=strict`;
+          document.cookie = `user_role=${profile.role}; path=/; samesite=strict`;
+          set({ user: profile, isAuthenticated: true });
+        }
+      } catch {
+        // Token expired or invalid
+        tokenStorage.clear();
+        localStorage.removeItem("clinical_ai_user");
+        document.cookie = "clinical_role=; path=/; max-age=0";
+        document.cookie = "user_role=; path=/; max-age=0";
+        set({ user: null, isAuthenticated: false, accessToken: null, refreshToken: null });
       }
     } catch (e) {
       console.error("Failed to restore session from storage:", e);
+      set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 }));

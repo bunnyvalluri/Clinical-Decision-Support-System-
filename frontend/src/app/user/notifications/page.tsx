@@ -47,8 +47,18 @@ const INITIAL_NOTIFICATIONS = [
   },
 ];
 
+interface PatientNotification {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  timestamp: string;
+  read: boolean;
+  href: string;
+}
+
 export default function PatientNotificationsPage() {
-  const [notifications, setNotifications] = React.useState(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = React.useState<PatientNotification[]>(INITIAL_NOTIFICATIONS);
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -56,14 +66,19 @@ export default function PatientNotificationsPage() {
 
   useUserWebSocket((evt) => {
     if (evt.event_type === "user.notification.created") {
-      const newNotif = {
+      const payload = evt.payload;
+      const title = typeof payload?.title === "string" ? payload.title : "Clinical Alert";
+      const description = typeof payload?.message === "string" ? payload.message : "New notification from your care team.";
+      const href = typeof payload?.action_url === "string" ? payload.action_url : "/user/dashboard";
+
+      const newNotif: PatientNotification = {
         id: `notif-${Date.now()}`,
-        title: evt.payload?.title || "Clinical Alert",
-        description: evt.payload?.message || "New notification from your care team.",
+        title,
+        description,
         category: "CLINICAL",
         timestamp: "Just now",
         read: false,
-        href: evt.payload?.action_url || "/user/dashboard",
+        href,
       };
       setNotifications((prev) => [newNotif, ...prev]);
     }

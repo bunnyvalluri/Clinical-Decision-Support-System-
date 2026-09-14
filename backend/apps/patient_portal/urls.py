@@ -19,5 +19,7 @@ urlpatterns = [
     path("consent/", views.PatientConsentView.as_view(), name="patient-consent"),
     path("tasks/", views.PatientTasksView.as_view(), name="patient-tasks"),
     path("tasks/<uuid:pk>/complete/", views.PatientTaskCompleteView.as_view(), name="patient-task-complete"),
+    path("reports/", views.PatientReportsView.as_view(), name="patient-reports"),
+    path("reports/<uuid:pk>/", views.PatientReportDetailView.as_view(), name="patient-report-detail"),
     path("security/", views.PatientSecurityView.as_view(), name="patient-security"),
 ]

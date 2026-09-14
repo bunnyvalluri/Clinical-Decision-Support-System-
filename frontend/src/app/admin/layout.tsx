@@ -45,7 +45,7 @@ const ADMIN_BOTTOM_ITEMS: NavItem[] = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RoleGuard requiredRoles={["ADMIN"]}>
+    <RoleGuard requiredRoles={["IT_ADMIN", "ADMIN"]}>
       <ResponsiveAppShell
         role="ADMIN"
         workspaceName="Hospital Administration"

@@ -7,7 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import React from "react";
 
-const DEMO_USERS: Record<string, any> = {
+interface DemoUserRecord {
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  department: string;
+  license: string;
+}
+
+const DEMO_USERS: Record<string, DemoUserRecord> = {
   u1: { name: "Dr. Elena Vance, MD", email: "dr.elena.vance@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology", license: "MD-883921" },
   u2: { name: "Sarah Jenkins, RN", email: "s.jenkins@hospital.org", role: "NURSE", status: "ACTIVE", department: "Emergency Triage", license: "RN-449102" },
   u3: { name: "Alex Rivera, MSc", email: "alex.rivera@hospital.org", role: "MEDICAL_INFORMATICIST", status: "ACTIVE", department: "Clinical Informatics", license: "BIO-10923" },
