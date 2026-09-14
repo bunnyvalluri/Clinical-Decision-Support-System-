@@ -640,63 +640,66 @@ export default function PatientDashboardPage() {
         </div>
       )}
 
-      {/* Hero Welcome & Patient Identity Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-950 via-teal-900 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-teal-800/40">
+      {/* Hero Welcome & Patient Identity Banner (Dedicated Clinical Light Mode) */}
+      <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-7 shadow-xs">
+        {/* Subtle clinical accent top bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-600 via-emerald-500 to-sky-500" />
+
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3">
-            {/* Live Status indicator */}
+            {/* Live Status indicator & Regulatory tag */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold border border-emerald-400/30">
+              <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
                 </span>
                 Active Telemetry Monitoring
               </span>
-              <span className="text-xs text-teal-200/70">
+              <span className="text-xs text-slate-500 font-medium">
                 FDA SaMD Class II Aligned · Protocol Cardio-2026
               </span>
             </div>
 
             {/* Dynamic Greeting */}
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
                 {greeting},{" "}
-                <span className="bg-gradient-to-r from-teal-200 to-emerald-300 bg-clip-text text-transparent">
+                <span className="text-teal-700">
                   {patient?.full_name || user?.full_name || "Eleanor"}
                 </span>
               </h1>
-              <p className="text-xs sm:text-sm text-teal-100/80 mt-1 max-w-2xl leading-relaxed">
-                Your vitals are synchronizing with your clinical care team. Last telemetry check was recorded{" "}
-                <span className="text-white font-medium">today at 08:00 AM</span>.
+              <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
+                Your vitals are synchronizing in real time with your clinical care team. Last telemetry was recorded{" "}
+                <span className="text-slate-900 font-semibold">today at 08:00 AM</span>.
               </p>
             </div>
 
-            {/* Patient Meta Badges */}
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-teal-100/90">
+            {/* Patient Meta Badges (Light clinical chips) */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               <button
                 onClick={() => handleCopyMrn(patient?.mrn || "MRN-PA-90241")}
                 title="Click to copy MRN"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-900/60 border border-teal-700/50 hover:bg-teal-800/80 transition-colors font-mono font-semibold"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-mono font-semibold transition-colors shadow-2xs"
               >
                 <span>MRN: {patient?.mrn || "MRN-PA-90241"}</span>
                 {copiedMrn ? (
-                  <Check className="h-3 w-3 text-emerald-400" />
+                  <Check className="h-3.5 w-3.5 text-emerald-600" />
                 ) : (
-                  <Copy className="h-3 w-3 text-teal-300" />
+                  <Copy className="h-3.5 w-3.5 text-slate-400" />
                 )}
               </button>
 
-              <span className="px-2.5 py-1 rounded-lg bg-teal-900/40 border border-teal-700/40">
-                Age: <strong className="text-white">{patient?.age || 68}</strong> (Female)
+              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs">
+                Age: <strong className="text-slate-900 font-bold">{patient?.age || 68}</strong> (Female)
               </span>
 
-              <span className="px-2.5 py-1 rounded-lg bg-teal-900/40 border border-teal-700/40">
-                Blood Group: <strong className="text-white">{patient?.blood_group || "A+"}</strong>
+              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs">
+                Blood Group: <strong className="text-slate-900 font-bold">{patient?.blood_group || "A+"}</strong>
               </span>
 
-              <span className="px-2.5 py-1 rounded-lg bg-teal-900/40 border border-teal-700/40 flex items-center gap-1">
-                <Stethoscope className="h-3 w-3 text-teal-300" />
+              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs flex items-center gap-1.5">
+                <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
                 <span>Dr. Sarah Lin (Cardiology)</span>
               </span>
             </div>
@@ -707,9 +710,9 @@ export default function PatientDashboardPage() {
             <Link href="/user/risk-assessment/new">
               <Button
                 size="sm"
-                className="bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs gap-2 shadow-lg shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs gap-2 shadow-xs transition-colors"
               >
-                <Sparkles className="h-4 w-4" /> Start Health Assessment
+                <Sparkles className="h-3.5 w-3.5" /> Start Health Assessment
               </Button>
             </Link>
 
@@ -717,18 +720,18 @@ export default function PatientDashboardPage() {
               onClick={() => setShowLogModal(true)}
               variant="outline"
               size="sm"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20 text-xs gap-2 backdrop-blur-xs transition-colors"
+              className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 text-xs font-semibold gap-2 shadow-2xs transition-colors"
             >
-              <HeartPulse className="h-4 w-4 text-rose-300" /> Quick Log Vitals
+              <HeartPulse className="h-3.5 w-3.5 text-rose-500" /> Quick Log Vitals
             </Button>
 
             <Button
               onClick={handleExportSummary}
               variant="ghost"
               size="sm"
-              className="text-teal-200 hover:text-white hover:bg-white/10 text-xs gap-1.5 transition-colors"
+              className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs gap-1.5 transition-colors border border-slate-200/60"
             >
-              <Download className="h-3.5 w-3.5" /> Export PDF
+              <Download className="h-3.5 w-3.5 text-slate-500" /> Export PDF
             </Button>
           </div>
         </div>
@@ -992,7 +995,7 @@ export default function PatientDashboardPage() {
 
             <CardContent className="p-5 sm:p-6 space-y-5">
               {/* Radial Arc Gauge & Algorithmic Narrative Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-teal-50/50 via-slate-50 to-amber-50/30 border border-slate-200/70">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90">
                 {/* SVG Radial Gauge */}
                 <div className="flex flex-col items-center justify-center text-center">
                   <div className="relative w-36 h-36 flex items-center justify-center">
