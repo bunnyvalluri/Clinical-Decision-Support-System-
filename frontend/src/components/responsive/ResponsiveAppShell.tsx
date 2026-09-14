@@ -145,9 +145,16 @@ export function ResponsiveAppShell({
     };
   }, [mobileDrawerOpen]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+    } catch {}
     logout();
-    router.push("/login");
+    if (typeof window !== "undefined") {
+      document.cookie = "clinical_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+      document.cookie = "user_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+      window.location.href = "/login?logout=true";
+    }
   };
 
   // Top 4-5 items for mobile bottom quick navigation

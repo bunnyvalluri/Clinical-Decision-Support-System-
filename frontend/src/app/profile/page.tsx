@@ -55,9 +55,12 @@ export default function ProfilePage() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={() => {
+            onClick={async () => {
+              try {
+                await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+              } catch {}
               logout();
-              router.push("/login");
+              window.location.href = "/login?logout=true";
             }}
             className="text-xs gap-1.5 self-start sm:self-auto shadow-sm"
           >

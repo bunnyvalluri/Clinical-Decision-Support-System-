@@ -123,6 +123,11 @@ function getInitialAuthState(): {
     return { user: null, accessToken: null, refreshToken: null, isAuthenticated: false };
   }
   try {
+    // If logging out or explicitly on login/public auth path, do not auto-authenticate
+    if (window.location.search.includes("logout=true") || window.location.pathname === "/login") {
+      return { user: null, accessToken: null, refreshToken: null, isAuthenticated: false };
+    }
+
     const access = tokenStorage.getAccess();
     const refresh = tokenStorage.getRefresh();
     const stored = localStorage.getItem("clinical_ai_user");
@@ -143,7 +148,7 @@ function getInitialAuthState(): {
         isAuthenticated: true,
       };
     }
-    // Infer role from URL path if directly accessed
+    // Infer role from URL path if directly accessed on a protected route
     const path = window.location.pathname;
     if (path.startsWith("/user")) {
       return { user: EVALUATOR_PROFILES.PATIENT, accessToken: "eval-patient-token", refreshToken: "eval-patient-refresh", isAuthenticated: true };
@@ -161,7 +166,7 @@ function getInitialAuthState(): {
       return { user: EVALUATOR_PROFILES.DOCTOR, accessToken: "eval-doctor-token", refreshToken: "eval-doctor-refresh", isAuthenticated: true };
     }
   } catch {}
-  return { user: EVALUATOR_PROFILES.PATIENT, accessToken: "eval-patient-token", refreshToken: "eval-patient-refresh", isAuthenticated: true };
+  return { user: null, accessToken: null, refreshToken: null, isAuthenticated: false };
 }
 
 export const useAuthStore = create<AuthState>((set) => {
@@ -192,9 +197,16 @@ export const useAuthStore = create<AuthState>((set) => {
   logout: () => {
     tokenStorage.clear();
     if (typeof window !== "undefined") {
-      localStorage.removeItem("clinical_ai_user");
-      document.cookie = "clinical_role=; path=/; max-age=0";
-      document.cookie = "user_role=; path=/; max-age=0";
+      try {
+        localStorage.removeItem("clinical_ai_user");
+        localStorage.removeItem("clinical_ai_access_token");
+        localStorage.removeItem("clinical_ai_refresh_token");
+        sessionStorage.clear();
+        document.cookie = "clinical_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+        document.cookie = "user_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+        document.cookie = "clinical_role=; path=/; samesite=strict; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+        document.cookie = "user_role=; path=/; samesite=strict; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+      } catch {}
     }
     set({
       user: null,

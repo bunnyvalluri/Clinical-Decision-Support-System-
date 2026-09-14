@@ -327,9 +327,12 @@ export function Shell({ children }: ShellProps) {
               </div>
             </div>
             <button
-              onClick={() => {
+              onClick={async () => {
+                try {
+                  await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+                } catch {}
                 logout();
-                router.push("/login");
+                window.location.href = "/login?logout=true";
               }}
               title="Sign Out"
               className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-rose-600 transition-colors"

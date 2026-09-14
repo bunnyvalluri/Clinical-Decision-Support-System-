@@ -87,6 +87,12 @@ export function middleware(request: NextRequest) {
 
   // 2. Redirect authenticated users away from public auth pages to their authorized dashboard
   if (["/login", "/register", "/forgot-password", "/reset-password"].includes(pathname)) {
+    if (request.nextUrl.searchParams.get("logout") === "true") {
+      const res = NextResponse.next();
+      res.cookies.set("clinical_role", "", { path: "/", maxAge: 0, expires: new Date(0) });
+      res.cookies.set("user_role", "", { path: "/", maxAge: 0, expires: new Date(0) });
+      return res;
+    }
     if (roleCookie) {
       return NextResponse.redirect(new URL(getRoleDashboard(roleCookie), request.url));
     }
