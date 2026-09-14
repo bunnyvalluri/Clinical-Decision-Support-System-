@@ -100,7 +100,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { loginWithCredentials, loginAsRole } = useAuthStore();
 
-  const [activeTab, setActiveTab] = React.useState<"sandbox" | "credentials">("sandbox");
+  const [activeTab, setActiveTab] = React.useState<"sandbox" | "credentials">("credentials");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
@@ -357,7 +357,7 @@ export default function LoginPage() {
           {/* Header Title */}
           <div className="space-y-1.5 text-left">
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">
-              Clinician Authentication
+              Clinical Workstation Access
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
               Authorized clinical staff access to active ward telemetry, patient cohorts, and algorithmic risk models.
@@ -366,19 +366,6 @@ export default function LoginPage() {
 
           {/* Interactive Mode Segmented Switch */}
           <div className="p-1 rounded-xl bg-slate-200/80 border border-slate-300/70 grid grid-cols-2 gap-1 text-xs select-none shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setActiveTab("sandbox")}
-              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                activeTab === "sandbox"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <Zap className="h-3.5 w-3.5 text-amber-500" />
-              <span>1-Click Sandbox (Instant)</span>
-            </button>
-
             <button
               type="button"
               onClick={() => setActiveTab("credentials")}
@@ -390,6 +377,19 @@ export default function LoginPage() {
             >
               <Lock className="h-3.5 w-3.5 text-teal-600" />
               <span>Enterprise Sign In</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("sandbox")}
+              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeTab === "sandbox"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Zap className="h-3.5 w-3.5 text-amber-500" />
+              <span>1-Click Sandbox (Instant)</span>
             </button>
           </div>
 
