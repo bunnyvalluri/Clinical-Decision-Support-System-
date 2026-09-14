@@ -693,7 +693,85 @@ export default function LandingPage() {
                 </a>
               </div>
 
+              {/* 1-Click Role Workspace Sandbox */}
+              <div className="pt-2 sm:pt-4">
+                <div className="flex items-center gap-1.5 mb-2">
+                  <UserCheck className="h-4 w-4 text-teal-600 shrink-0" />
+                  <span className="text-[10px] sm:text-xs uppercase tracking-wider text-slate-500 font-mono font-bold">
+                    1-Click Clinician Workspace:
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
+                  {/* Doctor */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo("DOCTOR")}
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                        MD
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Cardiology</span>
+                    </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-teal-700 transition-colors truncate">
+                      Doctor
+                    </p>
+                  </button>
 
+                  {/* Nurse */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo("NURSE")}
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                        RN
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Triage</span>
+                    </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-sky-700 transition-colors truncate">
+                      Nurse
+                    </p>
+                  </button>
+
+                  {/* Analyst */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo("ANALYST")}
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                        MI
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Informatics</span>
+                    </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-amber-700 transition-colors truncate">
+                      Medical Informaticist
+                    </p>
+                  </button>
+
+                  {/* Admin */}
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo("ADMIN")}
+                    className="group p-2 sm:p-2.5 rounded-xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-sm transition-all text-left flex flex-col justify-between cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
+                        IT
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 truncate">Admin</span>
+                    </div>
+                    <p className="font-bold text-xs text-slate-900 group-hover:text-purple-700 transition-colors truncate">
+                      IT Administrator
+                    </p>
+                  </button>
+                </div>
+              </div>
+            </div>
 
             {/* Right Column: Clear Clinical Medical Frame */}
             <div className="lg:col-span-5 relative flex justify-center items-center px-1 sm:px-0 mt-3 lg:mt-0">
