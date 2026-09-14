@@ -10,6 +10,7 @@ import {
   ChevronRight,
   ShieldCheck,
   Send,
+  CheckCheck,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -95,6 +96,9 @@ export default function PatientMessagesPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-sm font-bold text-slate-900 truncate">{c.clinician_name}</h3>
                       <span className="text-[11px] text-slate-400">· {c.department}</span>
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] px-1.5 py-0 flex items-center gap-0.5">
+                        <CheckCheck className="h-2.5 w-2.5 text-emerald-600" /> Reported
+                      </Badge>
                       {c.unread_count > 0 && (
                         <Badge className="bg-teal-600 text-white text-[10px] px-1.5 py-0">New</Badge>
                       )}
