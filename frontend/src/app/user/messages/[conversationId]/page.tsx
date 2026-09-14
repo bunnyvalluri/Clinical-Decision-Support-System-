@@ -12,21 +12,21 @@ import { Input } from "@/components/ui/input";
 const INITIAL_MESSAGES = [
   {
     id: "m-1",
-    sender: "Dr. Elena Vance, MD",
+    sender: "Doctor",
     is_patient: false,
     timestamp: "Yesterday, 02:15 PM",
-    text: "Eleanor, your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs.",
+    text: "Your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs.",
   },
   {
     id: "m-2",
-    sender: "Eleanor Ward",
+    sender: "User / Patient",
     is_patient: true,
     timestamp: "Yesterday, 03:20 PM",
-    text: "Thank you Dr. Vance! I recorded 134/86 this morning and have been walking 25 minutes every morning without chest tightness.",
+    text: "Thank you Doctor! I recorded 134/86 this morning and have been walking 25 minutes every morning without chest tightness.",
   },
   {
     id: "m-3",
-    sender: "Dr. Elena Vance, MD",
+    sender: "Doctor",
     is_patient: false,
     timestamp: "Yesterday, 04:00 PM",
     text: "Excellent progress. We'll do a routine check of your resting ECG during Wednesday's clinic visit.",
@@ -45,7 +45,7 @@ export default function ConversationDetailPage() {
     if (!newText.trim()) return;
     const msg = {
       id: `m-${Date.now()}`,
-      sender: "Eleanor Ward",
+      sender: "User / Patient",
       is_patient: true,
       timestamp: "Just now",
       text: newText.trim(),
@@ -66,9 +66,9 @@ export default function ConversationDetailPage() {
         <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-slate-900">Dr. Elena Vance, MD</h2>
+              <h2 className="text-sm font-bold text-slate-900">Doctor</h2>
               <Badge className="bg-teal-50 text-teal-800 border-teal-200 text-[10px]">
-                Attending Cardiologist
+                Attending Physician
               </Badge>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">Subject: 30-Day Ambulatory Blood Pressure Review</p>
@@ -108,7 +108,7 @@ export default function ConversationDetailPage() {
             <Input
               value={newText}
               onChange={(e) => setNewText(e.target.value)}
-              placeholder="Type your message to Dr. Elena Vance..."
+              placeholder="Type your message to Doctor..."
               className="text-xs bg-white"
             />
             <Button type="submit" size="sm" className="bg-teal-600 hover:bg-teal-700 text-white text-xs gap-1.5">

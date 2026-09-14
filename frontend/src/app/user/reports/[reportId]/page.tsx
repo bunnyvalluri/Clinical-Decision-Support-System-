@@ -47,7 +47,7 @@ export default function ReportDetailPage() {
           </div>
           <div>
             <span className="text-slate-400">Supervising MD:</span>
-            <p className="font-bold text-slate-800 mt-0.5">Dr. Elena Vance, MD</p>
+            <p className="font-bold text-slate-800 mt-0.5">Doctor</p>
           </div>
           <div>
             <span className="text-slate-400">Classification:</span>
@@ -64,7 +64,7 @@ export default function ReportDetailPage() {
         <div className="p-4 rounded-xl bg-white border border-slate-200 space-y-3 text-xs leading-relaxed text-slate-700">
           <h3 className="font-bold text-slate-900 text-sm">Executive Clinical Summary</h3>
           <p>
-            Patient Eleanor Ward (MRN-90241) underwent cardiovascular evaluation following episodic exertional tightness. Resting hemodynamics demonstrate systolic blood pressure in the mild prehypertensive range (134 mmHg mean) with regular sinus rhythm.
+            The patient (MRN-90241) underwent cardiovascular evaluation following episodic exertional tightness. Resting hemodynamics demonstrate systolic blood pressure in the mild prehypertensive range (134 mmHg mean) with regular sinus rhythm.
           </p>
           <p>
             Ensemble random forest prediction algorithm calculated a 42.0% probability tier. In accordance with clinical guidelines, secondary pharmacological adjustment was not indicated at this juncture; continued ambulatory lifestyle intervention, sodium reduction, and routine 3-month clinic follow-up are prescribed.

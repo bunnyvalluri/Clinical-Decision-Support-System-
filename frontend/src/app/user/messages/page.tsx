@@ -19,16 +19,16 @@ import { Input } from "@/components/ui/input";
 const MOCK_CONVERSATIONS = [
   {
     id: "conv-01",
-    clinician_name: "Dr. Elena Vance, MD",
+    clinician_name: "Doctor",
     department: "Cardiology Care Team",
     subject: "30-Day Ambulatory Blood Pressure Review",
-    last_message: "Eleanor, your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction...",
+    last_message: "Your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction...",
     last_message_at: "Yesterday",
     unread_count: 0,
   },
   {
     id: "conv-02",
-    clinician_name: "Sarah Jenkins, RN",
+    clinician_name: "Nurse",
     department: "Triage & Patient Education",
     subject: "Preparation for Upcoming Telehealth Consultation",
     last_message: "Please ensure your blood pressure cuff is calibrated prior to Wednesday morning's checkup.",
@@ -47,7 +47,7 @@ export default function PatientMessagesPage() {
     e.preventDefault();
     const newConv = {
       id: `conv-${Date.now()}`,
-      clinician_name: "Dr. Elena Vance, MD",
+      clinician_name: "Doctor",
       department: "Cardiology Care Team",
       subject: subject || "Clinical Inquiry",
       last_message: message,
@@ -127,7 +127,7 @@ export default function PatientMessagesPage() {
             <form onSubmit={handleStart} className="space-y-3.5 text-xs">
               <div className="space-y-1">
                 <label className="font-semibold text-slate-700">Recipient</label>
-                <Input value="Dr. Elena Vance, MD (Attending Cardiologist)" disabled className="bg-slate-50 text-xs text-slate-500" />
+                <Input value="Doctor (Attending Physician)" disabled className="bg-slate-50 text-xs text-slate-500" />
               </div>
 
               <div className="space-y-1">

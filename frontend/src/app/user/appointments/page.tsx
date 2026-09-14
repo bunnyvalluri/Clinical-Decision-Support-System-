@@ -23,7 +23,7 @@ import { useUserWebSocket } from "@/hooks/useUserWebSocket";
 const MOCK_APPTS = [
   {
     id: "appt-01",
-    clinician_name: "Dr. Elena Vance, MD",
+    clinician_name: "Doctor",
     department: "Cardiology Outpatient Clinic",
     scheduled_time: new Date(Date.now() + 86400000 * 3).toISOString(),
     duration_minutes: 30,
@@ -34,7 +34,7 @@ const MOCK_APPTS = [
   },
   {
     id: "appt-02",
-    clinician_name: "Sarah Jenkins, RN",
+    clinician_name: "Nurse",
     department: "Preventive Care & Vitals Triage",
     scheduled_time: new Date(Date.now() + 86400000 * 14).toISOString(),
     duration_minutes: 20,
@@ -45,7 +45,7 @@ const MOCK_APPTS = [
   },
   {
     id: "appt-03",
-    clinician_name: "Dr. Elena Vance, MD",
+    clinician_name: "Doctor",
     department: "Cardiology Outpatient Clinic",
     scheduled_time: "2026-06-15T14:00:00Z",
     duration_minutes: 30,
@@ -122,7 +122,7 @@ export default function PatientAppointmentsPage() {
 
     const newAppt: AppointmentItem = {
       id: `appt-${Date.now()}`,
-      clinician_name: "Dr. Elena Vance, MD",
+      clinician_name: "Doctor",
       department: dept,
       scheduled_time: new Date(dateStr).toISOString(),
       duration_minutes: 30,

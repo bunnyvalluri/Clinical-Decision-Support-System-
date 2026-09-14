@@ -30,7 +30,7 @@ const INITIAL_NOTIFICATIONS = [
   {
     id: "notif-02",
     title: "Upcoming Appointment Reminder",
-    description: "You have an outpatient consultation with Dr. Elena Vance scheduled for Wednesday at 10:30 AM.",
+    description: "You have an outpatient consultation with Doctor scheduled for Wednesday at 10:30 AM.",
     category: "APPOINTMENT",
     timestamp: "2 hours ago",
     read: false,
@@ -39,7 +39,7 @@ const INITIAL_NOTIFICATIONS = [
   {
     id: "notif-03",
     title: "New Care Team Message",
-    description: "Dr. Elena Vance sent a message regarding your latest 30-day vitals trends.",
+    description: "Doctor sent a message regarding your latest 30-day vitals trends.",
     category: "MESSAGE",
     timestamp: "Yesterday",
     read: true,

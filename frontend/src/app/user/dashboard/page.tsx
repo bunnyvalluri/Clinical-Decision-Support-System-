@@ -87,7 +87,7 @@ export default function PatientDashboardPage() {
   const getFallbackData = React.useCallback((): DashboardData => {
     return {
       patient: {
-        full_name: user?.full_name || "Eleanor Ward",
+        full_name: user?.full_name || "User / Patient",
         mrn: user?.license_number || "MRN-90241",
         age: 68,
         gender: "Female",
@@ -113,7 +113,7 @@ export default function PatientDashboardPage() {
       },
       next_appointment: {
         id: "appt-demo-01",
-        clinician_name: "Dr. Elena Vance, MD",
+        clinician_name: "Doctor",
         department: "Cardiology Outpatient Clinic",
         scheduled_time: new Date(Date.now() + 86400000 * 3).toISOString(),
         location_or_link: "Suite 402 - Heart & Vascular Pavilion",
@@ -189,7 +189,7 @@ export default function PatientDashboardPage() {
           </div>
           <p className="text-xs text-slate-500">
             MRN: <span className="font-mono font-semibold text-slate-700">{data?.patient?.mrn || "MRN-90241"}</span> · 
-            Primary Care: <span className="font-medium text-slate-700">Dr. Elena Vance, MD (Cardiology)</span>
+            Primary Care: <span className="font-medium text-slate-700">Doctor (Cardiology)</span>
           </p>
         </div>
 
@@ -432,11 +432,11 @@ export default function PatientDashboardPage() {
             <CardContent className="pt-4 space-y-3">
               <div className="p-3 rounded-xl bg-teal-50/50 border border-teal-100 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-teal-900">Dr. Elena Vance, MD</span>
+                  <span className="text-xs font-bold text-teal-900">Doctor</span>
                   <span className="text-[10px] text-slate-400">Yesterday</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  &quot;Eleanor, your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs.&quot;
+                  &quot;Your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs.&quot;
                 </p>
               </div>
 

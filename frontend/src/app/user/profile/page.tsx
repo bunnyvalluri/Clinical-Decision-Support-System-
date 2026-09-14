@@ -61,7 +61,7 @@ export default function PatientProfilePage() {
               <User className="h-10 w-10" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">{user?.full_name || "Eleanor Ward"}</h2>
+              <h2 className="text-lg font-bold text-slate-900">{user?.full_name || "User / Patient"}</h2>
               <Badge className="mt-1 bg-teal-50 text-teal-800 border-teal-200 text-xs">
                 Cardiology Outpatient
               </Badge>
@@ -88,7 +88,7 @@ export default function PatientProfilePage() {
 
             <div className="pt-2 border-t border-slate-100 text-left">
               <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Primary Physician</span>
-              <p className="text-xs font-bold text-slate-800 mt-0.5">Dr. Elena Vance, MD</p>
+              <p className="text-xs font-bold text-slate-800 mt-0.5">Doctor</p>
               <p className="text-[11px] text-slate-500">Cardiology & Intensive Care</p>
             </div>
           </CardContent>

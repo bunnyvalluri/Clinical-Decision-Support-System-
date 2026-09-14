@@ -41,7 +41,7 @@ export default function AppointmentDetailPage() {
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-2">
             <div className="flex justify-between">
               <span className="text-slate-400">Attending Clinician:</span>
-              <span className="font-bold text-slate-800">Dr. Elena Vance, MD</span>
+              <span className="font-bold text-slate-800">Doctor</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Department:</span>

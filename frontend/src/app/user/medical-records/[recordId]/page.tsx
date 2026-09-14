@@ -47,7 +47,7 @@ export default function PatientMedicalRecordDetailPage() {
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
             <span className="text-slate-400">Attending Provider:</span>
-            <p className="font-bold text-slate-800 mt-0.5">Dr. Elena Vance, MD</p>
+            <p className="font-bold text-slate-800 mt-0.5">Doctor</p>
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
             <span className="text-slate-400">Blood Pressure:</span>
