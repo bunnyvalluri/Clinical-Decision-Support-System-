@@ -130,6 +130,24 @@ services:
       NODE_ENV: development
 
   # -------------------------------------------------------------------------
+  # PocketBase — auxiliary non-clinical microservice (UI state & announcements)
+  # -------------------------------------------------------------------------
+  pocketbase:
+    build:
+      context: ./services/pocketbase
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - pocketbase_data:/pb/pb_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/api/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+
+  # -------------------------------------------------------------------------
   # Nginx reverse proxy
   # -------------------------------------------------------------------------
   nginx:
@@ -147,3 +165,4 @@ volumes:
   redis_data:
   backend_media:
   backend_logs:
+  pocketbase_data:

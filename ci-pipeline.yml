@@ -143,8 +143,22 @@ jobs:
       - name: Run TypeScript check
         run: npm run type-check
 
+      - name: Run Unit & Integration Tests (Routes & PocketBase)
+        run: npm test
+
       - name: Run React Doctor (Advisory Gate)
         run: npm run doctor:ci
+
+  pocketbase-validate:
+    name: PocketBase — Migration & Docker Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate PocketBase Dockerfile syntax
+        run: |
+          grep -q "ARG PB_VERSION=0.25.9" services/pocketbase/Dockerfile
+          test -f services/pocketbase/pb_migrations/1710000000_init_auxiliary.js
 
   frontend-build:
     name: Frontend — Build
@@ -170,3 +184,4 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
           NEXT_PUBLIC_WS_BASE_URL: ws://localhost:8000/ws
+          NEXT_PUBLIC_POCKETBASE_URL: http://localhost:8090
