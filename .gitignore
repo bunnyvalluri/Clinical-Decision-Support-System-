@@ -28,8 +28,9 @@ backend/env/
 
 # Django & runtime
 *.log
-logs/
+/logs/
 backend/logs/
+!frontend/src/app/admin/logs/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
