@@ -145,6 +145,13 @@ export function ResponsiveAppShell({
     };
   }, [mobileDrawerOpen]);
 
+  // Auto-collapse sidebar rail on medium viewports (1024px to 1279px) so main content has ample width
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 1024 && window.innerWidth < 1280) {
+      setTabletRailCollapsed(true);
+    }
+  }, []);
+
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});

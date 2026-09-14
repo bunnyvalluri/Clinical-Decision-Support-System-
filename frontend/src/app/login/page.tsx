@@ -13,12 +13,12 @@ import {
   Eye,
   EyeOff,
   HeartPulse,
+  Key,
   Lock,
   Mail,
-  Radio,
-  Server,
   Shield,
   ShieldCheck,
+  Sparkles,
   Stethoscope,
   UserCheck,
   Users,
@@ -28,15 +28,75 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { useAuthStore, getRoleHomeRoute } from "@/features/auth/authStore";
+import { useAuthStore, getRoleHomeRoute, type RoleType } from "@/features/auth/authStore";
+
+const DEMO_ROLES = [
+  {
+    role: "DOCTOR" as RoleType,
+    initials: "MD",
+    badgeColor: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    hoverBorder: "hover:border-emerald-500 hover:bg-emerald-50/40",
+    activeText: "text-emerald-700",
+    title: "Attending Physician / Cardiologist",
+    department: "Cardiology & Intensive Care",
+    credentials: "dr.elena.vance@hospital.org",
+    summary: "Full patient EHR, TreeSHAP feature attributions & overrides",
+  },
+  {
+    role: "NURSE" as RoleType,
+    initials: "RN",
+    badgeColor: "bg-sky-50 border-sky-200 text-sky-700",
+    hoverBorder: "hover:border-sky-500 hover:bg-sky-50/40",
+    activeText: "text-sky-700",
+    title: "Emergency Triage Nurse",
+    department: "Emergency Medicine & Bedside",
+    credentials: "s.jenkins@hospital.org",
+    summary: "Bedside rapid triage, deterioration alarms & vitals entry",
+  },
+  {
+    role: "ANALYST" as RoleType,
+    initials: "MI",
+    badgeColor: "bg-amber-50 border-amber-200 text-amber-800",
+    hoverBorder: "hover:border-amber-500 hover:bg-amber-50/40",
+    activeText: "text-amber-700",
+    title: "Medical Informaticist & Data Analyst",
+    department: "Clinical Informatics & Data Science",
+    credentials: "alex.rivera@hospital.org",
+    summary: "Model registry governance, drift evaluation & calibration audits",
+  },
+  {
+    role: "ADMIN" as RoleType,
+    initials: "IT",
+    badgeColor: "bg-purple-50 border-purple-200 text-purple-700",
+    hoverBorder: "hover:border-purple-500 hover:bg-purple-50/40",
+    activeText: "text-purple-700",
+    title: "IT Infrastructure Administrator",
+    department: "IT Systems & Cybersecurity",
+    credentials: "m.chen@hospital.org",
+    summary: "Audit trails, RBAC permission roles & FHIR microservices",
+  },
+  {
+    role: "PATIENT" as RoleType,
+    initials: "PT",
+    badgeColor: "bg-teal-50 border-teal-200 text-teal-700",
+    hoverBorder: "hover:border-teal-500 hover:bg-teal-50/40",
+    activeText: "text-teal-700",
+    title: "User / Patient Portal",
+    department: "Cardiology Patient Portal",
+    credentials: "eleanor.ward@patient.hospital.org",
+    summary: "Personal telemetry trends, AI risk report & appointment management",
+  },
+];
 
 export default function LoginPage() {
   const router = useRouter();
   const { loginWithCredentials, loginAsRole } = useAuthStore();
 
+  const [activeTab, setActiveTab] = React.useState<"sandbox" | "credentials">("sandbox");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
+  const [rememberMe, setRememberMe] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -59,155 +119,174 @@ export default function LoginPage() {
       setError(
         apiErr?.response?.data?.detail ||
         apiErr?.response?.data?.error ||
-        "Authentication failed. Please verify your hospital email credentials."
+        "Authentication failed. Please verify your hospital email credentials or use the 1-Click Sandbox."
       );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleQuickDemo = (role: "DOCTOR" | "NURSE" | "ANALYST" | "ADMIN" | "PATIENT") => {
+  const handleQuickDemo = (role: RoleType) => {
     loginAsRole(role);
     router.push(getRoleHomeRoute(role));
   };
 
+  const handlePrefill = (roleItem: typeof DEMO_ROLES[0]) => {
+    setEmail(roleItem.credentials);
+    setPassword("ClinicalSecure#2026");
+    setActiveTab("credentials");
+  };
+
   return (
-    <div className="min-h-screen bg-white text-slate-900 grid grid-cols-1 lg:grid-cols-12 selection:bg-teal-500/20 selection:text-teal-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900 grid grid-cols-1 lg:grid-cols-12 selection:bg-teal-500/20 selection:text-teal-900 antialiased">
       {/* ------------------------------------------------------------------ */}
-      {/* Left Column: Brand & Clinical Authority Panel (Desktop) */}
+      {/* Left Column: Brand, Clinical Authority & Telemetry Showcase       */}
       {/* ------------------------------------------------------------------ */}
-      <div className="hidden lg:flex lg:col-span-5 xl:col-span-5 bg-slate-50/80 text-slate-900 relative flex-col justify-between p-10 xl:p-14 overflow-hidden border-r border-slate-200">
-        {/* Ambient clinical lighting effects */}
+      <div className="hidden lg:flex lg:col-span-5 xl:col-span-5 bg-white text-slate-900 relative flex-col justify-between p-8 xl:p-12 overflow-hidden border-r border-slate-200/90 shadow-sm">
+        {/* Subtle Ambient Backdrops */}
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none opacity-50" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none opacity-60" />
 
         {/* Top Branding */}
-        <div className="relative z-10 space-y-4">
+        <div className="relative z-10 space-y-3.5">
           <Link href="/" className="inline-flex items-center gap-3 group">
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5 group-hover:border-teal-400 transition-colors shadow-xs">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 group-hover:border-teal-500 transition-all shadow-xs group-hover:shadow-sm">
               <Image
                 src="/logo.png"
-                alt="PatientRisk Logo"
-                width={44}
-                height={44}
+                alt="PatientRisk CDSS Logo"
+                width={40}
+                height={40}
                 className="h-full w-full object-contain rounded-lg"
                 priority
               />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-lg font-extrabold tracking-tight text-slate-900 group-hover:text-teal-700 transition-colors">
+                <span className="text-lg font-extrabold tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors">
                   PatientRisk
                 </span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
                   CDSS
                 </span>
               </div>
               <span className="text-[10px] uppercase font-mono font-semibold text-slate-500 tracking-wider block">
-                Clinical Decision Support • SaMD
+                Clinical Decision Support System
               </span>
             </div>
           </Link>
 
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-[11px] font-mono text-teal-800 shadow-2xs">
-            <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
-            <span>FDA SaMD Class II Aligned • HIPAA Title II</span>
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-mono font-semibold text-emerald-800 shadow-2xs">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              FDA SaMD Class II Aligned
+            </span>
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 text-[11px] font-mono font-medium text-slate-600">
+              <ShieldCheck className="h-3 w-3 text-teal-600" />
+              HIPAA Title II
+            </span>
           </div>
         </div>
 
-        {/* Middle Authority Presentation */}
-        <div className="relative z-10 space-y-8 my-8">
-          <div className="space-y-3">
-            <h1 className="text-2xl xl:text-3xl font-extrabold tracking-tight text-slate-950 leading-snug">
-              High-Acuity Telemetry & <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-teal-700 to-sky-700">
-                Calibrated Explainable AI
+        {/* Center Authority & Live Simulated Telemetry Widget */}
+        <div className="relative z-10 space-y-6 my-6">
+          <div className="space-y-2.5">
+            <h1 className="text-2xl xl:text-3xl font-black tracking-tight text-slate-950 leading-tight">
+              High-Acuity Telemetry &amp;{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-600 via-emerald-600 to-sky-600">
+                Explainable AI
               </span>
             </h1>
-            <p className="text-xs xl:text-sm text-slate-600 leading-relaxed max-w-md">
-              Continuous multi-class patient risk stratification, transparent TreeSHAP feature attributions, and human-in-the-loop clinical override workflows.
+            <p className="text-xs xl:text-sm text-slate-600 leading-relaxed">
+              Multi-parameter real-time patient risk stratification, TreeSHAP clinical factor attribution, and sovereign clinician override workflows.
             </p>
           </div>
 
-          {/* Core Institutional Highlights */}
-          <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <div className="h-8 w-8 rounded-lg bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shrink-0 mt-0.5">
-                <HeartPulse className="h-4 w-4" />
+          {/* Real-time Telemetry Pulse Simulation Card */}
+          <div className="rounded-2xl border border-slate-200/90 bg-gradient-to-br from-slate-50/90 via-white to-teal-50/30 p-4 shadow-xs space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                </span>
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wide font-mono">
+                  Live Ward Telemetry Stream
+                </span>
               </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900">Platt-Calibrated Multiclass Inference</h4>
-                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                  Brier score 0.0027 on held-out patient cohorts with 0.136ms sub-millisecond execution.
-                </p>
+              <span className="text-[10px] font-mono text-slate-500 font-semibold bg-white px-2 py-0.5 rounded-md border border-slate-200">
+                0.136ms Latency
+              </span>
+            </div>
+
+            {/* SVG Waveform Simulation */}
+            <div className="relative h-12 w-full overflow-hidden rounded-lg bg-slate-900 px-2 flex items-center">
+              <svg className="h-8 w-full" viewBox="0 0 300 40" preserveAspectRatio="none">
+                <path
+                  d="M0,20 L40,20 L50,10 L60,30 L70,5 L80,35 L90,20 L140,20 L150,12 L160,28 L170,8 L180,32 L190,20 L240,20 L250,14 L260,26 L270,10 L280,30 L300,20"
+                  fill="none"
+                  stroke="#10b981"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute right-3 top-2.5 flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 font-bold bg-slate-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                <HeartPulse className="h-3 w-3 animate-pulse text-rose-400" />
+                <span>76 BPM · 98% SpO2</span>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <div className="h-8 w-8 rounded-lg bg-sky-50 border border-sky-200 flex items-center justify-center text-sky-700 shrink-0 mt-0.5">
-                <Activity className="h-4 w-4" />
+            <div className="grid grid-cols-2 gap-2 text-[11px] pt-0.5">
+              <div className="p-2 rounded-xl bg-white border border-slate-200/80 space-y-0.5">
+                <span className="text-[10px] text-slate-400 uppercase font-mono block">Inference Confidence</span>
+                <span className="font-bold text-teal-700">98.4% Platt Calibrated</span>
               </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900">Live TreeSHAP Factor Attributions</h4>
-                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                  Decomposes risk probabilities into signed clinical weights relative to baseline $E[f(x)]$.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
-              <div className="h-8 w-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 shrink-0 mt-0.5">
-                <ShieldCheck className="h-4 w-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-slate-900">Physician Override Sovereignty</h4>
-                <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
-                  Mandatory documented rationales bound to PostgreSQL audit records preserve human agency.
-                </p>
+              <div className="p-2 rounded-xl bg-white border border-slate-200/80 space-y-0.5">
+                <span className="text-[10px] text-slate-400 uppercase font-mono block">Explainability</span>
+                <span className="font-bold text-sky-700">TreeSHAP Attributions</span>
               </div>
             </div>
           </div>
 
-          {/* Clinician Testimonial Card */}
-          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-2.5">
-            <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs">
-                EV
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-slate-900">Dr. Elena Vance, MD</span>
-                  <CheckCircle2 className="h-3.5 w-3.5 text-teal-600" />
-                </div>
-                <span className="text-[10px] text-slate-500">Chief of Cardiology & ICU Telemetry</span>
-              </div>
+          {/* Attending Physician Endorsement */}
+          <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+              EV
             </div>
-            <p className="text-[11px] text-slate-600 italic leading-relaxed">
-              &quot;The platform gives our intensive care team immediate risk visibility during acute admissions while preserving attending diagnostic sovereignty.&quot;
-            </p>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-900 truncate">Dr. Elena Vance, MD</span>
+                <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+              </div>
+              <p className="text-[11px] text-slate-500 truncate">Chief of Cardiology &amp; ICU Telemetry</p>
+              <p className="text-[10px] text-slate-600 italic mt-0.5 leading-snug line-clamp-2">
+                &quot;The platform gives our intensive care team immediate risk visibility while preserving clinician diagnostic sovereignty.&quot;
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Compliance Badges */}
-        <div className="relative z-10 pt-4 border-t border-slate-200 flex items-center justify-between text-[10px] font-mono text-slate-500">
-          <div className="flex items-center gap-3">
+        {/* Bottom Compliance Bar */}
+        <div className="relative z-10 pt-4 border-t border-slate-200/80 flex items-center justify-between text-[10px] font-mono text-slate-500">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <span>HL7 FHIR v4.0.1</span>
             <span>•</span>
             <span>TLS 1.3 AES-256</span>
             <span>•</span>
             <span>SOC 2 Type II</span>
           </div>
-          <span className="text-emerald-600 font-bold">ONLINE</span>
+          <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+            SYSTEM ONLINE
+          </span>
         </div>
       </div>
 
       {/* ------------------------------------------------------------------ */}
-      {/* Right Column: Authentication Form */}
+      {/* Right Column: Interactive Workstation Authentication Form          */}
       {/* ------------------------------------------------------------------ */}
-      <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-between p-6 sm:p-12 xl:p-16 bg-[#f8fafc] overflow-y-auto">
-        {/* Top Header Bar */}
-        <div className="flex items-center justify-between pb-8">
+      <div className="lg:col-span-7 xl:col-span-7 flex flex-col justify-between p-5 sm:p-10 xl:p-14 overflow-y-auto">
+        {/* Top Navigation Bar */}
+        <div className="flex items-center justify-between pb-6 sm:pb-8 border-b border-slate-200/70">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 hover:text-slate-950 transition-colors"
@@ -218,24 +297,28 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-slate-200 text-[11px] font-mono font-medium text-slate-700 shadow-2xs">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Node 04 • TLS 1.3 Enforced</span>
+            <span>Node 04 · TLS 1.3 Enforced</span>
           </div>
         </div>
 
-        {/* Center Authentication Workstation Box */}
-        <div className="max-w-lg w-full mx-auto space-y-8 my-auto py-4">
-          {/* Mobile Logo Branding */}
-          <div className="lg:hidden text-center space-y-2 mb-6">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="h-10 w-10 rounded-xl border border-slate-200 bg-white p-0.5 shadow-xs">
-                <Image src="/logo.png" alt="PatientRisk Logo" width={40} height={40} className="rounded-lg object-contain" />
+        {/* Center Main Workstation Container */}
+        <div className="max-w-xl w-full mx-auto space-y-6 my-auto py-4">
+          {/* Mobile Logo Branding (visible on < 1024px) */}
+          <div className="lg:hidden text-center space-y-2 mb-4">
+            <Link href="/" className="inline-flex items-center gap-2.5">
+              <div className="h-10 w-10 rounded-xl border border-slate-200 bg-white p-1 shadow-xs">
+                <Image src="/logo.png" alt="PatientRisk Logo" width={36} height={36} className="rounded-lg object-contain" />
               </div>
-              <span className="text-lg font-bold text-slate-900">PatientRisk CDSS</span>
+              <div className="text-left">
+                <span className="text-base font-extrabold text-slate-950 block leading-tight">PatientRisk CDSS</span>
+                <span className="text-[10px] text-slate-500 font-mono block">Clinical Decision Support</span>
+              </div>
             </Link>
           </div>
 
-          <div className="space-y-2 text-left">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-950">
+          {/* Header Title */}
+          <div className="space-y-1.5 text-left">
+            <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950">
               Clinician Authentication
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
@@ -243,222 +326,220 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* 1-Click Fast Clinician Sandbox Selector */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-xs space-y-3 text-left">
-            <div className="flex items-center justify-between pb-1 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <UserCheck className="h-4 w-4 text-teal-600" />
-                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono">
-                  1-Click Sandbox Login
+          {/* Interactive Mode Segmented Switch */}
+          <div className="p-1 rounded-xl bg-slate-200/70 border border-slate-300/60 grid grid-cols-2 gap-1 text-xs select-none">
+            <button
+              type="button"
+              onClick={() => setActiveTab("sandbox")}
+              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeTab === "sandbox"
+                  ? "bg-white text-teal-800 shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Zap className="h-3.5 w-3.5 text-amber-500" />
+              <span>1-Click Sandbox (Instant)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("credentials")}
+              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeTab === "credentials"
+                  ? "bg-white text-teal-800 shadow-xs"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Lock className="h-3.5 w-3.5 text-teal-600" />
+              <span>Enterprise Sign In</span>
+            </button>
+          </div>
+
+          {/* TAB 1: 1-Click Fast Sandbox Selector */}
+          {activeTab === "sandbox" && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm space-y-4 text-left animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-4 w-4 text-teal-600" />
+                  <span className="text-xs font-bold text-slate-900 uppercase tracking-wider font-mono">
+                    Evaluation Sandbox Accounts
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-semibold self-start sm:self-auto">
+                  Instant Authorization Active
                 </span>
               </div>
-              <Badge variant="outline" className="text-[10px] font-mono bg-slate-50 text-slate-600 border-slate-200">
-                Evaluation Mode
-              </Badge>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-              {/* Doctor */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("DOCTOR")}
-                className="group p-3 rounded-xl border border-slate-200/90 bg-white hover:border-teal-400 hover:bg-teal-50/30 hover:shadow-xs transition-all text-left flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-bold text-xs">
-                    MD
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                      Doctor
-                    </h4>
-                    <p className="text-[10px] text-slate-500">Cardiology, ICU & Clinical Reviews</p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-teal-600 transition-colors" />
-              </button>
-
-              {/* Nurse */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("NURSE")}
-                className="group p-3 rounded-xl border border-slate-200/90 bg-white hover:border-sky-400 hover:bg-sky-50/30 hover:shadow-xs transition-all text-left flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center font-bold text-xs">
-                    RN
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-sky-700 transition-colors">
-                      Nurse
-                    </h4>
-                    <p className="text-[10px] text-slate-500">Bedside Care & Emergency Triage</p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-sky-600 transition-colors" />
-              </button>
-
-              {/* Medical Informaticist */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("ANALYST")}
-                className="group p-3 rounded-xl border border-slate-200/90 bg-white hover:border-amber-400 hover:bg-amber-50/30 hover:shadow-xs transition-all text-left flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center font-bold text-xs">
-                    MI
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-amber-700 transition-colors">
-                      Medical Informaticist
-                    </h4>
-                    <p className="text-[10px] text-slate-500">Data Quality, Models & Drift</p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-amber-600 transition-colors" />
-              </button>
-
-              {/* IT Administrator */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("ADMIN")}
-                className="group p-3 rounded-xl border border-slate-200/90 bg-white hover:border-purple-400 hover:bg-purple-50/30 hover:shadow-xs transition-all text-left flex items-center justify-between cursor-pointer"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center font-bold text-xs">
-                    IT
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                      IT Administrator
-                    </h4>
-                    <p className="text-[10px] text-slate-500">System Infrastructure, RBAC & Audit</p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-purple-600 transition-colors" />
-              </button>
-
-              {/* User / Patient */}
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("PATIENT")}
-                className="group p-3 rounded-xl border border-slate-200/90 bg-white hover:border-teal-500 hover:bg-teal-50/30 hover:shadow-xs transition-all text-left flex items-center justify-between cursor-pointer sm:col-span-2"
-              >
-                <div className="flex items-center gap-2.5">
-                  <div className="h-8 w-8 rounded-lg bg-teal-50 border border-teal-300 text-teal-700 flex items-center justify-center font-bold text-xs">
-                    PT
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
-                        User / Patient
-                      </h4>
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-teal-100 text-teal-800 font-semibold">
-                        Patient Portal
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-500">Risk Assessment, Health Summary, Appointments & Vitals</p>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-teal-600 transition-colors" />
-              </button>
-            </div>
-          </div>
-
-          {/* Form Divider */}
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-slate-200 w-full" />
-            <span className="bg-[#f8fafc] px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 shrink-0">
-              <Lock className="h-3 w-3" />
-              Or Sign In With Enterprise Credentials
-            </span>
-            <div className="border-t border-slate-200 w-full" />
-          </div>
-
-          {/* Credentials Authentication Form */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-md text-left">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="error" onDismiss={() => setError(null)}>
-                  {error}
-                </Alert>
-              )}
-
-              <Input
-                label="Hospital Staff Email"
-                type="email"
-                placeholder="e.g. dr.vance@hospital.org"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                prefixIcon={<Mail className="h-4 w-4" />}
-                autoComplete="email"
-                required
-              />
-
-              <div className="space-y-1.5">
-                <div className="relative">
-                  <Input
-                    label="Password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    prefixIcon={<Lock className="h-4 w-4" />}
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-8 text-slate-400 hover:text-slate-600 cursor-pointer"
+              <div className="space-y-2.5">
+                {DEMO_ROLES.map((roleItem) => (
+                  <div
+                    key={roleItem.role}
+                    className={`group p-3 rounded-xl border border-slate-200/90 bg-white ${roleItem.hoverBorder} transition-all text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs hover:shadow-xs`}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div
+                        className={`h-9 w-9 rounded-xl ${roleItem.badgeColor} border flex items-center justify-center font-black text-xs shrink-0 mt-0.5 shadow-2xs`}
+                      >
+                        {roleItem.initials}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <h4 className={`text-xs font-bold text-slate-900 group-hover:${roleItem.activeText} transition-colors truncate`}>
+                            {roleItem.title}
+                          </h4>
+                          {roleItem.role === "PATIENT" && (
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-teal-100 text-teal-800 font-semibold">
+                              Patient Portal
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-medium truncate">{roleItem.department}</p>
+                        <p className="text-[10px] text-slate-400 mt-0.5 truncate">{roleItem.summary}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                      <button
+                        type="button"
+                        onClick={() => handlePrefill(roleItem)}
+                        title="Copy credentials to form"
+                        className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-[11px] font-semibold text-slate-600 transition-colors"
+                      >
+                        Fill
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickDemo(roleItem.role)}
+                        className="px-3.5 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow transition-all flex items-center gap-1.5"
+                      >
+                        <span>Launch</span>
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100 flex items-center justify-between">
+                <span>Want to test custom credentials?</span>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("credentials")}
+                  className="font-bold text-teal-700 hover:underline cursor-pointer"
+                >
+                  Switch to Credentials Form →
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: Credentials Authentication Form */}
+          {activeTab === "credentials" && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm text-left animate-in fade-in duration-200 space-y-4">
+              {/* Quick-Fill Pills for convenient credential testing */}
+              <div className="space-y-1.5 pb-2 border-b border-slate-100">
+                <span className="text-[10px] font-mono uppercase font-bold text-slate-400 block">
+                  Quick-Fill Verified Credentials:
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {DEMO_ROLES.map((r) => (
+                    <button
+                      key={r.role}
+                      type="button"
+                      onClick={() => handlePrefill(r)}
+                      className="px-2 py-1 rounded-md text-[11px] font-semibold bg-slate-50 hover:bg-teal-50 border border-slate-200 hover:border-teal-300 text-slate-700 transition-colors"
+                    >
+                      {r.initials} · {r.role === "PATIENT" ? "Patient" : r.role}
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-xs pt-1">
-                <label className="flex items-center gap-2 text-slate-600 cursor-pointer font-medium">
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="rounded border-slate-300 text-teal-600 focus:ring-teal-500"
-                  />
-                  <span>Remember hospital terminal session</span>
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-teal-700 hover:text-teal-800 font-semibold transition-colors"
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <Alert variant="error" onDismiss={() => setError(null)}>
+                    {error}
+                  </Alert>
+                )}
+
+                <Input
+                  label="Hospital Staff or Patient Email"
+                  type="email"
+                  placeholder="e.g. dr.elena.vance@hospital.org"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  prefixIcon={<Mail className="h-4 w-4" />}
+                  autoComplete="email"
+                  required
+                />
+
+                <div className="space-y-1.5">
+                  <div className="relative">
+                    <Input
+                      label="Password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      prefixIcon={<Lock className="h-4 w-4" />}
+                      autoComplete="current-password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className="absolute right-3 top-8 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between text-xs gap-2 pt-1">
+                  <label className="flex items-center gap-2 text-slate-600 cursor-pointer font-medium select-none">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="rounded border-slate-300 text-teal-600 focus:ring-teal-500 h-3.5 w-3.5"
+                    />
+                    <span>Remember terminal session</span>
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-teal-700 hover:text-teal-800 font-semibold transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <Button
+                  type="submit"
+                  variant="default"
+                  isLoading={isLoading}
+                  className="w-full gap-2 text-xs sm:text-sm font-bold shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 mt-2 py-2.5 transition-all cursor-pointer"
                 >
-                  Forgot password?
+                  <span>Sign In to Clinical Decision Support</span>
+                  <ArrowRight className="h-4 w-4 text-white" />
+                </Button>
+              </form>
+
+              <div className="mt-6 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
+                <span>New clinical practitioner or patient? </span>
+                <Link
+                  href="/register"
+                  className="text-teal-700 hover:text-teal-800 font-bold transition-colors"
+                >
+                  Register new account →
                 </Link>
               </div>
-
-              <Button
-                type="submit"
-                variant="default"
-                isLoading={isLoading}
-                className="w-full gap-2 text-xs sm:text-sm font-bold shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 mt-2 py-2.5 transition-all"
-              >
-                <span>Sign In to Clinical Decision Support</span>
-                <ArrowRight className="h-4 w-4 text-white" />
-              </Button>
-            </form>
-
-            <div className="mt-6 border-t border-slate-100 pt-4 text-center text-xs text-slate-500">
-              <span>New hospital clinical practitioner? </span>
-              <Link
-                href="/register"
-                className="text-teal-700 hover:text-teal-800 font-bold transition-colors"
-              >
-                Request clinical staff account →
-              </Link>
             </div>
-          </div>
+          )}
 
-          {/* HIPAA & Compliance Disclaimer */}
-          <div className="p-3 rounded-xl bg-slate-100/80 border border-slate-200 text-[11px] text-slate-500 text-center leading-relaxed">
-            <span className="font-semibold text-slate-700">HIPAA Security Notice (45 CFR § 164.312):</span> Protected Health Information access is cryptographically audited. Unauthorized access is prohibited by federal statute.
+          {/* HIPAA & Regulatory Compliance Notice */}
+          <div className="p-3.5 rounded-xl bg-slate-100/90 border border-slate-200 text-[11px] text-slate-600 text-center leading-relaxed">
+            <span className="font-bold text-slate-800">HIPAA Security Notice (45 CFR § 164.312):</span> Protected Health Information access is cryptographically audited with role-based access enforcement.
           </div>
         </div>
 

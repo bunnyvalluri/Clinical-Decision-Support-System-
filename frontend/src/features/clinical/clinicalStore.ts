@@ -8,6 +8,11 @@ import {
   ClinicalNotification,
   ReportItem,
   MLModelDetail,
+  INITIAL_PATIENTS,
+  INITIAL_PREDICTIONS,
+  INITIAL_NOTIFICATIONS,
+  INITIAL_REPORTS,
+  INITIAL_MODELS,
 } from "@/services/clinicalData";
 import type { RiskLevel } from "@/types";
 
@@ -36,6 +41,44 @@ export interface DataQualityMetric {
   score: number;
   status: string;
 }
+
+const INITIAL_DATA_QUALITY_METRICS: DataQualityMetric[] = [
+  { id: "dq-1", metric_name: "Systolic Blood Pressure Completeness", score: 0.998, status: "PASSED" },
+  { id: "dq-2", metric_name: "Diastolic Blood Pressure Completeness", score: 0.996, status: "PASSED" },
+  { id: "dq-3", metric_name: "Heart Rate Conformance (30-220 bpm)", score: 0.994, status: "PASSED" },
+  { id: "dq-4", metric_name: "Serum Creatinine Lab Accuracy", score: 0.989, status: "PASSED" },
+  { id: "dq-5", metric_name: "Oxygen Saturation (SpO2 > 60%)", score: 0.997, status: "PASSED" },
+  { id: "dq-6", metric_name: "Blood Glucose Distribution (<3σ)", score: 0.982, status: "WARNING" },
+];
+
+const INITIAL_DRIFT_MONITORS = [
+  { id: "drift-1", feature_name: "Systolic Blood Pressure", drift_type: "Covariate Shift", drift_score: 0.038, detection_method: "PSI", drift_detected: false },
+  { id: "drift-2", feature_name: "Serum Creatinine", drift_type: "Covariate Shift", drift_score: 0.052, detection_method: "PSI", drift_detected: false },
+  { id: "drift-3", feature_name: "ST Depression", drift_type: "Concept Drift", drift_score: 0.045, detection_method: "KS-Test", drift_detected: false },
+  { id: "drift-4", feature_name: "Heart Rate Resting", drift_type: "Covariate Shift", drift_score: 0.027, detection_method: "PSI", drift_detected: false },
+  { id: "drift-5", feature_name: "Blood Glucose Level", drift_type: "Covariate Shift", drift_score: 0.041, detection_method: "PSI", drift_detected: false },
+];
+
+const INITIAL_MODEL_EVALUATIONS = [
+  { id: "ev-1", model_name: "RandomForestClassifier v1.0.0", roc_auc: 0.985, f1_score: 0.978, evaluation_date: "2026-09-12T14:30:00Z" },
+  { id: "ev-2", model_name: "SupportVectorMachine v0.9.4", roc_auc: 0.957, f1_score: 0.941, evaluation_date: "2026-09-10T10:15:00Z" },
+  { id: "ev-3", model_name: "AdaBoostClassifier v0.8.2", roc_auc: 0.949, f1_score: 0.932, evaluation_date: "2026-09-08T09:00:00Z" },
+];
+
+const INITIAL_LLM_EVALUATIONS = [
+  { id: "llm-1", evaluation_type: "SSC-2021 Sepsis Guideline Grounding", model_name: "ClinicalLlama-70B-Med", evaluation_date: "2026-09-13T16:00:00Z", overall_score: 0.984 },
+  { id: "llm-2", evaluation_type: "SaMD Advisory Boundary Defense", model_name: "ClinicalLlama-70B-Med", evaluation_date: "2026-09-13T12:20:00Z", overall_score: 1.0 },
+  { id: "llm-3", evaluation_type: "Prompt Injection & Jailbreak Hardening", model_name: "ClinicalLlama-70B-Med", evaluation_date: "2026-09-12T18:45:00Z", overall_score: 1.0 },
+  { id: "llm-4", evaluation_type: "KDIGO AKI Stage Recommendations", model_name: "ClinicalLlama-70B-Med", evaluation_date: "2026-09-11T11:10:00Z", overall_score: 0.976 },
+];
+
+const INITIAL_AUDIT_LOGS = [
+  { id: "aud-1", action_type: "MODEL_PROMOTION", action: "Promoted RandomForestClassifier v1.0.0 to Active Champion", user_email: "alex.rivera@hospital.org", user: "Alex Rivera, MSc", resource_type: "ModelRegistry", created_at: "2026-09-14T09:12:00Z" },
+  { id: "aud-2", action_type: "DRIFT_SWEEP", action: "Executed automated PSI & Kolmogorov-Smirnov drift scan", user_email: "system.mlops@hospital.org", user: "MLOps Worker #2", resource_type: "DriftMonitor", created_at: "2026-09-14T06:00:00Z" },
+  { id: "aud-3", action_type: "DATA_QUALITY_CHECK", action: "Feature Store ingestion integrity validated: 99.9% completeness", user_email: "system.mlops@hospital.org", user: "ETL Pipeline", resource_type: "FeatureStore", created_at: "2026-09-13T23:59:00Z" },
+  { id: "aud-4", action_type: "SAFETY_EVALUATION", action: "Ran Prompt 18 LLM adversarial jailbreak & grounding audit", user_email: "alex.rivera@hospital.org", user: "Alex Rivera, MSc", resource_type: "AIEvaluation", created_at: "2026-09-13T16:30:00Z" },
+  { id: "aud-5", action_type: "REPORT_EXPORT", action: "Exported Quarterly SaMD Regulatory Compliance Dossier (PDF)", user_email: "alex.rivera@hospital.org", user: "Alex Rivera, MSc", resource_type: "ReportingService", created_at: "2026-09-13T10:05:00Z" },
+];
 
 interface ClinicalStoreState {
   patients: Patient[];
@@ -138,20 +181,20 @@ function calculateStats(patients: Patient[], predictions: PredictionRecord[], mo
 }
 
 export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
-  patients: [],
-  predictions: [],
-  notifications: [],
-  reports: [],
-  models: [],
+  patients: INITIAL_PATIENTS,
+  predictions: INITIAL_PREDICTIONS,
+  notifications: INITIAL_NOTIFICATIONS,
+  reports: INITIAL_REPORTS,
+  models: INITIAL_MODELS,
   activityTimeline: INITIAL_TIMELINE,
-  stats: calculateStats([], [], []),
-  unreadAlertsCount: 0,
-  llmEvaluations: [],
-  auditLogs: [],
-  dataQualityMetrics: [],
-  driftMonitors: [],
-  modelEvaluations: [],
-  mlModels: [],
+  stats: calculateStats(INITIAL_PATIENTS, INITIAL_PREDICTIONS, INITIAL_MODELS),
+  unreadAlertsCount: INITIAL_NOTIFICATIONS.filter((n) => !n.read).length,
+  llmEvaluations: INITIAL_LLM_EVALUATIONS,
+  auditLogs: INITIAL_AUDIT_LOGS,
+  dataQualityMetrics: INITIAL_DATA_QUALITY_METRICS,
+  driftMonitors: INITIAL_DRIFT_MONITORS,
+  modelEvaluations: INITIAL_MODEL_EVALUATIONS,
+  mlModels: INITIAL_MODELS,
 
   setPatients: (patients) =>
     set((state) => ({

@@ -155,8 +155,7 @@ function NativeTelemetryChart({
     <div className="w-full relative select-none">
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="w-full h-48 sm:h-56 overflow-visible"
-        preserveAspectRatio="none"
+        className="w-full h-auto max-h-56 overflow-visible"
       >
         <defs>
           <linearGradient id="chartSysGrad" x1="0" y1="0" x2="0" y2="1">
@@ -623,7 +622,7 @@ export default function PatientDashboardPage() {
   const riskLevel = prediction?.prediction_result || "MEDIUM";
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto min-w-0">
+    <div className="space-y-6 w-full min-w-0">
       {/* Floating Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 animate-in slide-in-from-top-4 fade-in duration-200">
@@ -641,12 +640,12 @@ export default function PatientDashboardPage() {
       )}
 
       {/* Hero Welcome & Patient Identity Banner (Dedicated Clinical Light Mode) */}
-      <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 p-6 sm:p-7 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 p-5 sm:p-7 shadow-xs">
         {/* Subtle clinical accent top bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-600 via-emerald-500 to-sky-500" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3">
+          <div className="space-y-3 min-w-0 flex-1">
             {/* Live Status indicator & Regulatory tag */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
@@ -661,9 +660,9 @@ export default function PatientDashboardPage() {
               </span>
             </div>
 
-            {/* Dynamic Greeting */}
+            {/* Dynamic Greeting (Natural inline text wrapping) */}
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900">
                 {greeting},{" "}
                 <span className="text-teal-700">
                   {patient?.full_name || user?.full_name || "Eleanor"}
@@ -680,7 +679,7 @@ export default function PatientDashboardPage() {
               <button
                 onClick={() => handleCopyMrn(patient?.mrn || "MRN-PA-90241")}
                 title="Click to copy MRN"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-mono font-semibold transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 font-mono font-semibold transition-colors shadow-2xs shrink-0"
               >
                 <span>MRN: {patient?.mrn || "MRN-PA-90241"}</span>
                 {copiedMrn ? (
@@ -690,15 +689,15 @@ export default function PatientDashboardPage() {
                 )}
               </button>
 
-              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs shrink-0">
                 Age: <strong className="text-slate-900 font-bold">{patient?.age || 68}</strong> (Female)
               </span>
 
-              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs shrink-0">
                 Blood Group: <strong className="text-slate-900 font-bold">{patient?.blood_group || "A+"}</strong>
               </span>
 
-              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs flex items-center gap-1.5">
+              <span className="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 font-medium shadow-2xs flex items-center gap-1.5 shrink-0">
                 <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
                 <span>Dr. Sarah Lin (Cardiology)</span>
               </span>
@@ -706,11 +705,11 @@ export default function PatientDashboardPage() {
           </div>
 
           {/* Quick Action Hub */}
-          <div className="flex flex-wrap items-center gap-2.5 shrink-0 pt-2 lg:pt-0">
-            <Link href="/user/risk-assessment/new">
+          <div className="flex flex-wrap sm:flex-nowrap lg:flex-wrap items-center gap-2.5 shrink-0 pt-2 lg:pt-0 w-full sm:w-auto">
+            <Link href="/user/risk-assessment/new" className="w-full sm:w-auto">
               <Button
                 size="sm"
-                className="bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs gap-2 shadow-xs transition-colors"
+                className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs gap-2 shadow-xs transition-colors"
               >
                 <Sparkles className="h-3.5 w-3.5" /> Start Health Assessment
               </Button>
@@ -720,7 +719,7 @@ export default function PatientDashboardPage() {
               onClick={() => setShowLogModal(true)}
               variant="outline"
               size="sm"
-              className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 text-xs font-semibold gap-2 shadow-2xs transition-colors"
+              className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border-slate-200 text-xs font-semibold gap-2 shadow-2xs transition-colors"
             >
               <HeartPulse className="h-3.5 w-3.5 text-rose-500" /> Quick Log Vitals
             </Button>
@@ -729,7 +728,7 @@ export default function PatientDashboardPage() {
               onClick={handleExportSummary}
               variant="ghost"
               size="sm"
-              className="text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs gap-1.5 transition-colors border border-slate-200/60"
+              className="w-full sm:w-auto text-slate-600 hover:text-slate-900 hover:bg-slate-100 text-xs gap-1.5 transition-colors border border-slate-200/60"
             >
               <Download className="h-3.5 w-3.5 text-slate-500" /> Export PDF
             </Button>
@@ -737,38 +736,38 @@ export default function PatientDashboardPage() {
         </div>
       </div>
 
-      {/* Vital Metrics Grid (4 Interactive Telemetry Cards) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Vital Metrics Grid (4 Interactive Telemetry Cards: 1-col mobile, 2-col tablet/laptop, 4-col large desktop) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* Blood Pressure Card */}
         <Card className="bg-white border-slate-200/90 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-amber-500" />
           <CardContent className="p-4 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="h-10 w-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold shrink-0">
                   <HeartPulse className="h-5 w-5" />
                 </div>
-                <div>
-                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Blood Pressure</h2>
-                  <span className="text-[10px] text-slate-400">Target &lt; 120/80</span>
+                <div className="min-w-0">
+                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider truncate">Blood Pressure</h2>
+                  <span className="text-[10px] text-slate-400 block truncate">Target &lt; 120/80</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowLogModal(true)}
-                className="text-[11px] font-semibold text-rose-600 hover:text-rose-800 bg-rose-50/80 hover:bg-rose-100 px-2 py-0.5 rounded-md transition-colors"
+                className="text-[11px] font-semibold text-rose-600 hover:text-rose-800 bg-rose-50/80 hover:bg-rose-100 px-2 py-0.5 rounded-md transition-colors shrink-0"
               >
                 + Log
               </button>
             </div>
 
-            <div className="flex items-baseline justify-between pt-1">
+            <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
                 <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
                   {vitals?.systolic_bp ? `${vitals.systolic_bp}/${vitals.diastolic_bp}` : "134/86"}
                 </span>
                 <span className="ml-1.5 text-xs font-semibold text-slate-400">mmHg</span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 shrink-0">
                 <TrendingDown className="h-3 w-3" /> -2 mmHg
               </span>
             </div>
@@ -791,10 +790,10 @@ export default function PatientDashboardPage() {
                   );
                 })}
               </div>
-              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-medium">
-                <span>7 days ago</span>
-                <span className="text-slate-600 font-semibold">Moderate Control</span>
-                <span>Today</span>
+              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-medium gap-1">
+                <span className="shrink-0">7 days ago</span>
+                <span className="text-slate-600 font-semibold truncate text-center">Moderate Control</span>
+                <span className="shrink-0">Today</span>
               </div>
             </div>
           </CardContent>
@@ -804,47 +803,47 @@ export default function PatientDashboardPage() {
         <Card className="bg-white border-slate-200/90 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-emerald-500" />
           <CardContent className="p-4 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
                   <Activity className="h-5 w-5" />
                 </div>
-                <div>
-                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Resting Pulse</h2>
-                  <span className="text-[10px] text-slate-400">Target 60–100 bpm</span>
+                <div className="min-w-0">
+                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider truncate">Resting Pulse</h2>
+                  <span className="text-[10px] text-slate-400 block truncate">Target 60–100 bpm</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowLogModal(true)}
-                className="text-[11px] font-semibold text-amber-600 hover:text-amber-800 bg-amber-50/80 hover:bg-amber-100 px-2 py-0.5 rounded-md transition-colors"
+                className="text-[11px] font-semibold text-amber-600 hover:text-amber-800 bg-amber-50/80 hover:bg-amber-100 px-2 py-0.5 rounded-md transition-colors shrink-0"
               >
                 + Log
               </button>
             </div>
 
-            <div className="flex items-baseline justify-between pt-1">
+            <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
                 <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
                   {vitals?.heart_rate || 76}
                 </span>
                 <span className="ml-1.5 text-xs font-semibold text-slate-400">bpm</span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 shrink-0">
                 <CheckCircle2 className="h-3 w-3" /> Normal Rhythm
               </span>
             </div>
 
             <div className="pt-1">
-              <div className="h-8 w-full flex items-center justify-between px-2 bg-amber-50/50 rounded-lg border border-amber-100">
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-800">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                  <span>Sinus Rhythm (Normal)</span>
+              <div className="h-8 w-full flex items-center justify-between px-2 bg-amber-50/50 rounded-lg border border-amber-100 gap-1">
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 min-w-0">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="truncate">Sinus Rhythm (Normal)</span>
                 </div>
-                <span className="text-[10px] font-mono text-slate-500">Avg 74</span>
+                <span className="text-[10px] font-mono text-slate-500 shrink-0">Avg 74</span>
               </div>
-              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-medium">
-                <span>Min: 68 bpm</span>
-                <span>Max: 82 bpm</span>
+              <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-medium gap-1">
+                <span className="shrink-0">Min: 68 bpm</span>
+                <span className="shrink-0">Max: 82 bpm</span>
               </div>
             </div>
           </CardContent>
@@ -854,32 +853,32 @@ export default function PatientDashboardPage() {
         <Card className="bg-white border-slate-200/90 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-sky-500 to-teal-500" />
           <CardContent className="p-4 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="h-10 w-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
                   <Zap className="h-5 w-5" />
                 </div>
-                <div>
-                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Blood Oxygen</h2>
-                  <span className="text-[10px] text-slate-400">Target &gt; 95%</span>
+                <div className="min-w-0">
+                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider truncate">Blood Oxygen</h2>
+                  <span className="text-[10px] text-slate-400 block truncate">Target &gt; 95%</span>
                 </div>
               </div>
               <button
                 onClick={() => setShowLogModal(true)}
-                className="text-[11px] font-semibold text-sky-600 hover:text-sky-800 bg-sky-50/80 hover:bg-sky-100 px-2 py-0.5 rounded-md transition-colors"
+                className="text-[11px] font-semibold text-sky-600 hover:text-sky-800 bg-sky-50/80 hover:bg-sky-100 px-2 py-0.5 rounded-md transition-colors shrink-0"
               >
                 + Log
               </button>
             </div>
 
-            <div className="flex items-baseline justify-between pt-1">
+            <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
                 <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
                   {vitals?.spo2 || 98}
                 </span>
                 <span className="ml-1 text-xs font-semibold text-slate-400">%</span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/60">
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/60 shrink-0">
                 Optimal
               </span>
             </div>
@@ -891,9 +890,9 @@ export default function PatientDashboardPage() {
                   style={{ width: `${vitals?.spo2 || 98}%` }}
                 />
               </div>
-              <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium">
-                <span>Pulse Oximeter</span>
-                <span className="text-emerald-600 font-semibold">100% Saturation Max</span>
+              <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium gap-1">
+                <span className="truncate">Pulse Oximeter</span>
+                <span className="text-emerald-600 font-semibold shrink-0">100% Saturation Max</span>
               </div>
             </div>
           </CardContent>
@@ -903,25 +902,25 @@ export default function PatientDashboardPage() {
         <Card className="bg-white border-slate-200/90 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden group">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 to-indigo-500" />
           <CardContent className="p-4 sm:p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="h-10 w-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold shrink-0">
                   <TrendingUp className="h-5 w-5" />
                 </div>
-                <div>
-                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider">AI Risk Index</h2>
-                  <span className="text-[10px] text-slate-400">CardioEnsemble-RF</span>
+                <div className="min-w-0">
+                  <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider truncate">AI Risk Index</h2>
+                  <span className="text-[10px] text-slate-400 block truncate">CardioEnsemble-RF</span>
                 </div>
               </div>
               <Link
                 href="/user/predictions"
-                className="text-[11px] font-semibold text-teal-700 hover:text-teal-900 bg-teal-50/80 hover:bg-teal-100 px-2 py-0.5 rounded-md transition-colors"
+                className="text-[11px] font-semibold text-teal-700 hover:text-teal-900 bg-teal-50/80 hover:bg-teal-100 px-2 py-0.5 rounded-md transition-colors shrink-0"
               >
                 Details &gt;
               </Link>
             </div>
 
-            <div className="flex items-baseline justify-between pt-1">
+            <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
                 <span className="text-2xl sm:text-3xl font-black tracking-tight text-amber-700">
                   {riskScore}%
@@ -930,7 +929,7 @@ export default function PatientDashboardPage() {
                   {riskLevel}
                 </span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
                 95% CI: 36-48%
               </span>
             </div>
@@ -956,34 +955,34 @@ export default function PatientDashboardPage() {
         </Card>
       </div>
 
-      {/* Main Content Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Main Content Layout: Responsive grid (1-col on mobile/tablet/laptop, 3-col on xl: >= 1280px) */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Left 2 Columns: Clinical AI Assessment Deep-Dive & Telemetry Trends */}
-        <div className="lg:col-span-2 space-y-6 min-w-0">
+        <div className="xl:col-span-2 space-y-6 min-w-0">
           {/* AI Clinical Health Assessment Feature Card */}
           <Card className="bg-white border-slate-200/90 shadow-sm overflow-hidden">
             <CardHeader className="pb-4 border-b border-slate-100/80 bg-gradient-to-r from-slate-50 to-white">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-700 border border-teal-500/20">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2.5 rounded-xl bg-teal-500/10 text-teal-700 border border-teal-500/20 shrink-0">
                     <Sparkles className="h-5 w-5" />
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
                       <CardTitle className="text-base sm:text-lg font-bold text-slate-900">
                         AI Clinical Risk Analysis
                       </CardTitle>
-                      <Badge variant="medium" className="text-[11px] font-bold">
+                      <Badge variant="medium" className="text-[11px] font-bold shrink-0">
                         {riskLevel} RISK · {riskScore}%
                       </Badge>
                     </div>
-                    <CardDescription className="text-xs text-slate-500">
+                    <CardDescription className="text-xs text-slate-500 truncate">
                       Evaluated by {prediction?.model_name || "CardioEnsemble-RF"} {prediction?.model_version_str || "v1.4.2"} · Updated today
                     </CardDescription>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <Link href="/user/risk-assessment/new">
                     <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white text-xs gap-1.5 shadow-sm">
                       <RefreshCw className="h-3.5 w-3.5" /> Recalculate
@@ -997,7 +996,7 @@ export default function PatientDashboardPage() {
               {/* Radial Arc Gauge & Algorithmic Narrative Breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/90">
                 {/* SVG Radial Gauge */}
-                <div className="flex flex-col items-center justify-center text-center">
+                <div className="flex flex-col items-center justify-center text-center shrink-0">
                   <div className="relative w-36 h-36 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                       <circle
@@ -1043,7 +1042,7 @@ export default function PatientDashboardPage() {
                 </div>
 
                 {/* Algorithmic Narrative Breakdown */}
-                <div className="md:col-span-2 space-y-3">
+                <div className="md:col-span-2 space-y-3 min-w-0">
                   <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
                     {prediction?.explanation ||
                       "The clinical algorithm evaluates your cardiovascular risk index as moderate. Primary drivers include sustained systolic pressure at 134 mmHg and demographic age factors, balanced by stable oxygenation and continuous compliance with medications."}
@@ -1055,34 +1054,34 @@ export default function PatientDashboardPage() {
                       Key Contributing Risk Factors:
                     </span>
                     <div className="space-y-1.5 text-xs">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-600 flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-rose-500" />
-                          Systolic BP (134 mmHg average)
+                      <div className="flex flex-wrap items-baseline justify-between gap-1">
+                        <span className="text-slate-600 flex items-center gap-1.5 min-w-0">
+                          <span className="h-1.5 w-1.5 rounded-full bg-rose-500 shrink-0" />
+                          <span className="truncate">Systolic BP (134 mmHg average)</span>
                         </span>
-                        <span className="font-semibold text-rose-600">+18% risk weight</span>
+                        <span className="font-semibold text-rose-600 shrink-0">+18% risk weight</span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5">
                         <div className="bg-rose-500 h-1.5 rounded-full" style={{ width: "65%" }} />
                       </div>
 
-                      <div className="flex items-center justify-between pt-1">
-                        <span className="text-slate-600 flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                          Age &amp; Prior Clinical History
+                      <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
+                        <span className="text-slate-600 flex items-center gap-1.5 min-w-0">
+                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
+                          <span className="truncate">Age &amp; Prior Clinical History</span>
                         </span>
-                        <span className="font-semibold text-amber-600">+12% risk weight</span>
+                        <span className="font-semibold text-amber-600 shrink-0">+12% risk weight</span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5">
                         <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: "42%" }} />
                       </div>
 
-                      <div className="flex items-center justify-between pt-1">
-                        <span className="text-slate-600 flex items-center gap-1.5">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                          Optimal SpO2 (98%) &amp; Walking Activity
+                      <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
+                        <span className="text-slate-600 flex items-center gap-1.5 min-w-0">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          <span className="truncate">Optimal SpO2 (98%) &amp; Walking Activity</span>
                         </span>
-                        <span className="font-semibold text-emerald-600">-8% protective factor</span>
+                        <span className="font-semibold text-emerald-600 shrink-0">-8% protective factor</span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5">
                         <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: "30%" }} />
@@ -1098,7 +1097,7 @@ export default function PatientDashboardPage() {
                   <ShieldCheck className="h-4 w-4 text-teal-600" />
                   Personalized Care Recommendations
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
                     <p className="text-xs font-bold text-slate-800">1. Daily BP Logging</p>
                     <p className="text-[11px] text-slate-500 leading-snug">
@@ -1111,7 +1110,7 @@ export default function PatientDashboardPage() {
                       Target &lt; 2,000 mg dietary sodium to help reduce vascular arterial tension.
                     </p>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 sm:col-span-2 md:col-span-1">
                     <p className="text-xs font-bold text-slate-800">3. Clinician Review</p>
                     <p className="text-[11px] text-slate-500 leading-snug">
                       Discuss these 30-day telemetry trends during your appointment on Thursday.
@@ -1191,7 +1190,7 @@ export default function PatientDashboardPage() {
               </div>
             </CardHeader>
 
-            <CardContent className="p-5">
+            <CardContent className="p-4 sm:p-5">
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between text-xs gap-3 text-slate-600">
                   {chartTab === "bp" ? (
@@ -1229,23 +1228,23 @@ export default function PatientDashboardPage() {
           </Card>
         </div>
 
-        {/* Right Column: Daily Health Plan, Care Team & Appointments */}
-        <div className="space-y-6 min-w-0">
+        {/* Right Column: Daily Health Plan, Care Team & Appointments (Stacked in 1-col on xl, 3-col on lg, 2-col on md, 1-col on mobile) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1 gap-6 min-w-0">
           {/* Daily Health Plan & Task Checklist */}
           <Card className="bg-white border-slate-200/90 shadow-sm overflow-hidden">
             <CardHeader className="pb-3 border-b border-slate-100/80">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700 shrink-0">
                     <ClipboardList className="h-4 w-4" />
                   </div>
-                  <CardTitle className="text-sm font-bold text-slate-900">
+                  <CardTitle className="text-sm font-bold text-slate-900 truncate">
                     Daily Care Checklist
                   </CardTitle>
                 </div>
                 <button
                   onClick={() => setShowAddTaskInput(!showAddTaskInput)}
-                  className="text-xs font-semibold text-teal-600 hover:text-teal-800 flex items-center gap-1"
+                  className="text-xs font-semibold text-teal-600 hover:text-teal-800 flex items-center gap-1 shrink-0"
                 >
                   <Plus className="h-3.5 w-3.5" /> Add Task
                 </button>
@@ -1321,7 +1320,7 @@ export default function PatientDashboardPage() {
                     <div
                       key={task.id}
                       onClick={() => handleToggleTask(task.id)}
-                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none ${
+                      className={`p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 select-none min-w-0 ${
                         isDone
                           ? "bg-slate-50/70 border-slate-200/60 opacity-80"
                           : "bg-white border-slate-200 hover:border-teal-300 hover:shadow-xs"
@@ -1341,13 +1340,13 @@ export default function PatientDashboardPage() {
 
                       <div className="min-w-0 flex-1">
                         <p
-                          className={`text-xs font-semibold leading-snug transition-colors ${
+                          className={`text-xs font-semibold leading-snug transition-colors break-words ${
                             isDone ? "line-through text-slate-400" : "text-slate-800"
                           }`}
                         >
                           {task.title}
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
                           <span className="text-[10px] text-slate-400 font-medium">
                             {task.due_date}
                           </span>
@@ -1376,22 +1375,22 @@ export default function PatientDashboardPage() {
             <Card className="bg-white border-slate-200/90 shadow-sm overflow-hidden">
               <CardHeader className="pb-3 border-b border-slate-100/80 bg-gradient-to-r from-sky-50/40 to-white">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-sky-50 text-sky-700">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="p-1.5 rounded-lg bg-sky-50 text-sky-700 shrink-0">
                       <Calendar className="h-4 w-4" />
                     </div>
-                    <CardTitle className="text-sm font-bold text-slate-900">
+                    <CardTitle className="text-sm font-bold text-slate-900 truncate">
                       Upcoming Appointment
                     </CardTitle>
                   </div>
-                  <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200">
+                  <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-200 shrink-0">
                     In 3 Days
                   </span>
                 </div>
               </CardHeader>
 
               <CardContent className="p-4 sm:p-5 space-y-4">
-                <div className="flex items-start gap-3.5">
+                <div className="flex items-start gap-3.5 min-w-0">
                   {/* Calendar Badge */}
                   <div className="h-12 w-12 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center shrink-0">
                     <span className="text-[9px] font-black text-slate-400 uppercase">SEP</span>
@@ -1399,15 +1398,15 @@ export default function PatientDashboardPage() {
                   </div>
 
                   <div className="min-w-0 flex-1 space-y-0.5">
-                    <h4 className="text-xs font-bold text-slate-900">{nextAppt.clinician_name}</h4>
-                    <p className="text-xs text-slate-600">{nextAppt.department}</p>
+                    <h4 className="text-xs font-bold text-slate-900 truncate">{nextAppt.clinician_name}</h4>
+                    <p className="text-xs text-slate-600 truncate">{nextAppt.department}</p>
                     <p className="text-[11px] text-slate-500 flex items-center gap-1 pt-0.5">
-                      <Clock className="h-3 w-3 text-slate-400" />
-                      Thu, Sep 17 at 9:53 AM
+                      <Clock className="h-3 w-3 text-slate-400 shrink-0" />
+                      <span className="truncate">Thu, Sep 17 at 9:53 AM</span>
                     </p>
                     <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                      <MapPin className="h-3 w-3 text-slate-400" />
-                      {nextAppt.location_or_link}
+                      <MapPin className="h-3 w-3 text-slate-400 shrink-0" />
+                      <span className="truncate">{nextAppt.location_or_link}</span>
                     </p>
                   </div>
                 </div>
@@ -1417,24 +1416,24 @@ export default function PatientDashboardPage() {
                   <span className="font-bold text-slate-700 block">Pre-Visit Instructions:</span>
                   <div className="flex items-center gap-1.5 text-slate-500">
                     <CheckCircle2 className="h-3 w-3 text-teal-600 shrink-0" />
-                    <span>Bring 7-day home blood pressure log or app export</span>
+                    <span className="truncate">Bring 7-day home BP log or app export</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-slate-500">
                     <CheckCircle2 className="h-3 w-3 text-teal-600 shrink-0" />
-                    <span>Bring current medication containers for dosage verification</span>
+                    <span className="truncate">Bring current medication containers</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex flex-col sm:flex-row gap-2 pt-1">
                   <Link href="/user/appointments" className="flex-1">
-                    <Button variant="outline" size="sm" className="w-full text-xs border-slate-200">
+                    <Button variant="outline" size="sm" className="w-full text-xs border-slate-200 truncate">
                       Manage / Reschedule
                     </Button>
                   </Link>
                   <Button
                     onClick={() => showToast("Added to your digital calendar (.ics)!")}
                     size="sm"
-                    className="text-xs bg-slate-900 text-white hover:bg-slate-800 shrink-0"
+                    className="w-full sm:w-auto text-xs bg-slate-900 text-white hover:bg-slate-800 shrink-0"
                   >
                     Add to Cal
                   </Button>
@@ -1446,16 +1445,16 @@ export default function PatientDashboardPage() {
           {/* Care Team Quick Access Card */}
           <Card className="bg-white border-slate-200/90 shadow-sm overflow-hidden">
             <CardHeader className="pb-3 border-b border-slate-100/80">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700 shrink-0">
                     <MessageSquare className="h-4 w-4" />
                   </div>
-                  <CardTitle className="text-sm font-bold text-slate-900">
+                  <CardTitle className="text-sm font-bold text-slate-900 truncate">
                     Care Team Message
                   </CardTitle>
                 </div>
-                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   Online
                 </span>
@@ -1465,16 +1464,16 @@ export default function PatientDashboardPage() {
             <CardContent className="p-4 sm:p-5 space-y-3.5">
               <div className="p-3 rounded-xl bg-teal-50/40 border border-teal-100 space-y-2">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="h-7 w-7 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="h-7 w-7 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
                       SL
                     </div>
-                    <div>
-                      <p className="text-xs font-bold text-teal-950">Dr. Sarah Lin, MD</p>
-                      <p className="text-[10px] text-slate-400">Cardiology Specialist</p>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-teal-950 truncate">Dr. Sarah Lin, MD</p>
+                      <p className="text-[10px] text-slate-400 truncate">Cardiology Specialist</p>
                     </div>
                   </div>
-                  <span className="text-[10px] text-slate-400">Yesterday</span>
+                  <span className="text-[10px] text-slate-400 shrink-0">Yesterday</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed italic">
                   &quot;Your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know immediately if any dizziness occurs.&quot;
@@ -1490,11 +1489,11 @@ export default function PatientDashboardPage() {
                     <MessageSquare className="h-3.5 w-3.5" /> Reply to Care Team
                   </Button>
                 </Link>
-                <div className="flex items-center justify-between text-[11px] text-slate-500 px-1">
-                  <span>Urgent Clinic Triage:</span>
+                <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] text-slate-500 px-1">
+                  <span className="shrink-0">Urgent Clinic Triage:</span>
                   <a
                     href="tel:5550194820"
-                    className="font-semibold text-teal-700 hover:underline flex items-center gap-1"
+                    className="font-semibold text-teal-700 hover:underline flex items-center gap-1 shrink-0"
                   >
                     <Phone className="h-3 w-3" /> (555) 019-4820
                   </a>
