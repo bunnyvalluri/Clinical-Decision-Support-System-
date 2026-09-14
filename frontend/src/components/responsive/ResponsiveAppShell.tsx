@@ -202,7 +202,7 @@ export function ResponsiveAppShell({
                 wsConnected ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
               }`}
             />
-            <span className="hidden xs:inline">{wsStatusText}</span>
+            <span className="hidden xs:inline" suppressHydrationWarning>{wsStatusText}</span>
           </div>
 
           <button
