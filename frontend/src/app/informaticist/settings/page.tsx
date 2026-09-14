@@ -60,7 +60,7 @@ export default function InformaticistSettingsPage() {
         <Button
           size="sm"
           onClick={handleSave}
-          className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8"
+          className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 shadow-2xs font-semibold"
         >
           <Save className="h-3.5 w-3.5 mr-1.5" />
           Save Preferences

@@ -279,7 +279,7 @@ export default function InformaticistModelsPage() {
           <Button
             size="sm"
             onClick={() => setShowRegisterModal(true)}
-            className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8"
+            className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 shadow-2xs font-semibold"
           >
             <Plus className="h-3.5 w-3.5 mr-1.5" />
             Register Model
@@ -434,7 +434,7 @@ export default function InformaticistModelsPage() {
                   onClick={() => setStatusFilter(f.key)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                     statusFilter === f.key
-                      ? "bg-slate-900 text-white font-semibold"
+                      ? "bg-teal-600 text-white font-semibold shadow-2xs"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                   }`}
                 >
@@ -772,15 +772,16 @@ export default function InformaticistModelsPage() {
       {inspectModel && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in zoom-in-95">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="relative bg-gradient-to-r from-slate-50 via-teal-50/40 to-slate-50 border-b border-slate-200 p-5 flex items-center justify-between text-slate-900">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-sky-500" />
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-amber-400 font-bold">Architecture &amp; Calibration Inspector</span>
-                <h3 className="text-lg font-bold mt-0.5">{inspectModel.name}</h3>
-                <p className="text-xs text-slate-300 font-mono">{inspectModel.version} · {inspectModel.framework}</p>
+                <span className="inline-flex items-center text-[10px] uppercase tracking-wider font-mono font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2 py-0.5 rounded">Architecture &amp; Calibration Inspector</span>
+                <h3 className="text-lg font-bold mt-1 text-slate-950">{inspectModel.name}</h3>
+                <p className="text-xs text-slate-500 font-mono">{inspectModel.version} · {inspectModel.framework}</p>
               </div>
               <button
                 onClick={() => setInspectModel(null)}
-                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+                className="h-8 w-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 cursor-pointer shadow-2xs"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -864,14 +865,15 @@ export default function InformaticistModelsPage() {
       {showRegisterModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="relative bg-gradient-to-r from-slate-50 via-teal-50/40 to-slate-50 border-b border-slate-200 p-5 flex items-center justify-between text-slate-900">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-sky-500" />
               <div>
-                <h3 className="text-base font-bold">Register New Clinical Classifier</h3>
-                <p className="text-xs text-slate-400">Deploy candidate model to MLOps shadow validation queue.</p>
+                <h3 className="text-base font-bold text-slate-950">Register New Clinical Classifier</h3>
+                <p className="text-xs text-slate-500">Deploy candidate model to MLOps shadow validation queue.</p>
               </div>
               <button
                 onClick={() => setShowRegisterModal(false)}
-                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+                className="h-8 w-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 cursor-pointer shadow-2xs"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -933,7 +935,7 @@ export default function InformaticistModelsPage() {
                   setNotification("LightGBM-CardioDecompensation registered in Shadow validation queue.");
                   setTimeout(() => setNotification(null), 3000);
                 }}
-                className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8 font-semibold"
+                className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 font-semibold shadow-2xs"
               >
                 Submit for Shadow Validation
               </Button>

@@ -218,7 +218,7 @@ export default function InformaticistNotificationsPage() {
             onClick={() => setSelectedFilter(cat.key)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               selectedFilter === cat.key
-                ? "bg-slate-900 text-white font-semibold"
+                ? "bg-teal-600 text-white font-semibold shadow-2xs border-teal-600"
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >

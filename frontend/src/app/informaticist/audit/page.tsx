@@ -156,7 +156,7 @@ export default function InformaticistAuditPage() {
           <Button
             size="sm"
             onClick={handleExport}
-            className="text-xs h-8 bg-slate-900 hover:bg-slate-800 text-white"
+            className="text-xs h-8 bg-teal-600 hover:bg-teal-700 text-white shadow-2xs font-semibold"
           >
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Export Ledger
@@ -201,7 +201,7 @@ export default function InformaticistAuditPage() {
               onClick={() => setSelectedAction(f.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
                 selectedAction === f.key
-                  ? "bg-slate-900 text-white font-semibold"
+                  ? "bg-teal-600 text-white font-semibold shadow-2xs"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >

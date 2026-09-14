@@ -103,7 +103,7 @@ export default function DriftMonitorPage() {
               setFeedbackMessage("Drift audit telemetry exported as CSV.");
               setTimeout(() => setFeedbackMessage(null), 3000);
             }}
-            className="text-xs h-8 bg-slate-900 hover:bg-slate-800 text-white"
+            className="text-xs h-8 bg-teal-600 hover:bg-teal-700 text-white shadow-2xs font-semibold"
           >
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Export PSI Audit

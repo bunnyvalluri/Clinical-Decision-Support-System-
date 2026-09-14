@@ -35,7 +35,7 @@ export default function ModelRegistryPage() {
         </div>
 
         <Link href="/informaticist/models">
-          <Button size="sm" className="bg-slate-900 text-white text-xs h-8">
+          <Button size="sm" className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 shadow-2xs font-semibold">
             View All Registered Models
           </Button>
         </Link>

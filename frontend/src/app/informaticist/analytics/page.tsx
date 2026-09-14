@@ -94,7 +94,7 @@ export default function AnalyticsPage() {
           <Button
             size="sm"
             onClick={handleExport}
-            className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8"
+            className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 shadow-2xs font-semibold"
           >
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Export Telemetry

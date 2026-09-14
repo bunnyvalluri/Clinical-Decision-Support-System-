@@ -141,7 +141,7 @@ export default function InformaticistReportsPage() {
         <Button
           size="sm"
           onClick={() => setShowGenerateModal(true)}
-          className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8"
+          className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 shadow-2xs font-semibold"
         >
           <Plus className="h-3.5 w-3.5 mr-1.5" />
           Generate New Report
@@ -172,7 +172,7 @@ export default function InformaticistReportsPage() {
             onClick={() => setFilterCategory(cat.key)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
               filterCategory === cat.key
-                ? "bg-slate-900 text-white font-semibold"
+                ? "bg-teal-600 text-white font-semibold shadow-2xs border-teal-600"
                 : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
             }`}
           >
@@ -232,14 +232,15 @@ export default function InformaticistReportsPage() {
       {showGenerateModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in">
-            <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
+            <div className="relative bg-gradient-to-r from-slate-50 via-teal-50/40 to-slate-50 border-b border-slate-200 p-5 flex items-center justify-between text-slate-900">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-500 via-emerald-500 to-sky-500" />
               <div>
-                <h3 className="text-base font-bold">Generate Informatics Report</h3>
-                <p className="text-xs text-slate-400">Compile formal SaMD or MLOps audit documentation.</p>
+                <h3 className="text-base font-bold text-slate-950">Generate Informatics Report</h3>
+                <p className="text-xs text-slate-500">Compile formal SaMD or MLOps audit documentation.</p>
               </div>
               <button
                 onClick={() => setShowGenerateModal(false)}
-                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+                className="h-8 w-8 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-600 hover:text-slate-900 cursor-pointer shadow-2xs"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -269,7 +270,7 @@ export default function InformaticistReportsPage() {
                       type="button"
                       onClick={() => setSelectedRange(r)}
                       className={`py-2 rounded-lg font-semibold text-xs border transition-all ${
-                        selectedRange === r ? "bg-slate-900 text-white border-slate-900" : "bg-slate-50 border-slate-200 text-slate-700"
+                        selectedRange === r ? "bg-teal-600 text-white border-teal-600 shadow-2xs" : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100"
                       }`}
                     >
                       {r}
@@ -294,7 +295,7 @@ export default function InformaticistReportsPage() {
                 size="sm"
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8 font-semibold"
+                className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 font-semibold shadow-2xs"
               >
                 {isGenerating ? <RefreshCw className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Sparkles className="h-3.5 w-3.5 mr-1.5" />}
                 {isGenerating ? "Compiling Dossier..." : "Compile & Download"}
