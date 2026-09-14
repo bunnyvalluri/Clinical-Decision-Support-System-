@@ -428,6 +428,12 @@ export function MobileFloatingNavigation({
     return resolveActiveNavItemId(pathname, navItems);
   }, [pathname, navItems]);
 
+  // Active item index for moving liquid glass pill
+  const activeIndex = React.useMemo(() => {
+    const idx = navItems.findIndex((item) => item.id === activeItemId);
+    return idx >= 0 ? idx : 0;
+  }, [navItems, activeItemId]);
+
   return (
     <nav
       role="navigation"
@@ -438,7 +444,34 @@ export function MobileFloatingNavigation({
         bottom: "calc(0.75rem + env(safe-area-inset-bottom, 0px))",
       }}
     >
-      <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.08),0_1px_3px_rgb(0,0,0,0.05)] px-1 sm:px-1.5 py-1.5 flex items-center justify-between">
+      <div className="relative bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-[0_10px_35px_rgba(15,23,42,0.1),0_2px_6px_rgba(15,23,42,0.04),inset_0_1px_1.5px_rgba(255,255,255,1)] px-1 sm:px-1.5 py-1.5 flex items-center justify-between overflow-hidden">
+        {/* ================================================================ */}
+        {/* Liquid Glass Moving Part (Light Mode Dedicated Active Indicator) */}
+        {/* ================================================================ */}
+        <div
+          aria-hidden="true"
+          className="absolute top-1.5 bottom-1.5 transition-all duration-400 ease-[cubic-bezier(0.34,1.4,0.64,1)] pointer-events-none rounded-xl sm:rounded-2xl z-0"
+          style={{
+            width: `calc(${100 / navItems.length}% - 6px)`,
+            left: `calc(${activeIndex * (100 / navItems.length)}% + 3px)`,
+          }}
+        >
+          {/* Liquid Glass Pill Body */}
+          <div className="relative w-full h-full rounded-xl sm:rounded-2xl overflow-hidden liquid-glass-indicator">
+            {/* Top Specular Reflection Highlight Arc */}
+            <div className="absolute inset-x-0 top-0 h-[48%] bg-gradient-to-b from-white/95 via-white/40 to-transparent pointer-events-none" />
+
+            {/* Diagonal Moving Glass Shimmer */}
+            <div className="absolute -inset-full top-0 w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/60 to-transparent pointer-events-none liquid-glass-shimmer-effect" />
+
+            {/* Refractive Cyan/Teal Liquid Caustic Underglow */}
+            <div className="absolute -bottom-1 inset-x-2 h-3.5 bg-gradient-to-r from-teal-400/35 via-sky-400/35 to-emerald-400/35 rounded-full blur-xs pointer-events-none" />
+          </div>
+
+          {/* Liquid Droplet Pill Accent */}
+          <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4 sm:w-5 h-1 rounded-full bg-gradient-to-r from-teal-600 via-teal-500 to-sky-600 shadow-[0_2px_6px_rgba(13,148,136,0.45)] pointer-events-none liquid-droplet-glow" />
+        </div>
+
         {navItems.map((item) => {
           const isActive = item.id === activeItemId;
           const Icon = item.icon;
@@ -455,10 +488,10 @@ export function MobileFloatingNavigation({
                   : item.label
               }
               data-testid={`mobile-nav-${item.label.toLowerCase()}`}
-              className={`touch-target flex-1 min-w-0 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl sm:rounded-2xl transition-all duration-200 relative group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-1 active:scale-95 ${
+              className={`touch-target flex-1 min-w-0 flex flex-col items-center justify-center py-1 px-0.5 rounded-xl sm:rounded-2xl transition-all duration-200 relative z-10 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-1 active:scale-95 ${
                 isActive
                   ? "text-slate-950 font-bold"
-                  : "text-slate-600 hover:text-slate-900 font-medium"
+                  : "text-slate-500 hover:text-slate-800 font-medium"
               }`}
             >
               {/* Icon Container with Badge */}
@@ -467,8 +500,8 @@ export function MobileFloatingNavigation({
                   strokeWidth={isActive ? 2.3 : 1.75}
                   className={`h-5 w-5 transition-all duration-200 ${
                     isActive
-                      ? "text-slate-950 scale-105"
-                      : "text-slate-600 group-hover:text-slate-900"
+                      ? "text-teal-950 scale-105 drop-shadow-xs"
+                      : "text-slate-500 group-hover:text-slate-800"
                   }`}
                   aria-hidden="true"
                 />
@@ -498,20 +531,12 @@ export function MobileFloatingNavigation({
               <span
                 className={`text-[10px] xs:text-[11px] leading-tight mt-1 truncate max-w-full text-center tracking-tight transition-all duration-200 ${
                   isActive
-                    ? "text-slate-950 font-bold"
-                    : "text-slate-600 group-hover:text-slate-900 font-medium"
+                    ? "text-slate-950 font-bold drop-shadow-2xs"
+                    : "text-slate-500 group-hover:text-slate-800 font-medium"
                 }`}
               >
                 {item.label}
               </span>
-
-              {/* Active Indicator Bar */}
-              {isActive && (
-                <span
-                  className="absolute bottom-0.5 h-0.75 w-3.5 sm:w-4 rounded-full bg-slate-950 transition-all duration-200"
-                  aria-hidden="true"
-                />
-              )}
             </Link>
           );
         })}

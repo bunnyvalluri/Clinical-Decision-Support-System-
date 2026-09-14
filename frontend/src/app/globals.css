@@ -174,3 +174,56 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ==========================================================================
+   Liquid Glass Navigation Effects (Light Mode Dedicated)
+   ========================================================================== */
+
+@keyframes liquid-glass-shimmer {
+  0% {
+    transform: translateX(-180%) rotate(25deg);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.7;
+  }
+  70% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(280%) rotate(25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes liquid-droplet-pulse {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(1) scaleY(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.18) scaleY(1.12);
+    opacity: 1;
+  }
+}
+
+.liquid-glass-indicator {
+  backdrop-filter: blur(16px) saturate(190%);
+  -webkit-backdrop-filter: blur(16px) saturate(190%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 253, 250, 0.75) 50%, rgba(255, 255, 255, 0.58) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 8px 24px -3px rgba(13, 148, 136, 0.18),
+    0 2px 6px -1px rgba(15, 23, 42, 0.05),
+    inset 0 1.5px 2px rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px rgba(13, 148, 136, 0.12);
+}
+
+.liquid-glass-shimmer-effect {
+  animation: liquid-glass-shimmer 4.5s ease-in-out infinite;
+}
+
+.liquid-droplet-glow {
+  animation: liquid-droplet-pulse 3s ease-in-out infinite;
+}
+
