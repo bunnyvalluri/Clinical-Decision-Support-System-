@@ -317,60 +317,117 @@ export default function DriftMonitorPage() {
                 Monitored Clinical Biomarker Feature Drift Matrix
               </CardTitle>
               <CardDescription className="text-xs text-slate-500">
-                Continuous PSI and non-parametric two-sample Kolmogorov-Smirnov test statistics calculated hourly.
+                Continuous PSI and non-parametric two-sample Kolmogorov-Smirnov test statistics calculated hourly. Tap any biomarker to view its divergence distribution.
               </CardDescription>
             </CardHeader>
 
-            <CardContent className="p-0 overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Clinical Biomarker</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Baseline Mean</TableHead>
-                    <TableHead>Current Mean</TableHead>
-                    <TableHead>PSI Score</TableHead>
-                    <TableHead>KS Statistic</TableHead>
-                    <TableHead>p-Value</TableHead>
-                    <TableHead>Trend</TableHead>
-                    <TableHead className="text-right">Drift Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {BIOMARKER_DRIFT_DATA.map(b => (
-                    <TableRow
-                      key={b.feature}
-                      onClick={() => setSelectedBiomarker(b.feature)}
-                      className={`cursor-pointer transition-colors ${
-                        selectedBiomarker === b.feature ? "bg-amber-50/50 font-medium" : "hover:bg-slate-50/70"
-                      }`}
-                    >
-                      <TableCell className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-                        {b.feature}
-                        {selectedBiomarker === b.feature && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />}
-                      </TableCell>
-                      <TableCell className="text-xs text-slate-500">{b.category}</TableCell>
-                      <TableCell className="font-mono text-xs text-slate-700">{b.baselineMean} {b.unit}</TableCell>
-                      <TableCell className="font-mono text-xs text-slate-700">{b.currentMean} {b.unit}</TableCell>
-                      <TableCell className="font-mono text-xs font-bold text-emerald-700">{b.psi.toFixed(3)}</TableCell>
-                      <TableCell className="font-mono text-xs text-slate-700">{b.ksStat.toFixed(3)}</TableCell>
-                      <TableCell className="font-mono text-xs text-slate-700">{b.ksPVal.toFixed(3)}</TableCell>
-                      <TableCell>
+            <CardContent className="p-0">
+              {/* Mobile Card View (< md) */}
+              <div className="md:hidden divide-y divide-slate-100">
+                {BIOMARKER_DRIFT_DATA.map((b) => (
+                  <div
+                    key={b.feature}
+                    onClick={() => setSelectedBiomarker(b.feature)}
+                    className={`p-4 space-y-3 cursor-pointer transition-colors ${
+                      selectedBiomarker === b.feature ? "bg-amber-50/40 border-l-4 border-amber-500" : "hover:bg-slate-50/70"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900">
+                          <span>{b.feature}</span>
+                          {selectedBiomarker === b.feature && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                          )}
+                        </div>
+                        <span className="text-[11px] text-slate-500">{b.category}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
                         <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
                           b.trend === "STABLE" ? "bg-slate-100 text-slate-700" : "bg-amber-50 text-amber-700"
                         }`}>
                           {b.trend}
                         </span>
-                      </TableCell>
-                      <TableCell className="text-right">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                           {b.status}
                         </span>
-                      </TableCell>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">Baseline Mean</span>
+                        <span className="font-mono font-semibold text-slate-700">{b.baselineMean} {b.unit}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">Current Mean</span>
+                        <span className="font-mono font-semibold text-slate-700">{b.currentMean} {b.unit}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">PSI Score</span>
+                        <span className="font-mono font-bold text-emerald-700">{b.psi.toFixed(3)}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">KS Stat (p-val)</span>
+                        <span className="font-mono text-slate-700">{b.ksStat.toFixed(3)} ({b.ksPVal.toFixed(2)})</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table View (>= md) */}
+              <div className="hidden md:block overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Clinical Biomarker</TableHead>
+                      <TableHead>Category</TableHead>
+                      <TableHead>Baseline Mean</TableHead>
+                      <TableHead>Current Mean</TableHead>
+                      <TableHead>PSI Score</TableHead>
+                      <TableHead>KS Statistic</TableHead>
+                      <TableHead>p-Value</TableHead>
+                      <TableHead>Trend</TableHead>
+                      <TableHead className="text-right">Drift Status</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {BIOMARKER_DRIFT_DATA.map(b => (
+                      <TableRow
+                        key={b.feature}
+                        onClick={() => setSelectedBiomarker(b.feature)}
+                        className={`cursor-pointer transition-colors ${
+                          selectedBiomarker === b.feature ? "bg-amber-50/50 font-medium" : "hover:bg-slate-50/70"
+                        }`}
+                      >
+                        <TableCell className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                          {b.feature}
+                          {selectedBiomarker === b.feature && <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />}
+                        </TableCell>
+                        <TableCell className="text-xs text-slate-500">{b.category}</TableCell>
+                        <TableCell className="font-mono text-xs text-slate-700">{b.baselineMean} {b.unit}</TableCell>
+                        <TableCell className="font-mono text-xs text-slate-700">{b.currentMean} {b.unit}</TableCell>
+                        <TableCell className="font-mono text-xs font-bold text-emerald-700">{b.psi.toFixed(3)}</TableCell>
+                        <TableCell className="font-mono text-xs text-slate-700">{b.ksStat.toFixed(3)}</TableCell>
+                        <TableCell className="font-mono text-xs text-slate-700">{b.ksPVal.toFixed(3)}</TableCell>
+                        <TableCell>
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                            b.trend === "STABLE" ? "bg-slate-100 text-slate-700" : "bg-amber-50 text-amber-700"
+                          }`}>
+                            {b.trend}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                            {b.status}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>

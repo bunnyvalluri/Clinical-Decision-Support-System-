@@ -480,12 +480,12 @@ export default function AdminSecurityPage() {
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             {/* Severity filter pills */}
-            <div className="flex items-center rounded-lg bg-slate-100 p-0.5">
+            <div className="flex items-center rounded-lg bg-slate-100 p-0.5 overflow-x-auto max-w-full">
               {(["ALL", "CRITICAL", "HIGH", "MEDIUM", "LOW"] as const).map((sev) => (
                 <button
                   key={sev}
                   onClick={() => setSeverityFilter(sev)}
-                  className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors ${
+                  className={`px-2 py-1 text-[10px] font-bold rounded-md transition-colors shrink-0 ${
                     severityFilter === sev
                       ? "bg-white text-slate-900 shadow-sm"
                       : "text-slate-500 hover:text-slate-900"
@@ -508,99 +508,180 @@ export default function AdminSecurityPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-slate-50/50">
-                <TableHead className="w-36 text-xs font-bold text-slate-700">Timestamp</TableHead>
-                <TableHead className="w-24 text-xs font-bold text-slate-700">Severity</TableHead>
-                <TableHead className="w-48 text-xs font-bold text-slate-700">Event Type</TableHead>
-                <TableHead className="text-xs font-bold text-slate-700">Details</TableHead>
-                <TableHead className="w-32 text-xs font-bold text-slate-700">Source IP</TableHead>
-                <TableHead className="w-36 text-right text-xs font-bold text-slate-700">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredEvents.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10 text-xs text-slate-500">
-                    No security incidents match the selected filter.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredEvents.map((evt) => (
-                  <TableRow key={evt.id} className="hover:bg-slate-50/80 transition-colors">
-                    <TableCell className="text-xs font-mono text-slate-500 whitespace-nowrap">
-                      {evt.timestamp}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          evt.severity === "CRITICAL"
-                            ? "destructive"
-                            : evt.severity === "HIGH"
-                            ? "destructive"
-                            : evt.severity === "MEDIUM"
-                            ? "warning"
-                            : "outline"
-                        }
-                        className="text-[10px] font-bold"
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredEvents.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                No security incidents match the selected filter.
+              </div>
+            ) : (
+              filteredEvents.map((evt) => (
+                <div key={evt.id} className="p-4 space-y-2.5 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[11px] font-mono text-slate-500">{evt.timestamp}</span>
+                    <Badge
+                      variant={
+                        evt.severity === "CRITICAL"
+                          ? "destructive"
+                          : evt.severity === "HIGH"
+                          ? "destructive"
+                          : evt.severity === "MEDIUM"
+                          ? "warning"
+                          : "outline"
+                      }
+                      className="text-[10px] font-bold"
+                    >
+                      {evt.severity}
+                    </Badge>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-slate-900">
+                    {evt.quarantined && <Ban className="h-3.5 w-3.5 text-rose-500 shrink-0" />}
+                    <span>{evt.type}</span>
+                  </div>
+
+                  <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-100 space-y-1">
+                    <p className="text-xs text-slate-700 leading-relaxed">{evt.details}</p>
+                    <span className="text-[10px] font-medium text-emerald-700 block">
+                      {evt.actionTaken}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <div className="flex items-center gap-1.5 font-mono text-xs text-slate-600">
+                      <span>{evt.sourceIp}</span>
+                      {evt.quarantined && (
+                        <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[9px] px-1 py-0 font-mono">
+                          QUARANTINED
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedEvent(evt)}
+                        className="h-7 px-2 text-[11px] font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100"
                       >
-                        {evt.severity}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs font-semibold text-slate-900 whitespace-nowrap">
-                      <div className="flex items-center gap-1.5">
-                        {evt.quarantined && <Ban className="h-3 w-3 text-rose-500 shrink-0" />}
-                        {evt.type}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-slate-600 max-w-sm sm:max-w-md">
-                      <p className="line-clamp-2">{evt.details}</p>
-                      <span className="text-[10px] font-medium text-emerald-700 block mt-0.5">
-                        {evt.actionTaken}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-xs font-mono text-slate-600 whitespace-nowrap">
-                      <div className="flex items-center gap-1">
-                        <span>{evt.sourceIp}</span>
-                        {evt.quarantined && (
-                          <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[9px] px-1 py-0 font-mono">
-                            QUARANTINED
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-xs text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
+                        <Eye className="h-3 w-3 mr-1" />
+                        Inspect
+                      </Button>
+                      {!evt.quarantined ? (
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
-                          onClick={() => setSelectedEvent(evt)}
-                          className="h-7 px-2 text-[11px] font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+                          onClick={() => handleQuarantineIp(evt.id, evt.sourceIp)}
+                          className="h-7 px-2 text-[11px] font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
                         >
-                          <Eye className="h-3 w-3 mr-1" />
-                          Inspect
+                          <Ban className="h-3 w-3 mr-1" />
+                          Quarantine
                         </Button>
-                        {!evt.quarantined ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleQuarantineIp(evt.id, evt.sourceIp)}
-                            className="h-7 px-2 text-[11px] font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
-                          >
-                            <Ban className="h-3 w-3 mr-1" />
-                            Quarantine
-                          </Button>
-                        ) : (
-                          <span className="text-[10px] font-semibold text-slate-400 px-2">Blocked</span>
-                        )}
-                      </div>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-slate-400 px-2">Blocked</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50/50">
+                  <TableHead className="w-36 text-xs font-bold text-slate-700">Timestamp</TableHead>
+                  <TableHead className="w-24 text-xs font-bold text-slate-700">Severity</TableHead>
+                  <TableHead className="w-48 text-xs font-bold text-slate-700">Event Type</TableHead>
+                  <TableHead className="text-xs font-bold text-slate-700">Details</TableHead>
+                  <TableHead className="w-32 text-xs font-bold text-slate-700">Source IP</TableHead>
+                  <TableHead className="w-36 text-right text-xs font-bold text-slate-700">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredEvents.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-10 text-xs text-slate-500">
+                      No security incidents match the selected filter.
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  filteredEvents.map((evt) => (
+                    <TableRow key={evt.id} className="hover:bg-slate-50/80 transition-colors">
+                      <TableCell className="text-xs font-mono text-slate-500 whitespace-nowrap">
+                        {evt.timestamp}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            evt.severity === "CRITICAL"
+                              ? "destructive"
+                              : evt.severity === "HIGH"
+                              ? "destructive"
+                              : evt.severity === "MEDIUM"
+                              ? "warning"
+                              : "outline"
+                          }
+                          className="text-[10px] font-bold"
+                        >
+                          {evt.severity}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs font-semibold text-slate-900 whitespace-nowrap">
+                        <div className="flex items-center gap-1.5">
+                          {evt.quarantined && <Ban className="h-3 w-3 text-rose-500 shrink-0" />}
+                          {evt.type}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs text-slate-600 max-w-sm sm:max-w-md">
+                        <p className="line-clamp-2">{evt.details}</p>
+                        <span className="text-[10px] font-medium text-emerald-700 block mt-0.5">
+                          {evt.actionTaken}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-xs font-mono text-slate-600 whitespace-nowrap">
+                        <div className="flex items-center gap-1">
+                          <span>{evt.sourceIp}</span>
+                          {evt.quarantined && (
+                            <Badge className="bg-rose-50 text-rose-700 border-rose-200 text-[9px] px-1 py-0 font-mono">
+                              QUARANTINED
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-xs text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedEvent(evt)}
+                            className="h-7 px-2 text-[11px] font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-100"
+                          >
+                            <Eye className="h-3 w-3 mr-1" />
+                            Inspect
+                          </Button>
+                          {!evt.quarantined ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleQuarantineIp(evt.id, evt.sourceIp)}
+                              className="h-7 px-2 text-[11px] font-semibold text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700"
+                            >
+                              <Ban className="h-3 w-3 mr-1" />
+                              Quarantine
+                            </Button>
+                          ) : (
+                            <span className="text-[10px] font-semibold text-slate-400 px-2">Blocked</span>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

@@ -240,59 +240,118 @@ export default function DataQualityPage() {
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Clinical Feature</TableHead>
-                <TableHead>LOINC Code</TableHead>
-                <TableHead>Completeness</TableHead>
-                <TableHead>Outlier (&gt;3σ)</TableHead>
-                <TableHead>Physiological Safe Range</TableHead>
-                <TableHead>Observed Range</TableHead>
-                <TableHead>Imputation Strategy</TableHead>
-                <TableHead className="text-right">Pipeline Quality</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredItems.map(item => (
-                <TableRow key={item.id} className="hover:bg-slate-50/70 transition-colors">
-                  <TableCell className="font-bold text-xs text-slate-900">
-                    {item.feature}
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-slate-500">{item.loinc}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {filteredItems.length === 0 ? (
+              <div className="p-8 text-center text-xs text-slate-500">
+                No clinical biomarkers match the search or category filter.
+              </div>
+            ) : (
+              filteredItems.map((item) => (
+                <div key={item.id} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 className="font-bold text-xs text-slate-900">{item.feature}</h4>
+                      <span className="font-mono text-[11px] text-slate-500">LOINC: {item.loinc}</span>
+                    </div>
+                    <div className="shrink-0">{getStatusBadge(item.status)}</div>
+                  </div>
+
+                  {/* Completeness Bar */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[11px] text-slate-500 font-medium">Completeness</span>
                       <span className="font-mono font-bold text-xs text-emerald-700">
                         {(item.completeness * 100).toFixed(1)}%
                       </span>
-                      <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                        <div
-                          className="bg-emerald-500 h-1.5 rounded-full"
-                          style={{ width: `${item.completeness * 100}%` }}
-                        />
-                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-slate-700">
-                    {(item.outlierRate * 100).toFixed(1)}%
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-slate-500">{item.safeRange}</TableCell>
-                  <TableCell className="font-mono text-xs font-semibold text-slate-800">
-                    {item.observedRange}
-                  </TableCell>
-                  <TableCell className="text-xs text-slate-600">
-                    <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px]">
-                      {item.imputation}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {getStatusBadge(item.status)}
-                  </TableCell>
+                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div
+                        className="bg-emerald-500 h-1.5 rounded-full"
+                        style={{ width: `${item.completeness * 100}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Outlier (&gt;3σ)</span>
+                      <span className="font-mono text-slate-700">{(item.outlierRate * 100).toFixed(1)}%</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Observed Range</span>
+                      <span className="font-mono font-semibold text-slate-800">{item.observedRange}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Physiological Safe</span>
+                      <span className="font-mono text-slate-500 text-[11px]">{item.safeRange}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block">Imputation</span>
+                      <span className="font-mono text-slate-700 text-[11px] truncate block">{item.imputation}</span>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Clinical Feature</TableHead>
+                  <TableHead>LOINC Code</TableHead>
+                  <TableHead>Completeness</TableHead>
+                  <TableHead>Outlier (&gt;3σ)</TableHead>
+                  <TableHead>Physiological Safe Range</TableHead>
+                  <TableHead>Observed Range</TableHead>
+                  <TableHead>Imputation Strategy</TableHead>
+                  <TableHead className="text-right">Pipeline Quality</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredItems.map(item => (
+                  <TableRow key={item.id} className="hover:bg-slate-50/70 transition-colors">
+                    <TableCell className="font-bold text-xs text-slate-900">
+                      {item.feature}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-slate-500">{item.loinc}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-xs text-emerald-700">
+                          {(item.completeness * 100).toFixed(1)}%
+                        </span>
+                        <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className="bg-emerald-500 h-1.5 rounded-full"
+                            style={{ width: `${item.completeness * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-slate-700">
+                      {(item.outlierRate * 100).toFixed(1)}%
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-slate-500">{item.safeRange}</TableCell>
+                    <TableCell className="font-mono text-xs font-semibold text-slate-800">
+                      {item.observedRange}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-600">
+                      <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px]">
+                        {item.imputation}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {getStatusBadge(item.status)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 

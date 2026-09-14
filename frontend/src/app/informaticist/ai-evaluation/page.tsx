@@ -232,37 +232,72 @@ export default function AIEvaluationPage() {
             Systematic semantic evaluation against peer-reviewed clinical guidelines and diagnostic protocols.
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0 overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Clinical Guideline Document</TableHead>
-                <TableHead>Domain</TableHead>
-                <TableHead>Evaluated Cases</TableHead>
-                <TableHead>Citation Grounding</TableHead>
-                <TableHead>Hallucination Rate</TableHead>
-                <TableHead className="text-right">Certification</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {GUIDELINE_BENCHMARKS.map(g => (
-                <TableRow key={g.source} className="hover:bg-slate-50/70 transition-colors">
-                  <TableCell className="font-bold text-xs text-slate-900">
-                    {g.source}
-                  </TableCell>
-                  <TableCell className="text-xs text-slate-600">{g.domain}</TableCell>
-                  <TableCell className="font-mono text-xs text-slate-700">{g.testCases} Cases</TableCell>
-                  <TableCell className="font-mono font-bold text-xs text-emerald-700">{g.grounding}</TableCell>
-                  <TableCell className="font-mono text-xs text-slate-700">{g.hallucination}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
-                      {g.status}
-                    </Badge>
-                  </TableCell>
+        <CardContent className="p-0">
+          {/* Mobile Card View (< md) */}
+          <div className="md:hidden divide-y divide-slate-100">
+            {GUIDELINE_BENCHMARKS.map((g) => (
+              <div key={g.source} className="p-4 space-y-3 hover:bg-slate-50/50 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h4 className="font-bold text-xs text-slate-900 leading-snug">{g.source}</h4>
+                    <span className="text-[11px] text-slate-500">{g.domain}</span>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 shrink-0">
+                    {g.status}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 bg-slate-50/80 rounded-lg p-2.5 border border-slate-100 text-xs">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Evaluated</span>
+                    <span className="font-mono text-slate-700 font-semibold">{g.testCases} Cases</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Grounding</span>
+                    <span className="font-mono font-bold text-emerald-700">{g.grounding}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Hallucination</span>
+                    <span className="font-mono text-slate-700">{g.hallucination}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View (>= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Clinical Guideline Document</TableHead>
+                  <TableHead>Domain</TableHead>
+                  <TableHead>Evaluated Cases</TableHead>
+                  <TableHead>Citation Grounding</TableHead>
+                  <TableHead>Hallucination Rate</TableHead>
+                  <TableHead className="text-right">Certification</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {GUIDELINE_BENCHMARKS.map(g => (
+                  <TableRow key={g.source} className="hover:bg-slate-50/70 transition-colors">
+                    <TableCell className="font-bold text-xs text-slate-900">
+                      {g.source}
+                    </TableCell>
+                    <TableCell className="text-xs text-slate-600">{g.domain}</TableCell>
+                    <TableCell className="font-mono text-xs text-slate-700">{g.testCases} Cases</TableCell>
+                    <TableCell className="font-mono font-bold text-xs text-emerald-700">{g.grounding}</TableCell>
+                    <TableCell className="font-mono text-xs text-slate-700">{g.hallucination}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200">
+                        {g.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
 
@@ -325,9 +360,9 @@ export default function AIEvaluationPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 pt-1 gap-2">
                   <span>Timestamp: {log.date} UTC</span>
-                  <div className="flex gap-4">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
                     <span>Hallucination: <strong className="text-emerald-600">None</strong></span>
                     <span>Injection Hardened: <strong className="text-emerald-600">Yes</strong></span>
                     <span>SaMD Compliant: <strong className="text-emerald-600">Yes</strong></span>
