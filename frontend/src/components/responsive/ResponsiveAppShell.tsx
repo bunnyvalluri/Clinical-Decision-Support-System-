@@ -176,26 +176,26 @@ export function ResponsiveAppShell({
       {/* ==================================================================== */}
       {/* 1. Mobile & Tablet Adaptive Top Header (< 1024px)                     */}
       {/* ==================================================================== */}
-      <header className="lg:hidden sticky top-0 z-40 bg-white border-b border-slate-200 px-4 py-3 pt-safe flex items-center justify-between shadow-2xs">
-        <div className="flex items-center gap-3">
+      <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between shadow-2xs">
+        <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
           <button
             type="button"
             onClick={() => setMobileDrawerOpen(true)}
             aria-label="Open Navigation Menu"
-            className="touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+            className="h-9 w-9 inline-flex items-center justify-center rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200 transition-colors shrink-0"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
           </button>
 
-          <Link href={`/${role.toLowerCase()}/dashboard`} className="flex items-center gap-2.5">
+          <Link href={`/${role.toLowerCase()}/dashboard`} className="flex items-center gap-2.5 min-w-0">
             <div className={`h-8 w-8 rounded-xl ${colors.brandBg} text-white flex items-center justify-center shadow-xs shrink-0`}>
               <BrandIcon className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <span className="text-sm font-bold text-slate-900 leading-tight truncate block">
+              <span className="text-xs sm:text-sm font-bold text-slate-900 leading-tight truncate block">
                 {workspaceName}
               </span>
-              <span className="text-[10px] text-slate-500 block leading-tight truncate">
+              <span className="text-[10px] text-slate-500 font-medium block leading-tight truncate">
                 PatientRisk CDSS
               </span>
             </div>
@@ -203,29 +203,38 @@ export function ResponsiveAppShell({
         </div>
 
         {/* Header Right Status Badges */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-medium border ${
+            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-medium border shadow-2xs ${
               wsConnected
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                : "bg-rose-50 text-rose-700 border-rose-200"
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200/90"
+                : "bg-rose-50 text-rose-700 border-rose-200/90"
             }`}
+            title={wsStatusText || (wsConnected ? "System Online" : "System Offline")}
           >
             <span
-              className={`h-1.5 w-1.5 rounded-full ${
+              className={`h-1.5 w-1.5 rounded-full shrink-0 ${
                 wsConnected ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
               }`}
             />
-            <span className="hidden xs:inline" suppressHydrationWarning>{wsStatusText}</span>
+            <span className="font-semibold" suppressHydrationWarning>
+              {wsConnected ? "LIVE" : "OFFLINE"}
+            </span>
           </div>
 
           <button
             type="button"
             onClick={() => router.push(`/${role.toLowerCase()}/profile`)}
             aria-label="View Profile"
-            className="touch-target inline-flex items-center justify-center h-8 w-8 rounded-full bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 hover:border-slate-300 flex items-center justify-center shrink-0 transition-all active:scale-95 shadow-2xs overflow-hidden"
           >
-            <User className="h-4 w-4" />
+            {user?.full_name ? (
+              <span className="text-xs font-bold text-slate-800">
+                {user.full_name[0].toUpperCase()}
+              </span>
+            ) : (
+              <User className="h-4 w-4 text-slate-600" />
+            )}
           </button>
         </div>
       </header>
@@ -439,7 +448,7 @@ export function ResponsiveAppShell({
                 type="button"
                 onClick={() => setMobileDrawerOpen(false)}
                 aria-label="Close navigation"
-                className="touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className="h-9 w-9 inline-flex items-center justify-center rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
