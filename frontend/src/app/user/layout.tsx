@@ -46,13 +46,8 @@ const USER_BOTTOM_ITEMS: NavItem[] = [
 function UserLayoutInner({ children }: { children: React.ReactNode }) {
   const { status: wsStatus } = useUserWebSocket();
 
-  const isConnected = wsStatus === "offline" || wsStatus === "connected";
-  const statusLabel =
-    wsStatus === "connected"
-      ? "Portal Live"
-      : wsStatus === "reconnecting"
-      ? "Syncing..."
-      : "Portal Active";
+  const isWsLive = wsStatus === "connected";
+  const statusLabel = isWsLive ? "Portal Live" : "Portal Active";
 
   return (
     <ResponsiveAppShell
@@ -63,7 +58,7 @@ function UserLayoutInner({ children }: { children: React.ReactNode }) {
       brandIcon={HeartPulse}
       navItems={USER_NAV_ITEMS}
       bottomItems={USER_BOTTOM_ITEMS}
-      wsConnected={isConnected}
+      wsConnected={true}
       wsStatusText={statusLabel}
     >
       {children}
