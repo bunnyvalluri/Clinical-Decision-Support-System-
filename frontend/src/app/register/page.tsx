@@ -30,7 +30,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
 
-  const [accountType, setAccountType] = React.useState<"STAFF" | "PATIENT">("STAFF");
+  const [accountType, setAccountType] = React.useState<"PATIENT" | "STAFF">("PATIENT");
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -361,21 +361,8 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/* Account Track Switcher: Staff vs Patient */}
+          {/* Account Track Switcher: Patient vs Staff */}
           <div className="p-1 rounded-xl bg-slate-200/80 border border-slate-300/70 grid grid-cols-2 gap-1 text-xs select-none shadow-2xs">
-            <button
-              type="button"
-              onClick={() => setAccountType("STAFF")}
-              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                accountType === "STAFF"
-                  ? "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
-              <span>Hospital Clinical Staff</span>
-            </button>
-
             <button
               type="button"
               onClick={() => setAccountType("PATIENT")}
@@ -387,6 +374,19 @@ export default function RegisterPage() {
             >
               <User className="h-3.5 w-3.5 text-sky-600" />
               <span>Patient Health Portal</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setAccountType("STAFF")}
+              className={`py-2 px-3 rounded-lg font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                accountType === "STAFF"
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
+              <span>Hospital Clinical Staff</span>
             </button>
           </div>
 
