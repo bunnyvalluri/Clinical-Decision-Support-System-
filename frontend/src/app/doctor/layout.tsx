@@ -37,8 +37,8 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
     <RoleGuard requiredRoles={["DOCTOR"]}>
       <ResponsiveAppShell
         role="DOCTOR"
-        workspaceName="Physician Workspace"
-        workspaceSubtitle="Cardiology & ICU Decision Support"
+        workspaceName="HealthNova AI"
+        workspaceSubtitle="Clinical Decision Support"
         accentColor="emerald"
         brandIcon={HeartPulse}
         navItems={DOCTOR_NAV_ITEMS}

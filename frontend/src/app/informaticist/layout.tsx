@@ -39,8 +39,8 @@ export default function InformaticistLayout({ children }: { children: React.Reac
     <RoleGuard requiredRoles={["MEDICAL_INFORMATICIST", "ANALYST"]}>
       <ResponsiveAppShell
         role="ANALYST"
-        workspaceName="Medical Informatics"
-        workspaceSubtitle="MLOps & SHAP Telemetry"
+        workspaceName="HealthNova AI"
+        workspaceSubtitle="Clinical Data & Model Intelligence"
         accentColor="amber"
         brandIcon={Brain}
         navItems={INFORMATICIST_NAV_ITEMS}

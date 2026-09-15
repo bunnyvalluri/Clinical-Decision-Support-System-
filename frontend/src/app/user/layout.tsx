@@ -52,8 +52,8 @@ function UserLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <ResponsiveAppShell
       role="PATIENT"
-      workspaceName="Patient Health Portal"
-      workspaceSubtitle="Personal Health Records & Monitoring"
+      workspaceName="HealthNova AI"
+      workspaceSubtitle="Personal Health Intelligence"
       accentColor="teal"
       brandIcon={HeartPulse}
       navItems={USER_NAV_ITEMS}

@@ -21,9 +21,31 @@ export const viewport: Viewport = {
   themeColor: "#ffffff",
 };
 
+import { BRAND_CONFIG } from "@/config/brand";
+
 export const metadata: Metadata = {
-  title: "PatientRisk | AI Clinical Decision Support System",
-  description: "Predict • Prevent • Support — Explainable AI Clinical Risk Stratification & Real-Time Decision Support",
+  metadataBase: new URL("https://clinical-decision-support-system-2026.vercel.app"),
+  title: {
+    default: `${BRAND_CONFIG.brandName} — ${BRAND_CONFIG.tagline}`,
+    template: `%s | ${BRAND_CONFIG.brandName}`,
+  },
+  description: BRAND_CONFIG.description,
+  applicationName: BRAND_CONFIG.brandName,
+  authors: [{ name: `${BRAND_CONFIG.brandName} Engineering & Clinical Team` }],
+  keywords: [
+    "HealthNova AI",
+    "Clinical Decision Support",
+    "Patient Risk Intelligence",
+    "Machine Learning",
+    "Healthcare AI",
+    "Explainable AI",
+    "TreeSHAP",
+    "Vital Signs Monitoring",
+    "Hospital Telemetry",
+  ],
+  creator: BRAND_CONFIG.brandName,
+  publisher: BRAND_CONFIG.brandName,
+  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -31,6 +53,31 @@ export const metadata: Metadata = {
     ],
     shortcut: "/favicon.ico",
     apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: `${BRAND_CONFIG.brandName} — ${BRAND_CONFIG.tagline}`,
+    description: BRAND_CONFIG.description,
+    siteName: BRAND_CONFIG.brandName,
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: `${BRAND_CONFIG.brandName} Clinical Decision Support`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${BRAND_CONFIG.brandName} — ${BRAND_CONFIG.tagline}`,
+    description: BRAND_CONFIG.description,
+    images: ["/logo.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

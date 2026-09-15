@@ -391,7 +391,7 @@ export default function ConsentPage() {
             protected health information (ePHI) or revoke authorizations via telephone or mail.
           </p>
           <a
-            href="mailto:privacy@patientrisk.internal"
+            href="mailto:privacy@healthnova.ai"
             className="text-xs font-semibold text-teal-700 hover:text-teal-800 inline-flex items-center gap-1"
           >
             Contact Hospital Privacy Officer <ChevronRight className="h-3.5 w-3.5" />

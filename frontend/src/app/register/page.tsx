@@ -203,7 +203,7 @@ export default function RegisterPage() {
             <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm group-hover:border-teal-500 transition-all">
               <Image
                 src="/logo.png"
-                alt="PatientRisk CDSS Logo"
+                alt="HealthNova AI Logo"
                 width={44}
                 height={44}
                 className="h-full w-full object-contain rounded-lg"
@@ -213,14 +213,14 @@ export default function RegisterPage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xl font-black tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors">
-                  PatientRisk
+                  HealthNova
                 </span>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
-                  CDSS v2.0
+                  AI
                 </span>
               </div>
-              <span className="text-[10px] uppercase font-mono font-semibold text-slate-500 tracking-wider block">
-                Clinical Decision Support System
+              <span className="text-[10px] font-medium text-slate-500 tracking-tight block">
+                AI-Powered Clinical Decision Support &amp; Patient Risk Intelligence
               </span>
             </div>
           </Link>
@@ -343,11 +343,11 @@ export default function RegisterPage() {
           <div className="lg:hidden text-center space-y-2 mb-4">
             <Link href="/" className="inline-flex items-center gap-2.5">
               <div className="h-10 w-10 rounded-xl border border-slate-200 bg-white p-1 shadow-xs">
-                <Image src="/logo.png" alt="PatientRisk Logo" width={36} height={36} className="rounded-lg object-contain" />
+                <Image src="/logo.png" alt="HealthNova AI Logo" width={36} height={36} className="rounded-lg object-contain" />
               </div>
               <div className="text-left">
-                <span className="text-base font-extrabold text-slate-950 block leading-tight">PatientRisk CDSS</span>
-                <span className="text-[10px] text-slate-500 font-mono block">Clinical Decision Support</span>
+                <span className="text-base font-extrabold text-slate-950 block leading-tight">HealthNova AI</span>
+                <span className="text-[10px] text-slate-500 font-medium block">Clinical Decision Support</span>
               </div>
             </Link>
           </div>
@@ -357,7 +357,7 @@ export default function RegisterPage() {
               Account Registration
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-              Register verified medical credentials or patient self-monitoring portal access.
+              Create your secure HealthNova AI account. Register verified clinical credentials or patient self-monitoring portal access.
             </p>
           </div>
 
@@ -677,7 +677,7 @@ export default function RegisterPage() {
 
         {/* Footer */}
         <div className="pt-6 text-center text-[11px] text-slate-400 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>PatientRisk CDSS Enterprise v1.0.0</span>
+          <span>HealthNova AI Enterprise v1.0.0</span>
           <span>Project BPY-CSE-2666 • Assistive Software as a Medical Device</span>
         </div>
       </div>

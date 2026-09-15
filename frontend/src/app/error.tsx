@@ -19,18 +19,22 @@ export default function GlobalError({
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center p-6 text-center">
       <div className="max-w-md w-full rounded-2xl border border-rose-200 bg-white p-8 shadow-sm space-y-5">
-        <div className="h-16 w-16 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-sm">
-          <AlertOctagon className="h-8 w-8" />
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <span className="text-xs font-bold text-slate-800 tracking-tight">HealthNova AI</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-xs font-mono font-bold text-rose-600 uppercase tracking-wider">
+            System Alert
+          </span>
+        </div>
+        <div className="h-14 w-14 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+          <AlertOctagon className="h-7 w-7" />
         </div>
         <div>
-          <span className="text-xs font-mono font-bold text-rose-600 uppercase tracking-wider">
-            System Error State
-          </span>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 mt-1">
-            Application Service Interruption
+          <h1 className="text-xl font-bold tracking-tight text-slate-900 mt-1">
+            Something went wrong
           </h1>
           <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-            An unexpected client-side exception occurred. Diagnostic error details have been sanitized and recorded in the audit pipeline.
+            An unexpected client exception occurred. HealthNova AI has safely isolated the view. Diagnostic error details have been sanitized and recorded in the audit pipeline.
           </p>
           {error?.digest && (
             <span className="inline-block mt-3 px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-[11px] font-mono text-slate-500">

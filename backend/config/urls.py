@@ -8,6 +8,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 
+admin.site.site_header = "HealthNova AI Administration"
+admin.site.site_title = "HealthNova AI"
+admin.site.index_title = "HealthNova AI Administration"
+
 urlpatterns = [
     # Admin interface
     path("admin/", admin.site.urls),

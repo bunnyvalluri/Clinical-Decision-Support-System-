@@ -36,8 +36,8 @@ export default function NurseLayout({ children }: { children: React.ReactNode })
     <RoleGuard requiredRoles={["NURSE"]}>
       <ResponsiveAppShell
         role="NURSE"
-        workspaceName="Triage & Bedside"
-        workspaceSubtitle="Emergency & Vital Telemetry"
+        workspaceName="HealthNova AI"
+        workspaceSubtitle="Triage & Patient Risk Monitoring"
         accentColor="sky"
         brandIcon={HeartPulse}
         navItems={NURSE_NAV_ITEMS}

@@ -178,8 +178,8 @@ export function DoctorWorkspace() {
     {
       role: "assistant",
       content:
-        "Greetings, Doctor. I am the Clinical Decision Support AI Assistant. I can assist you in reviewing differential diagnoses, cross-checking KDIGO/SSC/AHA clinical guidelines, or evaluating TreeSHAP risk factors. How may I support your evaluation today?",
-      guideline: "CDSS Boundary: Human-in-the-Loop Advisory Only. Not an Autonomous Diagnostic Instrument.",
+        "Greetings, Doctor. I am the HealthNova AI Clinical Assistant. I can assist you in reviewing differential diagnoses, cross-checking KDIGO/SSC/AHA clinical guidelines, or evaluating TreeSHAP risk factors. How may I support your evaluation today?",
+      guideline: "HealthNova AI Clinical Boundary: Human-in-the-Loop Advisory Only. Not an Autonomous Diagnostic Instrument.",
     },
   ]);
   const [aiLoading, setAiLoading] = React.useState(false);
@@ -386,7 +386,7 @@ export function DoctorWorkspace() {
           {
             label: "Concurrence Rate",
             value: `${concurRate}%`,
-            sub: "Agreement with CDSS output",
+            sub: "Agreement with HealthNova AI output",
             icon: CheckCircle2,
             accent: "text-emerald-700",
             bg: "bg-emerald-50",
@@ -757,7 +757,7 @@ export function DoctorWorkspace() {
                 </div>
                 <div>
                   <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-                    Evidence-Based Clinical AI Assistant
+                    HealthNova AI Clinical Assistant
                     <span className="inline-flex items-center rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-bold px-1.5 py-0.5">
                       RAG Verified
                     </span>

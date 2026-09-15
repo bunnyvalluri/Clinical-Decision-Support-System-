@@ -1,8 +1,10 @@
-# PatientRisk CDSS — Intelligent Clinical Decision Support System
+# HealthNova AI
+
+## AI-Powered Clinical Decision Support & Patient Risk Intelligence
 
 <p align="center">
   <a href="https://clinical-decision-support-system-2026.vercel.app">
-    <img src="frontend/public/landing-hero.png" alt="PatientRisk CDSS — Real-Time Clinical Decision Support System" width="100%" />
+    <img src="frontend/public/landing-hero.png" alt="HealthNova AI — Clinical Decision Support & Patient Risk Intelligence" width="100%" />
   </a>
 </p>
 
@@ -10,9 +12,7 @@
   <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-clinical--decision--support--system--2026.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
 </p>
 
-
-
-<h3 align="center">Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning</h3>
+<h3 align="center">Academic Research Project: Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques</h3>
 
 <p align="center">
   <em>Predict • Prevent • Support</em>
@@ -42,7 +42,7 @@ Cardiovascular diseases (CVDs) remain the leading cause of mortality worldwide, 
 
 Traditional clinical scoring tools (e.g., Framingham, TIMI) often rely on coarse linear cutoffs, lack real-time reactivity during active patient hospitalization, and fail to provide transparent reasoning.
 
-**PatientRisk CDSS (BPY-CSE-2666)** is an enterprise-grade, real-time clinical decision-support ecosystem engineered to bridge this gap:
+**HealthNova AI** is an enterprise-grade, real-time clinical decision-support ecosystem engineered to bridge this gap (Academic Project BPY-CSE-2666):
 - **Intelligent Stratification:** Leverages supervised machine learning (Random Forest, AdaBoost, SVM) to classify patient deterioration risks into 4 calibrated tiers: `LOW`, `MEDIUM`, `HIGH`, and `CRITICAL`.
 - **Explainable AI (XAI):** Uses TreeSHAP to attribute exact positive and protective risk drivers for every single inference, providing transparent clinical reasoning to attending clinicians.
 - **Zero-Reload Telemetry:** Delivers sub-second vital alerts and risk transitions directly to clinician dashboards via WebSockets powered by Django Channels and Redis.
@@ -61,13 +61,13 @@ Traditional clinical scoring tools (e.g., Framingham, TIMI) often rely on coarse
 | **Asynchronous PDF Reports** | Celery task queue + ReportLab rendering pipeline | Generates formatted, audit-ready clinical discharge and risk summaries |
 | **Granular RBAC** | Role-based token access (`ADMIN`, `DOCTOR`, `NURSE`, `ANALYST`, `PATIENT`) | Strict principle of least privilege safeguarding sensitive patient PHI |
 | **Cloud-Native Database** | Neon Serverless PostgreSQL with connection pooling & branching | Enterprise durability, instant schema test branches, and low-latency queries |
-| **Modern Clinical UI** | Next.js 16 App Router, React 19, TypeScript, and Tailwind CSS | Institutional dark-mode design system with color-coded clinical risk tokens |
+| **Modern Clinical UI** | Next.js 16 App Router, React 19, TypeScript, and Tailwind CSS | Accessible white-only clinical design system with color-coded risk tokens |
 
 ---
 
 ## 🏛️ System Architecture
 
-PatientRisk CDSS is architected with a decoupled multi-tier topology separating client presentation, ingress routing, stateful/stateless application workloads, asynchronous workers, real-time messaging, machine learning engines, and managed cloud storage:
+HealthNova AI is architected with a decoupled multi-tier topology separating client presentation, ingress routing, stateful/stateless application workloads, asynchronous workers, real-time messaging, machine learning engines, and managed cloud storage:
 
 ```mermaid
 flowchart TB

@@ -34,7 +34,7 @@ class HealthCheckView(APIView):
             "status": "healthy",
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "version": "1.0.0",
-            "service": "Patient Risk Level Prediction API",
+            "service": "HealthNova AI API",
             "services": {
                 "database": "online",
                 "cache": "online",

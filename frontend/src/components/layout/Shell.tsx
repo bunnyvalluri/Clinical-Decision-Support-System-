@@ -173,7 +173,7 @@ export function Shell({ children }: ShellProps) {
             <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-sky-200 bg-white shadow-sm p-0.5">
               <Image
                 src="/logo.png"
-                alt="PatientRisk Logo"
+                alt="HealthNova AI Logo"
                 width={40}
                 height={40}
                 className="h-full w-full object-contain rounded-lg"
@@ -182,10 +182,10 @@ export function Shell({ children }: ShellProps) {
             </div>
             <div>
               <span className="font-bold text-sm tracking-tight text-slate-900 block leading-tight">
-                PatientRisk
+                HealthNova AI
               </span>
-              <span className="text-[10px] uppercase font-mono font-semibold text-sky-600 tracking-wider">
-                Predict • Prevent
+              <span className="text-[10px] uppercase font-mono font-semibold text-teal-600 tracking-wider">
+                Clinical Decision Support
               </span>
             </div>
           </Link>

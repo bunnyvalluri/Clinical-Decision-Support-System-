@@ -49,20 +49,20 @@ export default function ResetPasswordPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10 text-center space-y-3">
         <Link href="/" className="inline-flex items-center gap-3">
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-sky-200 bg-white shadow-sm p-0.5">
-            <Image
-              src="/logo.png"
-              alt="PatientRisk Logo"
-              width={48}
-              height={48}
-              className="h-full w-full object-contain rounded-lg"
-              priority
-            />
-          </div>
-          <div className="text-left">
-            <span className="text-xl font-bold tracking-tight text-slate-900 block leading-tight">PatientRisk</span>
-            <span className="text-[10px] uppercase font-mono font-semibold text-sky-600 tracking-wider">Predict • Prevent • Support</span>
-          </div>
-        </Link>
+              <Image
+                src="/logo.png"
+                alt="HealthNova AI Logo"
+                width={48}
+                height={48}
+                className="h-full w-full object-contain rounded-lg"
+                priority
+              />
+            </div>
+            <div className="text-left">
+              <span className="text-xl font-bold tracking-tight text-slate-900 block leading-tight">HealthNova AI</span>
+              <span className="text-[10px] uppercase font-mono font-semibold text-teal-600 tracking-wider">Clinical Decision Support</span>
+            </div>
+          </Link>
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">
           Set New Password
         </h2>

@@ -8,13 +8,17 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center p-6 text-center">
       <div className="max-w-md w-full rounded-2xl border border-slate-200 bg-white p-8 shadow-sm space-y-5">
-        <div className="h-16 w-16 rounded-full bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center mx-auto shadow-sm">
-          <FileQuestion className="h-8 w-8" />
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <span className="text-xs font-bold text-slate-800 tracking-tight">HealthNova AI</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-xs font-mono font-bold text-teal-700 uppercase tracking-wider">
+            Error 404
+          </span>
+        </div>
+        <div className="h-14 w-14 rounded-2xl bg-slate-100 border border-slate-200 text-slate-500 flex items-center justify-center mx-auto shadow-2xs">
+          <FileQuestion className="h-7 w-7" />
         </div>
         <div>
-          <span className="text-xs font-mono font-bold text-emerald-700 uppercase tracking-wider">
-            Error 404 — Record Not Located
-          </span>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 mt-1">
             Clinical Resource Not Found
           </h1>

@@ -1,9 +1,11 @@
+import { BRAND_CONFIG } from "@/config/brand";
+
 /**
  * Application Constants
  */
-export const APP_NAME = "PatientRisk CDSS";
-export const APP_TAGLINE = "Predict • Prevent • Support";
-export const APP_VERSION = "1.0.0";
+export const APP_NAME = BRAND_CONFIG.brandName;
+export const APP_TAGLINE = BRAND_CONFIG.tagline;
+export const APP_VERSION = BRAND_CONFIG.productVersion;
 
 export const API_ROUTES = {
   HEALTH: "/health/",

@@ -12,11 +12,14 @@ import {
   Sparkles,
   Wifi,
   WifiOff,
-  X,
   User,
+  Users,
+  X,
+  Zap,
   Settings,
 } from "lucide-react";
-import { useAuthStore } from "@/features/auth/authStore";
+import { BRAND_CONFIG } from "@/config/brand";
+import { useAuthStore, type RoleType } from "@/features/auth/authStore";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { MobileFloatingNavigation } from "@/components/navigation/MobileFloatingNavigation";
 
@@ -198,10 +201,10 @@ export function ResponsiveAppShell({
             </div>
             <div className="min-w-0">
               <span className="text-xs sm:text-sm font-bold text-slate-900 leading-tight truncate block">
-                {workspaceName}
+                {BRAND_CONFIG.brandName}
               </span>
               <span className="text-[10px] text-slate-500 font-medium block leading-tight truncate">
-                PatientRisk CDSS
+                {workspaceSubtitle || BRAND_CONFIG.tagline}
               </span>
             </div>
           </Link>

@@ -29,7 +29,7 @@ export default function ForgotPasswordPage() {
           <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-sky-200 bg-white shadow-sm p-0.5">
             <Image
               src="/logo.png"
-              alt="PatientRisk Logo"
+              alt="HealthNova AI Logo"
               width={48}
               height={48}
               className="h-full w-full object-contain rounded-lg"
@@ -37,8 +37,8 @@ export default function ForgotPasswordPage() {
             />
           </div>
           <div className="text-left">
-            <span className="text-xl font-bold tracking-tight text-slate-900 block leading-tight">PatientRisk</span>
-            <span className="text-[10px] uppercase font-mono font-semibold text-sky-600 tracking-wider">Predict • Prevent • Support</span>
+            <span className="text-xl font-bold tracking-tight text-slate-900 block leading-tight">HealthNova AI</span>
+            <span className="text-[10px] uppercase font-mono font-semibold text-teal-600 tracking-wider">Clinical Decision Support</span>
           </div>
         </Link>
         <h2 className="text-2xl font-bold tracking-tight text-slate-900">

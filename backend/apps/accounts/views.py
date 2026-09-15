@@ -176,8 +176,8 @@ class PasswordResetRequestView(APIView):
 
             try:
                 send_mail(
-                    subject="Clinical AI - Password Reset Request",
-                    message=f"You requested a password reset. Use this secure link to set a new password:\n\n{reset_url}\n\nIf you did not request this, please contact security immediately.",
+                    subject="HealthNova AI — Password Reset",
+                    message=f"You requested a password reset for your HealthNova AI clinical account. Use this secure link to set a new password:\n\n{reset_url}\n\nIf you did not request this, please contact security immediately.\n\nHealthNova AI — AI-Powered Clinical Decision Support & Patient Risk Intelligence",
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[user.email],
                     fail_silently=False,
@@ -231,8 +231,8 @@ class EmailVerificationRequestView(APIView):
 
         try:
             send_mail(
-                subject="Clinical AI - Verify Your Email Address",
-                message=f"Please verify your clinical account email address by clicking the link:\n\n{verify_url}",
+                subject="HealthNova AI — Verify Your Account",
+                message=f"Please verify your HealthNova AI clinical account email address by clicking the link:\n\n{verify_url}\n\nHealthNova AI — AI-Powered Clinical Decision Support & Patient Risk Intelligence",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
                 fail_silently=False,

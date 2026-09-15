@@ -48,8 +48,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <RoleGuard requiredRoles={["IT_ADMIN", "ADMIN"]}>
       <ResponsiveAppShell
         role="ADMIN"
-        workspaceName="Hospital Administration"
-        workspaceSubtitle="System & Infrastructure Governance"
+        workspaceName="HealthNova AI"
+        workspaceSubtitle="Platform & Security Administration"
         accentColor="purple"
         brandIcon={ShieldCheck}
         navItems={ADMIN_NAV_ITEMS}

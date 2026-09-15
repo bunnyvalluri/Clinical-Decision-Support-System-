@@ -288,7 +288,7 @@ export default function LandingPage() {
               <div className="relative h-9 w-9 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs p-0.5 group-hover:border-teal-500 transition-colors">
                 <Image
                   src="/logo.png"
-                  alt="PatientRisk CDSS Logo"
+                  alt="HealthNova AI Logo"
                   width={40}
                   height={40}
                   className="h-full w-full object-contain rounded-lg"
@@ -298,14 +298,14 @@ export default function LandingPage() {
               <div>
                 <div className="flex items-center gap-1.5 sm:gap-2">
                   <span className="text-sm sm:text-base font-extrabold tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors">
-                    PatientRisk
+                    HealthNova
                   </span>
                   <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
-                    CDSS
+                    AI
                   </span>
                 </div>
-                <span className="text-[9px] sm:text-[10px] font-mono font-semibold text-slate-500 tracking-wider uppercase hidden xs:block">
-                  Clinical Decision Support • SaMD
+                <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 tracking-tight hidden xs:block">
+                  AI-Powered Clinical Decision Support
                 </span>
               </div>
             </Link>
@@ -398,16 +398,16 @@ export default function LandingPage() {
               <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5">
                 <Image
                   src="/logo.png"
-                  alt="PatientRisk CDSS Logo"
+                  alt="HealthNova AI Logo"
                   width={36}
                   height={36}
                   className="h-full w-full object-contain rounded-lg"
                 />
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-extrabold text-slate-950">PatientRisk</span>
+                <span className="text-base font-extrabold text-slate-950">HealthNova</span>
                 <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
-                  CDSS
+                  AI
                 </span>
               </div>
             </Link>
@@ -1371,7 +1371,7 @@ export default function LandingPage() {
           </div>
           <div className="space-y-3">
             {[
-              { q: "How does the system ensure licensed physicians retain final diagnostic authority?", a: "PatientRisk CDSS is strictly classified as an assistive SaMD tool. The platform enforces a structured Clinician Override workflow, requiring documented clinical rationales whenever judgment differs from model output." },
+              { q: "How does the system ensure licensed physicians retain final diagnostic authority?", a: "HealthNova AI is strictly classified as an assistive clinical decision support tool. The platform enforces a structured Clinician Override workflow, requiring documented clinical rationales whenever judgment differs from model output." },
               { q: "What algorithms are benchmarked and active in the clinical prediction loop?", a: "The system benchmarks Random Forest, SVM (RBF kernel), and AdaBoost on group-aware partitioned cohorts. Random Forest is the active champion, achieving 1.0000 sensitivity on acute cases and a calibrated Brier score of 0.0027." },
               { q: "How does the system handle high uncertainty or out-of-distribution patients?", a: "When prediction entropy exceeds 0.82 or the margin is below 0.18, the engine abstains with: 'Prediction requires additional review.' Mahalanobis distance checks flag atypical vitals outside validated training envelopes." },
               { q: "How are TreeSHAP feature attributions computed during real-time inference?", a: "The ML Engine employs runtime TreeSHAP unwrapped through CalibratedClassifierCV wrappers, decomposing margin scores into individual feature weight additions and subtractions, executing in under 0.2 milliseconds." },
@@ -1403,11 +1403,11 @@ export default function LandingPage() {
             <div className="lg:col-span-2 space-y-5">
               <Link href="/" className="flex items-center gap-2.5">
                 <div className="h-9 w-9 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5 shadow-xs">
-                  <Image src="/logo.png" alt="PatientRisk CDSS Logo" width={36} height={36} className="h-full w-full object-contain rounded-lg" />
+                  <Image src="/logo.png" alt="HealthNova AI Logo" width={36} height={36} className="h-full w-full object-contain rounded-lg" />
                 </div>
                 <div>
-                  <span className="text-sm font-extrabold text-slate-900 block leading-tight">PatientRisk CDSS</span>
-                  <span className="text-[10px] font-mono text-slate-400">Clinical Decision Support &bull; SaMD</span>
+                  <span className="text-sm font-extrabold text-slate-900 block leading-tight">HealthNova AI</span>
+                  <span className="text-[10px] text-slate-400">AI-Powered Clinical Decision Support &bull; Patient Risk Intelligence</span>
                 </div>
               </Link>
               <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
@@ -1452,9 +1452,9 @@ export default function LandingPage() {
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
             <div className="flex items-center gap-1.5">
               <HeartPulse className="h-3.5 w-3.5 text-teal-500 shrink-0" />
-              <span>BPY-CSE-2666 PatientRisk CDSS &copy; 2026. All rights reserved.</span>
+              <span>&copy; {new Date().getFullYear()} HealthNova AI. All rights reserved. | Academic Project: BPY-CSE-2666</span>
             </div>
-            <p className="text-center sm:text-right">Assistive SaMD tool. Does NOT provide autonomous medical diagnosis.</p>
+            <p className="text-center sm:text-right">Assistive clinical decision support tool. Does NOT provide autonomous medical diagnosis.</p>
           </div>
         </div>
       </footer>

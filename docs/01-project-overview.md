@@ -1,9 +1,10 @@
 # 01. Project Overview
 
+**Product Name:** HealthNova AI  
+**Product Subtitle:** AI-Powered Clinical Decision Support & Patient Risk Intelligence  
+**Academic Project Title:** Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques  
+**Academic Project Subtitle:** Patient Risk Level Prediction Using Machine Learning for Intelligent Clinical Decision Support  
 **Project Code:** BPY-CSE-2666  
-**Project Title:** Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques  
-**Application Name:** Patient Risk Level Prediction Using Machine Learning for Intelligent Clinical Decision Support (PatientRisk CDSS)  
-**System Tagline:** Predict • Prevent • Support  
 
 ---
 
@@ -27,7 +28,7 @@ Traditional clinical assessment relies heavily on manual scoring systems (such a
 
 ## 2. Project Objectives
 
-The **PatientRisk CDSS** project was designed and engineered to address these challenges by providing an intelligent, transparent, and responsive decision-support platform:
+The **HealthNova AI** platform (Academic Project BPY-CSE-2666) was designed and engineered to address these challenges by providing an intelligent, transparent, and responsive decision-support platform:
 
 1. **Intelligent Risk Stratification:** Train, validate, and deploy supervised machine learning models (Support Vector Machines, Random Forest, AdaBoost) capable of stratifying patients into four standardized clinical risk tiers: **LOW**, **MEDIUM**, **HIGH**, and **CRITICAL**.
 2. **Explainable AI (XAI):** Integrate TreeSHAP (SHapley Additive exPlanations) into the runtime prediction loop to provide clinicians with individualized factor attribution weights and natural language descriptions explaining *why* a particular risk level was assigned.

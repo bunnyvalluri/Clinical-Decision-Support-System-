@@ -150,9 +150,9 @@ export function ClinicalIntelligencePanel({
                 <CardTitle className="text-base font-bold text-slate-900">
                   Clinical Intelligence Orchestrator
                 </CardTitle>
-                <Badge variant="outline" className="bg-white border-blue-200 text-blue-700 text-xs">
+                <Badge variant="outline" className="bg-white border-teal-200 text-teal-800 text-xs">
                   <Sparkles className="h-3 w-3 mr-1" />
-                  CDSS AI Assistant
+                  HealthNova AI Clinical Assistant
                 </Badge>
                 {uncertainty.should_abstain ? (
                   <Badge variant="critical" className="text-xs">
@@ -440,7 +440,7 @@ export function ClinicalIntelligencePanel({
 
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-[11px] text-slate-400">
-                    Governed under CDSS Human-in-the-Loop Protocol.
+                    Governed under HealthNova AI Human-in-the-Loop Protocol.
                   </span>
                   <Button type="submit" disabled={isSubmitting || !rationale.trim()} size="sm" className="gap-2">
                     <Send className="h-3.5 w-3.5" />

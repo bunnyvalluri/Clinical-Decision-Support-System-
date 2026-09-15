@@ -41,7 +41,7 @@ const SUGGESTED_QUERIES = [
 const DEMO_RESPONSES: Record<string, { content: string; guideline: string; citations: string[] }> = {
   default: {
     content:
-      "Based on authorized clinical data and the CDSS knowledge base, I have cross-referenced the relevant clinical parameters.\n\nThis response synthesizes evidence from peer-reviewed guidelines. Please review all AI-generated content before clinical action — I operate strictly as a decision-support tool, not an autonomous diagnostic system.",
+      "Based on authorized clinical data and the HealthNova AI clinical knowledge base, I have cross-referenced the relevant clinical parameters.\n\nThis response synthesizes evidence from peer-reviewed guidelines. Please review all AI-generated content before clinical action — I operate strictly as a decision-support tool, not an autonomous diagnostic system.",
     guideline: "Hospital Standard Clinical Pathway — Critical Care Decision Support Protocol v2.1",
     citations: ["UpToDate Hospital Practice 2026", "AHA NSTE-ACS Standards 2022"],
   },
@@ -79,9 +79,9 @@ export default function DoctorAIAssistantPage() {
       id: "welcome",
       role: "assistant",
       content:
-        "Hello, Doctor. I'm your Clinical Decision Support AI Assistant.\n\nI can help you:\n• Summarize authorized patient risk data\n• Explain ML prediction results & SHAP drivers\n• Retrieve evidence-based clinical guidelines (SSC-2021, KDIGO, AHA/ACC)\n• Support differential diagnosis reasoning\n\nAll responses are advisory only — physician review is required before clinical action.",
+        "Hello, Doctor. I'm your HealthNova AI Clinical Assistant.\n\nI can help you:\n• Summarize authorized patient risk data\n• Explain ML prediction results & SHAP drivers\n• Retrieve evidence-based clinical guidelines (SSC-2021, KDIGO, AHA/ACC)\n• Support differential diagnosis reasoning\n\nAll responses are advisory only — physician review is required before clinical action.",
       timestamp: new Date(),
-      guideline: "CDSS Boundary: Human-in-the-Loop Advisory Only. Not an Autonomous Diagnostic Instrument.",
+      guideline: "HealthNova AI Clinical Boundary: Human-in-the-Loop Advisory Only. Not an Autonomous Diagnostic Instrument.",
     },
   ]);
   const [input, setInput] = React.useState("");
@@ -135,7 +135,7 @@ export default function DoctorAIAssistantPage() {
           </div>
           <div>
             <h1 className="font-bold text-slate-900 flex items-center gap-2">
-              Clinical AI Assistant
+              HealthNova AI Clinical Assistant
               <span className="inline-flex items-center gap-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-bold px-1.5 py-0.5">
                 <Sparkles className="h-2.5 w-2.5" />
                 RAG Verified

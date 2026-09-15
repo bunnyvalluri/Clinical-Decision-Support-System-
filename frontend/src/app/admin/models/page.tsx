@@ -494,7 +494,7 @@ export default function ModelManagementPage() {
               </div>
               <div className="flex justify-between py-1.5">
                 <span className="text-slate-500">Autonomous Diagnosis:</span>
-                <span className="text-red-700 font-mono font-bold">STRICTLY FORBIDDEN (CDSS Assistive Only)</span>
+                <span className="text-red-700 font-mono font-bold">STRICTLY FORBIDDEN (HealthNova AI Assistive Only)</span>
               </div>
             </CardContent>
           </Card>

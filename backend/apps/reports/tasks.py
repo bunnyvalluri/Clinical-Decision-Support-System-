@@ -83,8 +83,9 @@ def _build_clinical_pdf(report: Report, output_path: Path) -> None:
     story = []
 
     # 1. Header & Hospital Branding
-    story.append(Paragraph("CLINICAL DECISION SUPPORT SYSTEM", title_style))
-    story.append(Paragraph("Automated Clinical Risk Assessment & Encounter Summary", subtitle_style))
+    story.append(Paragraph("HealthNova AI", title_style))
+    story.append(Paragraph("Clinical Risk Assessment Report", section_heading))
+    story.append(Paragraph("AI-Powered Clinical Decision Support & Patient Risk Intelligence", subtitle_style))
     story.append(Spacer(1, 4))
     story.append(
         Paragraph(
@@ -93,7 +94,7 @@ def _build_clinical_pdf(report: Report, output_path: Path) -> None:
         )
     )
     story.append(Spacer(1, 8))
-    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#3b82f6"), spaceAfter=14))
+    story.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor("#0d9488"), spaceAfter=14))
 
     # 2. Patient Demographics
     story.append(Paragraph("1. Patient Identification & Demographics", section_heading))
@@ -285,6 +286,25 @@ def _build_clinical_pdf(report: Report, output_path: Path) -> None:
     t_sig = Table(sig_data, colWidths=[180, 200, 150])
     t_sig.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE")]))
     story.append(t_sig)
+
+    # 5. Regulatory & Clinical Safety Disclaimer
+    disclaimer_style = ParagraphStyle(
+        "ReportDisclaimer",
+        parent=styles["Normal"],
+        fontName="Helvetica-Oblique",
+        fontSize=7.5,
+        leading=10.5,
+        textColor=colors.HexColor("#64748b"),
+        spaceBefore=14,
+    )
+    story.append(Spacer(1, 14))
+    story.append(
+        Paragraph(
+            "HealthNova AI &bull; AI-Powered Clinical Decision Support &amp; Patient Risk Intelligence<br/>"
+            "This report is generated for clinical decision support and should be interpreted by an appropriately qualified healthcare professional.",
+            disclaimer_style,
+        )
+    )
 
     doc.build(story)
 

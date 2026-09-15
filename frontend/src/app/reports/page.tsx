@@ -64,7 +64,7 @@ export default function ReportsPage() {
   };
 
   const handleDownloadReport = (report: ReportItem) => {
-    const content = `HOSPITAL CLINICAL DECISION SUPPORT SYSTEM (CDSS)\n===================================================\nReport ID: ${report.id}\nTitle: ${report.title}\nType: ${report.report_type}\nCreated: ${report.created_at}\nStatus: ${report.status}\n\nClinical Summary:\nPatient Risk Stratification generated via Ensemble ML (RandomForest v1.4).\nVerified by Attending Cardiologist.\nHIPAA Protected Clinical Document.\n`;
+    const content = `HEALTHNOVA AI — CLINICAL RISK ASSESSMENT REPORT\nAI-Powered Clinical Decision Support & Patient Risk Intelligence\n===================================================\nReport ID: ${report.id}\nTitle: ${report.title}\nType: ${report.report_type}\nCreated: ${report.created_at}\nStatus: ${report.status}\n\nClinical Summary:\nPatient Risk Stratification generated via Ensemble ML (RandomForest v1.4).\nVerified by Attending Cardiologist.\n\nDisclaimer: This report is generated for clinical decision support and should be interpreted by an appropriately qualified healthcare professional.\nHIPAA Protected Document • HealthNova AI\n`;
     const blob = new Blob([content], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

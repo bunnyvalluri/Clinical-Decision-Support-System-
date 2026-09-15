@@ -91,7 +91,7 @@ export default function CreatePatientPage() {
                 Admit New Clinical Patient
               </h1>
               <p className="text-xs text-slate-500 mt-0.5">
-                Create an authoritative Electronic Health Record in the CDSS repository.
+                Create an authoritative Electronic Health Record in the HealthNova AI repository.
               </p>
             </div>
           </div>
