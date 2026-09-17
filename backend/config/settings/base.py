@@ -76,6 +76,10 @@ LOCAL_APPS = [
     "apps.audit.apps.AuditConfig",
     "apps.ai_orchestrator.apps.AiOrchestratorConfig",
     "apps.patient_portal.apps.PatientPortalConfig",
+    "apps.external_apis.apps.ExternalApisConfig",
+    "apps.security_testing.apps.SecurityTestingConfig",
+    "apps.mobile_gateway.apps.MobileGatewayConfig",
+    "apps.whiteboards.apps.WhiteboardsConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

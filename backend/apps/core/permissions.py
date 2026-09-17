@@ -108,14 +108,19 @@ class IsClinicianOrStaff(BasePermission):
 
 
 class IsAdminOrClinician(BasePermission):
-    """Grant access to ADMIN or CLINICIAN (Doctor) roles."""
+    """Grant access to ADMIN, CLINICIAN (Doctor), or MEDICAL_INFORMATICIST roles."""
 
-    message = "Clinician or Administrator privileges are required."
+    message = "Clinician, Informaticist, or Administrator privileges are required."
 
     def has_permission(self, request: Request, view: APIView) -> bool:
         if not (request.user and request.user.is_authenticated):
             return False
-        return request.user.is_admin or request.user.is_clinician
+        return (
+            request.user.is_admin
+            or request.user.is_clinician
+            or getattr(request.user, "is_informaticist", False)
+            or request.user.role in (UserRole.MEDICAL_INFORMATICIST, UserRole.ANALYST, "INFORMATICIST")
+        )
 
 
 class CanReviewPrediction(BasePermission):

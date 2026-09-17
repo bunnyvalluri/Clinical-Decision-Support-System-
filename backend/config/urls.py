@@ -29,7 +29,11 @@ urlpatterns = [
     path("api/v1/models/", include("apps.model_registry.urls", namespace="model_registry")),
     path("api/v1/audit/", include("apps.audit.urls", namespace="audit")),
     path("api/v1/ai/", include("apps.ai_orchestrator.urls", namespace="ai_orchestrator")),
+    path("api/v1/external-apis/", include("apps.external_apis.urls", namespace="external_apis")),
     path("api/v1/user/", include("apps.patient_portal.urls")),
+    path("api/v1/security/", include("apps.security_testing.urls", namespace="security_testing")),
+    path("api/v1/mobile/", include("apps.mobile_gateway.urls", namespace="mobile_gateway")),
+    path("api/v1/whiteboards/", include("apps.whiteboards.urls", namespace="whiteboards")),
 ]
 
 # Debug toolbar (development only)

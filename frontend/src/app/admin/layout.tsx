@@ -4,10 +4,12 @@ import * as React from "react";
 import {
   Activity,
   Bell,
+  Bot,
   Cpu,
   Database,
   FileText,
   Key,
+  Layers,
   LayoutDashboard,
   Monitor,
   Settings,
@@ -23,10 +25,12 @@ import { ResponsiveAppShell, NavItem } from "@/components/responsive/ResponsiveA
 
 const ADMIN_NAV_ITEMS: NavItem[] = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", mobileQuick: true },
+  { href: "/admin/ai", icon: Bot, label: "Ruflo AI Swarm", mobileQuick: true },
   { href: "/admin/users", icon: Users, label: "Users & Staff", mobileQuick: true },
   { href: "/admin/health", icon: Monitor, label: "System Health", mobileQuick: true },
   { href: "/admin/security", icon: ShieldCheck, label: "Security & 2FA", mobileQuick: true },
   { href: "/admin/roles", icon: Key, label: "RBAC Roles" },
+  { href: "/admin/integrations/apis", icon: Layers, label: "External APIs" },
   { href: "/admin/services", icon: Activity, label: "Core Services" },
   { href: "/admin/database", icon: Database, label: "PostgreSQL" },
   { href: "/admin/redis", icon: Zap, label: "Redis Cache" },

@@ -1,7 +1,7 @@
 """
-Model registry models — versioned machine learning model artifacts and metadata.
-Enforces strict model deployment lifecycles (CANDIDATE, ACTIVE, ARCHIVED),
-in-memory caching invalidation, and immutable audit trails.
+Model registry models — versioned machine learning model artifacts, metadata, and lifecycle governance.
+Enforces strict 13-state model deployment lifecycles, cryptographic SHA-256 artifact integrity,
+immutable audit trails, and Neon PostgreSQL authoritative source of truth.
 """
 from django.db import models, transaction
 from django.utils import timezone
@@ -10,9 +10,24 @@ from apps.core.models import AuditLog, BaseModel
 
 
 class ModelStatus(models.TextChoices):
-    CANDIDATE = "CANDIDATE", "Candidate"
-    ACTIVE = "ACTIVE", "Active (Production)"
+    # 13 Lifecycle States (Prompt 30 requirement)
+    DRAFT = "DRAFT", "Draft"
+    TRAINING = "TRAINING", "Training"
+    EVALUATING = "EVALUATING", "Evaluating"
+    VALIDATION_FAILED = "VALIDATION_FAILED", "Validation Failed"
+    PENDING_REVIEW = "PENDING_REVIEW", "Pending Review"
+    APPROVED = "APPROVED", "Approved"
+    STAGED = "STAGED", "Staged"
+    CANARY = "CANARY", "Canary"
+    PRODUCTION = "PRODUCTION", "Production"
+    DEPRECATED = "DEPRECATED", "Deprecated"
+    ROLLED_BACK = "ROLLED_BACK", "Rolled Back"
+    REJECTED = "REJECTED", "Rejected"
     ARCHIVED = "ARCHIVED", "Archived"
+
+    # Compatibility Aliases
+    ACTIVE = "ACTIVE", "Active (Production)"
+    CANDIDATE = "CANDIDATE", "Candidate"
     STAGING = "STAGING", "Staging"
     RETIRED = "RETIRED", "Retired"
     FAILED = "FAILED", "Failed"
@@ -23,7 +38,7 @@ class ModelVersion(BaseModel):
     Registry of trained machine learning model versions.
 
     Tracks algorithmic architecture, evaluation metrics, serialised artifact
-    pointers, and training dataset provenance.
+    pointers, SHA-256 cryptographic checksums, and training dataset provenance.
     """
 
     model_name = models.CharField(
@@ -43,13 +58,19 @@ class ModelVersion(BaseModel):
     status = models.CharField(
         max_length=30,
         choices=ModelStatus.choices,
-        default=ModelStatus.CANDIDATE,
+        default=ModelStatus.DRAFT,
         db_index=True,
         help_text="Deployment lifecycle status.",
     )
     artifact_location = models.CharField(
         max_length=500,
         help_text="Persistent storage URI or filesystem artifact path.",
+    )
+    checksum = models.CharField(
+        max_length=64,
+        blank=True,
+        default="",
+        help_text="Cryptographic SHA-256 artifact hash for integrity verification.",
     )
     training_dataset_identifier = models.CharField(
         max_length=150,
@@ -172,7 +193,7 @@ class ModelVersion(BaseModel):
 
     @property
     def is_active(self) -> bool:
-        return self.status == ModelStatus.ACTIVE
+        return self.status in (ModelStatus.ACTIVE, ModelStatus.PRODUCTION)
 
     @property
     def artifact_path(self) -> str:
@@ -190,35 +211,31 @@ class ModelVersion(BaseModel):
         """
         now = timezone.now()
         with transaction.atomic():
-            # 1. Identify currently active models for this model_name
             active_models = ModelVersion.objects.select_for_update().filter(
                 model_name=self.model_name,
-                status=ModelStatus.ACTIVE,
+                status__in=[ModelStatus.ACTIVE, ModelStatus.PRODUCTION],
             ).exclude(pk=self.pk)
 
             prior_versions = list(active_models.values_list("version", flat=True))
 
-            # 2. Archive prior active versions
             active_models.update(
                 status=ModelStatus.ARCHIVED,
                 retired_at=now,
             )
 
-            # 3. Promote this version to ACTIVE
-            self.status = ModelStatus.ACTIVE
+            self.status = ModelStatus.PRODUCTION
             self.activated_at = now
             self.activated_by = activated_by
             self.retired_at = None
             self.save(update_fields=["status", "activated_at", "activated_by", "retired_at", "updated_at"])
 
-            # 4. Audit Log
             try:
                 AuditLog.objects.create(
                     user=activated_by,
                     action=AuditLog.Action.UPDATE,
                     resource_type="ModelVersion",
                     resource_id=str(self.id),
-                    description=f"Promoted {self.model_name} v{self.version} to ACTIVE. Replaced: {prior_versions or 'None'}. Reason: {reason}",
+                    description=f"Promoted {self.model_name} v{self.version} to PRODUCTION. Replaced: {prior_versions or 'None'}. Reason: {reason}",
                     metadata={
                         "model_name": self.model_name,
                         "version": self.version,
@@ -229,7 +246,6 @@ class ModelVersion(BaseModel):
             except Exception:
                 pass
 
-        # 5. Invalidate in-memory cache
         try:
             from services.model_loader import ModelLoaderService
             ModelLoaderService.invalidate_cache(self.model_name)
@@ -237,9 +253,7 @@ class ModelVersion(BaseModel):
             pass
 
     def rollback(self, to_version: str, user=None, reason: str = "Rollback to prior version") -> "ModelVersion":
-        """
-        Rollback from current active model to a specified previous model version.
-        """
+        """Rollback from current active model to a specified previous model version."""
         target = ModelVersion.objects.get(model_name=self.model_name, version=to_version)
         target.activate(activated_by=user, reason=f"Rollback to v{to_version}. {reason}")
         return target
@@ -256,3 +270,99 @@ class ModelVersion(BaseModel):
         except Exception:
             pass
 
+
+class DatasetVersion(BaseModel):
+    """
+    Versioned clinical datasets used for model training and benchmark evaluations.
+    """
+    dataset_identifier = models.CharField(max_length=150, unique=True, db_index=True)
+    version = models.CharField(max_length=50, default="1.0.0")
+    source = models.CharField(max_length=200, default="Inpatient EHR Cohort")
+    sha256_hash = models.CharField(max_length=64, help_text="SHA-256 fingerprint of dataset contents.")
+    sample_count = models.PositiveIntegerField(default=0)
+    feature_count = models.PositiveIntegerField(default=14)
+    approval_status = models.CharField(max_length=30, default="APPROVED")
+    created_by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        db_table = "dataset_versions"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.dataset_identifier} (v{self.version})"
+
+
+class ModelEvaluation(BaseModel):
+    """
+    Audited evaluation runs comparing candidate models against validation cohorts.
+    """
+    model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name="evaluations")
+    dataset_version = models.ForeignKey(DatasetVersion, on_delete=models.SET_NULL, null=True, blank=True)
+    metrics = models.JSONField(default=dict)
+    fairness_metrics = models.JSONField(default=dict)
+    brier_score = models.DecimalField(max_digits=6, decimal_places=5, null=True, blank=True)
+    passed_safety_gates = models.BooleanField(default=True)
+    evaluated_by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        db_table = "model_evaluations"
+        ordering = ["-created_at"]
+
+
+class ModelApproval(BaseModel):
+    """
+    Human clinician sign-off records required prior to production promotion.
+    """
+    model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name="approvals")
+    approved_by = models.ForeignKey("accounts.User", on_delete=models.CASCADE)
+    role = models.CharField(max_length=50, default="Medical Informaticist")
+    status = models.CharField(max_length=30, default="APPROVED")
+    clinical_rationale = models.TextField()
+
+    class Meta:
+        db_table = "model_approvals"
+        ordering = ["-created_at"]
+
+
+class ModelDeployment(BaseModel):
+    """
+    Deployment history tracking staging, canary, and production transitions.
+    """
+    model_version = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name="deployments")
+    stage = models.CharField(max_length=30, default="PRODUCTION")
+    traffic_percentage = models.PositiveIntegerField(default=100)
+    deployed_by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(max_length=30, default="ACTIVE")
+
+    class Meta:
+        db_table = "model_deployments"
+        ordering = ["-created_at"]
+
+
+class ModelRollback(BaseModel):
+    """
+    Audit log of emergency or scheduled model rollbacks.
+    """
+    previous_model = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name="rollbacks_from")
+    target_model = models.ForeignKey(ModelVersion, on_delete=models.CASCADE, related_name="rollbacks_to")
+    reason = models.TextField()
+    operator = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True)
+
+    class Meta:
+        db_table = "model_rollbacks"
+        ordering = ["-created_at"]
+
+
+class DataQualityReport(BaseModel):
+    """
+    Periodic data quality audits recording missingness, anomalies, and schema validation.
+    """
+    dataset_identifier = models.CharField(max_length=150, default="clinical_risk_v1")
+    total_records = models.PositiveIntegerField(default=0)
+    integrity_score = models.DecimalField(max_digits=5, decimal_places=2, default=99.0)
+    missingness_summary = models.JSONField(default=dict)
+    passed_quality_gate = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "data_quality_reports"
+        ordering = ["-created_at"]

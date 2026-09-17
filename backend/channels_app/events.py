@@ -227,3 +227,128 @@ class DriftAlertEvent:
             "timestamp": self.timestamp,
         }
 
+
+@dataclass(frozen=True)
+class AIWorkflowStartedEvent:
+    workflow_id: str
+    task_id: str
+    initiator_role: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "AI_WORKFLOW_STARTED",
+            "type": "ai_workflow_started",
+            "workflow_id": str(self.workflow_id),
+            "task_id": str(self.task_id),
+            "initiator_role": self.initiator_role,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class AgentLifecycleEvent:
+    event_name: str  # AGENT_STARTED | AGENT_COMPLETED | AGENT_FAILED
+    workflow_id: str
+    agent_name: str
+    latency_ms: float = 0.0
+    status: str = "COMPLETED"
+    details: str = ""
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": self.event_name,
+            "type": "agent_lifecycle",
+            "workflow_id": str(self.workflow_id),
+            "agent_name": self.agent_name,
+            "status": self.status,
+            "latency_ms": round(float(self.latency_ms), 2),
+            "details": self.details,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class AIReviewRequiredEvent:
+    workflow_id: str
+    task_id: str
+    approval_gate_id: str
+    safety_verdict: str
+    justification: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "AI_REVIEW_REQUIRED",
+            "type": "ai_review_required",
+            "workflow_id": str(self.workflow_id),
+            "task_id": str(self.task_id),
+            "approval_gate_id": str(self.approval_gate_id),
+            "safety_verdict": self.safety_verdict,
+            "justification": self.justification,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class AIResponseReadyEvent:
+    workflow_id: str
+    task_id: str
+    safety_verdict: str
+    requires_human_review: bool
+    summary: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "AI_RESPONSE_READY",
+            "type": "ai_response_ready",
+            "workflow_id": str(self.workflow_id),
+            "task_id": str(self.task_id),
+            "safety_verdict": self.safety_verdict,
+            "requires_human_review": self.requires_human_review,
+            "summary": self.summary,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class AISecurityAlertEvent:
+    workflow_id: str
+    violation_type: str
+    reason: str
+    severity: str = "HIGH"
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "SECURITY_ALERT",
+            "type": "security_alert",
+            "workflow_id": str(self.workflow_id),
+            "violation_type": self.violation_type,
+            "reason": self.reason,
+            "severity": self.severity,
+            "timestamp": self.timestamp,
+        }
+

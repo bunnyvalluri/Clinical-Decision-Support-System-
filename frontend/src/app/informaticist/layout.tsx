@@ -23,6 +23,7 @@ const INFORMATICIST_NAV_ITEMS: NavItem[] = [
   { href: "/informaticist/drift", icon: TrendingDown, label: "Drift Monitor", mobileQuick: true },
   { href: "/informaticist/analytics", icon: BarChart3, label: "Analytics", mobileQuick: true },
   { href: "/informaticist/data-quality", icon: Database, label: "Data Quality" },
+  { href: "/informaticist/external-apis", icon: Database, label: "External APIs" },
   { href: "/informaticist/ai-evaluation", icon: Sparkles, label: "AI Evaluation" },
   { href: "/informaticist/reports", icon: FileText, label: "Reports" },
   { href: "/informaticist/audit", icon: ClipboardCheck, label: "Audit Ledger" },

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "project": "BPY-CSE-2666",
+  "last_audit": "2026-09-15T00:00:00Z",
+  "baseline_commit": "HEAD",
+  "audited_by": "Security Engineering & DevSecOps",
+  "known_findings": [],
+  "accepted_risks": [
+    {
+      "id": "AR-2026-001",
+      "component": "Next.js Frontend Client State",
+      "risk": "Client-side state does not hold authoritative PHI",
+      "justification": "All clinical state is authoritatively checked and signed by Django backend and Neon PostgreSQL. Frontend is untrusted display layer.",
+      "approved_by": "IT_ADMIN",
+      "expires_at": "2027-01-01T00:00:00Z"
+    }
+  ],
+  "false_positives": [
+    {
+      "pattern": "Missing X-Frame-Options on /api/v1/health/",
+      "reason": "Healthcheck endpoint produces purely application/json without HTML rendering surface."
+    }
+  ],
+  "fixed_vulnerabilities": [
+    {
+      "id": "VULN-2026-001",
+      "title": "Cross-Tenant Prediction Query Isolation",
+      "remediated_via": "HasPatientAccess permission class and tenancy filtering in PatientViewSet",
+      "retest_status": "RESOLVED",
+      "verified_at": "2026-09-15T00:00:00Z"
+    }
+  ],
+  "security_test_coverage": {
+    "target_allowlist_enforcement": "100%",
+    "five_role_rbac_boundary_tests": "100%",
+    "idor_protection_tests": "100%",
+    "secret_and_phi_redaction_tests": "100%",
+    "seven_question_validation_gate": "100%",
+    "retest_workflow_verification": "100%"
+  }
+}

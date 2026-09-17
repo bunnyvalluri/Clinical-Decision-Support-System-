@@ -23,6 +23,7 @@ const DOCTOR_NAV_ITEMS: NavItem[] = [
   { href: "/doctor/predictions", icon: Activity, label: "Predictions", mobileQuick: true },
   { href: "/doctor/reviews", icon: ClipboardList, label: "Reviews", badge: 3, mobileQuick: true },
   { href: "/doctor/ai-assistant", icon: Bot, label: "AI Assistant" },
+  { href: "/doctor/external-data", icon: Stethoscope, label: "External Data" },
   { href: "/doctor/reports", icon: FileText, label: "Reports" },
   { href: "/doctor/notifications", icon: Bell, label: "Notifications", badge: 5 },
 ];

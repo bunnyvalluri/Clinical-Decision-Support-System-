@@ -1,0 +1,78 @@
+{
+  "$schema": "https://ruflo.ruv.io/schema/v3/config.json",
+  "name": "ruflo-orchestrator-clinical-dss",
+  "version": "3.42.0",
+  "projectId": "BPY-CSE-2666",
+  "environment": "production-hardened",
+  "topology": {
+    "default": "hierarchical",
+    "fallback": "star",
+    "coordinatorRole": "coordinator",
+    "consensusMechanism": "weighted-majority",
+    "conflictResolution": "human_review_required"
+  },
+  "loopProtection": {
+    "maxSteps": 10,
+    "maxAgentsPerWorkflow": 6,
+    "maxRuntimeSeconds": 60,
+    "maxToolCallsPerStep": 5,
+    "maxTotalToolCalls": 15,
+    "maxRetries": 2,
+    "recursionDepthLimit": 3
+  },
+  "costControl": {
+    "defaultTokenBudget": 8000,
+    "maxWorkflowTokenBudget": 16000,
+    "tokenRateLimitPerMinute": 30000,
+    "enforceBudgetGate": true
+  },
+  "memoryDomains": {
+    "engineering": {
+      "description": "Code architecture, ADR patterns, dependency graphs",
+      "retentionDays": 180,
+      "allowPHI": false,
+      "readRoles": ["ADMIN", "INFORMATICIST"]
+    },
+    "agent_coordination": {
+      "description": "Ephemeral swarm state, task assignment, execution receipts",
+      "retentionDays": 14,
+      "allowPHI": false,
+      "readRoles": ["ADMIN", "INFORMATICIST"]
+    },
+    "project_knowledge": {
+      "description": "Healthcare CDS specifications, protocols, system requirements",
+      "retentionDays": 365,
+      "allowPHI": false,
+      "readRoles": ["ALL"]
+    },
+    "ai_evaluations": {
+      "description": "Model validation runs, drift statistics, fairness audits",
+      "retentionDays": 365,
+      "allowPHI": false,
+      "readRoles": ["ADMIN", "INFORMATICIST", "DOCTOR"]
+    },
+    "clinical_guidelines": {
+      "description": "Peer-reviewed medical guidelines, KDIGO, SSC, AHA literature",
+      "retentionDays": 730,
+      "allowPHI": false,
+      "readRoles": ["ALL"]
+    }
+  },
+  "securityBoundaries": {
+    "enforcePromptInjectionDefense": true,
+    "enforceToolAllowlist": true,
+    "enforceContextMinimization": true,
+    "enforceHumanApprovalGate": true,
+    "phiStorageProhibited": true,
+    "arbitraryShellProhibited": true,
+    "arbitrarySqlProhibited": true
+  },
+  "mcp": {
+    "serverName": "ruflo-cds-mcp",
+    "version": "3.42.0",
+    "transport": "stdio",
+    "command": "node",
+    "args": ["scripts/ruflo_mcp_server.mjs"],
+    "toolAllowlistPolicy": "strict"
+  }
+}

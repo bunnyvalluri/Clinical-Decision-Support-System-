@@ -14,6 +14,7 @@ WS endpoint conventions:
 from django.urls import re_path
 
 from channels_app import consumers
+from apps.mobile_gateway.consumers import MobileGatewayConsumer
 
 websocket_urlpatterns = [
     re_path(r"^ws/dashboard/$", consumers.DashboardConsumer.as_asgi()),
@@ -24,4 +25,7 @@ websocket_urlpatterns = [
     ),
     re_path(r"^ws/notifications/$", consumers.NotificationConsumer.as_asgi()),
     re_path(r"^ws/user/$", consumers.UserConsumer.as_asgi()),
+    re_path(r"^ws/ai/(?:(?P<workflow_id>[0-9a-f-]{36})/)?$", consumers.AIOrchestratorConsumer.as_asgi()),
+    re_path(r"^ws/mobile/$", MobileGatewayConsumer.as_asgi()),
+    re_path(r"^ws/whiteboards/(?P<whiteboard_id>[0-9a-f-]{36})/$", consumers.WhiteboardCollaborationConsumer.as_asgi()),
 ]

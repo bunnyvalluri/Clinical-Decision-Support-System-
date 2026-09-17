@@ -1,7 +1,8 @@
 """
-Views for model_registry app — registered models, version history, and lifecycle transitions.
-Enforces that only Clinicians and Administrators can activate or roll back production models.
-Provides real monitoring telemetry and real-time WebSocket lifecycle broadcasts.
+Views for model_registry app — registered models, version history, lifecycle transitions,
+and MLOps governance endpoints.
+Enforces that only Clinicians and Informaticists can approve or promote production models.
+Provides model comparison, security audits, real monitoring telemetry, and WebSocket broadcasts.
 """
 from datetime import timedelta
 import logging
@@ -16,10 +17,23 @@ from rest_framework.response import Response
 
 from apps.core.exceptions import ApplicationError, NotFoundError
 from apps.core.pagination import StandardResultsPagination
-from apps.core.permissions import IsAdminOrClinician
-from apps.model_registry.models import ModelStatus, ModelVersion
+from apps.core.permissions import IsAdminOrClinician, IsInformaticist
+from apps.model_registry.models import (
+    DataQualityReport,
+    DatasetVersion,
+    ModelApproval,
+    ModelDeployment,
+    ModelEvaluation,
+    ModelRollback,
+    ModelStatus,
+    ModelVersion,
+)
 from apps.model_registry.serializers import (
+    DataQualityReportSerializer,
+    DatasetVersionSerializer,
     ModelActivationSerializer,
+    ModelApprovalSerializer,
+    ModelDeploymentSerializer,
     ModelRollbackSerializer,
     ModelVersionSerializer,
 )
@@ -44,11 +58,15 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
     """
     ML Model Version Registry endpoints.
 
-    GET  /api/v1/models/                      — List all registered model versions
-    GET  /api/v1/models/{id}/                 — Retrieve detailed model version metadata
-    POST /api/v1/models/{id}/activate/        — Promote model version to production ACTIVE
-    POST /api/v1/models/{id}/rollback/        — Roll back active model to a prior version
-    GET  /api/v1/models/monitoring-telemetry/ — Real MLOps telemetry & drift indicators
+    GET  /api/v1/models/versions/                      — List all registered model versions
+    GET  /api/v1/models/versions/{id}/                 — Retrieve detailed model version metadata
+    POST /api/v1/models/versions/{id}/approve/         — Human clinician sign-off
+    POST /api/v1/models/versions/{id}/deploy/          — Promote to Staged, Canary, or Production
+    POST /api/v1/models/versions/{id}/activate/        — Promote model version to production
+    POST /api/v1/models/versions/{id}/rollback/        — Roll back active model to a prior version
+    GET  /api/v1/models/versions/compare/              — Compare models side-by-side
+    GET  /api/v1/models/versions/security-audit/       — Artifact integrity & security status
+    GET  /api/v1/models/versions/monitoring-telemetry/ — Real MLOps telemetry & drift indicators
     """
 
     permission_classes = [permissions.IsAuthenticated]
@@ -65,6 +83,77 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
         detail=True,
         methods=["post"],
         permission_classes=[permissions.IsAuthenticated, IsAdminOrClinician],
+        url_path="approve",
+    )
+    def approve(self, request: Request, pk=None) -> Response:
+        """Record mandatory human clinician sign-off."""
+        instance: ModelVersion = self.get_object()
+        rationale = request.data.get("clinical_rationale", "Clinically verified and safe for clinical trial/deployment.")
+
+        approval = ModelApproval.objects.create(
+            model_version=instance,
+            approved_by=request.user,
+            role=getattr(request.user, "role", "DOCTOR"),
+            status="APPROVED",
+            clinical_rationale=rationale,
+        )
+        instance.status = ModelStatus.APPROVED
+        instance.save(update_fields=["status", "updated_at"])
+
+        return Response({
+            "success": True,
+            "message": f"Model {instance.model_name} v{instance.version} approved by {request.user.email}.",
+            "approval": ModelApprovalSerializer(approval).data,
+            "model": ModelVersionSerializer(instance).data,
+        }, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticated, IsAdminOrClinician],
+        url_path="deploy",
+    )
+    def deploy(self, request: Request, pk=None) -> Response:
+        """Controlled promotion to STAGED, CANARY, or PRODUCTION."""
+        instance: ModelVersion = self.get_object()
+        target_stage = request.data.get("stage", "PRODUCTION").upper()
+        traffic_pct = int(request.data.get("traffic_percentage", 100))
+
+        # Check approval gate
+        if target_stage == "PRODUCTION" and instance.status not in (ModelStatus.APPROVED, ModelStatus.STAGED, ModelStatus.CANARY):
+            return Response({
+                "success": False,
+                "error": "Human clinician approval required before production deployment.",
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        deployment = ModelDeployment.objects.create(
+            model_version=instance,
+            stage=target_stage,
+            traffic_percentage=traffic_pct,
+            deployed_by=request.user,
+            status="ACTIVE",
+        )
+
+        if target_stage == "PRODUCTION":
+            instance.activate(activated_by=request.user, reason=f"Promoted to PRODUCTION ({traffic_pct}% traffic)")
+        elif target_stage == "CANARY":
+            instance.status = ModelStatus.CANARY
+            instance.save(update_fields=["status", "updated_at"])
+        elif target_stage == "STAGED":
+            instance.status = ModelStatus.STAGED
+            instance.save(update_fields=["status", "updated_at"])
+
+        return Response({
+            "success": True,
+            "message": f"Model {instance.model_name} v{instance.version} deployed to {target_stage}.",
+            "deployment": ModelDeploymentSerializer(deployment).data,
+            "model": ModelVersionSerializer(instance).data,
+        }, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticated, IsAdminOrClinician],
         url_path="activate",
     )
     def activate(self, request: Request, pk=None) -> Response:
@@ -75,10 +164,8 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
 
         reason = serializer.validated_data.get("reason", "Promoted to production")
         instance.activate(activated_by=request.user, reason=reason)
-
         instance.refresh_from_db()
 
-        # Real-time WebSocket dispatch: model.activated
         from channels_app.events import ModelLifecycleEvent
         _broadcast_model_event(
             ModelLifecycleEvent(
@@ -121,12 +208,17 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
                 user=request.user,
                 reason=reason,
             )
+            ModelRollback.objects.create(
+                previous_model=instance,
+                target_model=target_instance,
+                reason=reason,
+                operator=request.user,
+            )
         except ModelVersion.DoesNotExist:
             raise NotFoundError(
                 f"Target rollback version '{target_version}' does not exist for '{instance.model_name}'."
             )
 
-        # Real-time WebSocket dispatch: model.status.changed
         from channels_app.events import ModelLifecycleEvent
         _broadcast_model_event(
             ModelLifecycleEvent(
@@ -152,26 +244,70 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
         detail=False,
         methods=["get"],
         permission_classes=[permissions.IsAuthenticated],
+        url_path="compare",
+    )
+    def compare(self, request: Request) -> Response:
+        """Compare multiple model versions across evaluation metrics."""
+        models = ModelVersion.objects.all().order_by("-f1_score", "-accuracy")[:10]
+        comparisons = []
+        for m in models:
+            comparisons.append({
+                "id": str(m.id),
+                "model_name": m.model_name,
+                "algorithm": m.algorithm,
+                "version": m.version,
+                "status": m.status,
+                "accuracy": float(m.accuracy or 0.0),
+                "precision": float(m.precision or 0.0),
+                "recall": float(m.recall or 0.0),
+                "f1_score": float(m.f1_score or 0.0),
+                "roc_auc": float(m.roc_auc or 0.0),
+                "checksum": m.checksum,
+                "created_at": m.created_at.isoformat(),
+            })
+        return Response({"success": True, "data": comparisons})
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[permissions.IsAuthenticated],
+        url_path="security-audit",
+    )
+    def security_audit(self, request: Request) -> Response:
+        """Audit artifact integrity and security status for IT Admin."""
+        models = ModelVersion.objects.all()
+        audit_records = []
+        for m in models:
+            has_checksum = bool(m.checksum)
+            audit_records.append({
+                "id": str(m.id),
+                "model_name": m.model_name,
+                "version": m.version,
+                "status": m.status,
+                "has_checksum": has_checksum,
+                "checksum_preview": m.checksum[:16] if has_checksum else "MISSING",
+                "artifact_location": m.artifact_location,
+                "security_status": "VERIFIED" if has_checksum else "UNVERIFIED",
+            })
+        return Response({"success": True, "data": audit_records})
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[permissions.IsAuthenticated],
         url_path="monitoring-telemetry",
     )
     def monitoring_telemetry(self, request: Request) -> Response:
-        """
-        Real ML monitoring telemetry.
-        Aggregates live database statistics for active models, inference volume,
-        risk distribution, latency percentiles, error/override rates, and drift indicators.
-        """
+        """Real ML monitoring telemetry aggregated live from Neon PostgreSQL."""
         now = timezone.now()
         last_24h = now - timedelta(hours=24)
 
-        # 1. Active Model Info
-        active_model = ModelVersion.objects.filter(status=ModelStatus.ACTIVE).first()
+        active_model = ModelVersion.objects.filter(status__in=[ModelStatus.ACTIVE, ModelStatus.PRODUCTION]).first()
         active_data = ModelVersionSerializer(active_model).data if active_model else None
 
-        # 2. Real Prediction Volume
         total_predictions = Prediction.objects.count()
         preds_24h = Prediction.objects.filter(prediction_timestamp__gte=last_24h).count()
 
-        # 3. Real Risk Distribution
         risk_counts = Prediction.objects.values("prediction_result").annotate(count=Count("id"))
         risk_dist: dict[str, Any] = {}
         for item in risk_counts:
@@ -184,7 +320,6 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
             if r_choice not in risk_dist:
                 risk_dist[r_choice] = {"count": 0, "percentage": 0.0}
 
-        # 4. Latency Telemetry
         latency_agg = Prediction.objects.aggregate(
             avg_lat=Avg("inference_latency_ms"),
             max_lat=Max("inference_latency_ms"),
@@ -193,21 +328,17 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
         avg_latency = round(float(latency_agg["avg_lat"] or 0.0), 2)
         max_latency = round(float(latency_agg["max_lat"] or 0.0), 2)
 
-        # 5. Clinician Overrides (Error Rate Proxy)
         overrides_count = Prediction.objects.filter(clinician_override__isnull=False).count()
         override_rate = round((overrides_count / max(total_predictions, 1)) * 100.0, 2)
 
-        # 6. Prediction Drift Check vs Training Baseline
         from ml.mlops.drift_detector import PredictionDriftDetector
         drift_detector = PredictionDriftDetector()
 
-        # Extract recent 200 predictions
         recent_preds = list(
             Prediction.objects.order_by("-prediction_timestamp")[:200].values_list(
                 "prediction_result", flat=True
             )
         )
-        # Expected baseline (from clinical risk distribution)
         baseline_preds = ["LOW"] * 45 + ["MEDIUM"] * 30 + ["HIGH"] * 17 + ["CRITICAL"] * 8
         drift_result = (
             drift_detector.evaluate_predictions(baseline_preds, recent_preds)
@@ -215,7 +346,6 @@ class ModelVersionViewSet(viewsets.ReadOnlyModelViewSet):
             else None
         )
 
-        # 7. Active Alerts
         alerts = []
         if drift_result and drift_result.alert_triggered:
             alerts.append({

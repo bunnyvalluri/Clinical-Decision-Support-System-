@@ -29,6 +29,10 @@ class DriftEvaluationResult:
     interpretation: str
     missingness_shift: float = 0.0
 
+    @property
+    def psi(self) -> float:
+        return self.metric_value
+
 
 @dataclass
 class PredictionDriftResult:

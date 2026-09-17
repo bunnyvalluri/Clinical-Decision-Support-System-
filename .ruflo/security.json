@@ -1,0 +1,83 @@
+{
+  "$schema": "https://ruflo.ruv.io/schema/v3/security.json",
+  "securityPolicy": {
+    "version": "3.42.0",
+    "name": "Clinical Healthcare AI Defense Specification",
+    "lastAudited": "2026-09-15T15:00:00Z"
+  },
+  "promptInjectionDefense": {
+    "enabled": true,
+    "blockDirectOverrides": true,
+    "blockIndirectJailbreaks": true,
+    "suspiciousPatterns": [
+      "(?i)ignore\\s+(all\\s+)?(previous|prior|above)\\s+instructions?",
+      "(?i)system\\s+prompt\\s+override",
+      "(?i)you\\s+are\\s+now\\s+(in\\s+)?(dan|developer\\s+mode|unrestricted)",
+      "(?i)disregard\\s+medical\\s+guidelines?",
+      "(?i)act\\s+as\\s+(an?\\s+)?unrestricted",
+      "(?i)output\\s+all\\s+(passwords?|keys?|secrets?|tokens?|env)",
+      "(?i)drop\\s+table",
+      "(?i)delete\\s+from\\s+patients?",
+      "(?i)bypass\\s+(guardrails?|safety|rbac)",
+      "(?i)<script\\b[^>]*>",
+      "(?i)javascript\\s*:"
+    ],
+    "actionOnDetection": "BLOCK_AND_FLAG"
+  },
+  "dataClassification": {
+    "levels": [
+      {
+        "name": "PUBLIC",
+        "description": "General clinical guidelines, system documentation, public health literature",
+        "encryptionAtRest": true,
+        "anonymizationRequired": false
+      },
+      {
+        "name": "INTERNAL",
+        "description": "System architecture, performance metrics, model evaluation aggregates",
+        "encryptionAtRest": true,
+        "anonymizationRequired": false
+      },
+      {
+        "name": "CONFIDENTIAL",
+        "description": "Model weights, hyperparameter configs, retraining requests, audit logs",
+        "encryptionAtRest": true,
+        "anonymizationRequired": false
+      },
+      {
+        "name": "CLINICAL",
+        "description": "Patient physiological observations, risk predictions, TreeSHAP attributions",
+        "encryptionAtRest": true,
+        "anonymizationRequired": true
+      },
+      {
+        "name": "SENSITIVE",
+        "description": "Patient identifiers (MRN, full name, date of birth, contact details)",
+        "encryptionAtRest": true,
+        "anonymizationRequired": true
+      },
+      {
+        "name": "SECURITY",
+        "description": "JWT signing secrets, database credentials, encryption master keys",
+        "encryptionAtRest": true,
+        "anonymizationRequired": true
+      }
+    ]
+  },
+  "phiGuardrails": {
+    "prohibitPHIInAgentMemory": true,
+    "prohibitRawMRNInPrompts": true,
+    "contextMinimization": {
+      "maxVitalsRecords": 5,
+      "suppressPatientNameInInference": true,
+      "usePseudonymousSubjectId": true
+    }
+  },
+  "rateLimiting": {
+    "doctorMaxWorkflowsPerMinute": 30,
+    "nurseMaxWorkflowsPerMinute": 20,
+    "informaticistMaxWorkflowsPerMinute": 20,
+    "adminMaxWorkflowsPerMinute": 40,
+    "patientMaxWorkflowsPerMinute": 5
+  }
+}

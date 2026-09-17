@@ -342,3 +342,203 @@ class UserConsumer(BaseConsumer):
         data = event.get("event", event)
         await self.send_json_message(data)
 
+
+class AIOrchestratorConsumer(BaseConsumer):
+    """
+    ws://host/ws/ai/
+    ws://host/ws/ai/<workflow_id>/
+
+    Real-time WebSocket stream for Ruflo multi-agent lifecycle events,
+    task status transitions, safety alerts, and human approval notifications.
+    Access is restricted to authorized clinicians, informaticists, and administrators.
+    """
+
+    group_name = "ai_orchestration"
+
+    async def get_group_name(self) -> str:
+        workflow_id = self.scope.get("url_route", {}).get("kwargs", {}).get("workflow_id")
+        if workflow_id:
+            return f"ai_workflow_{workflow_id}"
+        return "ai_orchestration"
+
+    async def check_authorization(self, user: Any) -> bool:
+        role = getattr(user, "role", "")
+        # Patients are strictly forbidden from global orchestration events
+        if role in ["PATIENT", "USER"] and not getattr(user, "is_staff", False):
+            return False
+        return True
+
+    async def ai_event(self, event: dict[str, Any]) -> None:
+        """Handle structured real-time AI event dispatch."""
+        data = event.get("data", event)
+        await self.send_json_message(data)
+
+    async def receive_json(self, content: dict[str, Any]) -> None:
+        msg_type = content.get("type", "")
+        if msg_type == "ping":
+            await self.send_json_message({"type": "pong", "timestamp": _utc_now_iso() if "_utc_now_iso" in globals() else ""})
+        elif msg_type == "subscribe_task":
+            task_id = content.get("task_id")
+            if task_id:
+                task_group = f"ai_task_{task_id}"
+                await self.channel_layer.group_add(task_group, self.channel_name)
+                await self.send_json_message({"type": "subscribed", "group": task_group})
+
+
+class WhiteboardCollaborationConsumer(BaseConsumer):
+    """
+    ws://host/ws/whiteboards/<whiteboard_id>/
+
+    Real-time collaborative editing, live cursor broadcast, and user presence
+    for Clinical Whiteboards. Powered strictly by Django Channels + Redis.
+    """
+
+    async def get_group_name(self) -> str:
+        whiteboard_id = self.scope.get("url_route", {}).get("kwargs", {}).get("whiteboard_id")
+        return f"whiteboard_{whiteboard_id}" if whiteboard_id else ""
+
+    async def check_authorization(self, user: Any) -> bool:
+        whiteboard_id = self.scope.get("url_route", {}).get("kwargs", {}).get("whiteboard_id")
+        if not whiteboard_id:
+            return False
+        return await self._verify_whiteboard_access(user, whiteboard_id)
+
+    @database_sync_to_async
+    def _verify_whiteboard_access(self, user: Any, whiteboard_id: str) -> bool:
+        from apps.whiteboards.models import ClinicalWhiteboard, DataClassification, WhiteboardType, WhiteboardStatus
+        try:
+            wb = ClinicalWhiteboard.objects.get(id=whiteboard_id)
+        except Exception:
+            return False
+
+        role = getattr(user, "role", "")
+        if role == "PATIENT":
+            if wb.type not in [WhiteboardType.CARE_PLAN, WhiteboardType.PATIENT_JOURNEY] or wb.status != WhiteboardStatus.APPROVED:
+                return False
+            patient = getattr(user, "patient_profile", None)
+            return bool(patient and wb.patient == patient)
+
+        if role in ["IT_ADMIN", "ADMIN"]:
+            if wb.is_phi or wb.classification in [DataClassification.PHI, DataClassification.RESTRICTED]:
+                return False
+            return True
+
+        return True
+
+    async def connect(self) -> None:
+        await super().connect()
+        if self.group_name:
+            user = self.scope["user"]
+            color = "#0284c7"
+            if getattr(user, "role", "") == "NURSE":
+                color = "#10b981"
+            elif getattr(user, "role", "") == "MEDICAL_INFORMATICIST":
+                color = "#8b5cf6"
+
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    "type": "user_presence_event",
+                    "event": "USER_JOINED",
+                    "user_id": str(user.id),
+                    "user_name": user.get_full_name() or user.username,
+                    "role": getattr(user, "role", ""),
+                    "color": color,
+                },
+            )
+
+    async def disconnect(self, close_code: int) -> None:
+        if self.group_name:
+            user = self.scope.get("user")
+            if user and hasattr(user, "id"):
+                await self.channel_layer.group_send(
+                    self.group_name,
+                    {
+                        "type": "user_presence_event",
+                        "event": "USER_LEFT",
+                        "user_id": str(user.id),
+                    },
+                )
+        await super().disconnect(close_code)
+
+    async def receive(self, text_data: str | None = None, bytes_data: bytes | None = None) -> None:
+        if not text_data:
+            return
+        try:
+            data = json.loads(text_data)
+        except Exception:
+            return
+
+        msg_type = data.get("type") or data.get("action")
+        user = self.scope["user"]
+
+        if msg_type == "ping":
+            await self.send_json_message({"type": "pong", "timestamp": _utc_now_iso()})
+            return
+
+        if msg_type == "WHITEBOARD_UPDATE":
+            # Broadcast element changes to other room collaborators
+            elements = data.get("elements", [])
+            version = data.get("version", 1)
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    "type": "whiteboard_broadcast",
+                    "sender_channel": self.channel_name,
+                    "sender_id": str(user.id),
+                    "sender_name": user.get_full_name() or user.username,
+                    "elements": elements,
+                    "version": version,
+                },
+            )
+
+        elif msg_type == "CURSOR_MOVE":
+            x = data.get("x", 0)
+            y = data.get("y", 0)
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    "type": "cursor_broadcast",
+                    "sender_channel": self.channel_name,
+                    "user_id": str(user.id),
+                    "user_name": user.get_full_name() or user.username,
+                    "role": getattr(user, "role", ""),
+                    "x": x,
+                    "y": y,
+                },
+            )
+
+    async def whiteboard_broadcast(self, event: dict[str, Any]) -> None:
+        # Don't echo back to the sender
+        if self.channel_name == event.get("sender_channel"):
+            return
+        await self.send_json_message({
+            "type": "WHITEBOARD_UPDATE",
+            "sender_id": event.get("sender_id"),
+            "sender_name": event.get("sender_name"),
+            "elements": event.get("elements"),
+            "version": event.get("version"),
+        })
+
+    async def cursor_broadcast(self, event: dict[str, Any]) -> None:
+        if self.channel_name == event.get("sender_channel"):
+            return
+        await self.send_json_message({
+            "type": "CURSOR_UPDATE",
+            "user_id": event.get("user_id"),
+            "user_name": event.get("user_name"),
+            "role": event.get("role"),
+            "x": event.get("x"),
+            "y": event.get("y"),
+        })
+
+    async def user_presence_event(self, event: dict[str, Any]) -> None:
+        await self.send_json_message({
+            "type": event.get("event"),
+            "user_id": event.get("user_id"),
+            "user_name": event.get("user_name"),
+            "role": event.get("role"),
+            "color": event.get("color"),
+        })
+
+
