@@ -1,0 +1,20 @@
+{
+  "version": "1.0.8.dev0",
+  "integration_state_schema": 1,
+  "installed_integrations": [
+    "agy",
+    "cline"
+  ],
+  "integration_settings": {
+    "agy": {
+      "script": "ps",
+      "invoke_separator": "-"
+    },
+    "cline": {
+      "script": "ps",
+      "invoke_separator": "-"
+    }
+  },
+  "integration": "agy",
+  "default_integration": "agy"
+}

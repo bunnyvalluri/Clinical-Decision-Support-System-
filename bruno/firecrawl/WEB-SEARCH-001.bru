@@ -1,0 +1,31 @@
+meta {
+  name: WEB-SEARCH-001
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/web/search/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "query": "Sepsis bundle resuscitation guidelines",
+    "limit": 5
+  }
+}
+
+assert {
+  res.status: in [200, 401, 503]
+}

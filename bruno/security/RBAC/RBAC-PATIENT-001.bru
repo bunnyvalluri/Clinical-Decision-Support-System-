@@ -1,0 +1,24 @@
+meta {
+  name: RBAC-PATIENT-001
+  type: http
+  seq: 3
+}
+
+# Patient attempting to list all clinic patients must receive 403 Forbidden
+get {
+  url: {{base_url}}/api/v1/patients/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{patient_access_token}}
+}
+
+assert {
+  res.status: in [401, 403]
+}

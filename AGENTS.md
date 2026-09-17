@@ -47,3 +47,34 @@
 4. **Validation**: `clinical-safety-agent` validates synthesis; requires human review if high-risk or high-entropy.
 5. **Audit Record**: Workflow writes immutable entries to PostgreSQL (`agent_tasks`, `ai_interactions`, `ai_agent_traces`).
 6. **Realtime Broadcast**: Django Channels emits WebSocket update to authorized client.
+
+---
+
+## Spec Kit Governance Integration
+
+Spec Kit defines **WHAT** must be built, Ruflo coordinates **WHO** performs the work, and Cline/approved agents execute **HOW** code changes are implemented:
+
+```
+BUSINESS / CLINICAL REQUIREMENT
+              ↓
+SPEC KIT CONSTITUTION (.specify/memory/constitution.md)
+              ↓
+SPECIFICATION (/speckit-specify → spec.md)
+              ↓
+PLAN (/speckit-plan → plan.md)
+              ↓
+TASKS (/speckit-tasks → tasks.md)
+              ↓
+RUFLO MULTI-AGENT SWARM DISPATCH
+   ├── requirements-agent
+   ├── architect
+   ├── clinical-safety-agent
+   ├── healthcare-security-agent
+   ├── coder / cline
+   └── tester
+              ↓
+CONVERGENCE GATE (python scripts/converge.py)
+              ↓
+SYNCHRONIZED DOCUMENTATION & RELEASE
+```
+

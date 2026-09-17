@@ -46,3 +46,7 @@ whitenoise>=6.7.0,<6.8
 # Production server
 gunicorn>=23.0.0,<24.0
 uvicorn[standard]>=0.31.0,<0.32
+
+# Search Engine / Meilisearch (v1.12.0 compatible)
+meilisearch>=0.37.0,<0.44.0
+

@@ -1,0 +1,30 @@
+meta {
+  name: WEB-SSRF-BLOCK-001
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/v1/web/scrape/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "url": "http://127.0.0.1:8000/admin/"
+  }
+}
+
+assert {
+  res.status: in [403, 401]
+}

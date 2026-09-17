@@ -1,0 +1,53 @@
+# Multi-stage Production Dockerfile for Django ASGI Backend (HealthNova AI CDSS)
+# Non-root user, slim Python base, security-hardened
+
+# --- Stage 1: Build & Dependencies ---
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements/ /build/requirements/
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements/base.txt
+
+# --- Stage 2: Runtime Environment ---
+FROM python:3.11-slim AS runner
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DJANGO_SETTINGS_MODULE=config.settings.production \
+    PORT=8000
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root healthcare application user
+RUN groupadd -r healthnova && useradd -r -g healthnova -u 1001 healthnova
+
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+COPY . /app/
+RUN mkdir -p /app/media /app/logs && chown -R healthnova:healthnova /app
+
+USER healthnova
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -f http://localhost:8000/api/v1/health/ || exit 1
+
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]

@@ -1,0 +1,32 @@
+meta {
+  name: INFRA-RBAC-001
+  type: http
+  seq: 4
+}
+
+# Doctor attempting to trigger infrastructure deployment must receive 403 Forbidden
+post {
+  url: {{base_url}}/api/v1/infrastructure/deploy/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "application_id": "app-unauthorized-001",
+    "reason": "Unauthorized test attempt"
+  }
+}
+
+assert {
+  res.status: in [401, 403]
+}

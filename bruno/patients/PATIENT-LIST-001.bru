@@ -1,0 +1,23 @@
+meta {
+  name: PATIENT-LIST-001
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/v1/patients/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: in [200, 401]
+}

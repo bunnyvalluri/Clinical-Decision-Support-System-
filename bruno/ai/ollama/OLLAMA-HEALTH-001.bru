@@ -1,0 +1,20 @@
+meta {
+  name: OLLAMA-HEALTH-001
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/v1/ai/providers/ollama/health/
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 503]
+  res.body.version_pinned: eq "0.5.12"
+}

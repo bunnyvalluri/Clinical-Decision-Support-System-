@@ -1,0 +1,4 @@
+# Pinned Bruno CLI Version for HealthNova AI CDSS (BPY-CSE-2666)
+# Bruno CLI 3.x+ enforces Safe Mode (--sandbox=safe) by default.
+# Supply-chain integrity: do not use 'latest' or floating tags in CI/CD.
+@usebruno/cli@4.1.0

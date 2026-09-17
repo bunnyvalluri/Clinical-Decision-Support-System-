@@ -1,0 +1,20 @@
+meta {
+  name: OLLAMA-CIRCUIT-BREAKER-001
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{base_url}}/api/v1/ai/providers/ollama/health/
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 503]
+  res.body.circuit_breaker.state: in ["CLOSED", "OPEN", "HALF_OPEN", "UNKNOWN"]
+}

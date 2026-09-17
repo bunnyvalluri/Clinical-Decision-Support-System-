@@ -1,0 +1,66 @@
+# Production Docker Compose for Self-Hosted Firecrawl Web Intelligence
+# Pinned Release: v1.10.2
+# Architecture: Clean Room service isolation communicating over internal Docker network
+
+version: "3.8"
+
+services:
+  firecrawl-api:
+    image: mendableai/firecrawl:v1.10.2
+    container_name: firecrawl-api
+    restart: unless-stopped
+    environment:
+      - PORT=3002
+      - HOST=0.0.0.0
+      - REDIS_URL=redis://firecrawl-redis:6379
+      - PLAYWRIGHT_MICROSERVICE_URL=http://firecrawl-playwright:3000
+      - USE_DB_AUTHENTICATION=false
+      - NUM_WORKERS_PER_QUEUE=4
+      - ROBOTS_POLICY=respect
+      - SCRAPE_TIMEOUT=30000
+    ports:
+      - "127.0.0.1:3002:3002"
+    depends_on:
+      - firecrawl-redis
+      - firecrawl-playwright
+    networks:
+      - firecrawl-internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3002/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  firecrawl-playwright:
+    image: mendableai/playwright-service:v1.10.2
+    container_name: firecrawl-playwright
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - CONCURRENCY=5
+    networks:
+      - firecrawl-internal
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 3072M
+
+  firecrawl-redis:
+    image: redis:7.2-alpine
+    container_name: firecrawl-redis
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - firecrawl-redis-data:/data
+    networks:
+      - firecrawl-internal
+
+networks:
+  firecrawl-internal:
+    driver: bridge
+    internal: false
+
+volumes:
+  firecrawl-redis-data:

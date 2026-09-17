@@ -1,0 +1,23 @@
+meta {
+  name: INFO-OVERVIEW-001
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/v1/models/informatics/overview/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{informaticist_access_token}}
+}
+
+assert {
+  res.status: in [200, 401]
+}

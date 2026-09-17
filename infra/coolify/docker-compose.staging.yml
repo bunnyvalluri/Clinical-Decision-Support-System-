@@ -1,0 +1,56 @@
+version: '3.9'
+
+# HealthNova AI CDSS — Staging Docker Compose Manifest for Coolify
+# Operates with synthetic seed fixtures and isolated test networks
+
+networks:
+  public-web:
+    external: true
+  staging-internal:
+    internal: true
+
+volumes:
+  staging_redis_data:
+    driver: local
+
+services:
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: ../infra/docker/Dockerfile.frontend.prod
+    restart: unless-stopped
+    networks:
+      - public-web
+      - staging-internal
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.healthnova-staging-fe.rule=Host(`staging-app.healthnova.local`)"
+      - "traefik.http.routers.healthnova-staging-fe.entrypoints=https"
+
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: ../infra/docker/Dockerfile.backend.prod
+    restart: unless-stopped
+    networks:
+      - public-web
+      - staging-internal
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.staging
+      DEBUG: "False"
+      REDIS_URL: redis://redis-staging:6379/0
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.healthnova-staging-be.rule=Host(`staging-api.healthnova.local`)"
+      - "traefik.http.routers.healthnova-staging-be.entrypoints=https"
+
+  redis-staging:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - staging-internal
+    volumes:
+      - staging_redis_data:/data

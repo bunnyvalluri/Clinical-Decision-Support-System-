@@ -1,0 +1,33 @@
+meta {
+  name: AUTH-LOGIN-001
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/auth/login/
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+body:json {
+  {
+    "username": "{{test_doctor_username}}",
+    "password": "{{test_doctor_password}}"
+  }
+}
+
+assert {
+  res.status: in [200, 400, 401]
+}
+
+script:post-response {
+  if (res.getStatus() === 200 && res.getBody().access) {
+    bru.setEnvVar("doctor_access_token", res.getBody().access);
+  }
+}

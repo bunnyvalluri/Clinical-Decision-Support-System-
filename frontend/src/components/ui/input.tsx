@@ -1,7 +1,8 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
@@ -9,50 +10,78 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   suffixIcon?: React.ReactNode;
 }
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type = "text", label, error, helperText, prefixIcon, suffixIcon, id, disabled, ...props }, ref) => {
-    const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  (
+    {
+      className,
+      type = "text",
+      label,
+      error,
+      helperText,
+      prefixIcon,
+      suffixIcon,
+      id,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
+    const inputId =
+      id || (label ? label.toLowerCase().replace(/\s+/g, "-") : undefined);
+
+    const inputElement = (
+      <input
+        id={inputId}
+        type={type}
+        ref={ref}
+        disabled={disabled}
+        className={cn(
+          "flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          prefixIcon && "pl-9",
+          suffixIcon && "pr-9",
+          error && "border-destructive focus-visible:ring-destructive",
+          className
+        )}
+        {...props}
+      />
+    );
+
+    if (!label && !error && !helperText && !prefixIcon && !suffixIcon) {
+      return inputElement;
+    }
 
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label htmlFor={inputId} className="block text-xs font-semibold text-slate-700">
+          <label
+            htmlFor={inputId}
+            className="block text-xs font-semibold text-foreground"
+          >
             {label}
           </label>
         )}
         <div className="relative flex items-center">
           {prefixIcon && (
-            <div className="absolute left-3 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute left-3 flex items-center pointer-events-none text-muted-foreground">
               {prefixIcon}
             </div>
           )}
-          <input
-            id={inputId}
-            type={type}
-            ref={ref}
-            disabled={disabled}
-            className={cn(
-              "flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:border-transparent disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60",
-              prefixIcon && "pl-9",
-              suffixIcon && "pr-9",
-              error && "border-rose-300 focus-visible:ring-rose-500",
-              className
-            )}
-            {...props}
-          />
+          {inputElement}
           {suffixIcon && (
-            <div className="absolute right-3 flex items-center pointer-events-none text-slate-400">
+            <div className="absolute right-3 flex items-center pointer-events-none text-muted-foreground">
               {suffixIcon}
             </div>
           )}
         </div>
         {error ? (
-          <p className="text-xs text-rose-600 font-medium">{error}</p>
+          <p className="text-xs text-destructive font-medium">{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-slate-500">{helperText}</p>
+          <p className="text-xs text-muted-foreground">{helperText}</p>
         ) : null}
       </div>
     );
   }
 );
 Input.displayName = "Input";
+
+export { Input };

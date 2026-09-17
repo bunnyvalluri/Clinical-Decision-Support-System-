@@ -1,0 +1,23 @@
+meta {
+  name: PRED-SHAP-001
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/v1/predictions/{{test_prediction_id}}/explanation/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: in [200, 401, 404]
+}

@@ -21,25 +21,29 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { securityService, SecurityMetrics, SecurityScan, SecurityTarget } from "@/services/securityService";
+import { securityService, SecurityMetrics, SecurityScan, SecurityTarget, SecurityHealth } from "@/services/securityService";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function SecurityOverviewPage() {
   const [metrics, setMetrics] = React.useState<SecurityMetrics | null>(null);
   const [recentScans, setRecentScans] = React.useState<SecurityScan[]>([]);
   const [targets, setTargets] = React.useState<SecurityTarget[]>([]);
+  const [health, setHealth] = React.useState<SecurityHealth | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const fetchData = React.useCallback(async () => {
     try {
-      const [m, s, t] = await Promise.all([
+      const [m, s, t, h] = await Promise.all([
         securityService.getMetrics().catch(() => null),
         securityService.getScans().catch(() => []),
         securityService.getTargets().catch(() => []),
+        securityService.getHealth().catch(() => null),
       ]);
       setMetrics(m);
       setRecentScans(s);
       setTargets(t);
+      setHealth(h);
     } catch (err) {
       console.error("Failed to load security data:", err);
     } finally {
@@ -57,8 +61,45 @@ export default function SecurityOverviewPage() {
     fetchData();
   };
 
+  const handleToggleKillSwitch = async () => {
+    if (!health) return;
+    const action = health.kill_switch_active ? "deactivate" : "activate";
+    const reason = health.kill_switch_active
+      ? "Resumed normal security testing operations"
+      : "Emergency stop invoked by IT Administrator from Security Overview";
+    try {
+      await securityService.toggleKillSwitch(action, reason);
+      fetchData();
+    } catch (e) {
+      console.error("Failed to toggle kill switch:", e);
+    }
+  };
+
   return (
     <div className="space-y-6 pb-12 bg-slate-50 min-h-screen text-slate-900 p-6">
+      {/* Emergency Kill Switch Banner */}
+      {health?.kill_switch_active && (
+        <div className="bg-red-50 border border-red-300 rounded-xl p-4 flex items-center justify-between shadow-sm">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+            <div>
+              <h3 className="text-sm font-bold text-red-900">GLOBAL SECURITY SCAN KILL SWITCH IS ACTIVE</h3>
+              <p className="text-xs text-red-700 mt-0.5">
+                All background scans are blocked and running audits are halted.
+              </p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            className="bg-white border-red-300 text-red-700 hover:bg-red-100 text-xs font-semibold"
+            onClick={handleToggleKillSwitch}
+          >
+            Deactivate Kill Switch
+          </Button>
+        </div>
+      )}
+
       {/* Header Banner */}
       <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -69,7 +110,12 @@ export default function SecurityOverviewPage() {
                 DevSecOps Policy Active
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
-                Agentic-Bug-Hunter v3.42.0
+                Strix-SecOps v{health?.strix.version || "1.0.2"}
+              </span>
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                health?.strix.available ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-100 text-slate-700 border-slate-200"
+              }`}>
+                {health?.strix.status || "CHECKING"}
               </span>
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 mt-2">

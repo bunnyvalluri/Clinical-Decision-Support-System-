@@ -185,3 +185,21 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api/v1
           NEXT_PUBLIC_WS_BASE_URL: ws://localhost:8000/ws
           NEXT_PUBLIC_POCKETBASE_URL: http://localhost:8090
+
+  spec-kit-governance:
+    name: Governance — Spec Kit SDD & Convergence Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Run Spec Kit Specification Validation
+        run: python scripts/validate_specs.py
+
+      - name: Run Architectural Convergence Gate
+        run: python scripts/converge.py
+

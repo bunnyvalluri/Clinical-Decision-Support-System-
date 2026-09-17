@@ -25,6 +25,26 @@ from .views import (
     OrchestratorEvaluationView,
     RufloSwarmEvaluateView,
     ToolRegistryView,
+    ClineSessionListView,
+    ClineSessionDetailView,
+    ClineTaskCreateView,
+    ClineTaskDetailView,
+    ClineApprovalListView,
+    ClineApprovalDecisionView,
+    ClineKillSwitchView,
+    ClineToolDefinitionListView,
+)
+from .ollama_views import (
+    OllamaChatView,
+    OllamaEmbeddingView,
+    OllamaEvaluateView,
+    OllamaExplainPredictionView,
+    OllamaHealthView,
+    OllamaModelDeleteView,
+    OllamaModelListView,
+    OllamaModelPullView,
+    OllamaModelStatusUpdateView,
+    OllamaModelSyncView,
 )
 
 app_name = "ai_orchestrator"
@@ -40,6 +60,18 @@ urlpatterns = [
     path("evaluations/", AIEvaluationListView.as_view(), name="evaluations-list"),
     path("evaluations/run/", AIEvaluationRunView.as_view(), name="evaluations-run"),
     path("mcp/servers/", MCPServerListView.as_view(), name="mcp-servers-list"),
+
+    # Ollama Local LLM Inference Layer Endpoints (Prompt 38)
+    path("providers/ollama/health/", OllamaHealthView.as_view(), name="ollama-health"),
+    path("providers/ollama/models/", OllamaModelListView.as_view(), name="ollama-models-list"),
+    path("providers/ollama/models/sync/", OllamaModelSyncView.as_view(), name="ollama-models-sync"),
+    path("providers/ollama/models/pull/", OllamaModelPullView.as_view(), name="ollama-models-pull"),
+    path("providers/ollama/models/<str:model_tag>/status/", OllamaModelStatusUpdateView.as_view(), name="ollama-models-status"),
+    path("providers/ollama/models/<str:model_tag>/delete/", OllamaModelDeleteView.as_view(), name="ollama-models-delete"),
+    path("providers/ollama/chat/", OllamaChatView.as_view(), name="ollama-chat"),
+    path("providers/ollama/embeddings/", OllamaEmbeddingView.as_view(), name="ollama-embeddings"),
+    path("providers/ollama/explain-prediction/", OllamaExplainPredictionView.as_view(), name="ollama-explain-prediction"),
+    path("providers/ollama/evaluate/", OllamaEvaluateView.as_view(), name="ollama-evaluate"),
 
     # Core Clinical Orchestration & Rules
     path("orchestrator/evaluate/", OrchestratorEvaluationView.as_view(), name="orchestrator-evaluate"),
@@ -60,4 +92,14 @@ urlpatterns = [
     path("metrics/", AIObservabilityMetricsView.as_view(), name="observability-metrics"),
     path("memory/", AgentMemoryListView.as_view(), name="memory-list"),
     path("interactions/", AIInteractionListView.as_view(), name="interactions-list"),
+
+    # Cline Controlled Agent Execution Layer (Prompt 37)
+    path("cline/sessions/", ClineSessionListView.as_view(), name="cline-sessions-list"),
+    path("cline/sessions/<uuid:session_id>/", ClineSessionDetailView.as_view(), name="cline-session-detail"),
+    path("cline/tasks/", ClineTaskCreateView.as_view(), name="cline-tasks-create"),
+    path("cline/tasks/<uuid:task_id>/", ClineTaskDetailView.as_view(), name="cline-task-detail"),
+    path("cline/approvals/", ClineApprovalListView.as_view(), name="cline-approvals-list"),
+    path("cline/approvals/decide/", ClineApprovalDecisionView.as_view(), name="cline-approvals-decide"),
+    path("cline/kill-switch/", ClineKillSwitchView.as_view(), name="cline-kill-switch"),
+    path("cline/tools/", ClineToolDefinitionListView.as_view(), name="cline-tools-list"),
 ]

@@ -1,0 +1,24 @@
+meta {
+  name: IDOR-PATIENT-001
+  type: http
+  seq: 1
+}
+
+# Patient requesting another patient's medical records must receive 403 Forbidden or 404 Not Found
+get {
+  url: {{base_url}}/api/v1/user/medical-records/00000000-0000-0000-0000-000000000999/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{patient_access_token}}
+}
+
+assert {
+  res.status: in [401, 403, 404]
+}

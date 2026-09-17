@@ -1,0 +1,23 @@
+meta {
+  name: PATIENT-DETAIL-001
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/v1/patients/{{test_patient_id}}/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: in [200, 401, 404]
+}

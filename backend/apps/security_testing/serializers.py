@@ -242,3 +242,104 @@ class ReconSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ReconSession
         fields = ["id", "target", "status", "started_at", "completed_at", "total_endpoints_discovered", "endpoints"]
+
+
+# ---------------------------------------------------------------------------
+# Prompt 44: Pentest-Agents & Abstraction Serializers
+# ---------------------------------------------------------------------------
+
+from apps.security_testing.models import (
+    SecurityAgentRun,
+    SecurityAgentCapability,
+    MCPToolRegistry,
+    SecurityFindingCluster,
+)
+
+
+class SecurityAgentRunSerializer(serializers.ModelSerializer):
+    target_name = serializers.CharField(source="assessment.target.name", read_only=True)
+
+    class Meta:
+        model = SecurityAgentRun
+        fields = [
+            "id",
+            "provider",
+            "agent",
+            "task",
+            "assessment",
+            "target_name",
+            "status",
+            "start_time",
+            "end_time",
+            "token_usage",
+            "tool_calls",
+            "result",
+            "error",
+            "correlation_id",
+            "workspace_path",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class SecurityAgentCapabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SecurityAgentCapability
+        fields = [
+            "id",
+            "capability",
+            "risk_level",
+            "required_permission",
+            "allowed_environment",
+            "network_policy",
+            "approval_required",
+            "is_active",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class MCPToolRegistrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MCPToolRegistry
+        fields = [
+            "id",
+            "name",
+            "description",
+            "risk",
+            "permissions",
+            "allowed_roles",
+            "allowed_targets",
+            "network_scope",
+            "data_classification",
+            "approval_requirement",
+            "is_enabled",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+
+
+class SecurityFindingClusterSerializer(serializers.ModelSerializer):
+    findings_count = serializers.IntegerField(source="findings.count", read_only=True)
+
+    class Meta:
+        model = SecurityFindingCluster
+        fields = [
+            "id",
+            "cluster_hash",
+            "title",
+            "vulnerability_type",
+            "affected_endpoint",
+            "primary_finding",
+            "findings_count",
+            "providers",
+            "confidence_score",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+

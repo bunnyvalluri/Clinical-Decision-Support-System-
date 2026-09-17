@@ -32,6 +32,7 @@ export default function NurseAIAssistantPage() {
 
       <div className="flex-1 min-h-0">
         <AIChat
+          agentRole="NURSE"
           roleSubtitle="Bedside Triage · Nursing Care Protocols · Clinical Escalation"
           initialGreeting="Hello, Nurse. I am your HealthNova Clinical Workflow Assistant. I provide rapid access to hospital nursing care protocols, vital sign triage criteria (qSOFA, NEWS2), and escalation guidelines. How may I assist your shift workflow?"
           suggestedQueries={NURSE_QUERIES}

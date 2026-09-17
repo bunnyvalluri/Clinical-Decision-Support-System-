@@ -34,11 +34,16 @@ class ProviderRegistry:
         gemini_key = config("GEMINI_API_KEY", default=config("GOOGLE_API_KEY", default=""))
         ollama_url = config("OLLAMA_BASE_URL", default="http://localhost:11434")
 
+        from integrations.ollama.provider import OllamaProvider
+
+        ollama_prov = OllamaProvider(base_url=ollama_url)
+
         self._providers["OPENAI"] = OpenAIProvider(api_key=openai_key)
         self._providers["ANTHROPIC"] = AnthropicProvider(api_key=anthropic_key)
         self._providers["GEMINI"] = GeminiProvider(api_key=gemini_key)
-        self._providers["LOCAL"] = LocalModelProvider(base_url=ollama_url)
-        self._providers["OPENSOURCE"] = LocalModelProvider(base_url=ollama_url)
+        self._providers["LOCAL"] = ollama_prov
+        self._providers["OLLAMA"] = ollama_prov
+        self._providers["OPENSOURCE"] = ollama_prov
 
     def get_provider(self, provider_name: str) -> BaseLLMProvider:
         normalized = provider_name.upper()
@@ -51,8 +56,11 @@ class ProviderRegistry:
         return {name: prov.health_check() for name, prov in self._providers.items()}
 
 
-_global_registry = ProviderRegistry()
+_global_registry: Optional[ProviderRegistry] = None
 
 
 def get_provider_registry() -> ProviderRegistry:
+    global _global_registry
+    if _global_registry is None:
+        _global_registry = ProviderRegistry()
     return _global_registry

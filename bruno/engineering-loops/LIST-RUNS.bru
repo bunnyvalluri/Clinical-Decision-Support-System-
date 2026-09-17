@@ -1,0 +1,22 @@
+meta {
+  name: List Loop Runs
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/v1/engineering/runs/
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+assert {
+  res.status: eq 200
+}

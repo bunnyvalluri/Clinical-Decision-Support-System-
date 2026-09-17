@@ -23,6 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import apiClient from "@/services/apiClient";
+import { ClineWorkbench } from "@/components/ai/ClineWorkbench";
 
 interface MetricsResponse {
   system_status: string;
@@ -288,6 +289,11 @@ export default function AdminAIOverviewPage() {
             <span>→</span>
           </div>
         </Link>
+      </div>
+
+      {/* Embedded Cline Controlled Agent Execution Platform */}
+      <div className="pt-4 border-t border-slate-200">
+        <ClineWorkbench currentRole="ADMIN" defaultAgentType="INFRASTRUCTURE_ASSISTANT" />
       </div>
     </div>
   );

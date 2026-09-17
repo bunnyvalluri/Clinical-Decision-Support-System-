@@ -1,0 +1,36 @@
+# Coolify Compose Stack for Ollama Local Inference Layer
+# HealthNova CDSS — Enterprise Private Cloud Stack
+version: '3.8'
+
+services:
+  ollama:
+    image: ollama/ollama:0.5.12
+    restart: unless-stopped
+    environment:
+      - OLLAMA_KEEP_ALIVE=15m
+      - OLLAMA_ORIGINS=""
+      - OLLAMA_NUM_PARALLEL=4
+      - OLLAMA_FLASH_ATTENTION=1
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - internal_cdss_network
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 32768M
+        reservations:
+          memory: 4096M
+
+volumes:
+  ollama_data:
+    driver: local
+
+networks:
+  internal_cdss_network:
+    external: true

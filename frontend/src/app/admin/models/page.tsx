@@ -26,6 +26,7 @@ import { Alert } from "@/components/ui/alert";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
 import { useAuthStore } from "@/features/auth/authStore";
 import apiClient from "@/services/apiClient";
+import { OllamaHealthBadge, OllamaModelManager } from "@/components/ai";
 
 interface ModelVersionDto {
   id: string;
@@ -82,6 +83,7 @@ export default function ModelManagementPage() {
   const [actionLoadingId, setActionLoadingId] = React.useState<string | null>(null);
   const [isRetraining, setIsRetraining] = React.useState(false);
   const [retrainSuccess, setRetrainSuccess] = React.useState(false);
+  const [modelTab, setModelTab] = React.useState<"classical" | "ollama">("classical");
 
   const isAuthorized = user?.role === "ADMIN" || user?.role === "DOCTOR" || user?.role === "ANALYST";
 
@@ -195,7 +197,8 @@ export default function ModelManagementPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <OllamaHealthBadge />
             <Badge variant="outline" className="text-xs font-mono bg-white border-slate-200 text-slate-700 shadow-sm">
               Role: {user?.role || "CLINICIAN"}
             </Badge>
@@ -221,6 +224,36 @@ export default function ModelManagementPage() {
             </Button>
           </div>
         </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex border-b border-slate-200 gap-6">
+          <button
+            onClick={() => setModelTab("classical")}
+            className={`pb-3 text-xs font-bold border-b-2 transition-colors ${
+              modelTab === "classical"
+                ? "border-emerald-600 text-emerald-700"
+                : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            Classical ML Pipelines (scikit-learn)
+          </button>
+          <button
+            onClick={() => setModelTab("ollama")}
+            className={`pb-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
+              modelTab === "ollama"
+                ? "border-blue-600 text-blue-700"
+                : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            Ollama Local LLM Models
+          </button>
+        </div>
+
+        {modelTab === "ollama" ? (
+          <OllamaModelManager />
+        ) : (
+          <>
 
         {retrainSuccess && (
           <Alert variant="success" onDismiss={() => setRetrainSuccess(false)}>
@@ -499,6 +532,8 @@ export default function ModelManagementPage() {
             </CardContent>
           </Card>
         </div>
+        </>
+        )}
       </div>
   );
 }

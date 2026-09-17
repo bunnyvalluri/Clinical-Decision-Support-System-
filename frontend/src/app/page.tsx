@@ -313,11 +313,17 @@ export default function LandingPage() {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-6 xl:gap-7 text-xs font-semibold text-slate-600">
+            <Link href="/" className="text-teal-700 font-bold transition-colors">
+              Home
+            </Link>
+            <Link href="/about" className="hover:text-teal-700 transition-colors">
+              About
+            </Link>
+            <Link href="/features" className="hover:text-teal-700 transition-colors">
+              Features
+            </Link>
             <a href="#simulator" className="hover:text-teal-700 transition-colors">
               Risk Simulator
-            </a>
-            <a href="#features" className="hover:text-teal-700 transition-colors">
-              Capabilities
             </a>
             <a href="#workflow" className="hover:text-teal-700 transition-colors">
               Care Pathway
@@ -442,6 +448,13 @@ export default function LandingPage() {
                 Platform Sections
               </p>
               {[
+                {
+                  href: "/about",
+                  label: "About Platform",
+                  desc: "Intelligent Clinical Decision Support Overview",
+                  icon: Sparkles,
+                  color: "bg-teal-50 text-teal-700 border-teal-200",
+                },
                 {
                   href: "#simulator",
                   label: "Risk Simulator",
@@ -1425,6 +1438,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500">Platform</h4>
               <ul className="space-y-3 text-sm text-slate-500">
+                <li><Link href="/about" className="hover:text-teal-600 transition-colors font-medium text-slate-900">About Platform</Link></li>
                 <li><Link href="/dashboard" className="hover:text-teal-600 transition-colors">Clinician Portal</Link></li>
                 <li><a href="#simulator" className="hover:text-teal-600 transition-colors">Risk Simulator</a></li>
                 <li><Link href="/login" className="hover:text-teal-600 transition-colors">Sign In</Link></li>
@@ -1435,7 +1449,7 @@ export default function LandingPage() {
               <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500">Technology</h4>
               <ul className="space-y-3 text-sm text-slate-500">
                 <li><Link href="/admin/models" className="hover:text-teal-600 transition-colors">MLOps Registry</Link></li>
-                <li><a href="#features" className="hover:text-teal-600 transition-colors">Capabilities</a></li>
+                <li><Link href="/features" className="hover:text-teal-600 transition-colors">Features &amp; Capabilities</Link></li>
                 <li><a href="#architecture" className="hover:text-teal-600 transition-colors">Cloud Stack</a></li>
                 <li><a href="https://github.com/bunnyvalluri/Clinical-Decision-Support-System-" target="_blank" rel="noreferrer" className="hover:text-teal-600 transition-colors">GitHub Repo</a></li>
               </ul>

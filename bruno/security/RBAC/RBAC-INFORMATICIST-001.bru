@@ -1,0 +1,32 @@
+meta {
+  name: RBAC-INFORMATICIST-001
+  type: http
+  seq: 5
+}
+
+# Informaticist is restricted from executing doctor triage escalations
+post {
+  url: {{base_url}}/api/v1/clinical/triage/escalate/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{informaticist_access_token}}
+}
+
+body:json {
+  {
+    "patient_id": "{{test_patient_id}}",
+    "escalation_reason": "Test escalation attempt"
+  }
+}
+
+assert {
+  res.status: in [401, 403]
+}

@@ -32,6 +32,7 @@ export default function InformaticistAIAssistantPage() {
 
       <div className="flex-1 min-h-0">
         <AIChat
+          agentRole="INFORMATICIST"
           roleSubtitle="MLOps Analytics · Feature Drift · Calibration · Model Registry"
           initialGreeting="Hello, Informaticist. I am your HealthNova MLOps & Data Analysis Assistant. I can help you evaluate feature drift (PSI, KS-test), inspect ensemble calibration, and audit RAG grounding metrics. No raw patient identifiers are processed."
           suggestedQueries={INFORMATICIST_QUERIES}

@@ -2,6 +2,7 @@
 Serializers for Clinical AI Orchestration, Deterministic Rules,
 Knowledge Retrieval, and Human-in-the-Loop Decisions.
 """
+from typing import Any, Dict, List, Optional
 from rest_framework import serializers
 from .models import (
     AgentMemoryRecord,
@@ -311,4 +312,176 @@ class MCPServerSerializer(serializers.ModelSerializer):
         model = MCPServer
         fields = "__all__"
         read_only_fields = ["id", "created_at"]
+
+
+# ===========================================================================
+# Cline Controlled Agent Execution Layer Serializers (Prompt 37)
+# ===========================================================================
+
+from .models import (
+    ClineAgentSession,
+    ClineAgentTask,
+    ClineAgentEvent,
+    ClineAgentApproval,
+    ClineMCPServerRegistry,
+    ClineToolDefinition,
+)
+
+
+class ClineAgentSessionSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ClineAgentSession
+        fields = [
+            "id",
+            "user",
+            "user_name",
+            "role",
+            "agent_type",
+            "purpose",
+            "status",
+            "correlation_id",
+            "environment",
+            "approval_policy",
+            "token_budget",
+            "tokens_used",
+            "max_tool_calls",
+            "tool_calls_count",
+            "cost_limit_usd",
+            "total_cost_usd",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "user",
+            "correlation_id",
+            "tokens_used",
+            "tool_calls_count",
+            "total_cost_usd",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_user_name(self, obj) -> str:
+        if obj.user:
+            return f"{obj.user.first_name} {obj.user.last_name}".strip() or obj.user.username
+        return "Unknown"
+
+
+class ClineAgentTaskSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.SerializerMethodField()
+    approved_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ClineAgentTask
+        fields = [
+            "id",
+            "session",
+            "task_type",
+            "prompt_hash",
+            "prompt_summary",
+            "status",
+            "started_at",
+            "completed_at",
+            "error_code",
+            "result_summary",
+            "tool_calls_count",
+            "total_cost_usd",
+            "created_by",
+            "created_by_name",
+            "approved_by",
+            "approved_by_name",
+            "created_at",
+        ]
+        read_only_fields = [
+            "id",
+            "prompt_hash",
+            "status",
+            "started_at",
+            "completed_at",
+            "error_code",
+            "result_summary",
+            "tool_calls_count",
+            "total_cost_usd",
+            "created_by",
+            "approved_by",
+            "created_at",
+        ]
+
+    def get_created_by_name(self, obj) -> str:
+        if obj.created_by:
+            return f"{obj.created_by.first_name} {obj.created_by.last_name}".strip() or obj.created_by.username
+        return "System"
+
+    def get_approved_by_name(self, obj) -> Optional[str]:
+        if obj.approved_by:
+            return f"{obj.approved_by.first_name} {obj.approved_by.last_name}".strip() or obj.approved_by.username
+        return None
+
+
+class ClineAgentEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClineAgentEvent
+        fields = [
+            "id",
+            "session",
+            "task",
+            "event_type",
+            "tool_name",
+            "resource_type",
+            "resource_id",
+            "summary",
+            "approval_state",
+            "correlation_id",
+            "timestamp",
+        ]
+        read_only_fields = fields
+
+
+class ClineAgentApprovalSerializer(serializers.ModelSerializer):
+    requested_by_name = serializers.SerializerMethodField()
+    approved_by_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ClineAgentApproval
+        fields = [
+            "id",
+            "task",
+            "requested_action",
+            "risk_level",
+            "details",
+            "requested_by",
+            "requested_by_name",
+            "approved_by",
+            "approved_by_name",
+            "status",
+            "reason",
+            "timestamp",
+            "decided_at",
+        ]
+        read_only_fields = ["id", "timestamp", "decided_at"]
+
+    def get_requested_by_name(self, obj) -> str:
+        if obj.requested_by:
+            return f"{obj.requested_by.first_name} {obj.requested_by.last_name}".strip() or obj.requested_by.username
+        return "System"
+
+    def get_approved_by_name(self, obj) -> Optional[str]:
+        if obj.approved_by:
+            return f"{obj.approved_by.first_name} {obj.approved_by.last_name}".strip() or obj.approved_by.username
+        return None
+
+
+class ClineTaskCreateSerializer(serializers.Serializer):
+    session_id = serializers.UUIDField(required=True)
+    prompt = serializers.CharField(required=True, min_length=3, max_length=4096)
+    task_type = serializers.CharField(required=False, default="QUERY_ANALYSIS", max_length=64)
+
+
+class ClineApprovalDecisionSerializer(serializers.Serializer):
+    approval_id = serializers.UUIDField(required=True)
+    decision = serializers.ChoiceField(choices=["APPROVE", "DENY"])
+    reason = serializers.CharField(required=False, allow_blank=True, default="", max_length=512)
 

@@ -352,3 +352,110 @@ class AISecurityAlertEvent:
             "timestamp": self.timestamp,
         }
 
+
+@dataclass(frozen=True)
+class AIStreamChunkEvent:
+    correlation_id: str
+    model: str
+    delta: str
+    is_done: bool = False
+    tokens_out: int = 0
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "AI_RESPONSE_CHUNK",
+            "type": "ai.response.chunk",
+            "correlation_id": self.correlation_id,
+            "model": self.model,
+            "delta": self.delta,
+            "is_done": self.is_done,
+            "tokens_out": self.tokens_out,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class AIStreamLifecycleEvent:
+    correlation_id: str
+    model: str
+    lifecycle_state: str  # STARTED | COMPLETED | FAILED
+    latency_ms: float = 0.0
+    error: str = ""
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": f"AI_RESPONSE_{self.lifecycle_state.upper()}",
+            "type": f"ai.response.{self.lifecycle_state.lower()}",
+            "correlation_id": self.correlation_id,
+            "model": self.model,
+            "lifecycle_state": self.lifecycle_state,
+            "latency_ms": round(float(self.latency_ms), 2),
+            "error": self.error,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class WebJobEvent:
+    event_type: str  # web.job.created, web.job.started, web.job.progress, web.job.completed, web.job.failed, web.job.cancelled
+    job_id: str
+    status: str
+    total: int = 0
+    completed: int = 0
+    failures: int = 0
+    base_url: str = ""
+    error: str = ""
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": self.event_type.upper().replace(".", "_"),
+            "type": self.event_type,
+            "job_id": self.job_id,
+            "status": self.status,
+            "total": self.total,
+            "completed": self.completed,
+            "failures": self.failures,
+            "base_url": self.base_url,
+            "error": self.error,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class WebResearchCompletedEvent:
+    session_id: str
+    status: str
+    source_count: int = 0
+    mode: str = "MEDICAL_EVIDENCE"
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "WEB_RESEARCH_COMPLETED",
+            "type": "web.research.completed",
+            "session_id": self.session_id,
+            "status": self.status,
+            "source_count": self.source_count,
+            "mode": self.mode,
+            "timestamp": self.timestamp,
+        }
+

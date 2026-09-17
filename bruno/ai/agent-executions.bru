@@ -1,0 +1,31 @@
+meta {
+  name: AI-AGENT-EXECUTIONS-001
+  type: http
+  seq: 11
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/agents/sessions/{{agent_session_id}}/run/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "query": "Review latest lactic acid and blood pressure for possible sepsis resuscitation criteria.",
+    "patient_id": null
+  }
+}
+
+assert {
+  res.status: in [200, 400, 401, 403, 404]
+}

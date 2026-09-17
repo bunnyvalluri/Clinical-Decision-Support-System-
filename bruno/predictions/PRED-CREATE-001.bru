@@ -1,0 +1,37 @@
+meta {
+  name: PRED-CREATE-001
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/v1/predictions/records/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "patient": "{{test_patient_id}}",
+    "features": {
+      "systolic_bp": 135,
+      "diastolic_bp": 85,
+      "heart_rate": 78,
+      "temperature": 37.2,
+      "oxygen_saturation": 97
+    }
+  }
+}
+
+assert {
+  res.status: in [200, 201, 400, 401, 404]
+}

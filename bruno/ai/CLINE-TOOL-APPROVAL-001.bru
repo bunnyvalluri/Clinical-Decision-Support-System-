@@ -1,0 +1,32 @@
+meta {
+  name: CLINE-TOOL-APPROVAL-001
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/cline/approvals/decide/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+body:json {
+  {
+    "approval_id": "{{cline_approval_id}}",
+    "decision": "APPROVE",
+    "reason": "Authorized staged test execution by Chief Medical Officer"
+  }
+}
+
+assert {
+  res.status: in [200, 400, 401, 403, 404]
+}

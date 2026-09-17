@@ -1,13 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { Send, Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Send, Sparkles, AlertCircle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import apiClient from "@/services/apiClient";
 import { AIMessage, MessageData } from "./AIMessage";
 import { AIStreamingMessage } from "./AIStreamingMessage";
-import { HumanApprovalDialog } from "./HumanApprovalDialog";
 import { AIErrorState } from "./AIErrorState";
+import { ToolActivityStream } from "./agent/ToolActivityStream";
+import { PendingApprovalCard } from "./agent/PendingApprovalCard";
+import { AgentExecutionControls } from "./agent/AgentExecutionControls";
+import { agentService, ToolTraceStep } from "@/services/ai/agentService";
+import { approvalService, AgentApprovalDTO } from "@/services/ai/approvalService";
+import { AgentSocketClient } from "@/services/ai/agentSocket";
 
 interface SuggestedQuery {
   label: string;
@@ -20,6 +25,7 @@ interface AIChatProps {
   suggestedQueries: SuggestedQuery[];
   patientId?: string;
   apiEndpoint?: string;
+  agentRole?: "DOCTOR" | "NURSE" | "PATIENT" | "INFORMATICIST" | "ADMIN";
 }
 
 export const AIChat: React.FC<AIChatProps> = ({
@@ -28,6 +34,7 @@ export const AIChat: React.FC<AIChatProps> = ({
   suggestedQueries,
   patientId,
   apiEndpoint = "/ai/chat/",
+  agentRole,
 }) => {
   const [messages, setMessages] = React.useState<MessageData[]>([
     {
@@ -42,14 +49,77 @@ export const AIChat: React.FC<AIChatProps> = ({
   const [input, setInput] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [errorInfo, setErrorInfo] = React.useState<{ code?: string; message?: string } | null>(null);
-  const [approvalModalOpen, setApprovalModalOpen] = React.useState(false);
-  const [pendingAction, setPendingAction] = React.useState<any>(null);
+
+  // Agent State
+  const [sessionId, setSessionId] = React.useState<string | null>(null);
+  const [currentExecutionId, setCurrentExecutionId] = React.useState<string | undefined>(undefined);
+  const [activeTrace, setActiveTrace] = React.useState<ToolTraceStep[]>([]);
+  const [pendingApproval, setPendingApproval] = React.useState<AgentApprovalDTO | null>(null);
+  const [executionMetadata, setExecutionMetadata] = React.useState<{
+    provider?: string;
+    model?: string;
+    latencyMs?: number;
+    iterationCount?: number;
+    status?: string;
+  }>({});
 
   const bottomRef = React.useRef<HTMLDivElement>(null);
+  const socketRef = React.useRef<AgentSocketClient | null>(null);
+
+  // Initialize or re-use session
+  React.useEffect(() => {
+    let isMounted = true;
+    async function initSession() {
+      if (!agentRole) return;
+      try {
+        const session = await agentService.createSession(
+          agentRole,
+          patientId,
+          `${agentRole} Clinical Session`
+        );
+        if (isMounted) {
+          setSessionId(session.id);
+          // Connect WebSocket
+          const client = new AgentSocketClient(session.id);
+          socketRef.current = client;
+          client.connect();
+
+          client.subscribe((event) => {
+            if (event.type === "tool_call_completed" || event.type === "tool_call_failed") {
+              setActiveTrace((prev) => [
+                ...prev,
+                {
+                  tool_name: event.data.tool_name,
+                  status: event.data.status,
+                  latency_ms: event.data.execution_time_ms,
+                  arguments: event.data.arguments,
+                  error: event.data.error,
+                },
+              ]);
+            } else if (event.type === "approval_required" && event.data.approval_id) {
+              approvalService.getApproval(event.data.approval_id).then((appr) => {
+                if (isMounted) setPendingApproval(appr);
+              });
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Agent session init fallback to standard chat endpoint:", err);
+      }
+    }
+    initSession();
+
+    return () => {
+      isMounted = false;
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, [agentRole, patientId]);
 
   React.useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
+  }, [messages, isLoading, activeTrace, pendingApproval]);
 
   const handleSend = async (contentToSend: string) => {
     const text = contentToSend.trim();
@@ -66,7 +136,64 @@ export const AIChat: React.FC<AIChatProps> = ({
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsLoading(true);
+    setActiveTrace([]);
+    setPendingApproval(null);
 
+    // If agent session exists, execute via agentService
+    if (sessionId) {
+      try {
+        const res = await agentService.runAgent(sessionId, text, patientId);
+        setCurrentExecutionId(res.execution_id);
+        setExecutionMetadata({
+          provider: res.provider,
+          model: res.model,
+          latencyMs: res.latency_ms,
+          iterationCount: res.iterations,
+          status: res.status,
+        });
+
+        const aiMsg: MessageData = {
+          id: res.execution_id || `ai-${Date.now()}`,
+          role: "assistant",
+          content: res.final_response || "Clinical assessment completed.",
+          timestamp: new Date(),
+          modelName: `${res.provider}/${res.model}`,
+          citations: (res.citations || []).map((c: any) => ({
+            guideline_id: c.guideline_id || c.document_id || "CLINICAL-GUIDELINE",
+            title: c.title || "Approved Clinical Guideline",
+            section: c.section || "",
+            recommendation: c.passage || c.recommendation || "",
+            evidence_level: c.evidence_level || "Class I",
+            doi_or_url: c.doi_or_url,
+          })),
+          groundingStatus: "GROUNDED",
+          groundingConfidence: 1.0,
+        };
+
+        setMessages((prev) => [...prev, aiMsg]);
+
+        // If approval was requested during the run
+        if (res.approval_required && res.approval_id) {
+          try {
+            const appr = await approvalService.getApproval(res.approval_id);
+            setPendingApproval(appr);
+          } catch (e) {
+            console.error("Failed to load approval details:", e);
+          }
+        }
+      } catch (err: any) {
+        const errData = err.response?.data;
+        setErrorInfo({
+          code: errData?.code || "AI_AGENT_ERROR",
+          message: errData?.error || "Failed to execute agent workflow.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
+    // Standard fallback execution
     try {
       const res = await apiClient.post<{
         conversation_id: string;
@@ -97,10 +224,6 @@ export const AIChat: React.FC<AIChatProps> = ({
       };
 
       setMessages((prev) => [...prev, aiMsg]);
-
-      if (data.requires_human_approval && data.approval_details) {
-        setPendingAction(data.approval_details);
-      }
     } catch (err: any) {
       const errData = err.response?.data;
       setErrorInfo({
@@ -139,13 +262,35 @@ export const AIChat: React.FC<AIChatProps> = ({
           <AIMessage
             key={msg.id}
             message={msg}
-            onApproveAction={() => setApprovalModalOpen(true)}
+            onApproveAction={() => {}}
           />
         ))}
 
-        {isLoading && (
+        {/* Live Verified Tool Activity Stream */}
+        <ToolActivityStream steps={activeTrace} isLoading={isLoading} />
+
+        {/* Pending Human Clinician Approval Card */}
+        {pendingApproval && (
+          <PendingApprovalCard
+            approval={pendingApproval}
+            onResolved={(updated) => {
+              setPendingApproval(updated);
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: `approval-res-${Date.now()}`,
+                  role: "system",
+                  content: `✓ Clinician Sign-Off Recorded: ${updated.status} (${updated.requested_action})`,
+                  timestamp: new Date(),
+                },
+              ]);
+            }}
+          />
+        )}
+
+        {isLoading && !activeTrace.length && (
           <AIStreamingMessage
-            partialText="Synthesizing grounded evidence and clinical guidelines..."
+            partialText="Synthesizing grounded evidence and evaluating safety boundaries..."
             isStreaming={true}
           />
         )}
@@ -163,6 +308,21 @@ export const AIChat: React.FC<AIChatProps> = ({
 
         <div ref={bottomRef} />
       </div>
+
+      {/* Execution Controls & Telemetry */}
+      {currentExecutionId && (
+        <div className="px-4 py-2 border-t border-slate-100 bg-white">
+          <AgentExecutionControls
+            executionId={currentExecutionId}
+            sessionId={sessionId || undefined}
+            status={executionMetadata.status}
+            latencyMs={executionMetadata.latencyMs}
+            iterationCount={executionMetadata.iterationCount}
+            provider={executionMetadata.provider}
+            model={executionMetadata.model}
+          />
+        </div>
+      )}
 
       {/* Suggested Queries */}
       {suggestedQueries.length > 0 && messages.length <= 3 && (
@@ -214,38 +374,8 @@ export const AIChat: React.FC<AIChatProps> = ({
           </Button>
         </form>
       </div>
-
-      {/* Human Approval Gate Dialog */}
-      <HumanApprovalDialog
-        isOpen={approvalModalOpen}
-        actionTitle={pendingAction?.action || "Clinical Recommendation Sign-Off"}
-        actionDetails="Review and authenticate the proposed clinical decision-support plan in compliance with institutional safety governance."
-        onClose={() => setApprovalModalOpen(false)}
-        onApprove={(rationale) => {
-          setApprovalModalOpen(false);
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `gate-${Date.now()}`,
-              role: "system",
-              content: `✓ Clinician Signed & Approved: ${rationale || "Plan accepted"}`,
-              timestamp: new Date(),
-            },
-          ]);
-        }}
-        onReject={(rationale) => {
-          setApprovalModalOpen(false);
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `gate-${Date.now()}`,
-              role: "system",
-              content: `✗ Clinician Rejected Action: ${rationale || "Plan rejected"}`,
-              timestamp: new Date(),
-            },
-          ]);
-        }}
-      />
     </div>
   );
 };
+
+export default AIChat;

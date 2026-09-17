@@ -1,0 +1,30 @@
+meta {
+  name: Trigger Loop Run
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/v1/engineering/loops/{{loop_id}}/run/
+  auth: bearer
+  body: json
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+body:json {
+  {
+    "trigger": "MANUAL"
+  }
+}
+
+assert {
+  res.status: in [200, 202]
+}

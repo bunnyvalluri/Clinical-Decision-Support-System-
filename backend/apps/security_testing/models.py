@@ -167,6 +167,32 @@ class SecurityScan(BaseModel):
     timeout_seconds = models.IntegerField(default=300)
     tools_used = models.JSONField(default=list)
     raw_logs_sanitized = models.TextField(blank=True)
+    # Strix integration fields
+    scan_mode = models.CharField(
+        max_length=40,
+        choices=[
+            ("QUICK_SECURITY_REVIEW", "Quick Security Review"),
+            ("STANDARD_SECURITY_ASSESSMENT", "Standard Security Assessment"),
+            ("DEEP_SECURITY_ASSESSMENT", "Deep Security Assessment"),
+        ],
+        default="STANDARD_SECURITY_ASSESSMENT",
+        blank=True,
+    )
+    coverage_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("FULL", "Full Coverage"),
+            ("PARTIAL", "Partial Coverage"),
+            ("INCONCLUSIVE", "Inconclusive"),
+            ("NOT_STARTED", "Not Started"),
+        ],
+        default="NOT_STARTED",
+    )
+    strix_version = models.CharField(max_length=30, blank=True, default="")
+    budget_limit = models.FloatField(default=10.0, help_text="Maximum LLM cost budget in USD")
+    actual_cost = models.FloatField(default=0.0)
+    sarif_artifact_path = models.CharField(max_length=512, blank=True, help_text="Relative path to SARIF 2.1.0 artifact")
+    authorization_snapshot = models.JSONField(default=dict, help_text="Snapshot of authorization state at scan creation")
 
     class Meta:
         ordering = ["-created_at"]
@@ -229,6 +255,39 @@ class SecurityFinding(BaseModel):
     )
     validated_at = models.DateTimeField(null=True, blank=True)
     resolved_at = models.DateTimeField(null=True, blank=True)
+    # Strix integration fields
+    fingerprint = models.CharField(
+        max_length=64,
+        blank=True,
+        db_index=True,
+        help_text="Deterministic SHA-256 fingerprint for cross-scan deduplication",
+    )
+    clinical_impact = models.CharField(
+        max_length=50,
+        blank=True,
+        choices=[
+            ("NONE", "No Clinical Impact"),
+            ("CONFIDENTIALITY", "Patient Confidentiality Risk"),
+            ("INTEGRITY", "Clinical Data Integrity Risk"),
+            ("AVAILABILITY", "Service Availability Risk"),
+            ("PREDICTION_INTEGRITY", "ML Prediction Integrity Risk"),
+            ("AUDIT_INTEGRITY", "Audit Log Integrity Risk"),
+        ],
+        default="NONE",
+    )
+    organizational_risk = models.CharField(
+        max_length=20,
+        choices=[
+            ("CRITICAL", "Critical"),
+            ("HIGH", "High"),
+            ("MEDIUM", "Medium"),
+            ("LOW", "Low"),
+            ("INFORMATIONAL", "Informational"),
+        ],
+        blank=True,
+        default="",
+    )
+    is_regression = models.BooleanField(default=False, help_text="True if this is a re-occurrence of a previously fixed finding")
 
     class Meta:
         ordering = ["-created_at"]
@@ -460,3 +519,249 @@ class ReconFinding(BaseModel):
 class ReconEvidence(BaseModel):
     finding = models.ForeignKey(ReconFinding, on_delete=models.CASCADE, related_name="recon_evidences")
     evidence_data = models.JSONField(default=dict)
+
+
+# ---------------------------------------------------------------------------
+# Prompt 44: Pentest-Agents & Common Security Provider Abstraction Models
+# ---------------------------------------------------------------------------
+
+# Domain alias: SecurityAssessment is synonymous with SecurityScan
+SecurityAssessment = SecurityScan
+
+
+class SecurityProviderType(models.TextChoices):
+    STRIX = "STRIX", "Strix AI Security Engine"
+    AGENTIC_BUGHUNTER = "AGENTIC_BUGHUNTER", "Agentic Bug Hunter Toolkit"
+    PENTEST_AGENTS = "PENTEST_AGENTS", "H-mmer Pentest-Agents Framework"
+
+
+class AgentRunStatus(models.TextChoices):
+    PLANNED = "PLANNED", "Planned"
+    AUTHORIZED = "AUTHORIZED", "Authorized"
+    QUEUED = "QUEUED", "Queued in Celery"
+    RUNNING = "RUNNING", "Running"
+    PAUSED = "PAUSED", "Paused"
+    WAITING_APPROVAL = "WAITING_APPROVAL", "Waiting for Approval"
+    VALIDATING = "VALIDATING", "Validating Output"
+    COMPLETED = "COMPLETED", "Completed"
+    FAILED = "FAILED", "Failed"
+    CANCELLED = "CANCELLED", "Cancelled"
+    EXPIRED = "EXPIRED", "Expired"
+
+
+class AgentRoleType(models.TextChoices):
+    RECON = "RECON", "Reconnaissance Agent"
+    SAST = "SAST", "Static Application Security Testing Agent"
+    API_SECURITY = "API_SECURITY", "API Security Agent"
+    AUTH_SECURITY = "AUTH_SECURITY", "Authorization & RBAC Agent"
+    IDOR = "IDOR", "IDOR Detection Agent"
+    INPUT_VALIDATION = "INPUT_VALIDATION", "Input Validation Agent"
+    WEB_SECURITY = "WEB_SECURITY", "Web Security Agent"
+    CLOUD_SECURITY = "CLOUD_SECURITY", "Cloud Security Agent"
+    AI_SECURITY = "AI_SECURITY", "AI & Prompt Security Agent"
+    VALIDATOR = "VALIDATOR", "7-Question Validation Agent"
+    REPORT_WRITER = "REPORT_WRITER", "Report Drafting Agent"
+    DUPLICATE_CHECKER = "DUPLICATE_CHECKER", "Duplicate Detection Agent"
+
+
+class SecurityAgentRun(BaseModel):
+    """
+    Execution trace for an isolated security agent run within a controlled workspace.
+    """
+    provider = models.CharField(
+        max_length=30,
+        choices=SecurityProviderType.choices,
+        default=SecurityProviderType.PENTEST_AGENTS,
+        db_index=True,
+    )
+    agent = models.CharField(
+        max_length=40,
+        choices=AgentRoleType.choices,
+        default=AgentRoleType.API_SECURITY,
+        db_index=True,
+    )
+    task = models.CharField(max_length=255, help_text="Specific testing task or objective")
+    assessment = models.ForeignKey(
+        SecurityScan,
+        on_delete=models.CASCADE,
+        related_name="agent_runs",
+        help_text="Parent security assessment / scan",
+    )
+    status = models.CharField(
+        max_length=30,
+        choices=AgentRunStatus.choices,
+        default=AgentRunStatus.PLANNED,
+        db_index=True,
+    )
+    start_time = models.DateTimeField(null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    token_usage = models.JSONField(
+        default=dict,
+        help_text="Token usage breakdown: {'prompt_tokens': 0, 'completion_tokens': 0, 'total_tokens': 0, 'estimated_cost': 0.0}",
+    )
+    tool_calls = models.JSONField(
+        default=list,
+        help_text="Sanitized chronological audit trail of agent tool calls",
+    )
+    result = models.JSONField(
+        default=dict,
+        help_text="Normalized agent execution findings and output",
+    )
+    error = models.TextField(blank=True)
+    correlation_id = models.CharField(
+        max_length=64,
+        blank=True,
+        db_index=True,
+        help_text="Distributed tracing correlation ID",
+    )
+    workspace_path = models.CharField(
+        max_length=512,
+        blank=True,
+        help_text="Path to ephemeral workspace directory in security_workspaces/",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.provider} [{self.agent}] - {self.task[:30]} ({self.status})"
+
+
+class SecurityAgentCapability(BaseModel):
+    """
+    Capability registry defining permissions, risks, and environment constraints for agents.
+    Default-deny enforced: capabilities must be explicitly enabled.
+    """
+    capability = models.CharField(
+        max_length=40,
+        unique=True,
+        choices=[
+            ("RECON", "Reconnaissance"),
+            ("SAST", "Static Application Security Testing"),
+            ("API_TESTING", "API Endpoint Security Testing"),
+            ("AUTH_TESTING", "Authorization Matrix Testing"),
+            ("IDOR", "Insecure Direct Object Reference"),
+            ("RCE_ANALYSIS", "Remote Code Execution Analysis"),
+            ("SSRF_ANALYSIS", "SSRF Boundary Analysis"),
+            ("XSS_ANALYSIS", "Cross-Site Scripting Analysis"),
+            ("WEB3_ANALYSIS", "Web3 / Cryptographic Key Testing"),
+            ("EXPLOIT_CHAINING", "Safe Multi-step Exploit Chaining Analysis"),
+            ("WRITEUP_ANALYSIS", "Approved Bug Bounty Writeup Search"),
+            ("REPORT_GENERATION", "Standardized Security Report Drafting"),
+        ],
+    )
+    risk_level = models.CharField(
+        max_length=20,
+        choices=[
+            ("LOW", "Low Risk"),
+            ("MEDIUM", "Medium Risk"),
+            ("HIGH", "High Risk"),
+            ("CRITICAL", "Critical Risk"),
+        ],
+        default="MEDIUM",
+    )
+    required_permission = models.CharField(max_length=100, default="SECURITY_AGENT_RUN")
+    allowed_environment = models.CharField(
+        max_length=30,
+        choices=SecurityEnvironment.choices,
+        default=SecurityEnvironment.SECURITY_TEST,
+    )
+    network_policy = models.CharField(
+        max_length=30,
+        choices=[
+            ("NONE", "No Network (Isolated Sandbox)"),
+            ("RESTRICTED", "Restricted to Target Host Only"),
+            ("TARGET_ONLY", "Direct Target Port Only"),
+        ],
+        default="NONE",
+    )
+    approval_required = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Capability {self.capability} [Risk: {self.risk_level}]"
+
+
+class MCPToolRegistry(BaseModel):
+    """
+    Registry for Model Context Protocol (MCP) tools available to security agents.
+    Strict Default-Deny: Any unregistered or unapproved tool is rejected.
+    """
+    name = models.CharField(max_length=100, unique=True, help_text="MCP Tool Identifier (e.g. mcp_bounty_search)")
+    description = models.TextField()
+    risk = models.CharField(
+        max_length=20,
+        choices=[
+            ("LOW", "Low Risk"),
+            ("MEDIUM", "Medium Risk"),
+            ("HIGH", "High Risk"),
+            ("CRITICAL", "Critical Risk"),
+        ],
+        default="HIGH",
+    )
+    permissions = models.JSONField(default=list, help_text="Required user/system permissions")
+    allowed_roles = models.JSONField(default=list, help_text="Allowed agent roles (e.g. ['REPORT_WRITER', 'RECON'])")
+    allowed_targets = models.JSONField(default=list, help_text="Target names or '*' if governed by target authorization")
+    network_scope = models.CharField(
+        max_length=30,
+        choices=[
+            ("LOCAL_ONLY", "Local Sandbox Only"),
+            ("TARGET_ONLY", "Authorized Target Network"),
+            ("BLOCKED", "Network Access Blocked"),
+        ],
+        default="BLOCKED",
+    )
+    data_classification = models.CharField(
+        max_length=30,
+        choices=[
+            ("PUBLIC", "Public"),
+            ("INTERNAL", "Internal"),
+            ("RESTRICTED", "Restricted (No Secrets/PHI)"),
+        ],
+        default="RESTRICTED",
+    )
+    approval_requirement = models.BooleanField(default=True)
+    is_enabled = models.BooleanField(default=False, help_text="Explicit enable switch (Default DENY)")
+
+    def __str__(self):
+        return f"MCP Tool: {self.name} (Enabled: {self.is_enabled})"
+
+
+class SecurityFindingCluster(BaseModel):
+    """
+    Correlates and deduplicates findings discovered across multiple security providers
+    (Strix, Agentic Bug Hunter, Pentest-Agents) using deterministic fingerprints.
+    """
+    cluster_hash = models.CharField(max_length=64, unique=True, db_index=True)
+    title = models.CharField(max_length=255)
+    vulnerability_type = models.CharField(max_length=100, db_index=True)
+    affected_endpoint = models.CharField(max_length=255)
+    primary_finding = models.ForeignKey(
+        SecurityFinding,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="primary_cluster",
+    )
+    findings = models.ManyToManyField(
+        SecurityFinding,
+        related_name="finding_clusters",
+        blank=True,
+    )
+    providers = models.JSONField(
+        default=list,
+        help_text="List of providers that confirmed this finding (e.g. ['STRIX', 'PENTEST_AGENTS'])",
+    )
+    confidence_score = models.FloatField(default=0.8)
+    status = models.CharField(
+        max_length=30,
+        choices=FindingState.choices,
+        default=FindingState.TRIAGED,
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Cluster {self.cluster_hash[:8]} - {self.title} [{len(self.providers)} providers]"
+

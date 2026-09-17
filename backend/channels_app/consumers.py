@@ -383,6 +383,12 @@ class AIOrchestratorConsumer(BaseConsumer):
                 task_group = f"ai_task_{task_id}"
                 await self.channel_layer.group_add(task_group, self.channel_name)
                 await self.send_json_message({"type": "subscribed", "group": task_group})
+        elif msg_type == "subscribe_cline_session":
+            session_id = content.get("session_id")
+            if session_id:
+                session_group = f"cline_session_{session_id}"
+                await self.channel_layer.group_add(session_group, self.channel_name)
+                await self.send_json_message({"type": "subscribed", "group": session_group})
 
 
 class WhiteboardCollaborationConsumer(BaseConsumer):

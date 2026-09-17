@@ -81,7 +81,13 @@ LOCAL_APPS = [
     "apps.mobile_gateway.apps.MobileGatewayConfig",
     "apps.whiteboards.apps.WhiteboardsConfig",
     "apps.nocodb.apps.NocodbConfig",
+    "apps.search.apps.SearchConfig",
+    "apps.infrastructure.apps.InfrastructureConfig",
+    "apps.ai_agents.apps.AiAgentsConfig",
+    "apps.web_intelligence.apps.WebIntelligenceConfig",
+    "apps.engineering_loops.apps.EngineeringLoopsConfig",
 ]
+
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -258,6 +264,7 @@ CELERY_TASK_ROUTES = {
     "apps.predictions.tasks.*": {"queue": "ml"},
     "celery_tasks.ml_tasks.*": {"queue": "ml"},
     "celery_tasks.scheduled_tasks.*": {"queue": "default"},
+    "apps.search.tasks.*": {"queue": "default"},
 }
 
 # Worker concurrency & reliability
@@ -426,3 +433,42 @@ LOGGING = {
         },
     },
 }
+
+# ---------------------------------------------------------------------------
+# Centralized DevSecOps & Strix Security Testing Configuration
+# ---------------------------------------------------------------------------
+SECURITY_SCANNING_ENABLED = config("SECURITY_SCANNING_ENABLED", default=True, cast=bool)
+SECURITY_SCAN_ENVIRONMENT = config("SECURITY_SCAN_ENVIRONMENT", default="SECURITY_TEST")
+SECURITY_SCAN_MAX_CONCURRENCY = config("SECURITY_SCAN_MAX_CONCURRENCY", default=2, cast=int)
+SECURITY_SCAN_MAX_DURATION = config("SECURITY_SCAN_MAX_DURATION", default=300, cast=int)
+SECURITY_SCAN_MAX_BUDGET = config("SECURITY_SCAN_MAX_BUDGET", default=10.0, cast=float)
+SECURITY_PRODUCTION_SCAN_ENABLED = config("SECURITY_PRODUCTION_SCAN_ENABLED", default=False, cast=bool)
+SECURITY_ALLOWED_TARGETS = config("SECURITY_ALLOWED_TARGETS", default="localhost,127.0.0.1,cdss-staging.internal", cast=Csv())
+SECURITY_ALLOWED_DOMAINS = config("SECURITY_ALLOWED_DOMAINS", default="localhost,127.0.0.1,cdss-staging.internal", cast=Csv())
+SECURITY_ALLOW_EXTERNAL_STRIX = config("SECURITY_ALLOW_EXTERNAL_STRIX", default=False, cast=bool)
+SECURITY_STRIX_VERSION = config("SECURITY_STRIX_VERSION", default="1.0.2")
+SECURITY_STRIX_IMAGE = config("SECURITY_STRIX_IMAGE", default="usestrix/strix:1.0.2")
+SECURITY_KILL_SWITCH = config("SECURITY_KILL_SWITCH", default=False, cast=bool)
+
+# ---------------------------------------------------------------------------
+# Firecrawl Web Intelligence & Controlled Web Retrieval Configuration
+# ---------------------------------------------------------------------------
+FIRECRAWL_ENABLED = config("FIRECRAWL_ENABLED", default=True, cast=bool)
+FIRECRAWL_MODE = config("FIRECRAWL_MODE", default="self_hosted")
+FIRECRAWL_BASE_URL = config("FIRECRAWL_BASE_URL", default="http://localhost:3002")
+FIRECRAWL_API_KEY = config("FIRECRAWL_API_KEY", default="")
+FIRECRAWL_CONNECT_TIMEOUT = config("FIRECRAWL_CONNECT_TIMEOUT", default=5, cast=int)
+FIRECRAWL_REQUEST_TIMEOUT = config("FIRECRAWL_REQUEST_TIMEOUT", default=30, cast=int)
+FIRECRAWL_MAX_CONCURRENCY = config("FIRECRAWL_MAX_CONCURRENCY", default=5, cast=int)
+FIRECRAWL_MAX_CRAWL_PAGES = config("FIRECRAWL_MAX_CRAWL_PAGES", default=50, cast=int)
+FIRECRAWL_MAX_BATCH_URLS = config("FIRECRAWL_MAX_BATCH_URLS", default=20, cast=int)
+FIRECRAWL_MAX_CONTENT_BYTES = config("FIRECRAWL_MAX_CONTENT_BYTES", default=5242880, cast=int)
+FIRECRAWL_ALLOWED_DOMAINS = config("FIRECRAWL_ALLOWED_DOMAINS", default="", cast=Csv())
+FIRECRAWL_BLOCKED_DOMAINS = config("FIRECRAWL_BLOCKED_DOMAINS", default="", cast=Csv())
+FIRECRAWL_ALLOW_PUBLIC_WEB_SEARCH = config("FIRECRAWL_ALLOW_PUBLIC_WEB_SEARCH", default=True, cast=bool)
+FIRECRAWL_ALLOW_CRAWL = config("FIRECRAWL_ALLOW_CRAWL", default=True, cast=bool)
+FIRECRAWL_ALLOW_INTERACT = config("FIRECRAWL_ALLOW_INTERACT", default=False, cast=bool)
+FIRECRAWL_ALLOW_AGENT = config("FIRECRAWL_ALLOW_AGENT", default=False, cast=bool)
+FIRECRAWL_ROBOTS_POLICY = config("FIRECRAWL_ROBOTS_POLICY", default="respect")
+FIRECRAWL_CIRCUIT_FAIL_MAX = config("FIRECRAWL_CIRCUIT_FAIL_MAX", default=5, cast=int)
+FIRECRAWL_CIRCUIT_RESET_SEC = config("FIRECRAWL_CIRCUIT_RESET_SEC", default=60, cast=int)

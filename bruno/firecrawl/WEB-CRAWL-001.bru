@@ -1,0 +1,32 @@
+meta {
+  name: WEB-CRAWL-001
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/v1/web/crawl/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+body:json {
+  {
+    "url": "https://www.cdc.gov/sepsis/clinical-tools/",
+    "limit": 10,
+    "max_depth": 2
+  }
+}
+
+assert {
+  res.status: in [200, 202, 401, 403, 503]
+}

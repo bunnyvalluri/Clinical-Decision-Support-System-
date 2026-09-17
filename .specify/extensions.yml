@@ -1,0 +1,56 @@
+# Spec Kit Extensions and Governance Hooks Configuration
+# Healthcare Clinical Decision Support System (CDSS)
+
+version: "1.0.0"
+project: "Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction"
+preset: "healthcare-cdss"
+
+extensions:
+  - name: "clinical-safety"
+    description: "Audits specifications and plans against deterministic clinical safety rules (qSOFA, NEWS2) and enforces clinician sign-off"
+    enabled: true
+    priority: 1
+  - name: "ml-governance"
+    description: "Validates model calibration, TreeSHAP attributions, feature drift (PSI), and forbids metric fabrication"
+    enabled: true
+    priority: 2
+  - name: "security-gate"
+    description: "Enforces multi-tier backend authorization, IDOR checks, prompt injection barriers, and zero-PHI context minimization"
+    enabled: true
+    priority: 3
+  - name: "convergence"
+    description: "Evaluates cross-artifact alignment across Spec, Plan, Tasks, Code, Tests, and Documentation"
+    enabled: true
+    priority: 4
+
+hooks:
+  before_specify:
+    - name: "clinical_boundary_check"
+      command: "speckit.clinical.boundary"
+      description: "Verify that proposed feature does not attempt autonomous diagnosis or prescription"
+      optional: false
+  before_plan:
+    - name: "constitution_audit"
+      command: "speckit.constitution.audit"
+      description: "Verify compliance with the Thirty Articles of the Healthcare CDSS Constitution"
+      optional: false
+  before_tasks:
+    - name: "testability_check"
+      command: "speckit.testability.check"
+      description: "Verify that all user stories and FRs have testable criteria and assigned stable IDs"
+      optional: false
+  after_tasks:
+    - name: "traceability_matrix_sync"
+      command: "speckit.traceability.sync"
+      description: "Synchronize requirement IDs to tasks in specs/TRACEABILITY-MATRIX.md"
+      optional: false
+  before_implement:
+    - name: "security_pre_flight"
+      command: "speckit.security.preflight"
+      description: "Verify object-level authorization and zero-PHI data constraints before coding"
+      optional: false
+  after_implement:
+    - name: "convergence_validation"
+      command: "speckit.converge"
+      description: "Verify functional, security, clinical, and documentation convergence"
+      optional: false

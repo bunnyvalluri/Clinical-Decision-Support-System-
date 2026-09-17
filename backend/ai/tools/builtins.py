@@ -211,6 +211,152 @@ def register_builtin_tools() -> None:
         )
     )
 
+    # -----------------------------------------------------------------------
+    # Firecrawl Web Intelligence Tools
+    # -----------------------------------------------------------------------
+    def handle_firecrawl_search(query: str, limit: int = 5, **kwargs) -> Dict[str, Any]:
+        from integrations.firecrawl.service import WebIntelligenceService
+        service = WebIntelligenceService()
+        res = service.search(query=query, role="DOCTOR", limit=limit)
+        return {
+            "query": res.query,
+            "total_count": res.total_count,
+            "results": [
+                {
+                    "title": r.title,
+                    "url": r.url,
+                    "snippet": r.snippet,
+                    "trust_tier": r.trust_tier.value,
+                    "content_hash": r.content_hash,
+                }
+                for r in res.results
+            ],
+        }
+
+    def handle_firecrawl_scrape(url: str, **kwargs) -> Dict[str, Any]:
+        from integrations.firecrawl.service import WebIntelligenceService
+        service = WebIntelligenceService()
+        doc = service.scrape_url(url=url, role="DOCTOR")
+        return {
+            "url": doc.url,
+            "title": doc.title,
+            "markdown": doc.markdown[:2000],  # Bounded context window
+            "content_hash": doc.content_hash,
+            "trust_tier": doc.trust_tier.value,
+        }
+
+    def handle_firecrawl_map(url: str, limit: int = 50, **kwargs) -> Dict[str, Any]:
+        from integrations.firecrawl.service import WebIntelligenceService
+        service = WebIntelligenceService()
+        res = service.map_website(url=url, role="DOCTOR", limit=limit)
+        return {"url": res.url, "links": res.links[:limit], "total": res.total_links}
+
+    def handle_firecrawl_crawl(url: str, limit: int = 25, **kwargs) -> Dict[str, Any]:
+        from apps.web_intelligence.models import WebCrawlJob, JobStateChoices
+        from apps.web_intelligence.tasks import execute_crawl_task
+        job = WebCrawlJob.objects.create(
+            base_url=url,
+            role="DOCTOR",
+            status=JobStateChoices.QUEUED,
+            total_pages=limit,
+        )
+        execute_crawl_task.delay(str(job.id))
+        return {"job_id": str(job.id), "status": "QUEUED", "base_url": url}
+
+    def handle_firecrawl_extract(urls: list, schema: dict, prompt: str = "", **kwargs) -> Dict[str, Any]:
+        from integrations.firecrawl.service import WebIntelligenceService
+        service = WebIntelligenceService()
+        return service.extract_data(urls=urls, schema=schema, role="DOCTOR", prompt=prompt)
+
+    AIToolRegistry.register(
+        ToolDefinition(
+            name="firecrawl_search",
+            description="Search external medical literature, clinical guidelines, and verified web evidence.",
+            action_level=ActionLevel.LEVEL_0,
+            allowed_roles=["DOCTOR", "NURSE", "INFORMATICIST", "ADMIN"],
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "query": {"type": "string", "description": "Medical search query"},
+                    "limit": {"type": "integer", "description": "Number of results (max 10)"},
+                },
+                "required": ["query"],
+            },
+            output_schema={"type": "object"},
+            handler=handle_firecrawl_search,
+        )
+    )
+
+    AIToolRegistry.register(
+        ToolDefinition(
+            name="firecrawl_scrape",
+            description="Scrape and sanitize a specific web page into clean markdown with SSRF protection.",
+            action_level=ActionLevel.LEVEL_0,
+            allowed_roles=["DOCTOR", "INFORMATICIST", "ADMIN"],
+            input_schema={
+                "type": "object",
+                "properties": {"url": {"type": "string", "description": "Target HTTP/HTTPS URL"}},
+                "required": ["url"],
+            },
+            output_schema={"type": "object"},
+            handler=handle_firecrawl_scrape,
+        )
+    )
+
+    AIToolRegistry.register(
+        ToolDefinition(
+            name="firecrawl_map",
+            description="Discover links and structure on an approved medical website.",
+            action_level=ActionLevel.LEVEL_0,
+            allowed_roles=["DOCTOR", "INFORMATICIST", "ADMIN"],
+            input_schema={
+                "type": "object",
+                "properties": {"url": {"type": "string", "description": "Target website URL"}},
+                "required": ["url"],
+            },
+            output_schema={"type": "object"},
+            handler=handle_firecrawl_map,
+        )
+    )
+
+    AIToolRegistry.register(
+        ToolDefinition(
+            name="firecrawl_crawl",
+            description="Launch an asynchronous background site crawl job.",
+            action_level=ActionLevel.LEVEL_1,
+            allowed_roles=["INFORMATICIST", "ADMIN"],
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "url": {"type": "string", "description": "Root URL to crawl"},
+                    "limit": {"type": "integer", "description": "Maximum pages to crawl"},
+                },
+                "required": ["url"],
+            },
+            output_schema={"type": "object"},
+            handler=handle_firecrawl_crawl,
+        )
+    )
+
+    AIToolRegistry.register(
+        ToolDefinition(
+            name="firecrawl_extract",
+            description="Extract structured JSON matching a Pydantic/JSON schema from web pages.",
+            action_level=ActionLevel.LEVEL_1,
+            allowed_roles=["DOCTOR", "INFORMATICIST", "ADMIN"],
+            input_schema={
+                "type": "object",
+                "properties": {
+                    "urls": {"type": "array", "items": {"type": "string"}},
+                    "schema": {"type": "object"},
+                },
+                "required": ["urls", "schema"],
+            },
+            output_schema={"type": "object"},
+            handler=handle_firecrawl_extract,
+        )
+    )
+
 
 # Automatically register on module import
 register_builtin_tools()

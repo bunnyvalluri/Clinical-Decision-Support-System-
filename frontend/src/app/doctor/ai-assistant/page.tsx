@@ -33,6 +33,7 @@ export default function DoctorAIAssistantPage() {
 
       <div className="flex-1 min-h-0">
         <AIChat
+          agentRole="DOCTOR"
           roleSubtitle="Clinical Decision Support · Grounded Literature (SSC, KDIGO, AHA) · Multi-Agent Governance"
           initialGreeting="Hello, Doctor. I am your HealthNova AI Clinical Assistant. I can assist you with grounded clinical guideline retrieval, calibrated ML risk explanations, and draft encounter notes. All clinical actions operate strictly under Human-in-the-Loop governance."
           suggestedQueries={DOCTOR_QUERIES}

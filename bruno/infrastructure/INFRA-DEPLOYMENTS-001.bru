@@ -1,0 +1,24 @@
+meta {
+  name: INFRA-DEPLOYMENTS-001
+  type: http
+  seq: 3
+}
+
+# Historical deployment activity check
+get {
+  url: {{base_url}}/api/v1/infrastructure/deployments/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+assert {
+  res.status: in [200, 401, 403]
+}

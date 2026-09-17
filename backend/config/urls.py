@@ -7,12 +7,16 @@ WebSocket routing is handled by Django Channels (see config/asgi.py).
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
+from apps.ai_orchestrator.ollama_views import OllamaHealthView
 
 admin.site.site_header = "HealthNova AI Administration"
 admin.site.site_title = "HealthNova AI"
 admin.site.index_title = "HealthNova AI Administration"
 
 urlpatterns = [
+    # Direct alias for Ollama Healthcheck
+    path("api/ai/providers/ollama/health", OllamaHealthView.as_view(), name="ollama-health-direct"),
+    path("api/ai/providers/ollama/health/", OllamaHealthView.as_view(), name="ollama-health-direct-slash"),
     # Admin interface
     path("admin/", admin.site.urls),
 
@@ -28,6 +32,7 @@ urlpatterns = [
     path("api/v1/ml/", include("apps.ml_engine.urls", namespace="ml_engine")),
     path("api/v1/models/", include("apps.model_registry.urls", namespace="model_registry")),
     path("api/v1/audit/", include("apps.audit.urls", namespace="audit")),
+    path("api/v1/ai/agents/", include("apps.ai_agents.urls", namespace="ai_agents")),
     path("api/v1/ai/", include("apps.ai_orchestrator.urls", namespace="ai_orchestrator")),
     path("api/v1/external-apis/", include("apps.external_apis.urls", namespace="external_apis")),
     path("api/v1/user/", include("apps.patient_portal.urls")),
@@ -35,7 +40,14 @@ urlpatterns = [
     path("api/v1/mobile/", include("apps.mobile_gateway.urls", namespace="mobile_gateway")),
     path("api/v1/whiteboards/", include("apps.whiteboards.urls", namespace="whiteboards")),
     path("api/v1/nocodb/", include("apps.nocodb.urls", namespace="nocodb")),
+    path("api/v1/search/", include("apps.search.urls", namespace="search")),
+    path("api/v1/infrastructure/", include("apps.infrastructure.urls", namespace="infrastructure")),
+    path("api/v1/web/", include(("apps.web_intelligence.urls", "web_intelligence"), namespace="web_intelligence")),
+    path("api/web/", include(("apps.web_intelligence.urls", "web_intelligence"), namespace="web_intelligence_compat")),
+    path("api/v1/engineering/", include("apps.engineering_loops.urls", namespace="engineering_loops")),
+    path("api/engineering/", include("apps.engineering_loops.urls", namespace="engineering_loops_compat")),
 ]
+
 
 # Debug toolbar (development only)
 if settings.DEBUG:

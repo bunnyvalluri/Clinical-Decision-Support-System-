@@ -1,0 +1,22 @@
+meta {
+  name: List Engineering Loops
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/v1/engineering/loops/
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+assert {
+  res.status: eq 200
+}

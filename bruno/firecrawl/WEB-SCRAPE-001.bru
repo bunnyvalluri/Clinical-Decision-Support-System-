@@ -1,0 +1,31 @@
+meta {
+  name: WEB-SCRAPE-001
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/v1/web/scrape/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "url": "https://www.who.int/news-room/fact-sheets/detail/sepsis",
+    "only_main_content": true
+  }
+}
+
+assert {
+  res.status: in [200, 401, 403, 503]
+}

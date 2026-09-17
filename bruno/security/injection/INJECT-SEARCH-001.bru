@@ -1,0 +1,25 @@
+meta {
+  name: INJECT-SEARCH-001
+  type: http
+  seq: 1
+}
+
+# Verify search handles boolean injection and single quotes without crashing or unauthorized data leakage
+get {
+  url: {{base_url}}/api/v1/search/?q=test' OR '1'='1 --
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: in [200, 400, 401]
+}
+

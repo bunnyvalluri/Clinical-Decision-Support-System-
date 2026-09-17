@@ -284,6 +284,7 @@ function getAuthorizedMobileNavItems(
             "/admin/redis",
             "/admin/celery",
             "/admin/websockets",
+            "/admin/infrastructure",
           ],
           authorizedRoles: ["IT_ADMIN", "ADMIN"],
         },

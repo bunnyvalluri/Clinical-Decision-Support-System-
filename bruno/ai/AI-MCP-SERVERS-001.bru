@@ -1,0 +1,23 @@
+meta {
+  name: AI-MCP-SERVERS-001
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/v1/ai/mcp/servers/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{informaticist_access_token}}
+}
+
+assert {
+  res.status: in [200, 401, 403]
+}

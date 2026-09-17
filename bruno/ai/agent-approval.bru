@@ -1,0 +1,31 @@
+meta {
+  name: AI-AGENT-APPROVAL-001
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/agents/approvals/{{approval_id}}/decide/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "decision": "APPROVED",
+    "rationale": "Verified lactic acid > 4.0 mmol/L and MAP < 65 mmHg; accepting resuscitation guideline."
+  }
+}
+
+assert {
+  res.status: in [200, 400, 401, 403, 404]
+}

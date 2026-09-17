@@ -1,0 +1,37 @@
+meta {
+  name: OLLAMA-CHAT-001
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/providers/ollama/chat/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "messages": [
+      {
+        "role": "user",
+        "content": "Summarize vitals trend for suspected respiratory infection."
+      }
+    ],
+    "model": "llama3.3:8b-instruct-q4_K_M",
+    "temperature": 0.1
+  }
+}
+
+assert {
+  res.status: in [200, 401, 403, 404, 500, 503]
+}

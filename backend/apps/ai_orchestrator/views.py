@@ -1060,3 +1060,317 @@ class MCPServerListView(APIView):
         serializer = MCPServerSerializer(servers, many=True)
         return Response({"count": servers.count(), "results": serializer.data}, status=status.HTTP_200_OK)
 
+
+# ===========================================================================
+# Cline Controlled Agent Execution Layer Views (Prompt 37)
+# ===========================================================================
+
+from .models import (
+    ClineAgentSession,
+    ClineAgentTask,
+    ClineAgentEvent,
+    ClineAgentApproval,
+    ClineMCPServerRegistry,
+    ClineToolDefinition,
+)
+from .serializers import (
+    ClineAgentSessionSerializer,
+    ClineAgentTaskSerializer,
+    ClineAgentEventSerializer,
+    ClineAgentApprovalSerializer,
+    ClineTaskCreateSerializer,
+    ClineApprovalDecisionSerializer,
+)
+from integrations.cline.session_service import ClineSessionService
+from integrations.cline.adapter import ClineAgentAdapter
+from integrations.cline.event_adapter import ClineEventAdapter
+from integrations.cline.tool_registry import ClineToolRegistry
+
+
+class ClineSessionListView(APIView):
+    """
+    GET /api/v1/ai/cline/sessions/
+    POST /api/v1/ai/cline/sessions/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        role = getattr(request.user, "role", "PATIENT")
+        qs = ClineAgentSession.objects.all()
+        if role not in ["ADMIN", "SUPERADMIN"] and not request.user.is_staff:
+            qs = qs.filter(user=request.user)
+
+        serializer = ClineAgentSessionSerializer(qs[:50], many=True)
+        return Response({"count": qs.count(), "results": serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request: Request) -> Response:
+        role = getattr(request.user, "role", "PATIENT")
+        agent_type = request.data.get("agent_type", "CLINICAL_KNOWLEDGE_ASSISTANT")
+        purpose = request.data.get("purpose", "General Clinical Guidance")
+        env = request.data.get("environment", "DEVELOPMENT")
+
+        try:
+            session = ClineSessionService.create_session(
+                user=request.user,
+                role=role,
+                agent_type=agent_type,
+                purpose=purpose,
+                environment=env,
+            )
+            serializer = ClineAgentSessionSerializer(session)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except PermissionError as pe:
+            return Response({"error": str(pe), "code": "ROLE_RESTRICTION"}, status=status.HTTP_403_FORBIDDEN)
+        except Exception as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClineSessionDetailView(APIView):
+    """
+    GET /api/v1/ai/cline/sessions/<uuid:session_id>/
+    DELETE /api/v1/ai/cline/sessions/<uuid:session_id>/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request, session_id: uuid.UUID) -> Response:
+        session = get_object_or_404(ClineAgentSession, id=session_id)
+        if session.user != request.user and not request.user.is_staff:
+            return Response({"error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ClineAgentSessionSerializer(session)
+        events = ClineAgentEvent.objects.filter(session=session).order_by("-timestamp")[:30]
+        tasks = ClineAgentTask.objects.filter(session=session).order_by("-created_at")[:10]
+
+        return Response(
+            {
+                "session": serializer.data,
+                "recent_tasks": ClineAgentTaskSerializer(tasks, many=True).data,
+                "recent_events": ClineAgentEventSerializer(events, many=True).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def delete(self, request: Request, session_id: uuid.UUID) -> Response:
+        session = get_object_or_404(ClineAgentSession, id=session_id)
+        if session.user != request.user and not request.user.is_staff:
+            return Response({"error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        session.status = ClineAgentSession.SessionStatus.TERMINATED
+        session.save(update_fields=["status", "updated_at"])
+        return Response({"message": "Agent session terminated safely."}, status=status.HTTP_200_OK)
+
+
+class ClineTaskCreateView(APIView):
+    """
+    POST /api/v1/ai/cline/tasks/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = ClineTaskCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        session_id = serializer.validated_data["session_id"]
+        prompt = serializer.validated_data["prompt"]
+        task_type = serializer.validated_data.get("task_type", "QUERY_ANALYSIS")
+
+        session = get_object_or_404(ClineAgentSession, id=session_id)
+        if session.user != request.user and not request.user.is_staff:
+            return Response({"error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            task = ClineSessionService.create_task(
+                session_id=str(session.id),
+                prompt=prompt,
+                task_type=task_type,
+                user=request.user,
+            )
+
+            # Attempt async dispatch via Celery if available, or synchronous adapter fallback
+            try:
+                from celery_tasks.cline_tasks import execute_cline_task_async
+                execute_cline_task_async.delay(
+                    session_id=str(session.id),
+                    task_id=str(task.id),
+                    prompt=prompt,
+                )
+                async_dispatched = True
+            except Exception:
+                # Fallback to direct synchronous execution in dev environment
+                adapter = ClineAgentAdapter(session_id=str(session.id))
+                adapter.execute_task(task_id=str(task.id), prompt=prompt)
+                async_dispatched = False
+
+            task.refresh_from_db()
+            task_data = ClineAgentTaskSerializer(task).data
+            task_data["async_dispatched"] = async_dispatched
+            return Response(task_data, status=status.HTTP_201_CREATED)
+        except PermissionError as pe:
+            return Response({"error": str(pe), "code": "KILL_SWITCH_ACTIVE"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        except Exception as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClineTaskDetailView(APIView):
+    """
+    GET /api/v1/ai/cline/tasks/<uuid:task_id>/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request, task_id: uuid.UUID) -> Response:
+        task = get_object_or_404(ClineAgentTask, id=task_id)
+        if task.session.user != request.user and not request.user.is_staff:
+            return Response({"error": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
+
+        events = ClineAgentEvent.objects.filter(task=task).order_by("timestamp")
+        approvals = ClineAgentApproval.objects.filter(task=task)
+
+        return Response(
+            {
+                "task": ClineAgentTaskSerializer(task).data,
+                "events": ClineAgentEventSerializer(events, many=True).data,
+                "approvals": ClineAgentApprovalSerializer(approvals, many=True).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class ClineApprovalListView(APIView):
+    """
+    GET /api/v1/ai/cline/approvals/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        approvals = ClineAgentApproval.objects.filter(status=ClineAgentApproval.ApprovalStatus.PENDING)
+        serializer = ClineAgentApprovalSerializer(approvals, many=True)
+        return Response({"count": approvals.count(), "results": serializer.data}, status=status.HTTP_200_OK)
+
+
+class ClineApprovalDecisionView(APIView):
+    """
+    POST /api/v1/ai/cline/approvals/decide/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        role = getattr(request.user, "role", "PATIENT")
+        if role not in ["DOCTOR", "INFORMATICIST", "ADMIN", "SUPERADMIN"] and not request.user.is_staff:
+            return Response({"error": "Unauthorized to approve agent operations."}, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = ClineApprovalDecisionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        approval = get_object_or_404(ClineAgentApproval, id=serializer.validated_data["approval_id"])
+        decision = serializer.validated_data["decision"]
+        reason = serializer.validated_data.get("reason", "")
+
+        approval.status = (
+            ClineAgentApproval.ApprovalStatus.APPROVED
+            if decision == "APPROVE"
+            else ClineAgentApproval.ApprovalStatus.DENIED
+        )
+        approval.approved_by = request.user
+        approval.reason = reason
+        approval.decided_at = timezone.now()
+        approval.save(update_fields=["status", "approved_by", "reason", "decided_at"])
+
+        # Update associated task
+        task = approval.task
+        if decision == "APPROVE":
+            task.status = ClineAgentTask.TaskStatus.COMPLETED
+            task.result_summary = f"Operation '{approval.requested_action}' authorized and executed by human sign-off."
+            task.completed_at = timezone.now()
+            task.save(update_fields=["status", "result_summary", "completed_at"])
+
+            ClineEventAdapter.emit_event(
+                session_id=str(task.session_id),
+                task_id=str(task.id),
+                event_type="tool_approved",
+                tool_name=approval.requested_action,
+                summary=f"Tool operation authorized by {request.user.username}.",
+                approval_state="APPROVED",
+                correlation_id=task.session.correlation_id,
+            )
+        else:
+            task.status = ClineAgentTask.TaskStatus.FAILED
+            task.error_code = "HUMAN_REJECTED"
+            task.result_summary = f"Operation rejected: {reason}"
+            task.completed_at = timezone.now()
+            task.save(update_fields=["status", "error_code", "result_summary", "completed_at"])
+
+            ClineEventAdapter.emit_event(
+                session_id=str(task.session_id),
+                task_id=str(task.id),
+                event_type="tool_denied",
+                tool_name=approval.requested_action,
+                summary=f"Tool operation denied: {reason}",
+                approval_state="DENIED",
+                correlation_id=task.session.correlation_id,
+            )
+
+        return Response({"message": f"Approval gate {approval.id} updated to {approval.status}."}, status=status.HTTP_200_OK)
+
+
+class ClineKillSwitchView(APIView):
+    """
+    GET /api/v1/ai/cline/kill-switch/
+    POST /api/v1/ai/cline/kill-switch/
+    Emergency AI stop toggle restricted to Administrators.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        is_active = os.environ.get("AI_KILL_SWITCH_ACTIVE") == "true"
+        return Response({"kill_switch_active": is_active}, status=status.HTTP_200_OK)
+
+    def post(self, request: Request) -> Response:
+        role = getattr(request.user, "role", "PATIENT")
+        if role not in ["ADMIN", "SUPERADMIN"] and not request.user.is_staff:
+            return Response({"error": "Admin privileges required to toggle kill switch."}, status=status.HTTP_403_FORBIDDEN)
+
+        active = bool(request.data.get("active", False))
+        os.environ["AI_KILL_SWITCH_ACTIVE"] = "true" if active else "false"
+
+        ClineAuditAdapter.record_audit(
+            correlation_id="kill-switch-toggle",
+            user_id=str(request.user.id),
+            role=role,
+            event_type="KILL_SWITCH",
+            agent_type="ADMIN_OVERRIDE",
+            payload_summary=f"Global Kill Switch set to {active} by {request.user.username}",
+            safety_verdict="KILL_SWITCH_ENGAGED" if active else "KILL_SWITCH_DISENGAGED",
+        )
+
+        return Response(
+            {
+                "kill_switch_active": active,
+                "message": f"Global AI Emergency Kill Switch is now {'ACTIVE' if active else 'DEACTIVATED'}.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class ClineToolDefinitionListView(APIView):
+    """
+    GET /api/v1/ai/cline/tools/
+    Returns approved tools and risk tiers.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+        role = getattr(request.user, "role", "PATIENT")
+        tools = ClineToolRegistry.list_tools_for_role(role)
+        results = [
+            {
+                "name": t.name,
+                "description": t.description,
+                "risk_level": t.risk_level,
+                "allowed_roles": t.allowed_roles,
+                "input_schema": t.input_schema,
+                "requires_approval": t.requires_approval,
+            }
+            for t in tools
+        ]
+        return Response({"count": len(results), "results": results}, status=status.HTTP_200_OK)
+

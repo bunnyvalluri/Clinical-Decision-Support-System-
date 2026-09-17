@@ -78,3 +78,10 @@ docker-compose.override.yml
 .gradle/
 android/.gradle/
 android/app/.gradle/
+
+# Bruno API Testing (secrets and test outputs)
+bruno/environments/*.secret.bru
+bruno/**/.env*
+reports/bruno/
+*.bru.bak
+

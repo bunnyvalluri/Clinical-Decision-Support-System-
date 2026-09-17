@@ -1,0 +1,179 @@
+version: '3.9'
+
+# HealthNova AI CDSS — Production Docker Compose Manifest for Coolify
+# Automated Let's Encrypt TLS termination via Traefik labels
+# Isolated internal networks, explicit resource quotas, and strict health checks
+
+networks:
+  public-web:
+    external: true
+  app-internal:
+    internal: true
+  data-internal:
+    internal: true
+
+volumes:
+  backend_media:
+    driver: local
+  backend_logs:
+    driver: local
+  redis_data:
+    driver: local
+  meilisearch_data:
+    driver: local
+
+services:
+  # -------------------------------------------------------------------------
+  # Next.js Clinical Frontend (Standalone Node Production Build)
+  # -------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: ../infra/docker/Dockerfile.frontend.prod
+    restart: unless-stopped
+    networks:
+      - public-web
+      - app-internal
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1536M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.healthnova-fe.rule=Host(`app.healthnova.ai`)"
+      - "traefik.http.routers.healthnova-fe.entrypoints=https"
+      - "traefik.http.routers.healthnova-fe.tls.certresolver=letsencrypt"
+      - "traefik.http.services.healthnova-fe.loadbalancer.server.port=3000"
+
+  # -------------------------------------------------------------------------
+  # Django REST Framework Backend (Daphne ASGI Gateway: HTTP + WebSockets)
+  # -------------------------------------------------------------------------
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: ../infra/docker/Dockerfile.backend.prod
+    restart: unless-stopped
+    networks:
+      - public-web
+      - app-internal
+      - data-internal
+    env_file:
+      - ../../backend/.env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      DEBUG: "False"
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    volumes:
+      - backend_media:/app/media
+      - backend_logs:/app/logs
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/ready/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.healthnova-be.rule=Host(`api.healthnova.ai`)"
+      - "traefik.http.routers.healthnova-be.entrypoints=https"
+      - "traefik.http.routers.healthnova-be.tls.certresolver=letsencrypt"
+      - "traefik.http.services.healthnova-be.loadbalancer.server.port=8000"
+
+  # -------------------------------------------------------------------------
+  # Redis Broker & Channel Layer Cache
+  # -------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - app-internal
+      - data-internal
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 768M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # -------------------------------------------------------------------------
+  # Celery Background Task Worker (Clinical Risk & Sepsis Inference)
+  # -------------------------------------------------------------------------
+  celery-worker:
+    build:
+      context: ../../backend
+      dockerfile: ../infra/docker/Dockerfile.backend.prod
+    restart: unless-stopped
+    networks:
+      - app-internal
+      - data-internal
+    env_file:
+      - ../../backend/.env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      DEBUG: "False"
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+    command: celery -A config worker --loglevel=INFO --concurrency=4 -n worker-prod@%h
+    depends_on:
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+
+  # -------------------------------------------------------------------------
+  # Meilisearch Fast Search Projection Engine
+  # -------------------------------------------------------------------------
+  meilisearch:
+    image: getmeili/meilisearch:v1.12.0
+    restart: unless-stopped
+    networks:
+      - data-internal
+    volumes:
+      - meilisearch_data:/meili_data
+    environment:
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_HTTP_PAYLOAD_SIZE_LIMIT: 10485760
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

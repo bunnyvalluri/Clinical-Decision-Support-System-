@@ -1,0 +1,23 @@
+meta {
+  name: AI-AGENT-TOOLS-001
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{base_url}}/api/v1/ai/agents/tools/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: in [200, 401, 403]
+}

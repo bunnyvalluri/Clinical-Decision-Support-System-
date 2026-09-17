@@ -1,0 +1,32 @@
+meta {
+  name: CLINE-TASK-EXECUTE-001
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/cline/tasks/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+body:json {
+  {
+    "session_id": "{{cline_session_id}}",
+    "prompt": "Evaluate latest sepsis protocol indicators for patient risk protocol.",
+    "task_type": "QUERY_ANALYSIS"
+  }
+}
+
+assert {
+  res.status: in [200, 201, 400, 401, 403, 503]
+}

@@ -88,12 +88,60 @@ export default function ScanDetailPage() {
           </div>
         </div>
 
-        {scan.status === "RUNNING" && (
-          <Button variant="destructive" size="sm" onClick={handleStop}>
-            <Ban className="w-4 h-4 mr-1.5" />
-            Emergency Stop
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+            onClick={async () => {
+              try {
+                const blob = await securityService.downloadSarif(scan.id);
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `scan_${scan.id}.sarif`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+              } catch (e) {
+                console.error("Failed to download SARIF:", e);
+              }
+            }}
+          >
+            Export SARIF 2.1.0
           </Button>
-        )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            className="text-xs bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+            onClick={async () => {
+              try {
+                const blob = await securityService.downloadReport(scan.id, "markdown");
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `scan_${scan.id}_report.md`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+              } catch (e) {
+                console.error("Failed to download Report:", e);
+              }
+            }}
+          >
+            Export Report (.md)
+          </Button>
+
+          {scan.status === "RUNNING" && (
+            <Button variant="destructive" size="sm" onClick={handleStop}>
+              <Ban className="w-4 h-4 mr-1.5" />
+              Emergency Stop
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Meta Grid */}

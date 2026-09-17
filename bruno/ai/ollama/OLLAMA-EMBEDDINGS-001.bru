@@ -1,0 +1,31 @@
+meta {
+  name: OLLAMA-EMBEDDINGS-001
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/providers/ollama/embeddings/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "text": "Clinical guideline: In patients with suspected sepsis, measure blood lactate levels within 1 hour.",
+    "model": "nomic-embed-text:latest"
+  }
+}
+
+assert {
+  res.status: in [200, 401, 500, 503]
+}

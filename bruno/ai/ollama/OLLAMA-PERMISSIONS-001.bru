@@ -1,0 +1,23 @@
+meta {
+  name: OLLAMA-PERMISSIONS-001
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/providers/ollama/models/sync/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{nurse_access_token}}
+}
+
+assert {
+  res.status: in [401, 403]
+}

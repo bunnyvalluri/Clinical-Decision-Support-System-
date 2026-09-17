@@ -169,6 +169,64 @@ services:
       start_period: 30s
 
   # -------------------------------------------------------------------------
+  # Meilisearch — dedicated search indexing & fast retrieval layer (v1.12.0)
+  # -------------------------------------------------------------------------
+  meilisearch:
+    image: getmeili/meilisearch:v1.12.0
+    restart: unless-stopped
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_ENV: production
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:-healthnova_meili_master_secret_key_32c}
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MAX_INDEXING_MEMORY: 512Mb
+      MEILI_MAX_INDEXING_THREADS: 2
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+        reservations:
+          memory: 256M
+
+  # -------------------------------------------------------------------------
+  # Ollama — Self-Hosted / Local LLM Inference Layer (Prompt 38, v0.5.12)
+  # -------------------------------------------------------------------------
+  ollama:
+    image: ollama/ollama:0.5.12
+    container_name: cdss_ollama
+    restart: unless-stopped
+    environment:
+      OLLAMA_KEEP_ALIVE: 15m
+      OLLAMA_ORIGINS: ""
+      OLLAMA_NUM_PARALLEL: 2
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./docker/ollama:/root/modelfiles:ro
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 16384M
+        reservations:
+          memory: 2048M
+
+  # -------------------------------------------------------------------------
   # Nginx reverse proxy
   # -------------------------------------------------------------------------
   nginx:
@@ -188,4 +246,5 @@ volumes:
   backend_logs:
   pocketbase_data:
   nocodb_data:
-
+  meilisearch_data:
+  ollama_data:

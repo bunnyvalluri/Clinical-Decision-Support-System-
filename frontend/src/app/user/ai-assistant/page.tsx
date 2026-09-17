@@ -32,6 +32,7 @@ export default function PatientAIAssistantPage() {
 
       <div className="flex-1 min-h-0">
         <AIChat
+          agentRole="PATIENT"
           roleSubtitle="Health Education · General Wellness · Visit Preparation"
           initialGreeting="Hello! I am your HealthNova Health Education Assistant. You can ask me questions about medical concepts, understanding your lab reports, or preparing questions for your next doctor's visit. Remember, I am here to help you understand health information, not to diagnose or prescribe treatments."
           suggestedQueries={PATIENT_QUERIES}

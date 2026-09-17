@@ -1,0 +1,21 @@
+meta {
+  name: HEADERS-SECURITY-001
+  type: http
+  seq: 1
+}
+
+# Verify required security response headers on public/health endpoints
+get {
+  url: {{base_url}}/api/v1/health/
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: eq 200
+  res.headers["x-content-type-options"]: eq nosniff
+}

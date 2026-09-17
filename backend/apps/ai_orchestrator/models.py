@@ -938,3 +938,452 @@ class AIAuditEvent(models.Model):
 AITrace = AIAgentTrace
 AgentExecution = AgentTask
 AIApproval = AIApprovalGate
+
+
+# ===========================================================================
+# Cline Controlled Agent Execution Layer Models (Prompt 37)
+# ===========================================================================
+
+class ClineAgentSession(models.Model):
+    """
+    Controlled agent session managing user correlation, agent profile,
+    token/cost budgets, and environment execution constraints.
+    """
+
+    class SessionStatus(models.TextChoices):
+        IDLE = "IDLE", "Idle"
+        ACTIVE = "ACTIVE", "Active"
+        PAUSED = "PAUSED", "Paused"
+        WAITING_FOR_APPROVAL = "WAITING_FOR_APPROVAL", "Waiting for Approval"
+        COMPLETED = "COMPLETED", "Completed"
+        TERMINATED = "TERMINATED", "Terminated"
+
+    class EnvironmentTier(models.TextChoices):
+        DEVELOPMENT = "DEVELOPMENT", "Development Sandbox"
+        STAGING = "STAGING", "Staging Environment"
+        PRODUCTION = "PRODUCTION", "Production Guarded"
+
+    class ApprovalPolicy(models.TextChoices):
+        STRICT = "STRICT", "Strict (All Medium+ require human sign-off)"
+        ELEVATED = "ELEVATED", "Elevated (High+ require human sign-off)"
+        READ_ONLY = "READ_ONLY", "Read Only (No mutations permitted)"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="cline_agent_sessions",
+        db_index=True,
+    )
+    role = models.CharField(max_length=32, default="DOCTOR", db_index=True)
+    agent_type = models.CharField(max_length=64, default="CLINICAL_KNOWLEDGE_ASSISTANT", db_index=True)
+    purpose = models.TextField(blank=True, default="")
+    status = models.CharField(max_length=32, choices=SessionStatus.choices, default=SessionStatus.IDLE, db_index=True)
+    correlation_id = models.CharField(max_length=64, db_index=True)
+    environment = models.CharField(
+        max_length=32,
+        choices=EnvironmentTier.choices,
+        default=EnvironmentTier.DEVELOPMENT,
+    )
+    approval_policy = models.CharField(
+        max_length=32,
+        choices=ApprovalPolicy.choices,
+        default=ApprovalPolicy.STRICT,
+    )
+    token_budget = models.PositiveIntegerField(default=100000, help_text="Maximum tokens permitted in session")
+    tokens_used = models.PositiveIntegerField(default=0)
+    max_tool_calls = models.PositiveIntegerField(default=20, help_text="Maximum tool executions per session")
+    tool_calls_count = models.PositiveIntegerField(default=0)
+    cost_limit_usd = models.DecimalField(max_digits=8, decimal_places=4, default=2.0000)
+    total_cost_usd = models.DecimalField(max_digits=8, decimal_places=4, default=0.0000)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)
+
+    class Meta:
+        db_table = "cline_agent_sessions"
+        ordering = ["-updated_at"]
+        verbose_name = "Cline Agent Session"
+        verbose_name_plural = "Cline Agent Sessions"
+
+    def __str__(self) -> str:
+        return f"ClineSession {self.id} [{self.agent_type}:{self.role}] - {self.status}"
+
+
+class ClineAgentTask(models.Model):
+    """
+    Granular task queued and executed by the Cline agent engine.
+    """
+
+    class TaskStatus(models.TextChoices):
+        QUEUED = "QUEUED", "Queued"
+        RUNNING = "RUNNING", "Running"
+        WAITING_FOR_APPROVAL = "WAITING_FOR_APPROVAL", "Waiting for Approval"
+        COMPLETED = "COMPLETED", "Completed"
+        FAILED = "FAILED", "Failed"
+        CANCELLED = "CANCELLED", "Cancelled"
+        TIMED_OUT = "TIMED_OUT", "Timed Out"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(
+        ClineAgentSession,
+        on_delete=models.CASCADE,
+        related_name="tasks",
+        db_index=True,
+    )
+    task_type = models.CharField(max_length=64, default="QUERY_ANALYSIS", db_index=True)
+    prompt_hash = models.CharField(max_length=64, help_text="SHA-256 hash of task prompt (avoids PHI storage)")
+    prompt_summary = models.TextField(blank=True, default="", help_text="PHI-redacted summary")
+    status = models.CharField(max_length=32, choices=TaskStatus.choices, default=TaskStatus.QUEUED, db_index=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    error_code = models.CharField(max_length=64, blank=True, default="")
+    result_summary = models.TextField(blank=True, default="")
+    tool_calls_count = models.PositiveIntegerField(default=0)
+    total_cost_usd = models.DecimalField(max_digits=8, decimal_places=4, default=0.0000)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="created_cline_tasks",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_cline_tasks",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        db_table = "cline_agent_tasks"
+        ordering = ["-created_at"]
+        verbose_name = "Cline Agent Task"
+        verbose_name_plural = "Cline Agent Tasks"
+
+    def __str__(self) -> str:
+        return f"ClineTask {self.id} [{self.task_type}] - {self.status}"
+
+
+class ClineAgentEvent(models.Model):
+    """
+    Immutable audit event emitted during Cline agent execution.
+    Exposes only safe summaries (never raw chain-of-thought).
+    """
+
+    class EventType(models.TextChoices):
+        AGENT_STARTED = "agent_started", "Agent Started"
+        AGENT_THINKING_SUMMARY = "agent_thinking_summary", "Agent Thinking Summary"
+        TOOL_REQUESTED = "tool_requested", "Tool Requested"
+        TOOL_APPROVED = "tool_approved", "Tool Approved"
+        TOOL_DENIED = "tool_denied", "Tool Denied"
+        TOOL_COMPLETED = "tool_completed", "Tool Completed"
+        AGENT_MESSAGE = "agent_message", "Agent Message"
+        AGENT_WARNING = "agent_warning", "Agent Warning"
+        AGENT_ERROR = "agent_error", "Agent Error"
+        AGENT_COMPLETED = "agent_completed", "Agent Completed"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(
+        ClineAgentSession,
+        on_delete=models.CASCADE,
+        related_name="events",
+        db_index=True,
+    )
+    task = models.ForeignKey(
+        ClineAgentTask,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="events",
+        db_index=True,
+    )
+    event_type = models.CharField(max_length=32, choices=EventType.choices, db_index=True)
+    tool_name = models.CharField(max_length=128, blank=True, default="")
+    resource_type = models.CharField(max_length=64, blank=True, default="")
+    resource_id = models.CharField(max_length=128, blank=True, default="")
+    summary = models.TextField(help_text="Safe redacted summary (zero PHI, zero private CoT)")
+    approval_state = models.CharField(max_length=32, default="NOT_REQUIRED")
+    correlation_id = models.CharField(max_length=64, db_index=True)
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        db_table = "cline_agent_events"
+        ordering = ["timestamp"]
+        verbose_name = "Cline Agent Event"
+        verbose_name_plural = "Cline Agent Events"
+
+    def __str__(self) -> str:
+        return f"ClineEvent {self.id} [{self.event_type}] @ {self.timestamp}"
+
+
+class ClineAgentApproval(models.Model):
+    """
+    Human-in-the-loop approval gate for medium/high risk tool operations.
+    """
+
+    class RiskLevel(models.TextChoices):
+        LOW = "LOW", "Low Risk"
+        MEDIUM = "MEDIUM", "Medium Risk"
+        HIGH = "HIGH", "High Risk"
+        CRITICAL = "CRITICAL", "Critical Risk"
+
+    class ApprovalStatus(models.TextChoices):
+        PENDING = "PENDING", "Pending Decision"
+        APPROVED = "APPROVED", "Approved"
+        DENIED = "DENIED", "Denied"
+        EXPIRED = "EXPIRED", "Expired"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    task = models.ForeignKey(
+        ClineAgentTask,
+        on_delete=models.CASCADE,
+        related_name="approvals",
+        db_index=True,
+    )
+    requested_action = models.CharField(max_length=128)
+    risk_level = models.CharField(max_length=16, choices=RiskLevel.choices, default=RiskLevel.MEDIUM)
+    details = models.JSONField(default=dict, help_text="Redacted parameter payload")
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="requested_cline_approvals",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reviewed_cline_approvals",
+    )
+    status = models.CharField(
+        max_length=16,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.PENDING,
+        db_index=True,
+    )
+    reason = models.TextField(blank=True, default="")
+    timestamp = models.DateTimeField(auto_now_add=True)
+    decided_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "cline_agent_approvals"
+        ordering = ["-timestamp"]
+        verbose_name = "Cline Agent Approval"
+        verbose_name_plural = "Cline Agent Approvals"
+
+    def __str__(self) -> str:
+        return f"ClineApproval {self.requested_action} [{self.status}]"
+
+
+class ClineMCPServerRegistry(models.Model):
+    """
+    Authoritative registry of Model Context Protocol endpoints.
+    Default status is DISABLED (strict default-deny).
+    """
+
+    class TrustLevel(models.TextChoices):
+        SANDBOXED_LOCAL = "SANDBOXED_LOCAL", "Sandboxed Local Network"
+        VERIFIED_CONTAINER = "VERIFIED_CONTAINER", "Verified Container Subnet"
+        RESTRICTED_ADMIN = "RESTRICTED_ADMIN", "Restricted Admin Only"
+
+    class DataClassification(models.TextChoices):
+        PUBLIC = "PUBLIC", "Public Non-Clinical Data"
+        INTERNAL = "INTERNAL", "Internal Hospital Operations"
+        SENSITIVE = "SENSITIVE", "Sensitive Business Data"
+        PHI_CAPABLE = "PHI", "PHI Capable (Restricted Authorization Required)"
+        CRITICAL = "CRITICAL", "Critical Infrastructure"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, unique=True, db_index=True)
+    endpoint = models.CharField(max_length=512)
+    transport = models.CharField(max_length=32, default="HTTP_SSE")
+    owner = models.CharField(max_length=128, default="HEALTHNOVA_INFRA")
+    trust_level = models.CharField(
+        max_length=32,
+        choices=TrustLevel.choices,
+        default=TrustLevel.SANDBOXED_LOCAL,
+    )
+    data_classification = models.CharField(
+        max_length=32,
+        choices=DataClassification.choices,
+        default=DataClassification.INTERNAL,
+    )
+    allowed_roles = models.JSONField(default=list)
+    allowed_tools = models.JSONField(default=list)
+    is_active = models.BooleanField(default=False, help_text="Default is FALSE (Default-Deny policy)")
+    last_health_check = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "cline_mcp_server_registry"
+        ordering = ["name"]
+        verbose_name = "Cline MCP Server Registry"
+        verbose_name_plural = "Cline MCP Server Registries"
+
+    def __str__(self) -> str:
+        return f"MCP Registry {self.name} (active: {self.is_active})"
+
+
+class ClineToolDefinition(models.Model):
+    """
+    Declarative tool registration for Cline agent engine with schema validation.
+    """
+
+    class RiskLevel(models.TextChoices):
+        LOW = "LOW", "Low Risk"
+        MEDIUM = "MEDIUM", "Medium Risk"
+        HIGH = "HIGH", "High Risk"
+        CRITICAL = "CRITICAL", "Critical (Default Deny)"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, unique=True, db_index=True)
+    description = models.TextField()
+    input_schema = models.JSONField(default=dict)
+    output_schema = models.JSONField(default=dict)
+    risk_level = models.CharField(max_length=16, choices=RiskLevel.choices, default=RiskLevel.LOW)
+    allowed_roles = models.JSONField(default=list)
+    allowed_environments = models.JSONField(default=list)
+    requires_approval = models.BooleanField(default=False)
+    data_classification = models.CharField(max_length=32, default="INTERNAL")
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "cline_tool_definitions"
+        ordering = ["name"]
+        verbose_name = "Cline Tool Definition"
+        verbose_name_plural = "Cline Tool Definitions"
+
+    def __str__(self) -> str:
+        return f"ClineTool {self.name} [{self.risk_level}] (active: {self.is_active})"
+
+
+class LLMModelRegistry(models.Model):
+    """
+    Authoritative Neon PostgreSQL Registry for Local and Hosted LLM Models.
+    Tracks governance lifecycle: DISCOVERED -> EVALUATING -> APPROVED -> ACTIVE -> DEPRECATED -> RETIRED.
+    """
+
+    class Status(models.TextChoices):
+        DISCOVERED = "DISCOVERED", "Discovered in Daemon"
+        EVALUATING = "EVALUATING", "Under Evaluation Benchmarks"
+        APPROVED = "APPROVED", "Approved by Clinical Informaticist"
+        ACTIVE = "ACTIVE", "Active in Routing Pipeline"
+        DEPRECATED = "DEPRECATED", "Deprecated"
+        RETIRED = "RETIRED", "Retired"
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128, db_index=True)
+    tag = models.CharField(max_length=128, unique=True, db_index=True)
+    provider = models.CharField(max_length=64, default="OLLAMA", db_index=True)
+    runtime = models.CharField(max_length=64, default="LOCAL_CONTAINER")
+    context_length = models.IntegerField(default=4096)
+    capabilities = models.JSONField(default=list, help_text="e.g. ['chat', 'structured_output', 'tool_calling', 'embeddings']")
+    license = models.CharField(max_length=128, default="Open Source")
+    status = models.CharField(max_length=32, choices=Status.choices, default=Status.DISCOVERED, db_index=True)
+    environment = models.CharField(max_length=64, default="PRODUCTION")
+    approved_roles = models.JSONField(default=list, help_text="Roles authorized to invoke this model")
+    data_classification = models.CharField(max_length=64, default="RESTRICTED_PHI")
+    parameters_summary = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "llm_model_registry"
+        ordering = ["-updated_at"]
+        verbose_name = "LLM Model Registry"
+        verbose_name_plural = "LLM Model Registries"
+
+    def __str__(self) -> str:
+        return f"{self.tag} [{self.provider}] - {self.status}"
+
+
+class AISession(models.Model):
+    """
+    Durable session tracking for clinical AI chat and inference conversations.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ai_sessions",
+    )
+    role = models.CharField(max_length=64, default="DOCTOR")
+    model = models.CharField(max_length=128)
+    provider = models.CharField(max_length=64, default="OLLAMA")
+    purpose = models.CharField(max_length=128, default="CLINICAL_DECISION_SUPPORT")
+    status = models.CharField(max_length=32, default="ACTIVE")
+    correlation_id = models.CharField(max_length=64, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "ai_sessions"
+        ordering = ["-created_at"]
+        verbose_name = "AI Session"
+        verbose_name_plural = "AI Sessions"
+
+    def __str__(self) -> str:
+        return f"AISession {self.id} ({self.model}) - {self.role}"
+
+
+class AIRequest(models.Model):
+    """
+    Request-level tracking and audit for individual LLM invocations.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.ForeignKey(
+        AISession,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="requests",
+    )
+    model = models.CharField(max_length=128, db_index=True)
+    provider = models.CharField(max_length=64, default="OLLAMA")
+    prompt_tokens = models.IntegerField(default=0)
+    completion_tokens = models.IntegerField(default=0)
+    latency_ms = models.FloatField(default=0.0)
+    status = models.CharField(max_length=32, default="COMPLETED")
+    correlation_id = models.CharField(max_length=64, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "ai_requests"
+        ordering = ["-created_at"]
+        verbose_name = "AI Request Audit"
+        verbose_name_plural = "AI Request Audits"
+
+    def __str__(self) -> str:
+        return f"AIRequest {self.id} - {self.model} ({self.status})"
+
+
+class EmbeddingRegistry(models.Model):
+    """
+    Authoritative index registry for vector dimensions and distance metrics.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    model_name = models.CharField(max_length=128, unique=True, db_index=True)
+    dimension = models.IntegerField(default=768)
+    distance_metric = models.CharField(max_length=32, default="COSINE")
+    version = models.CharField(max_length=32, default="1.0.0")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "embedding_registry"
+        ordering = ["model_name"]
+        verbose_name = "Embedding Registry"
+        verbose_name_plural = "Embedding Registries"
+
+    def __str__(self) -> str:
+        return f"EmbeddingRegistry {self.model_name} (dim: {self.dimension})"

@@ -1,0 +1,23 @@
+meta {
+  name: NURSE-TRIAGE-001
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/v1/clinical/triage/queue/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{nurse_access_token}}
+}
+
+assert {
+  res.status: in [200, 401]
+}

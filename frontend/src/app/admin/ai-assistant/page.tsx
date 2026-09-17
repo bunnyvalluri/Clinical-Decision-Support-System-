@@ -32,6 +32,7 @@ export default function AdminAIAssistantPage() {
 
       <div className="flex-1 min-h-0">
         <AIChat
+          agentRole="ADMIN"
           roleSubtitle="Gateway Diagnostics · Security Audit · MCP Status · Infrastructure Logs"
           initialGreeting="Hello, System Administrator. I am your HealthNova System Diagnostic Assistant. I can help you monitor AI Gateway status, audit rate limits, inspect MCP connectivity, and track token costs. No arbitrary shell execution is permitted."
           suggestedQueries={ADMIN_QUERIES}

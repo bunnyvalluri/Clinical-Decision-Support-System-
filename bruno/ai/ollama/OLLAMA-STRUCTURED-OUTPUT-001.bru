@@ -1,0 +1,36 @@
+meta {
+  name: OLLAMA-STRUCTURED-OUTPUT-001
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/providers/ollama/explain-prediction/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "risk_score": 0.82,
+    "model_family": "Random Forest Classifier (scikit-learn)",
+    "top_features": [
+      { "feature": "respiratory_rate", "importance": 0.42, "value": 28 },
+      { "feature": "systolic_bp", "importance": 0.31, "value": 88 }
+    ]
+  }
+}
+
+assert {
+  res.status: in [200, 401]
+  res.body.human_signoff_required: eq true
+}

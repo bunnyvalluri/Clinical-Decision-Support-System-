@@ -1,63 +1,117 @@
 import * as React from "react";
-import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
 import { AlertCircle, AlertTriangle, CheckCircle2, Info, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "info" | "success" | "warning" | "error" | "critical";
+const alertVariants = cva(
+  "relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7",
+  {
+    variants: {
+      variant: {
+        default: "bg-background text-foreground border-border",
+        destructive:
+          "border-destructive/50 text-destructive [&>svg]:text-destructive bg-rose-50/50",
+        info: "border-sky-200 bg-sky-50 text-sky-900 [&>svg]:text-sky-600",
+        success:
+          "border-emerald-200 bg-emerald-50 text-emerald-900 [&>svg]:text-emerald-600",
+        warning:
+          "border-amber-200 bg-amber-50 text-amber-900 [&>svg]:text-amber-600",
+        error:
+          "border-destructive/50 bg-rose-50 text-destructive [&>svg]:text-destructive",
+        critical:
+          "border-destructive bg-rose-100 text-destructive font-semibold [&>svg]:text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+const AlertTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props}
+  />
+));
+AlertTitle.displayName = "AlertTitle";
+
+const AlertDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props}
+  />
+));
+AlertDescription.displayName = "AlertDescription";
+
+export interface AlertProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof alertVariants> {
   title?: string;
   onDismiss?: () => void;
 }
 
-export function Alert({
-  className,
-  variant = "default",
-  title,
-  children,
-  onDismiss,
-  ...props
-}: AlertProps) {
-  const icons = {
-    default: <Info className="h-4 w-4 text-slate-500" />,
-    info: <Info className="h-4 w-4 text-blue-600" />,
-    success: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
-    warning: <AlertTriangle className="h-4 w-4 text-amber-600" />,
-    error: <XCircle className="h-4 w-4 text-rose-600" />,
-    critical: <AlertCircle className="h-4 w-4 text-rose-600 animate-pulse" />,
-  };
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  (
+    { className, variant = "default", title, children, onDismiss, ...props },
+    ref
+  ) => {
+    // If title or onDismiss is passed with direct children, support convenient classic layout
+    const hasIcon = !React.Children.toArray(children).some(
+      (child) => React.isValidElement(child) && child.type === "svg"
+    );
 
-  const variants = {
-    default: "bg-slate-50 border-slate-200 text-slate-800",
-    info: "bg-blue-50/80 border-blue-200 text-blue-950",
-    success: "bg-emerald-50/80 border-emerald-200 text-emerald-950",
-    warning: "bg-amber-50/80 border-amber-200 text-amber-950",
-    error: "bg-rose-50/80 border-rose-200 text-rose-950",
-    critical: "bg-rose-100 border-rose-300 text-rose-950 shadow-sm",
-  };
+    const getIcon = () => {
+      switch (variant) {
+        case "info":
+          return <Info className="h-4 w-4" />;
+        case "success":
+          return <CheckCircle2 className="h-4 w-4" />;
+        case "warning":
+          return <AlertTriangle className="h-4 w-4" />;
+        case "error":
+        case "destructive":
+          return <XCircle className="h-4 w-4" />;
+        case "critical":
+          return <AlertCircle className="h-4 w-4 animate-pulse" />;
+        default:
+          return <Info className="h-4 w-4" />;
+      }
+    };
 
-  return (
-    <div
-      role="alert"
-      className={cn(
-        "relative flex w-full gap-3 rounded-xl border p-4 text-sm transition-all",
-        variants[variant],
-        className
-      )}
-      {...props}
-    >
-      <div className="shrink-0 pt-0.5">{icons[variant]}</div>
-      <div className="flex-1 space-y-1">
-        {title && <h5 className="font-semibold leading-tight tracking-tight">{title}</h5>}
-        <div className="text-xs leading-relaxed opacity-90">{children}</div>
+    return (
+      <div
+        ref={ref}
+        role="alert"
+        className={cn(alertVariants({ variant }), className)}
+        {...props}
+      >
+        {hasIcon && getIcon()}
+        <div>
+          {title && <AlertTitle>{title}</AlertTitle>}
+          {title ? <AlertDescription>{children}</AlertDescription> : children}
+        </div>
+        {onDismiss && (
+          <button
+            onClick={onDismiss}
+            className="absolute right-3 top-3 p-1 rounded-md opacity-70 hover:opacity-100 transition-opacity"
+            aria-label="Dismiss alert"
+          >
+            <XCircle className="h-4 w-4 text-muted-foreground" />
+          </button>
+        )}
       </div>
-      {onDismiss && (
-        <button
-          onClick={onDismiss}
-          className="shrink-0 -mr-1 -mt-1 p-1 rounded-md opacity-70 hover:opacity-100 transition-opacity"
-          aria-label="Dismiss alert"
-        >
-          <XCircle className="h-4 w-4" />
-        </button>
-      )}
-    </div>
-  );
-}
+    );
+  }
+);
+Alert.displayName = "Alert";
+
+export { Alert, AlertTitle, AlertDescription, alertVariants };

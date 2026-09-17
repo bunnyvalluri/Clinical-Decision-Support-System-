@@ -1,0 +1,33 @@
+meta {
+  name: RBAC-ADMIN-001
+  type: http
+  seq: 4
+}
+
+# IT Administrator is restricted from creating clinical encounters/vitals directly
+post {
+  url: {{base_url}}/api/v1/clinical/vitals/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+body:json {
+  {
+    "patient_id": "{{test_patient_id}}",
+    "systolic_bp": 120,
+    "diastolic_bp": 80
+  }
+}
+
+assert {
+  res.status: in [401, 403]
+}

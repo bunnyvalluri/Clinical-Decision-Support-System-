@@ -1,0 +1,32 @@
+meta {
+  name: AI-AGENT-SESSIONS-001
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{base_url}}/api/v1/ai/agents/sessions/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "agent_type": "DOCTOR",
+    "title": "Physician Clinical Decision Session",
+    "patient": null
+  }
+}
+
+assert {
+  res.status: in [201, 400, 401, 403]
+}

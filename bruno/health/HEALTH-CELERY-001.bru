@@ -1,0 +1,20 @@
+meta {
+  name: HEALTH-CELERY-001
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/api/v1/health/celery/
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+assert {
+  res.status: in [200, 503]
+  res.body.status: isDefined
+}
