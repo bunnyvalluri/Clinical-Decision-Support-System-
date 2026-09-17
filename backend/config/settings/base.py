@@ -80,6 +80,7 @@ LOCAL_APPS = [
     "apps.security_testing.apps.SecurityTestingConfig",
     "apps.mobile_gateway.apps.MobileGatewayConfig",
     "apps.whiteboards.apps.WhiteboardsConfig",
+    "apps.nocodb.apps.NocodbConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

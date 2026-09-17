@@ -28,4 +28,6 @@ websocket_urlpatterns = [
     re_path(r"^ws/ai/(?:(?P<workflow_id>[0-9a-f-]{36})/)?$", consumers.AIOrchestratorConsumer.as_asgi()),
     re_path(r"^ws/mobile/$", MobileGatewayConsumer.as_asgi()),
     re_path(r"^ws/whiteboards/(?P<whiteboard_id>[0-9a-f-]{36})/$", consumers.WhiteboardCollaborationConsumer.as_asgi()),
+    re_path(r"^ws/nocodb/(?P<dataset_slug>[a-zA-Z0-9_-]+)/$", consumers.NocoDBWorkspaceConsumer.as_asgi()),
 ]
+

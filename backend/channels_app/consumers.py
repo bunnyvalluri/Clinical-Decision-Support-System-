@@ -542,3 +542,58 @@ class WhiteboardCollaborationConsumer(BaseConsumer):
         })
 
 
+class NocoDBWorkspaceConsumer(BaseConsumer):
+    """
+    ws://host/ws/nocodb/<dataset_slug>/
+
+    Real-time data synchronization and workspace updates for NocoDB governed datasets.
+    Broadcasts row updates, sync events, and schema notifications.
+    """
+
+    async def get_group_name(self) -> str:
+        slug = self.scope.get("url_route", {}).get("kwargs", {}).get("dataset_slug")
+        return f"nocodb_{slug}" if slug else ""
+
+    async def check_authorization(self, user: Any) -> bool:
+        slug = self.scope.get("url_route", {}).get("kwargs", {}).get("dataset_slug")
+        if not slug:
+            return False
+        return await self._verify_dataset_access(user, slug)
+
+    @database_sync_to_async
+    def _verify_dataset_access(self, user: Any, slug: str) -> bool:
+        if not user or not user.is_authenticated:
+            return False
+        if user.is_superuser:
+            return True
+        from apps.nocodb.models import NocoDBDataset
+        from apps.nocodb.permissions import normalize_role
+        try:
+            ds = NocoDBDataset.objects.get(slug=slug, is_active=True)
+            role = normalize_role(getattr(user, "role", ""))
+            allowed = [r.lower() for r in (ds.allowed_roles or [])]
+            if role == "admin" and ("admin" in allowed or "it_admin" in allowed):
+                return True
+            return role in allowed
+        except Exception:
+            return False
+
+    async def dataset_update_broadcast(self, event: dict[str, Any]) -> None:
+        await self.send_json_message({
+            "type": "DATASET_UPDATE",
+            "dataset_slug": event.get("dataset_slug"),
+            "action": event.get("action"),
+            "record_id": event.get("record_id"),
+            "timestamp": event.get("timestamp"),
+        })
+
+    async def sync_completed_broadcast(self, event: dict[str, Any]) -> None:
+        await self.send_json_message({
+            "type": "SYNC_COMPLETED",
+            "dataset_slug": event.get("dataset_slug"),
+            "row_count": event.get("row_count"),
+            "timestamp": event.get("timestamp"),
+        })
+
+
+

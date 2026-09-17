@@ -148,6 +148,27 @@ services:
       retries: 3
 
   # -------------------------------------------------------------------------
+  # NocoDB — auxiliary healthcare analytics & data workspace engine
+  # -------------------------------------------------------------------------
+  nocodb:
+    image: nocodb/nocodb:0.258.0
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      NC_DB: "sqlite3:///usr/app/data/noco.db"
+      NC_PUBLIC_URL: "http://localhost:8080"
+      NC_DISABLE_TELEMETRY: "true"
+    volumes:
+      - nocodb_data:/usr/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # -------------------------------------------------------------------------
   # Nginx reverse proxy
   # -------------------------------------------------------------------------
   nginx:
@@ -166,3 +187,5 @@ volumes:
   backend_media:
   backend_logs:
   pocketbase_data:
+  nocodb_data:
+

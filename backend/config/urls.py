@@ -34,6 +34,7 @@ urlpatterns = [
     path("api/v1/security/", include("apps.security_testing.urls", namespace="security_testing")),
     path("api/v1/mobile/", include("apps.mobile_gateway.urls", namespace="mobile_gateway")),
     path("api/v1/whiteboards/", include("apps.whiteboards.urls", namespace="whiteboards")),
+    path("api/v1/nocodb/", include("apps.nocodb.urls", namespace="nocodb")),
 ]
 
 # Debug toolbar (development only)

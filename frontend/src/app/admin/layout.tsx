@@ -35,6 +35,7 @@ const ADMIN_NAV_ITEMS: NavItem[] = [
   { href: "/admin/integrations/apis", icon: Layers, label: "External APIs" },
   { href: "/admin/services", icon: Activity, label: "Core Services" },
   { href: "/admin/database", icon: Database, label: "PostgreSQL" },
+  { href: "/admin/nocodb", icon: Database, label: "NocoDB Governance" },
   { href: "/admin/redis", icon: Zap, label: "Redis Cache" },
   { href: "/admin/celery", icon: Cpu, label: "Celery Workers" },
   { href: "/admin/websockets", icon: Wifi, label: "WebSockets" },
