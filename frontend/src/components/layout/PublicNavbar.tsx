@@ -4,9 +4,16 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowRight, Menu, X, ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Menu,
+  X,
+  ShieldCheck,
+  Activity,
+  Sparkles,
+  HeartPulse,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 import { PUBLIC_NAV_LINKS } from "@/config/navigation";
 
 export function PublicNavbar() {
@@ -42,31 +49,31 @@ export function PublicNavbar() {
   }, [mobileMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200/90 bg-white/95 backdrop-blur-xl transition-all shadow-xs pt-safe">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-3.5 sm:px-6 lg:px-8">
-        {/* Logo & Brand Identity */}
-        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative h-9 w-9 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs p-0.5 group-hover:border-teal-500 transition-colors">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-xl transition-all shadow-xs pt-safe">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Brand & Logo Section */}
+        <div className="flex items-center shrink-0 mr-4 lg:mr-6">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative h-9 w-9 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs p-1 group-hover:border-teal-500 transition-colors">
               <Image
                 src="/logo.png"
                 alt="HealthNova AI Logo"
-                width={40}
-                height={40}
+                width={36}
+                height={36}
                 className="h-full w-full object-contain rounded-lg"
                 priority
               />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="text-sm sm:text-base font-extrabold tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors">
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base sm:text-lg font-black tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors whitespace-nowrap">
                   HealthNova
                 </span>
-                <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
+                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/80 shadow-2xs whitespace-nowrap">
                   AI
                 </span>
               </div>
-              <span className="text-[9px] sm:text-[10px] font-medium text-slate-500 tracking-tight hidden xs:block">
+              <span className="text-[10px] font-medium text-slate-400 tracking-tight hidden 2xl:block whitespace-nowrap">
                 AI-Powered Clinical Decision Support
               </span>
             </div>
@@ -76,7 +83,7 @@ export function PublicNavbar() {
         {/* Desktop Navigation Links */}
         <nav
           aria-label="Main Public Navigation"
-          className="hidden lg:flex items-center gap-6 xl:gap-7 text-xs font-semibold text-slate-600"
+          className="hidden lg:flex items-center gap-1 xl:gap-1.5"
         >
           {PUBLIC_NAV_LINKS.map((link) => {
             const isActive =
@@ -88,10 +95,10 @@ export function PublicNavbar() {
               <Link
                 key={link.name}
                 href={link.href}
-                className={`transition-colors py-1 relative ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive
-                    ? "text-teal-700 font-bold border-b-2 border-teal-600 -mb-[2px]"
-                    : "text-slate-600 hover:text-teal-700"
+                    ? "bg-teal-50 text-teal-800 font-bold border border-teal-200/60 shadow-2xs"
+                    : "text-slate-600 hover:text-slate-950 hover:bg-slate-100/80"
                 }`}
               >
                 {link.name}
@@ -100,11 +107,14 @@ export function PublicNavbar() {
           })}
         </nav>
 
-        {/* Action CTAs & Mobile Hamburger */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        {/* Right CTA Cluster */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           {/* Live Operational Heartbeat Badge */}
-          <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50/80 text-[11px] font-medium text-emerald-800">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50/80 text-[11px] font-medium text-emerald-800 whitespace-nowrap">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
             <span className="font-mono font-semibold">Systems Live</span>
           </div>
 
@@ -112,17 +122,17 @@ export function PublicNavbar() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-xs font-semibold text-slate-700 hover:text-slate-950 hover:bg-slate-100"
+              className="text-xs font-semibold text-slate-700 hover:text-slate-950 hover:bg-slate-100/90 whitespace-nowrap px-3"
             >
               Sign In
             </Button>
           </Link>
 
-          <Link href="/register" className="hidden md:inline-flex">
+          <Link href="/register" className="hidden 2xl:inline-flex">
             <Button
               variant="outline"
               size="sm"
-              className="text-xs font-semibold border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-slate-50"
+              className="text-xs font-semibold border-slate-200 text-slate-700 hover:text-slate-950 hover:bg-slate-50 whitespace-nowrap px-3"
             >
               Register
             </Button>
@@ -131,20 +141,19 @@ export function PublicNavbar() {
           <Link href="/dashboard">
             <Button
               size="sm"
-              className="text-xs font-bold gap-1 sm:gap-1.5 shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 transition-all px-2.5 sm:px-3"
+              className="text-xs font-bold gap-1.5 shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 transition-all px-3 sm:px-3.5 whitespace-nowrap"
             >
-              <span className="hidden xs:inline">Launch Portal</span>
-              <span className="xs:hidden">Launch</span>
+              <span>Launch Portal</span>
               <ArrowRight className="h-3.5 w-3.5 text-white" />
             </Button>
           </Link>
 
-          {/* Mobile / Tablet Menu Button */}
+          {/* Mobile / Tablet Menu Trigger */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation menu"
-            className="lg:hidden touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors"
+            className="lg:hidden touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors ml-1"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -200,12 +209,12 @@ export function PublicNavbar() {
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                 <span className="truncate">SYSTEMS OPERATIONAL • BPY-CSE-2666</span>
               </div>
-              <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full shrink-0">
+              <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full shrink-0 font-bold">
                 LIVE
               </span>
             </div>
 
-            {/* Navigation Section Anchor Links */}
+            {/* Navigation Section Links */}
             <div className="space-y-1">
               <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold px-2 mb-2">
                 Navigation
@@ -229,7 +238,7 @@ export function PublicNavbar() {
                   >
                     <span>{link.name}</span>
                     {isActive && (
-                      <span className="text-[10px] font-mono bg-teal-100 text-teal-800 px-1.5 py-0.5 rounded-md">
+                      <span className="text-[10px] font-mono bg-teal-100 text-teal-800 px-1.5 py-0.5 rounded-md font-bold">
                         Current
                       </span>
                     )}
@@ -245,7 +254,7 @@ export function PublicNavbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full block"
               >
-                <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold gap-2">
+                <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold gap-2 shadow-sm py-2.5">
                   Launch Clinician Portal
                   <ArrowRight className="h-4 w-4" />
                 </Button>
