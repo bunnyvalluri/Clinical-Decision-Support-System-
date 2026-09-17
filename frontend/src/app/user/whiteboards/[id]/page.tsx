@@ -14,18 +14,22 @@ export default function UserWhiteboardDetailPage() {
 
   useEffect(() => {
     if (!id) return;
+    let isCurrent = true;
     const fetchBoard = async () => {
       try {
         setLoading(true);
         const data = await whiteboardApi.get(id);
-        setWhiteboard(data);
+        if (isCurrent) setWhiteboard(data);
       } catch (err: any) {
-        setError(err?.response?.data?.detail || "Failed to load patient care plan.");
+        if (isCurrent) setError(err?.response?.data?.detail || "Failed to load patient care plan.");
       } finally {
-        setLoading(false);
+        if (isCurrent) setLoading(false);
       }
     };
     fetchBoard();
+    return () => {
+      isCurrent = false;
+    };
   }, [id]);
 
   if (loading) {

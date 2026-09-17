@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
+
+const subscribe = () => () => {};
 
 interface ExcalidrawClientProps {
   initialData?: {
@@ -21,13 +23,13 @@ export default function ExcalidrawClient({
   isReadOnly = false,
   excalidrawRef,
 }: ExcalidrawClientProps) {
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
+  if (!isMounted) {
     return (
       <div className="flex h-full w-full items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-3">
@@ -71,7 +73,7 @@ export default function ExcalidrawClient({
             clearCanvas: !isReadOnly,
             loadScene: false,
             saveToActiveFile: false,
-            theme: false, // Disables dark mode toggle in compliance with hospital light theme standard
+            toggleTheme: false, // Disables dark mode toggle in compliance with hospital light theme standard
             export: {
               saveFileToDisk: true,
             },

@@ -50,6 +50,7 @@ export default function VersionHistoryDrawer({
         <button
           type="button"
           onClick={onClose}
+          aria-label="Close version history"
           className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
         >
           <X className="h-4 w-4" />
@@ -103,7 +104,7 @@ export default function VersionHistoryDrawer({
               <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
                 <span className="flex items-center gap-1">
                   <Clock className="h-3 w-3" />
-                  {new Date(ver.created_at).toLocaleString()}
+                  {ver.created_at ? ver.created_at.slice(0, 19).replace("T", " ") : ""}
                 </span>
                 <span className="font-mono text-[10px]" title={`SHA-256: ${ver.content_hash}`}>
                   {ver.content_hash.slice(0, 8)}...
@@ -126,6 +127,7 @@ export default function VersionHistoryDrawer({
           <input
             type="text"
             placeholder="Audit reason (e.g. Rollback to pre-incident triage tree)"
+            aria-label="Audit reason"
             value={restoreReason}
             onChange={(e) => setRestoreReason(e.target.value)}
             className="mt-2 w-full rounded border border-slate-300 px-2 py-1.5 text-xs text-slate-800 focus:border-sky-500 focus:outline-none"

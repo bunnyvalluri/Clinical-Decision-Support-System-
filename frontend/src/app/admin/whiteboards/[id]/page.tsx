@@ -14,18 +14,22 @@ export default function AdminWhiteboardDetailPage() {
 
   useEffect(() => {
     if (!id) return;
+    let isCurrent = true;
     const fetchBoard = async () => {
       try {
         setLoading(true);
         const data = await whiteboardApi.get(id);
-        setWhiteboard(data);
+        if (isCurrent) setWhiteboard(data);
       } catch (err: any) {
-        setError(err?.response?.data?.detail || "Failed to load architecture whiteboard.");
+        if (isCurrent) setError(err?.response?.data?.detail || "Failed to load architecture whiteboard.");
       } finally {
-        setLoading(false);
+        if (isCurrent) setLoading(false);
       }
     };
     fetchBoard();
+    return () => {
+      isCurrent = false;
+    };
   }, [id]);
 
   if (loading) {

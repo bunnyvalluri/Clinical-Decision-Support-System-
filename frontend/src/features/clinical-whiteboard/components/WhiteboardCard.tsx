@@ -41,7 +41,7 @@ export default function WhiteboardCard({ whiteboard, basePath }: WhiteboardCardP
   return (
     <Link
       href={`${basePath}/${whiteboard.id}`}
-      className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-sky-400 hover:shadow-md"
+      className="group flex flex-col justify-between rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-colors hover:border-sky-400 hover:shadow-md"
     >
       <div>
         <div className="flex items-center justify-between gap-2 mb-3">
@@ -98,7 +98,7 @@ export default function WhiteboardCard({ whiteboard, basePath }: WhiteboardCardP
         </span>
         <span className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
-          {new Date(whiteboard.updated_at).toLocaleDateString()}
+          {whiteboard.updated_at ? whiteboard.updated_at.slice(0, 10) : ""}
         </span>
       </div>
     </Link>

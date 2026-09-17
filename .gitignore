@@ -75,3 +75,6 @@ docker-compose.override.yml
 .github/
 
 .vercel
+.gradle/
+android/.gradle/
+android/app/.gradle/
