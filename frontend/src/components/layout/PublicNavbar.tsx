@@ -50,11 +50,11 @@ export function PublicNavbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-xl transition-all shadow-xs pt-safe">
-      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="w-full mx-auto flex h-16 max-w-7xl items-center justify-between px-3 sm:px-6 lg:px-8">
         {/* Brand & Logo Section */}
-        <div className="flex items-center shrink-0 mr-4 lg:mr-6">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative h-9 w-9 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs p-1 group-hover:border-teal-500 transition-colors">
+        <div className="flex items-center shrink-0 mr-2 sm:mr-4 lg:mr-6">
+          <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="relative h-8 w-8 sm:h-10 sm:w-10 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs p-1 group-hover:border-teal-500 transition-colors">
               <Image
                 src="/logo.png"
                 alt="HealthNova AI Logo"
@@ -65,11 +65,11 @@ export function PublicNavbar() {
               />
             </div>
             <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-base sm:text-lg font-black tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors whitespace-nowrap">
+              <div className="flex items-center gap-1 sm:gap-1.5">
+                <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-slate-950 group-hover:text-teal-700 transition-colors whitespace-nowrap">
                   HealthNova
                 </span>
-                <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/80 shadow-2xs whitespace-nowrap">
+                <span className="text-[9px] sm:text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200/80 shadow-2xs whitespace-nowrap">
                   AI
                 </span>
               </div>
@@ -108,7 +108,7 @@ export function PublicNavbar() {
         </nav>
 
         {/* Right CTA Cluster */}
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           {/* Live Operational Heartbeat Badge */}
           <div className="hidden xl:flex items-center gap-2 px-2.5 py-1 rounded-full border border-emerald-200 bg-emerald-50/80 text-[11px] font-medium text-emerald-800 whitespace-nowrap">
             <span className="relative flex h-2 w-2">
@@ -138,13 +138,14 @@ export function PublicNavbar() {
             </Button>
           </Link>
 
-          <Link href="/dashboard">
+          <Link href="/dashboard" className="hidden min-[360px]:inline-flex sm:inline-flex">
             <Button
               size="sm"
-              className="text-xs font-bold gap-1.5 shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 transition-all px-3 sm:px-3.5 whitespace-nowrap"
+              className="h-8 sm:h-9 text-xs font-bold gap-1 sm:gap-1.5 shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 transition-all px-2.5 sm:px-3.5 whitespace-nowrap"
             >
-              <span>Launch Portal</span>
-              <ArrowRight className="h-3.5 w-3.5 text-white" />
+              <span className="hidden sm:inline">Launch </span>
+              <span>Portal</span>
+              <ArrowRight className="h-3.5 w-3.5 text-white shrink-0" />
             </Button>
           </Link>
 
@@ -153,9 +154,10 @@ export function PublicNavbar() {
             type="button"
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation menu"
-            className="lg:hidden touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition-colors ml-1"
+            aria-expanded={mobileMenuOpen}
+            className="lg:hidden touch-target inline-flex items-center justify-center p-2 rounded-xl text-slate-700 hover:text-slate-950 hover:bg-slate-100 active:bg-slate-200 transition-colors shrink-0"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5 text-slate-800" />
           </button>
         </div>
       </div>
@@ -165,7 +167,8 @@ export function PublicNavbar() {
         <div
           role="dialog"
           aria-modal="true"
-          className="lg:hidden fixed inset-0 z-[100] flex flex-col bg-white animate-in fade-in duration-200"
+          aria-label="Mobile Navigation Menu"
+          className="lg:hidden fixed inset-0 z-[100] flex flex-col bg-white overscroll-contain animate-in fade-in duration-200"
         >
           {/* Mobile Drawer Top Bar */}
           <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4 pt-safe bg-white shrink-0">

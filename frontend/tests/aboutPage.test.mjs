@@ -157,6 +157,46 @@ test("Public Navigation & Footer: Unified links and institutional metadata", () 
   );
 });
 
+test("Public Navigation: Mobile viewport responsiveness and accessible menu drawer", () => {
+  const navPath = path.join(rootDir, "src", "components", "layout", "PublicNavbar.tsx");
+  assert.ok(fs.existsSync(navPath), "PublicNavbar.tsx must exist");
+  const navContent = fs.readFileSync(navPath, "utf-8");
+
+  // Mobile trigger button verification
+  assert.match(
+    navContent,
+    /aria-label=["']Open navigation menu["']/,
+    "Must have accessible mobile menu trigger button"
+  );
+  assert.match(
+    navContent,
+    /<Menu\s+[^>]*\/>/,
+    "Must render Menu icon for mobile trigger"
+  );
+  assert.match(
+    navContent,
+    /touch-target/,
+    "Mobile menu trigger must use touch-target for Apple HIG tap sizing"
+  );
+
+  // Mobile drawer dialog verification
+  assert.match(
+    navContent,
+    /role=["']dialog["']/,
+    "Mobile menu drawer must have role='dialog'"
+  );
+  assert.match(
+    navContent,
+    /aria-label=["']Mobile Navigation Menu["']/,
+    "Mobile menu drawer must have accessible name"
+  );
+  assert.match(
+    navContent,
+    /<X\s+[^>]*\/>/,
+    "Mobile menu drawer must include X close button"
+  );
+});
+
 test("Theme Policy: Zero dark-mode classes in about components", () => {
   const aboutDir = path.join(rootDir, "src", "components", "about");
   const entries = fs.readdirSync(aboutDir);
