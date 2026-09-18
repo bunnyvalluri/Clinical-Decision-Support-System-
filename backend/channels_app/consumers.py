@@ -183,6 +183,26 @@ class DashboardConsumer(BaseConsumer):
             }
         )
 
+    async def risk_prediction_completed(self, event: dict[str, Any]) -> None:
+        payload = event.get("payload", event)
+        await self.send_json_message({"event": "RISK_PREDICTION_COMPLETED", "type": "risk_prediction_completed", **payload})
+
+    async def risk_prediction_abstained(self, event: dict[str, Any]) -> None:
+        payload = event.get("payload", event)
+        await self.send_json_message({"event": "RISK_PREDICTION_ABSTAINED", "type": "risk_prediction_abstained", **payload})
+
+    async def risk_prediction_failed(self, event: dict[str, Any]) -> None:
+        payload = event.get("payload", event)
+        await self.send_json_message({"event": "RISK_PREDICTION_FAILED", "type": "risk_prediction_failed", **payload})
+
+    async def risk_model_activated(self, event: dict[str, Any]) -> None:
+        payload = event.get("payload", event)
+        await self.send_json_message({"event": "RISK_MODEL_ACTIVATED", "type": "risk_model_activated", **payload})
+
+    async def risk_model_deprecated(self, event: dict[str, Any]) -> None:
+        payload = event.get("payload", event)
+        await self.send_json_message({"event": "RISK_MODEL_DEPRECATED", "type": "risk_model_deprecated", **payload})
+
 
 class RiskAlertConsumer(BaseConsumer):
     """

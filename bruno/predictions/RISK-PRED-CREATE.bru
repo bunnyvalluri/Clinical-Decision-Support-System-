@@ -1,0 +1,43 @@
+meta {
+  name: RISK-PRED-CREATE
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{base_url}}/api/v1/risk/predictions/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "patient_id": "{{test_patient_id}}",
+    "features": {
+      "age": 68,
+      "systolic_bp": 145,
+      "diastolic_bp": 92,
+      "heart_rate": 88,
+      "respiratory_rate": 22,
+      "temperature": 38.3,
+      "oxygen_saturation": 93.0,
+      "bmi": 27.4,
+      "glucose": 135,
+      "gcs": 15
+    },
+    "trigger": "ADMISSION"
+  }
+}
+
+assert {
+  res.status: in [200, 201, 400, 422]
+}

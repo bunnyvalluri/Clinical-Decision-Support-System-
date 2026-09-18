@@ -128,3 +128,43 @@ class ClinicalRecordViewSet(AuditLogMixin, viewsets.ModelViewSet):
             description=f"Soft-deleted clinical record {instance.id}.",
         )
         instance.delete()
+
+
+class DataQualityIssueViewSet(AuditLogMixin, viewsets.ModelViewSet):
+    """
+    Granular clinical data quality anomaly management.
+    Allows informaticists and clinicians to review, triage, and resolve data anomalies.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["feature_name", "observed_value", "expected_range", "patient__mrn"]
+    ordering_fields = ["created_at", "severity", "status"]
+    ordering = ["-created_at"]
+    audit_resource_type = "DataQualityIssue"
+
+    def get_queryset(self):
+        from apps.clinical.models import DataQualityIssue
+        qs = DataQualityIssue.objects.select_related("patient", "assigned_to")
+        status_filter = self.request.query_params.get("status")
+        if status_filter:
+            qs = qs.filter(status=status_filter.upper())
+        severity = self.request.query_params.get("severity")
+        if severity:
+            qs = qs.filter(severity=severity.upper())
+        return qs
+
+    def get_serializer_class(self):
+        from apps.clinical.serializers import DataQualityIssueSerializer
+        return DataQualityIssueSerializer
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        self._log(
+            self.request,
+            action=AuditLog.Action.CREATE,
+            resource_id=str(instance.pk),
+            description=f"Logged data quality anomaly for feature {instance.feature_name} ({instance.issue_type}).",
+        )
+

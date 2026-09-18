@@ -16,7 +16,8 @@ from apps.predictions.views import PredictionViewSet
 app_name = "predictions"
 
 router = DefaultRouter()
-router.register("records", PredictionViewSet, basename="prediction")
+router.register("records", PredictionViewSet, basename="prediction-record")
+router.register("", PredictionViewSet, basename="prediction")
 
 urlpatterns = [
     path("doctor-summary/", doctor_summary_view, name="doctor_summary"),

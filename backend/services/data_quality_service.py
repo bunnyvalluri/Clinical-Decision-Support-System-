@@ -138,3 +138,22 @@ class ClinicalDataQualityService:
             "quality_gate_passed": critical_count == 0,
             "last_audited_at": datetime.now(timezone.utc).isoformat(),
         }
+
+    @classmethod
+    def assess_record_quality(cls, features: Dict[str, Any]) -> Dict[str, Any]:
+        """Assess record data quality without persisting issues to database."""
+        issues = cls.audit_record(features=features, persist_issues=False)
+        status_val = "VALID"
+        if any(i.get("severity") == "CRITICAL" for i in issues):
+            status_val = "CRITICAL_ANOMALIES"
+        elif any(i.get("severity") in ("HIGH", "MEDIUM") for i in issues):
+            status_val = "WARNINGS_DETECTED"
+        return {
+            "status": status_val,
+            "issue_count": len(issues),
+            "issues": issues,
+        }
+
+
+# Standard alias
+DataQualityService = ClinicalDataQualityService

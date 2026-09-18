@@ -2,162 +2,213 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
 import { DoctorLayout } from "@/components/layout/DoctorLayout";
-import { RiskAssessmentCard } from "@/components/clinical/RiskAssessmentCard";
+import { RiskAssessmentForm } from "@/components/risk/RiskAssessmentForm";
+import { RiskResultCard } from "@/components/risk/RiskResultCard";
+import { RiskTimeline } from "@/components/risk/RiskTimeline";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, ArrowLeft, Clock, Eye, TrendingUp } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Activity, ArrowLeft, PlusCircle, History, RefreshCw, AlertCircle } from "lucide-react";
+import {
+  PatientRiskSummary,
+  RiskLevel,
+  RiskPrediction,
+  riskApi,
+} from "@/services/risk/riskApi";
 
-export default function DoctorPatientPredictionsHistoryPage() {
+export default function DoctorPatientPredictionsPage() {
   const { patientId } = useParams<{ patientId: string }>();
   const router = useRouter();
-  const [predictions, setPredictions] = React.useState<any[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    async function loadPredictions() {
-      setIsLoading(true);
-      try {
-        const res = await fetch(`/api/v1/patients/${patientId}/predictions/`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.results && json.results.length > 0) {
-            setPredictions(json.results);
-          } else {
-            // Baseline sequential prediction history
-            setPredictions([
-              {
-                id: "pred-2",
-                prediction_number: 2,
-                display_label: "Prediction #2",
-                prediction_result: "MEDIUM",
-                probability: 0.428,
-                confidence_score: 0.884,
-                uncertainty_score: 0.125,
-                is_abstaining: false,
-                ood_status: "IN_DISTRIBUTION",
-                model_name: "random_forest_risk_model",
-                model_version_str: "1.0.0",
-                prediction_timestamp: new Date().toISOString(),
-                features_snapshot: { systolic_bp: 142, heart_rate: 82, oxygen_saturation: 97 },
-                clinical_review: { status: "REVIEWED", decision: "CONCUR" },
-              },
-              {
-                id: "pred-1",
-                prediction_number: 1,
-                display_label: "Prediction #1",
-                prediction_result: "HIGH",
-                probability: 0.684,
-                confidence_score: 0.821,
-                uncertainty_score: 0.185,
-                is_abstaining: false,
-                ood_status: "IN_DISTRIBUTION",
-                model_name: "random_forest_risk_model",
-                model_version_str: "1.0.0",
-                prediction_timestamp: new Date(Date.now() - 3600000 * 4).toISOString(),
-                features_snapshot: { systolic_bp: 168, heart_rate: 98, oxygen_saturation: 94 },
-                clinical_review: { status: "REVIEWED", decision: "OVERRIDE" },
-              },
-            ]);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to load predictions history:", err);
-      } finally {
-        setIsLoading(false);
+  const [activeTab, setActiveTab] = React.useState<string>("assess");
+  const [riskSummary, setRiskSummary] = React.useState<PatientRiskSummary | null>(null);
+  const [selectedPrediction, setSelectedPrediction] = React.useState<RiskPrediction | null>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const loadData = React.useCallback(async () => {
+    if (!patientId) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const summary = await riskApi.getPatientRisk(patientId);
+      setRiskSummary(summary);
+      if (summary.latest_risk) {
+        setSelectedPrediction(summary.latest_risk);
       }
-    }
-
-    if (patientId) {
-      loadPredictions();
+    } catch (err: any) {
+      console.error("Failed to load patient risk:", err);
+      setError(
+        err?.response?.data?.error?.message ||
+          err?.message ||
+          "Failed to load patient risk record from database."
+      );
+    } finally {
+      setIsLoading(false);
     }
   }, [patientId]);
 
+  React.useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Handle new prediction completed
+  const handlePredictionComplete = (newPrediction: RiskPrediction) => {
+    setSelectedPrediction(newPrediction);
+    setActiveTab("result");
+    loadData(); // refresh trajectory
+  };
+
+  // Handle physician clinical review / override
+  const handleRecordReview = async (predId: string, override: RiskLevel, rationale: string) => {
+    const updated = await riskApi.recordReview(predId, {
+      clinician_override: override,
+      override_reason: rationale,
+    });
+    setSelectedPrediction(updated);
+    loadData();
+  };
+
+  // Select item from timeline
+  const handleSelectFromTimeline = async (id: string) => {
+    try {
+      const detail = await riskApi.getPrediction(id);
+      setSelectedPrediction(detail);
+      setActiveTab("result");
+    } catch (err) {
+      console.error("Failed to load prediction detail:", err);
+    }
+  };
+
   return (
     <DoctorLayout>
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center gap-3">
+      <div className="p-6 max-w-6xl mx-auto space-y-6">
+        {/* Top Breadcrumb & Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push(`/doctor/patients/${patientId}`)}
+              className="gap-1 text-xs text-slate-700 hover:text-slate-900"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              Back to Patient Chart
+            </Button>
+            <span className="text-slate-300">/</span>
+            <span className="text-xs text-slate-500 font-medium">Risk Level Assessment & CDSS</span>
+          </div>
+
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
-            onClick={() => router.push(`/doctor/patients/${patientId}`)}
-            className="gap-1 text-xs"
+            onClick={loadData}
+            disabled={isLoading}
+            className="h-8 text-xs gap-1.5 border-slate-300"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Patient
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
+            Refresh
           </Button>
-          <span className="text-slate-300">/</span>
-          <span className="text-xs text-slate-500 font-medium">Historical Predictions</span>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Activity className="h-6 w-6 text-blue-600" />
-            Sequential Risk Predictions History
-          </h1>
-          <p className="text-xs text-slate-500">
-            Compare risk trajectory, probability deltas, model versions, and physician overrides over time for patient MRN: {patientId}.
-          </p>
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <Activity className="h-6 w-6 text-sky-700" />
+              Patient Risk Level Prediction & Clinical Decision Support
+            </h1>
+            <p className="text-xs text-slate-600 mt-1">
+              Patient MRN: <strong className="text-slate-900 font-mono">{riskSummary?.patient_mrn || patientId}</strong> —
+              Authoritative Source: <strong className="text-slate-800">Neon PostgreSQL</strong>
+            </p>
+          </div>
         </div>
 
-        {/* Prediction Cards Sequence */}
-        <div className="space-y-4">
-          {predictions.map((p) => (
-            <Card key={p.id} className="border border-slate-200 bg-white shadow-xs">
-              <CardHeader className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-row items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs font-bold py-0.5">
-                    {p.display_label || `Prediction #${p.prediction_number || 1}`}
-                  </Badge>
-                  <span className="text-xs font-semibold text-slate-800">
-                    Result: <strong className={p.prediction_result === "HIGH" ? "text-rose-600" : "text-amber-600"}>{p.prediction_result}</strong>
-                  </span>
-                  <span className="text-xs text-slate-500 font-mono">
-                    ({(Number(p.probability) * 100).toFixed(1)}% prob)
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-500 font-mono flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
-                    {new Date(p.prediction_timestamp).toLocaleString()}
-                  </span>
-                  <Link href={`/doctor/patients/${patientId}/predictions/${p.id}`}>
-                    <Button size="sm" variant="outline" className="text-xs gap-1 py-1 h-7">
-                      <Eye className="h-3.5 w-3.5" /> Inspect Attribution
-                    </Button>
-                  </Link>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 space-y-3 text-xs">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-50 p-2.5 rounded border border-slate-100 text-xs">
-                  <div>
-                    <span className="text-slate-500 block text-[11px]">Model Algorithm</span>
-                    <span className="font-semibold text-slate-800 font-mono">{p.model_name}</span>
+        {error && (
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Tab Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <TabsList className="bg-slate-100 p-1 border border-slate-200">
+            <TabsTrigger value="assess" className="text-xs gap-1.5 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs">
+              <PlusCircle className="w-3.5 h-3.5" />
+              New Risk Assessment
+            </TabsTrigger>
+            <TabsTrigger value="result" className="text-xs gap-1.5 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs">
+              <Activity className="w-3.5 h-3.5" />
+              Risk Assessment & CDSS Result
+            </TabsTrigger>
+            <TabsTrigger value="trajectory" className="text-xs gap-1.5 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs">
+              <History className="w-3.5 h-3.5" />
+              Sequential Trajectory ({riskSummary?.total_predictions || 0})
+            </TabsTrigger>
+          </TabsList>
+
+          {/* TAB 1: New Assessment Form */}
+          <TabsContent value="assess" className="space-y-4">
+            <RiskAssessmentForm
+              patientId={patientId}
+              onPredictionComplete={handlePredictionComplete}
+              disabled={isLoading}
+            />
+          </TabsContent>
+
+          {/* TAB 2: Latest / Selected Result */}
+          <TabsContent value="result" className="space-y-4">
+            {selectedPrediction ? (
+              <RiskResultCard
+                prediction={selectedPrediction}
+                patientName={`Patient MRN: ${riskSummary?.patient_mrn || patientId}`}
+                onRecordReview={handleRecordReview}
+              />
+            ) : (
+              <div className="p-8 text-center rounded-xl border border-slate-200 bg-white space-y-3">
+                <Activity className="w-8 h-8 text-slate-300 mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-800">No Risk Assessment Selected</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Execute a new clinical assessment or select a historical prediction from the timeline to inspect full TreeSHAP explainability and CDSS guidance.
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => setActiveTab("assess")}
+                  className="text-xs bg-sky-700 hover:bg-sky-800 text-white"
+                >
+                  Start Assessment
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* TAB 3: Longitudinal Risk Trajectory */}
+          <TabsContent value="trajectory" className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-1">
+                <RiskTimeline
+                  items={riskSummary?.risk_trajectory || []}
+                  selectedId={selectedPrediction?.id}
+                  onSelectPrediction={handleSelectFromTimeline}
+                />
+              </div>
+              <div className="md:col-span-2">
+                {selectedPrediction ? (
+                  <RiskResultCard
+                    prediction={selectedPrediction}
+                    patientName={`Patient MRN: ${riskSummary?.patient_mrn || patientId}`}
+                    onRecordReview={handleRecordReview}
+                  />
+                ) : (
+                  <div className="p-8 text-center rounded-xl border border-slate-200 bg-white text-xs text-slate-500">
+                    Select a historical assessment on the left to review inference attributions.
                   </div>
-                  <div>
-                    <span className="text-slate-500 block text-[11px]">Model Version</span>
-                    <span className="font-semibold text-slate-800 font-mono">v{p.model_version_str || "1.0.0"}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block text-[11px]">Confidence</span>
-                    <span className="font-semibold text-slate-800 font-mono">
-                      {p.confidence_score ? `${(Number(p.confidence_score) * 100).toFixed(1)}%` : "N/A"}
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block text-[11px]">Review Status</span>
-                    <Badge variant="outline" className="text-[10px] bg-white text-slate-700">
-                      {p.clinical_review?.status || "PENDING_REVIEW"}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </DoctorLayout>
   );

@@ -8,7 +8,7 @@ from decimal import Decimal
 from django.utils import timezone
 from rest_framework import serializers
 
-from apps.clinical.models import ClinicalRecord, EncounterType
+from apps.clinical.models import ClinicalFeatureDefinition, ClinicalRecord, ClinicalRule, EncounterType
 
 
 class ClinicalRecordValidationMixin:
@@ -249,3 +249,80 @@ class ClinicalRecordCreateUpdateSerializer(ClinicalRecordValidationMixin, serial
         extra_kwargs = {
             "patient": {"required": False},  # When creating via nested /patients/{id}/clinical-records/, populated automatically
         }
+
+
+class ClinicalFeatureDefinitionSerializer(serializers.ModelSerializer):
+    """Serializer for dynamic clinical feature definitions and validation boundaries."""
+
+    class Meta:
+        model = ClinicalFeatureDefinition
+        fields = [
+            "id",
+            "name",
+            "display_name",
+            "data_type",
+            "unit",
+            "required",
+            "min_value",
+            "max_value",
+            "allowed_values",
+            "preprocessing_strategy",
+            "clinical_category",
+            "is_active",
+            "version",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class ClinicalRuleSerializer(serializers.ModelSerializer):
+    """Serializer for deterministic clinical safety rules."""
+
+    class Meta:
+        model = ClinicalRule
+        fields = [
+            "id",
+            "rule_name",
+            "description",
+            "condition_expression",
+            "severity",
+            "action_type",
+            "version",
+            "effective_from",
+            "effective_to",
+            "approval_status",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class DataQualityIssueSerializer(serializers.ModelSerializer):
+    """Serializer for granular clinical data quality anomalies."""
+
+    patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
+    assigned_to_name = serializers.CharField(source="assigned_to.get_full_name", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import DataQualityIssue
+        model = DataQualityIssue
+        fields = [
+            "id",
+            "patient",
+            "patient_mrn",
+            "clinical_record",
+            "issue_type",
+            "severity",
+            "feature_name",
+            "observed_value",
+            "expected_range",
+            "source",
+            "status",
+            "assigned_to",
+            "assigned_to_name",
+            "resolution",
+            "resolved_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at"]
+

@@ -1,0 +1,23 @@
+meta {
+  name: RISK-EVALUATIONS-LIST
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{base_url}}/api/v1/risk/evaluations/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: eq 200
+}

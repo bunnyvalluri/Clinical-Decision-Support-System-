@@ -45,9 +45,15 @@ class ApplicationError(Exception):
         self,
         message: str | None = None,
         details: dict[str, Any] | None = None,
+        status_code: int | None = None,
+        code: str | None = None,
     ) -> None:
         self.message = message or self.__class__.message
         self.details = details or {}
+        if status_code is not None:
+            self.status_code = status_code
+        if code is not None:
+            self.code = code
         super().__init__(self.message)
 
 

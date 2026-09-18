@@ -9,13 +9,20 @@ Defines the BaseRiskModel interface and concrete implementations:
 All models share the same versioned preprocessing pipeline to guarantee zero training-serving skew.
 """
 from abc import ABC, abstractmethod
+import hashlib
+import logging
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 
+from ml.features.schema import validate_features
 from ml.preprocessing.pipeline import build_preprocessing_pipeline
+
+logger = logging.getLogger(__name__)
 
 
 class BaseRiskModel(ABC):
@@ -74,6 +81,53 @@ class BaseRiskModel(ABC):
             idx = self.classes_.index(p) if p in self.classes_ else 0
             probs[i, idx] = 1.0
         return probs
+
+    def fit(self, X: pd.DataFrame, y: pd.Series, **kwargs) -> Pipeline:
+        """Fit the unified preprocessing and classifier pipeline."""
+        self.pipeline = self.build_full_pipeline()
+        self.pipeline.fit(X, y)
+        if hasattr(self.pipeline, "classes_"):
+            self.classes_ = list(self.pipeline.classes_)
+        return self.pipeline
+
+    def evaluate(self, X_test: pd.DataFrame, y_test: pd.Series, **kwargs) -> Dict[str, Any]:
+        """Evaluate model against held-out validation or test cohort."""
+        from ml.evaluation.evaluator import evaluate_model
+        y_pred = self.predict(X_test)
+        y_prob = self.predict_proba(X_test)
+        return evaluate_model(y_true=y_test, y_pred=y_pred, y_prob=y_prob)
+
+    def explain(self, record: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate TreeSHAP or feature-importance attributions for clinical observation record."""
+        from ml.explainability.explainer import explain_prediction
+        df = self.validate_schema(record)
+        return explain_prediction(pipeline=self.pipeline, input_df=df, model_name=self.model_name)
+
+    def validate_schema(self, record: Dict[str, Any]) -> pd.DataFrame:
+        """Validate input dictionary and format canonical feature DataFrame."""
+        return validate_features(record)
+
+    def save(self, path: Union[str, Path]) -> str:
+        """Serialize model artifact to disk and compute SHA-256 integrity hash."""
+        if self.pipeline is None:
+            raise RuntimeError(f"Cannot serialize uninitialized or unfitted pipeline for {self.model_name}.")
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(self.pipeline, p, compress=3)
+        sha256 = hashlib.sha256()
+        with open(p, "rb") as f:
+            for chunk in iter(lambda: f.read(65536), b""):
+                sha256.update(chunk)
+        return sha256.hexdigest()
+
+    def load(self, path: Union[str, Path]) -> None:
+        """Load serialized model artifact from persistent storage."""
+        p = Path(path)
+        if not p.exists():
+            raise FileNotFoundError(f"Model artifact not found at {p}")
+        self.pipeline = joblib.load(p)
+        if hasattr(self.pipeline, "classes_"):
+            self.classes_ = list(self.pipeline.classes_)
 
     def get_metadata(self) -> Dict[str, Any]:
         """Return model metadata, architecture details, and version provenance."""
@@ -174,3 +228,8 @@ class AdaBoostRiskModel(BaseRiskModel):
             learning_rate=self.learning_rate,
             random_state=self.random_state,
         )
+
+
+# Backward and Domain Standard Aliases
+BaseRiskPredictionModel = BaseRiskModel
+SVMRiskModel = SVCRiskModel

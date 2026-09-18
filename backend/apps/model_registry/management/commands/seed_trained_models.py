@@ -84,6 +84,30 @@ class Command(BaseCommand):
                         f"  [+] {action_str} {mv.model_name} v{mv.version} [{mv.status}] (acc={mv.accuracy})"
                     )
                 )
+
+                # Seed DatasetVersion and ModelEvaluation
+                from apps.model_registry.models import DatasetVersion, ModelEvaluation
+                dv, _ = DatasetVersion.objects.get_or_create(
+                    dataset_identifier="clinical_risk_v1",
+                    defaults={
+                        "version": "1.0.0",
+                        "source": "EHR Inpatient Cohort (BPY-CSE-2666)",
+                        "sha256_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "sample_count": 2501,
+                        "feature_count": 16,
+                        "approval_status": "APPROVED",
+                    },
+                )
+
+                ModelEvaluation.objects.update_or_create(
+                    model_version=mv,
+                    dataset_version=dv,
+                    defaults={
+                        "metrics": eval_data,
+                        "brier_score": eval_data.get("brier_score"),
+                        "passed_safety_gates": float(eval_data.get("accuracy", 0.0) or 0.0) >= 0.75,
+                    },
+                )
                 seeded_count += 1
 
         self.stdout.write(self.style.SUCCESS(f"Successfully registered {seeded_count} models in PostgreSQL."))

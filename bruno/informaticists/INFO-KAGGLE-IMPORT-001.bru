@@ -1,0 +1,33 @@
+meta {
+  name: INFO-KAGGLE-IMPORT-001
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_url}}/api/v1/models/datasets/import/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{informaticist_access_token}}
+}
+
+body:json {
+  {
+    "kaggle_owner": "fedesoriano",
+    "kaggle_slug": "stroke-prediction-dataset",
+    "title": "Stroke Prediction Dataset",
+    "license_name": "CC0: Public Domain"
+  }
+}
+
+assert {
+  res.status: in [200, 201, 401]
+}

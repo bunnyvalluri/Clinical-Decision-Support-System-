@@ -21,6 +21,7 @@ import { ResponsiveAppShell, NavItem } from "@/components/responsive/ResponsiveA
 const INFORMATICIST_NAV_ITEMS: NavItem[] = [
   { href: "/informaticist/dashboard", icon: LayoutDashboard, label: "Dashboard", mobileQuick: true },
   { href: "/informaticist/models", icon: Brain, label: "Models & Registry", mobileQuick: true },
+  { href: "/informaticist/datasets", icon: Database, label: "Datasets & Ingestion", mobileQuick: true },
   { href: "/informaticist/drift", icon: TrendingDown, label: "Drift Monitor", mobileQuick: true },
   { href: "/informaticist/analytics", icon: BarChart3, label: "Analytics", mobileQuick: true },
   { href: "/informaticist/whiteboards", icon: PenTool, label: "Whiteboards" },

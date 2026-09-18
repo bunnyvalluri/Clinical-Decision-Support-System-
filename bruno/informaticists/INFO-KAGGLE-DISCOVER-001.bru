@@ -1,0 +1,31 @@
+meta {
+  name: INFO-KAGGLE-DISCOVER-001
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_url}}/api/v1/models/datasets/discover/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{informaticist_access_token}}
+}
+
+body:json {
+  {
+    "query": "cardiovascular disease",
+    "limit": 10
+  }
+}
+
+assert {
+  res.status: in [200, 401]
+}

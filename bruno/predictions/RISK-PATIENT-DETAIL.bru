@@ -1,0 +1,23 @@
+meta {
+  name: RISK-PATIENT-DETAIL
+  type: http
+  seq: 15
+}
+
+get {
+  url: {{base_url}}/api/v1/patients/{{test_patient_id}}/risk/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+assert {
+  res.status: in [200, 404]
+}

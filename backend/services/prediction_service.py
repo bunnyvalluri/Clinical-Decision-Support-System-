@@ -281,8 +281,8 @@ class PredictionService(BaseService):
             )
         except MissingFeatureError as exc:
             raise MissingClinicalDataError(str(exc)) from exc
-        except FeatureValidationError as exc:
-            raise ApplicationError(str(exc), status_code=400) from exc
+        except FeatureValidationError:
+            raise
         except ModelUnavailableError as exc:
             logger.error("ML model unavailable for inference: %s", exc)
             raise PredictionServiceError(
@@ -304,7 +304,20 @@ class PredictionService(BaseService):
         if clinical_record:
             prediction.clinical_record = clinical_record
 
-        # 5. Real-time Event Dispatching
+        # 5. Intelligent Clinical Decision Support Synthesis
+        try:
+            from services.clinical_decision_support_service import ClinicalDecisionSupportService
+            cdss = ClinicalDecisionSupportService()
+            prediction.cdss_guidance = cdss.generate_support_guidance(
+                patient_id=str(patient.id),
+                features=features,
+                prediction=prediction,
+            )
+        except Exception as cdss_exc:
+            logger.warning("CDSS guidance synthesis warning: %s", cdss_exc)
+            prediction.cdss_guidance = None
+
+        # 6. Real-time Event Dispatching
         _broadcast_realtime_event(prediction)
 
         return prediction
@@ -449,3 +462,7 @@ class PredictionService(BaseService):
             )
 
         return prediction
+
+
+# Alias for explicit domain interface
+RiskPredictionService = PredictionService

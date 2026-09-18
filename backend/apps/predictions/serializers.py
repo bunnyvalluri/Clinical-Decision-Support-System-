@@ -61,6 +61,24 @@ class PredictionSerializer(serializers.ModelSerializer):
     model_version = serializers.CharField(source="model_version_str", read_only=True)
     inference_latency = serializers.DecimalField(source="inference_latency_ms", max_digits=8, decimal_places=2, read_only=True)
     timestamp = serializers.DateTimeField(source="prediction_timestamp", read_only=True)
+    cdss_guidance = serializers.SerializerMethodField(read_only=True)
+
+    def get_cdss_guidance(self, obj):
+        if hasattr(obj, "cdss_guidance") and obj.cdss_guidance:
+            if hasattr(obj.cdss_guidance, "to_dict"):
+                return obj.cdss_guidance.to_dict()
+            return obj.cdss_guidance
+        try:
+            from services.clinical_decision_support_service import ClinicalDecisionSupportService
+            cdss = ClinicalDecisionSupportService()
+            guidance = cdss.generate_support_guidance(
+                patient_id=str(obj.patient_id),
+                features=obj.features_snapshot or {},
+                prediction=obj,
+            )
+            return guidance.to_dict()
+        except Exception:
+            return None
 
     class Meta:
         model = Prediction
@@ -78,6 +96,9 @@ class PredictionSerializer(serializers.ModelSerializer):
             "risk_level",
             "probability",
             "confidence_score",
+            "uncertainty_score",
+            "is_abstaining",
+            "ood_status",
             "inference_latency",
             "inference_latency_ms",
             "feature_schema_version",
@@ -89,6 +110,7 @@ class PredictionSerializer(serializers.ModelSerializer):
             "overridden_by",
             "overridden_by_name",
             "explanation",
+            "cdss_guidance",
             "created_at",
         ]
         read_only_fields = fields

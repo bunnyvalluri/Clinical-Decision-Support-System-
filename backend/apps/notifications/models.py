@@ -13,6 +13,25 @@ class NotificationSeverity(models.TextChoices):
     CRITICAL = "CRITICAL", "Critical / Emergency"
 
 
+class NotificationType(models.TextChoices):
+    CLINICAL = "CLINICAL", "Clinical Event"
+    RISK = "RISK", "Risk Assessment Alert"
+    TRIAGE = "TRIAGE", "Triage Escalation"
+    APPOINTMENT = "APPOINTMENT", "Appointment"
+    SYSTEM = "SYSTEM", "System Alert"
+    SECURITY = "SECURITY", "Security Event"
+    AI = "AI", "AI Assistant Output"
+    MODEL = "MODEL", "Model Registry Alert"
+    DATA_QUALITY = "DATA_QUALITY", "Data Quality Anomaly"
+    ADMIN = "ADMIN", "Administrative Alert"
+
+
+class NotificationStatus(models.TextChoices):
+    UNREAD = "UNREAD", "Unread"
+    READ = "READ", "Read"
+    ARCHIVED = "ARCHIVED", "Archived"
+
+
 class NotificationChannel(models.TextChoices):
     IN_APP = "IN_APP", "In-App Notification"
     WEBSOCKET = "WEBSOCKET", "Real-Time WebSocket"
@@ -47,10 +66,22 @@ class Notification(BaseModel):
         related_name="notifications",
         help_text="Prediction that triggered this notification.",
     )
+    notification_type = models.CharField(
+        max_length=30,
+        choices=NotificationType.choices,
+        default=NotificationType.CLINICAL,
+        db_index=True,
+    )
     severity = models.CharField(
         max_length=20,
         choices=NotificationSeverity.choices,
         default=NotificationSeverity.INFO,
+        db_index=True,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=NotificationStatus.choices,
+        default=NotificationStatus.UNREAD,
         db_index=True,
     )
     channel = models.CharField(

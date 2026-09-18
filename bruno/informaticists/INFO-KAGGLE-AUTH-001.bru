@@ -1,0 +1,23 @@
+meta {
+  name: INFO-KAGGLE-AUTH-001
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/v1/models/datasets/auth-status/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{informaticist_access_token}}
+}
+
+assert {
+  res.status: in [200, 401]
+}

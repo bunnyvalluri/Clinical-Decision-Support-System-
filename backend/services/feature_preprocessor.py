@@ -8,18 +8,42 @@ from ml.features.schema import FEATURE_LIMITS, FEATURE_NAMES
 
 
 class FeatureValidationError(Exception):
-    """Base exception for feature preprocessing errors."""
-    pass
+    """Base exception for structured feature preprocessing and physiological errors."""
+
+    def __init__(
+        self,
+        message: str,
+        field: str | None = None,
+        code: str = "VALIDATION_ERROR",
+        errors: list[dict[str, Any]] | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.message = message
+        self.field = field
+        self.code = code
+        self.errors = errors or ([{"field": field, "code": code, "message": message}] if field else [])
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "field": self.field,
+            "code": self.code,
+            "message": self.message,
+            "errors": self.errors,
+        }
 
 
 class MissingFeatureError(FeatureValidationError):
     """Raised when critical clinical features are missing."""
-    pass
+
+    def __init__(self, message: str, field: str | None = None, errors: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(message=message, field=field, code="MISSING_REQUIRED", errors=errors)
 
 
 class InvalidFeatureRangeError(FeatureValidationError):
-    """Raised when a feature value falls outside physiological limits."""
-    pass
+    """Raised when a feature value falls outside configured physiological limits."""
+
+    def __init__(self, message: str, field: str | None = None, errors: list[dict[str, Any]] | None = None) -> None:
+        super().__init__(message=message, field=field, code="OUT_OF_RANGE", errors=errors)
 
 
 class FeaturePreprocessor:
@@ -63,27 +87,74 @@ class FeaturePreprocessor:
 
     def validate_features(self, features: dict[str, Any]) -> None:
         """
-        Ensure all required features exist and are within physiologically possible ranges.
+        Strictly validate features against physiological bounds and database definitions.
+        Emits structured clinical errors without silent imputation or data fabrication.
         """
-        missing = [f for f in self.REQUIRED_FEATURES if f not in features or features[f] is None]
-        if missing:
-            raise MissingFeatureError(
-                f"Missing required clinical features for prediction: {sorted(missing)}"
-            )
+        validation_errors: list[dict[str, Any]] = []
 
-        for feature_name, (min_val, max_val) in FEATURE_LIMITS.items():
-            if feature_name in features and features[feature_name] is not None:
+        # Check required features
+        for req in sorted(self.REQUIRED_FEATURES):
+            if req not in features or features[req] is None or features[req] == "":
+                validation_errors.append({
+                    "field": req,
+                    "code": "MISSING_REQUIRED",
+                    "message": f"Required clinical feature '{req}' is missing or null.",
+                })
+
+        # Check against database definitions if available, otherwise fallback to schema limits
+        limits = dict(FEATURE_LIMITS)
+        try:
+            from apps.clinical.models import ClinicalFeatureDefinition
+            for cfd in ClinicalFeatureDefinition.objects.filter(is_active=True):
+                if cfd.min_value is not None and cfd.max_value is not None:
+                    limits[cfd.name] = (float(cfd.min_value), float(cfd.max_value))
+        except Exception:
+            pass
+
+        for feature_name, (min_val, max_val) in limits.items():
+            if feature_name in features and features[feature_name] is not None and features[feature_name] != "":
+                val_raw = features[feature_name]
                 try:
-                    val = float(features[feature_name])
-                except (ValueError, TypeError) as exc:
-                    raise FeatureValidationError(
-                        f"Feature '{feature_name}' must be numeric, got '{features[feature_name]}'"
-                    ) from exc
+                    val = float(val_raw)
+                except (ValueError, TypeError):
+                    validation_errors.append({
+                        "field": feature_name,
+                        "code": "INVALID_DATATYPE",
+                        "message": f"Feature '{feature_name}' must be numeric, got '{val_raw}'.",
+                    })
+                    continue
 
                 if val < min_val or val > max_val:
-                    raise InvalidFeatureRangeError(
-                        f"Feature '{feature_name}' value {val} out of physiological bounds [{min_val}, {max_val}]."
-                    )
+                    validation_errors.append({
+                        "field": feature_name,
+                        "code": "OUT_OF_RANGE",
+                        "message": (
+                            f"Value {val} for '{feature_name}' is outside configured physiological limits "
+                            f"[{min_val}, {max_val}]."
+                        ),
+                    })
+
+        if validation_errors:
+            first = validation_errors[0]
+            first_code = first.get("code")
+            if first_code == "MISSING_REQUIRED":
+                raise MissingFeatureError(
+                    message=first["message"],
+                    field=first.get("field"),
+                    errors=validation_errors,
+                )
+            if first_code == "OUT_OF_RANGE":
+                raise InvalidFeatureRangeError(
+                    message=first["message"],
+                    field=first.get("field"),
+                    errors=validation_errors,
+                )
+            raise FeatureValidationError(
+                message=first["message"],
+                field=first.get("field"),
+                code=first_code or "VALIDATION_ERROR",
+                errors=validation_errors,
+            )
 
     def prepare_dataframe(self, features_dict: dict[str, Any]) -> tuple[pd.DataFrame, dict[str, Any]]:
         """

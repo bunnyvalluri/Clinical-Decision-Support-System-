@@ -34,62 +34,16 @@ export default function DoctorPatientTimelinePage() {
               }))
             );
           } else {
-            // Baseline encounter timeline fallback
-            setTimelineEvents([
-              {
-                id: "1",
-                title: "Patient Encounter & Baseline Vitals Recorded",
-                timestamp: "2 hours ago",
-                description: "Systolic BP 142 mmHg, Heart Rate 82 bpm, SpO2 97%. Recorded in Outpatient Ward.",
-                eventType: "VITAL_CHECK",
-                actor: "Nurse Sarah Jenkins, RN",
-                severity: "normal",
-              },
-              {
-                id: "2",
-                title: "AI Risk Prediction #1: MEDIUM Risk (42.8%)",
-                timestamp: "1 hour ago",
-                description: "Predicted by Random Forest v1.0.0. TreeSHAP indicates elevated blood pressure as primary risk driver.",
-                eventType: "PREDICTION",
-                actor: "Random Forest Risk Engine",
-                severity: "warning",
-              },
-              {
-                id: "3",
-                title: "Physician Clinical Concurrence Logged",
-                timestamp: "30 mins ago",
-                description: "Dr. Michael Chen concurred with AI risk stratification. Serial blood pressure monitoring ordered.",
-                eventType: "REVIEW",
-                actor: "Dr. Michael Chen, MD",
-                severity: "normal",
-              },
-            ]);
+            setTimelineEvents([]);
           }
         } else {
-          setTimelineEvents([
-            {
-              id: "1",
-              title: "Patient Encounter & Baseline Vitals Recorded",
-              timestamp: "2 hours ago",
-              description: "Systolic BP 142 mmHg, Heart Rate 82 bpm, SpO2 97%. Recorded in Outpatient Ward.",
-              eventType: "VITAL_CHECK",
-              actor: "Nurse Sarah Jenkins, RN",
-              severity: "normal",
-            },
-            {
-              id: "2",
-              title: "AI Risk Prediction #1: MEDIUM Risk (42.8%)",
-              timestamp: "1 hour ago",
-              description: "Predicted by Random Forest v1.0.0. TreeSHAP indicates elevated blood pressure as primary risk driver.",
-              eventType: "PREDICTION",
-              actor: "Random Forest Risk Engine",
-              severity: "warning",
-            },
-          ]);
+          setTimelineEvents([]);
         }
       } catch (err) {
         console.error("Failed to load timeline:", err);
+        setTimelineEvents([]);
       } finally {
+
         setIsLoading(false);
       }
     }
@@ -145,6 +99,10 @@ export default function DoctorPatientTimelinePage() {
           <CardContent className="p-6">
             {isLoading ? (
               <div className="p-12 text-center text-xs text-slate-500">Loading chronological timeline...</div>
+            ) : timelineEvents.length === 0 ? (
+              <div className="p-12 text-center text-sm font-medium text-slate-500">
+                No clinical events available.
+              </div>
             ) : (
               <ClinicalTimeline events={timelineEvents} />
             )}

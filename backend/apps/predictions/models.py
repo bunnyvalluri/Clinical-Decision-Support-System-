@@ -14,6 +14,20 @@ class RiskLevel(models.TextChoices):
     CRITICAL = "CRITICAL", "Critical Risk"
 
 
+class ReviewStatus(models.TextChoices):
+    GENERATED = "GENERATED", "Generated"
+    PENDING_REVIEW = "PENDING_REVIEW", "Pending Review"
+    UNDER_REVIEW = "UNDER_REVIEW", "Under Review"
+    REVIEWED = "REVIEWED", "Reviewed / Concurred"
+    ACCEPTED_FOR_CONSIDERATION = "ACCEPTED_FOR_CONSIDERATION", "Accepted for Consideration"
+    REJECTED = "REJECTED", "Rejected"
+    REQUIRES_MORE_INFORMATION = "REQUIRES_MORE_INFORMATION", "Requires More Information"
+    ESCALATED = "ESCALATED", "Escalated"
+    SUPERSEDED = "SUPERSEDED", "Superseded"
+    EXPIRED = "EXPIRED", "Expired"
+    ERROR = "ERROR", "Error"
+
+
 class Prediction(BaseModel):
     """
     Historical patient risk level prediction record.
@@ -124,6 +138,13 @@ class Prediction(BaseModel):
         related_name="prediction_overrides",
         help_text="Physician who recorded the clinical override.",
     )
+    review_status = models.CharField(
+        max_length=35,
+        choices=ReviewStatus.choices,
+        default=ReviewStatus.GENERATED,
+        db_index=True,
+        help_text="Clinical review lifecycle state (GENERATED, PENDING_REVIEW, REVIEWED, etc.).",
+    )
 
     class Meta:
         db_table = "predictions"
@@ -192,13 +213,6 @@ class PredictionExplanation(BaseModel):
 
     def __str__(self) -> str:
         return f"Explanation ({self.method}) for Prediction {self.prediction_id}"
-
-
-class ReviewStatus(models.TextChoices):
-    PENDING_REVIEW = "PENDING_REVIEW", "Pending Review"
-    REVIEWED = "REVIEWED", "Reviewed / Concurred"
-    REQUIRES_MORE_INFORMATION = "REQUIRES_MORE_INFORMATION", "Requires More Information"
-    ESCALATED = "ESCALATED", "Escalated"
 
 
 class ReviewDecision(models.TextChoices):

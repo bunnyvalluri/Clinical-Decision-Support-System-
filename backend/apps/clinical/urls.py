@@ -9,12 +9,13 @@ from apps.clinical.triage_views import (
     triage_queue_view,
     update_triage_state_view,
 )
-from apps.clinical.views import ClinicalRecordViewSet
+from apps.clinical.views import ClinicalRecordViewSet, DataQualityIssueViewSet
 
 app_name = "clinical"
 
 router = DefaultRouter()
 router.register(r"records", ClinicalRecordViewSet, basename="clinical_record")
+router.register(r"data-quality-issues", DataQualityIssueViewSet, basename="data_quality_issue")
 
 urlpatterns = [
     path("triage/queue/", triage_queue_view, name="triage_queue"),

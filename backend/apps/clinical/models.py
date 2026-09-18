@@ -493,3 +493,101 @@ class DataQualityIssue(SoftDeleteModel):
         return f"DataQualityIssue [{self.severity}] {self.feature_name}: {self.issue_type} ({self.status})"
 
 
+class ClinicalFeatureDefinition(SoftDeleteModel):
+    """
+    Configurable clinical feature definition schema.
+    Controls clinical input validation, bounds, units, and preprocessing strategies.
+    """
+
+    class DataType(models.TextChoices):
+        NUMERICAL = "NUMERICAL", "Numerical / Continuous"
+        CATEGORICAL = "CATEGORICAL", "Categorical / Discrete"
+        BOOLEAN = "BOOLEAN", "Boolean Flag"
+
+    class PreprocessingStrategy(models.TextChoices):
+        STANDARD_SCALER = "STANDARD_SCALER", "Standard Scaler + Median Impute"
+        ROBUST_SCALER = "ROBUST_SCALER", "Robust Scaler + Median Impute"
+        ONE_HOT = "ONE_HOT", "One-Hot Encoding"
+        PASS_THROUGH = "PASS_THROUGH", "Pass Through"
+
+    class ClinicalCategory(models.TextChoices):
+        DEMOGRAPHIC = "DEMOGRAPHIC", "Demographic"
+        CARDIOVASCULAR = "CARDIOVASCULAR", "Cardiovascular"
+        RESPIRATORY = "RESPIRATORY", "Respiratory"
+        VITAL = "VITAL", "Vital Signs"
+        METABOLIC = "METABOLIC", "Metabolic"
+        ELECTROLYTE = "ELECTROLYTE", "Electrolytes"
+        RENAL = "RENAL", "Renal Function"
+        ENCOUNTER = "ENCOUNTER", "Encounter Details"
+
+    name = models.CharField(max_length=100, unique=True, db_index=True)
+    display_name = models.CharField(max_length=150)
+    data_type = models.CharField(max_length=30, choices=DataType.choices, default=DataType.NUMERICAL)
+    unit = models.CharField(max_length=50, blank=True)
+    required = models.BooleanField(default=True)
+    min_value = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    max_value = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    allowed_values = models.JSONField(default=list, blank=True)
+    preprocessing_strategy = models.CharField(
+        max_length=50,
+        choices=PreprocessingStrategy.choices,
+        default=PreprocessingStrategy.STANDARD_SCALER,
+    )
+    clinical_category = models.CharField(
+        max_length=50,
+        choices=ClinicalCategory.choices,
+        default=ClinicalCategory.VITAL,
+    )
+    is_active = models.BooleanField(default=True, db_index=True)
+    version = models.CharField(max_length=50, default="1.0.0")
+
+    class Meta:
+        db_table = "clinical_feature_definitions"
+        verbose_name = "Clinical Feature Definition"
+        verbose_name_plural = "Clinical Feature Definitions"
+        ordering = ["clinical_category", "name"]
+
+    def __str__(self) -> str:
+        return f"{self.display_name} ({self.name}) [{self.data_type}]"
+
+
+class ClinicalRule(SoftDeleteModel):
+    """
+    Deterministic clinical scoring and alert rules (e.g. qSOFA, NEWS2, acute bounds).
+    Operates strictly deterministically with human review gates.
+    """
+
+    class Severity(models.TextChoices):
+        ROUTINE = "ROUTINE", "Routine Observation"
+        MONITOR = "MONITOR", "Increased Monitoring"
+        URGENT = "URGENT", "Urgent Clinical Review"
+        CRITICAL = "CRITICAL", "Critical Emergency / STAT Alert"
+
+    class ActionType(models.TextChoices):
+        BEDSIDE_EVALUATION = "BEDSIDE_EVALUATION", "Immediate Bedside Evaluation"
+        ICU_TRANSFER = "ICU_TRANSFER", "ICU / Specialist Consult"
+        REASSESS_1H = "REASSESS_1H", "Serial Reassessment in 1 Hour"
+        SEPSIS_BUNDLE = "SEPSIS_BUNDLE", "Initiate Sepsis Resuscitation Bundle"
+        NOTIFY_DOCTOR = "NOTIFY_DOCTOR", "Notify Attending Physician"
+
+    rule_name = models.CharField(max_length=150, unique=True, db_index=True)
+    description = models.TextField(blank=True)
+    condition_expression = models.JSONField(default=dict, help_text="Structured rule predicates.")
+    severity = models.CharField(max_length=30, choices=Severity.choices, default=Severity.URGENT)
+    action_type = models.CharField(max_length=50, choices=ActionType.choices, default=ActionType.BEDSIDE_EVALUATION)
+    version = models.CharField(max_length=50, default="1.0.0")
+    effective_from = models.DateTimeField(default=timezone.now)
+    effective_to = models.DateTimeField(null=True, blank=True)
+    approval_status = models.CharField(max_length=30, default="APPROVED")
+
+    class Meta:
+        db_table = "clinical_rules"
+        verbose_name = "Clinical Rule"
+        verbose_name_plural = "Clinical Rules"
+        ordering = ["-severity", "rule_name"]
+
+    def __str__(self) -> str:
+        return f"Rule: {self.rule_name} [{self.severity}]"
+
+
+

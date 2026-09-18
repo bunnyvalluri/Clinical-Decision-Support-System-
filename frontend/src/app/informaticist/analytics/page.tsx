@@ -32,14 +32,14 @@ export default function AnalyticsPage() {
   const [department, setDepartment] = React.useState<string>("ALL");
   const [exportNotice, setExportNotice] = React.useState<string | null>(null);
 
-  // Derive dynamic metrics from predictions or fallback to cohort baseline
-  const baseCount = Math.max(predictions.length, 14820);
-  const total = baseCount;
-  const critical = Math.round(total * 0.024);
-  const high = Math.round(total * 0.118);
-  const med = Math.round(total * 0.274);
-  const low = total - (critical + high + med);
-  const avgProb = 0.286;
+  // Derive dynamic metrics from real predictions
+  const total = predictions.length;
+  const critical = predictions.filter((p) => p.risk_level === "CRITICAL").length;
+  const high = predictions.filter((p) => p.risk_level === "HIGH").length;
+  const med = predictions.filter((p) => p.risk_level === "MEDIUM").length;
+  const low = predictions.filter((p) => p.risk_level === "LOW").length;
+  const avgProb = total > 0 ? predictions.reduce((acc, p) => acc + (p.probability || 0), 0) / total : 0;
+
 
   const handleExport = () => {
     setExportNotice("Informatics Population Risk & Telemetry CSV successfully downloaded.");

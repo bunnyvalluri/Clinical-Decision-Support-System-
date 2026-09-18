@@ -27,6 +27,7 @@ urlpatterns = [
     path("api/v1/clinical/", include("apps.clinical.urls", namespace="clinical")),
     path("api/v1/clinical-records/", include("apps.clinical.record_urls", namespace="clinical_records")),
     path("api/v1/predictions/", include("apps.predictions.urls", namespace="predictions")),
+    path("api/v1/risk/", include("apps.predictions.risk_urls", namespace="risk")),
     path("api/v1/reports/", include("apps.reports.urls", namespace="reports")),
     path("api/v1/notifications/", include("apps.notifications.urls", namespace="notifications")),
     path("api/v1/ml/", include("apps.ml_engine.urls", namespace="ml_engine")),
@@ -50,6 +51,8 @@ urlpatterns = [
     path("api/blog/", include(("apps.blog.urls", "blog"), namespace="blog_compat")),
     path("api/v1/automation/jules/", include("integrations.jules.urls", namespace="jules")),
     path("api/admin/automation/jules/", include("integrations.jules.urls", namespace="jules_admin_compat")),
+    path("api/v1/informaticist/datasets/", include("apps.model_registry.kaggle_urls")),
+    path("api/informaticist/datasets/", include("apps.model_registry.kaggle_urls")),
 ]
 
 

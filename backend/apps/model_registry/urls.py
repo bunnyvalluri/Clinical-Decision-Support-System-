@@ -27,5 +27,6 @@ urlpatterns = [
     path("research-benchmarks/", research_benchmarks_view, name="research_benchmarks_direct"),
     path("drift/", drift_monitoring_view, name="drift_direct"),
     path("fairness/", fairness_evaluation_view, name="fairness_direct"),
+    path("datasets/", include("apps.model_registry.kaggle_urls")),
     path("", include(router.urls)),
 ]
