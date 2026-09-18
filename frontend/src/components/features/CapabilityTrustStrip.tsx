@@ -5,7 +5,7 @@ import { TRUST_STRIP_ITEMS } from "@/config/features";
 
 export function CapabilityTrustStrip() {
   return (
-    <section className="py-6 sm:py-8 bg-slate-50/70 border-b border-slate-200/80">
+    <section className="py-7 sm:py-9 bg-gradient-to-r from-slate-50 via-teal-50/20 to-slate-50 border-b border-slate-200/80">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
           {TRUST_STRIP_ITEMS.map((item) => {
@@ -13,16 +13,16 @@ export function CapabilityTrustStrip() {
             return (
               <div
                 key={item.title}
-                className="flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all duration-200"
+                className="flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:border-teal-400 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 group cursor-default"
               >
-                <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-200/60 text-teal-700 flex items-center justify-center shrink-0 shadow-2xs">
-                  <IconComponent className="h-4 w-4" />
+                <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0 shadow-2xs group-hover:scale-110 transition-transform duration-300">
+                  <IconComponent className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-950 truncate leading-tight">
+                  <p className="text-xs font-extrabold text-slate-950 truncate leading-tight group-hover:text-teal-700 transition-colors">
                     {item.title}
                   </p>
-                  <p className="text-[10px] font-mono text-slate-500 truncate leading-tight mt-0.5">
+                  <p className="text-[10px] font-mono font-semibold text-slate-500 truncate leading-tight mt-0.5">
                     {item.subtitle}
                   </p>
                 </div>

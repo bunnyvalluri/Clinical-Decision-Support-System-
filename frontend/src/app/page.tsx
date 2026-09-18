@@ -423,7 +423,7 @@ export default function LandingPage() {
                   <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100 border border-slate-200 shadow-inner group">
                     <Image
                       src="/doctor-hero.jpg"
-                      alt="Attending Cardiologist Dr. Elena Vance reviewing patient risk assessment on tablet"
+                      alt="Attending Cardiologist Dr. Marcus Vance reviewing patient risk assessment on tablet"
                       width={600}
                       height={600}
                       priority
@@ -441,11 +441,11 @@ export default function LandingPage() {
                   <div className="p-3 rounded-xl bg-white text-slate-900 flex items-center justify-between border border-slate-200 shadow-xs">
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-teal-600 to-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                        EV
+                        MV
                       </div>
                       <div className="min-w-0 text-left">
                         <div className="flex items-center gap-1">
-                          <h4 className="text-xs font-bold text-slate-900 truncate">Dr. Elena Vance, MD</h4>
+                          <h4 className="text-xs font-bold text-slate-900 truncate">Dr. Marcus Vance, MD</h4>
                           <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
                         </div>
                         <p className="text-[10px] text-slate-500 truncate">Chief of Cardiology</p>

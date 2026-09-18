@@ -1,92 +1,110 @@
 "use client";
 
 import React from "react";
-import { Eye, Target, HeartHandshake, CheckCircle2 } from "lucide-react";
+import { Eye, Target, HeartHandshake, CheckCircle2, Sparkles, ShieldCheck, ArrowUpRight } from "lucide-react";
 
 interface FoundationCard {
   title: string;
   subtitle: string;
   content: string;
-  bullets: string[];
+  metricBadge: string;
+  bullets: { text: string; highlight: string }[];
   icon: React.ComponentType<{ className?: string }>;
   iconBg: string;
   iconColor: string;
+  accentGradient: string;
   badgeBg: string;
   badgeText: string;
-  borderColor: string;
+  hoverBorder: string;
 }
 
 const FOUNDATION_CARDS: FoundationCard[] = [
   {
     title: "Our Vision",
-    subtitle: "Anticipatory & Precision Care",
+    subtitle: "ANTICIPATORY & PRECISION CARE",
     content:
-      "Transforming inpatient and outpatient healthcare delivery into an anticipatory, precision-guided experience where preventable clinical deteriorations are detected hours before bedside monitors alarm.",
+      "Transforming inpatient and outpatient hospital delivery into an anticipatory, precision-guided experience where preventable clinical deteriorations are intercepted hours before bedside monitors alarm.",
+    metricBadge: "Target: <20ms Bedside Sync",
     bullets: [
-      "Early sepsis & shock trajectory forecasting",
-      "Sub-20ms point-of-care data synchronization",
-      "Zero clinical black-box opacity",
+      { highlight: "Early Sepsis Trajectory", text: "Predicting decompensation 6-8 hours in advance." },
+      { highlight: "Sub-20ms Telemetry", text: "Zero-latency synchronization across acute ICU wards." },
+      { highlight: "Zero Black-Box Opacity", text: "Full pathophysiological interpretability for clinicians." },
     ],
     icon: Eye,
     iconBg: "bg-teal-50",
     iconColor: "text-teal-700",
-    badgeBg: "bg-teal-50/80",
+    accentGradient: "from-teal-500 to-emerald-500",
+    badgeBg: "bg-teal-50",
     badgeText: "text-teal-800 border-teal-200",
-    borderColor: "group-hover:border-teal-300",
+    hoverBorder: "hover:border-teal-400 hover:shadow-teal-500/5",
   },
   {
     title: "Our Mission",
-    subtitle: "Evidence-Informed Decision Support",
+    subtitle: "EVIDENCE-INFORMED DECISION SUPPORT",
     content:
       "Providing frontline healthcare teams with ambient, calibrated, and explainable decision support tools that eliminate clinical documentation fatigue and empower clinicians to act with swift confidence.",
+    metricBadge: "Evaluated: ROC-AUC 0.94",
     bullets: [
-      "Multi-hospital evaluated ML ensembles (ROC-AUC 0.94)",
-      "Native HL7 FHIR v4.0.1 bidirectional integration",
-      "Context-minimized patient data flows",
+      { highlight: "Multi-Hospital ML", text: "Evaluated ensembles with empirical Platt calibration." },
+      { highlight: "Native HL7 FHIR v4.0.1", text: "Bidirectional integration with Epic & Cerner." },
+      { highlight: "Context Minimization", text: "Redacting all patient PHI prior to ML inference." },
     ],
     icon: Target,
     iconBg: "bg-blue-50",
     iconColor: "text-blue-700",
-    badgeBg: "bg-blue-50/80",
+    accentGradient: "from-blue-500 to-sky-500",
+    badgeBg: "bg-blue-50",
     badgeText: "text-blue-800 border-blue-200",
-    borderColor: "group-hover:border-blue-300",
+    hoverBorder: "hover:border-blue-400 hover:shadow-blue-500/5",
   },
   {
     title: "Our Purpose",
-    subtitle: "Human-Centered Medical AI",
+    subtitle: "HUMAN-CENTERED MEDICAL AI",
     content:
       "Engineering reliable, ethically-grounded clinical intelligence that respects clinician autonomy, enforces strict HIPAA/SOC 2 privacy, and preserves the sacred doctor-patient relationship.",
+    metricBadge: "Policy: 100% Clinician Sign-Off",
     bullets: [
-      "Mandatory licensed clinician review and sign-off",
-      "Non-autonomous FDA CDSS guidance compliance",
-      "Authoritative Neon PostgreSQL audit persistence",
+      { highlight: "Mandatory Human Sign-Off", text: "AI assists; licensed attending physicians decide." },
+      { highlight: "FDA CDSS Compliance", text: "Strict alignment with non-device guidance standards." },
+      { highlight: "Neon PostgreSQL Store", text: "Authoritative immutable audit persistence." },
     ],
     icon: HeartHandshake,
     iconBg: "bg-purple-50",
     iconColor: "text-purple-700",
-    badgeBg: "bg-purple-50/80",
+    accentGradient: "from-purple-500 to-indigo-500",
+    badgeBg: "bg-purple-50",
     badgeText: "text-purple-800 border-purple-200",
-    borderColor: "group-hover:border-purple-300",
+    hoverBorder: "hover:border-purple-400 hover:shadow-purple-500/5",
   },
 ];
 
 export function FoundationSection() {
   return (
-    <section id="foundation" className="py-16 sm:py-24 bg-white border-b border-slate-100">
+    <section id="foundation" className="py-20 sm:py-28 bg-white border-b border-slate-200/80 relative">
+      {/* Background ambient lighting */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[450px] bg-gradient-to-r from-teal-50/60 via-slate-50 to-sky-50/60 rounded-full blur-3xl -z-10"
+      />
+
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Large Rounded Container matching the Reference Design */}
-        <div className="rounded-3xl bg-slate-50/70 border border-slate-200/80 p-8 sm:p-12 lg:p-16 shadow-2xs">
+        {/* Large Rounded Modern Hospital SaaS Container */}
+        <div className="rounded-3xl bg-gradient-to-b from-slate-50/90 via-slate-50/60 to-white border border-slate-200/90 p-7 sm:p-12 lg:p-16 shadow-lg shadow-slate-100/80">
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto space-y-4 mb-12 sm:mb-16">
-            <span className="inline-block text-xs font-mono font-bold tracking-wider text-teal-700 uppercase bg-teal-50 border border-teal-200 px-3.5 py-1 rounded-full shadow-2xs">
-              OUR FOUNDATION
-            </span>
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-950">
-              Bridging the Gap Between Data, Intelligence &amp; Clinical Care
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
+              <Sparkles className="h-3.5 w-3.5 text-teal-600" />
+              <span>OUR FOUNDATION</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+              Bridging the Gap Between Data,{" "}
+              <span className="bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+                Intelligence &amp; Clinical Care
+              </span>
             </h2>
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
               A unified, clinically-grounded architecture built to address the three core pillars of
-              modern hospital operations: early detection, cognitive burden reduction, and patient safety.
+              modern hospital operations: early deterioration detection, cognitive burden reduction, and patient safety.
             </p>
           </div>
 
@@ -98,43 +116,57 @@ export function FoundationSection() {
                 <div
                   key={card.title}
                   tabIndex={0}
-                  className={`group relative rounded-2xl bg-white border border-slate-200/90 p-7 sm:p-8 shadow-xs transition-all duration-200 hover:-translate-y-1 hover:shadow-md ${card.borderColor} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 flex flex-col justify-between`}
+                  className={`group relative rounded-2xl bg-white border border-slate-200/90 p-7 sm:p-8 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl ${card.hoverBorder} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 flex flex-col justify-between overflow-hidden`}
                 >
+                  {/* Top Color Accent Line */}
+                  <div
+                    aria-hidden="true"
+                    className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${card.accentGradient}`}
+                  />
+
                   <div>
-                    {/* Top Row: Icon & Tag */}
+                    {/* Top Row: Icon & Subtitle Tag */}
                     <div className="flex items-center justify-between mb-6">
                       <div
-                        className={`h-12 w-12 rounded-2xl border border-slate-200/80 ${card.iconBg} ${card.iconColor} flex items-center justify-center shadow-2xs transition-transform group-hover:scale-105`}
+                        className={`h-12 w-12 rounded-2xl border border-slate-200/80 ${card.iconBg} ${card.iconColor} flex items-center justify-center shadow-xs transition-transform duration-300 group-hover:scale-110`}
                       >
                         <IconComponent className="h-6 w-6" />
                       </div>
                       <span
-                        className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md border ${card.badgeBg} ${card.badgeText}`}
+                        className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-md border ${card.badgeBg} ${card.badgeText} uppercase tracking-wider`}
                       >
                         {card.subtitle}
                       </span>
                     </div>
 
-                    {/* Card Title */}
-                    <h3 className="text-xl font-bold text-slate-950 tracking-tight mb-3">
-                      {card.title}
-                    </h3>
+                    {/* Card Title & Metric Pill */}
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">
+                        {card.title}
+                      </h3>
+                      <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0">
+                        {card.metricBadge}
+                      </span>
+                    </div>
 
-                    {/* Card Content */}
+                    {/* Card Content Description */}
                     <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
                       {card.content}
                     </p>
                   </div>
 
-                  {/* Bullet points */}
-                  <ul className="space-y-2.5 pt-4 border-t border-slate-100 text-xs text-slate-700">
+                  {/* Bullet Points with Highlighted Keywords */}
+                  <div className="pt-5 border-t border-slate-100 space-y-3">
                     {card.bullets.map((bullet) => (
-                      <li key={bullet} className="flex items-start gap-2">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0 mt-0.5" />
-                        <span className="leading-snug">{bullet}</span>
-                      </li>
+                      <div key={bullet.highlight} className="flex items-start gap-2.5 text-xs text-slate-700">
+                        <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
+                        <span className="leading-snug">
+                          <strong className="font-bold text-slate-900">{bullet.highlight}:</strong>{" "}
+                          {bullet.text}
+                        </span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               );
             })}
