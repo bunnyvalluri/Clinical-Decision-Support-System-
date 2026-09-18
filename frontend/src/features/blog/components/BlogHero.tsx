@@ -2,12 +2,16 @@
 
 import React from "react";
 import Image from "next/image";
-import { Sparkles, BarChart2, Lightbulb, ShieldCheck } from "lucide-react";
+import { Sparkles, BarChart2, Lightbulb, ShieldCheck, Search } from "lucide-react";
 import { BRAND_CONFIG } from "@/config/brand";
 
-export function BlogHero() {
+interface BlogHeroProps {
+  onOpenSearch?: () => void;
+}
+
+export function BlogHero({ onOpenSearch }: BlogHeroProps) {
   return (
-    <section className="relative overflow-hidden pt-6 pb-12 sm:pt-10 sm:pb-16 lg:pt-12 lg:pb-20 border-b border-slate-200/80 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.06),rgba(2,132,199,0.03),transparent)]">
+    <section className="relative overflow-hidden pt-4 pb-12 sm:pt-8 sm:pb-16 lg:pt-10 lg:pb-20 border-b border-slate-200/80 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.06),rgba(2,132,199,0.03),transparent)]">
       {/* Background medical grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_35%,#000_70%,transparent_100%)] pointer-events-none opacity-30" />
 
@@ -35,10 +39,29 @@ export function BlogHero() {
             </p>
 
             {/* Clinical Advisory Ribbon */}
-            <div className="inline-flex items-center gap-2 pt-2 text-xs font-semibold text-slate-500">
+            <div className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
               <ShieldCheck className="h-4 w-4 text-teal-600 shrink-0" />
               <span>Evidence-based clinical intelligence &bull; Human-in-the-loop healthcare</span>
             </div>
+
+            {/* Instant Search Bar */}
+            {onOpenSearch && (
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={onOpenSearch}
+                  className="group flex items-center gap-3 w-full max-w-lg px-4 py-3 rounded-2xl bg-white border border-slate-200/90 shadow-sm hover:border-teal-400 hover:shadow-md transition-all text-left"
+                >
+                  <Search className="h-4 w-4 text-teal-600 group-hover:scale-110 transition-transform shrink-0" />
+                  <span className="flex-1 text-xs sm:text-sm text-slate-500 font-medium truncate">
+                    Search clinical research, TreeSHAP, sepsis trajectories...
+                  </span>
+                  <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[10px] font-mono text-slate-500">
+                    ⌘K
+                  </kbd>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Hero Visual with Doctor & Floating Badges */}
@@ -67,7 +90,7 @@ export function BlogHero() {
                     Smarter Healthcare
                   </span>
                   <span className="block text-[9px] font-medium text-slate-500">
-                    Real-time Predictive Analytics
+                    Real-Time Predictive Analytics
                   </span>
                 </div>
               </div>

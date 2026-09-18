@@ -9,6 +9,9 @@ import {
   ShieldCheck,
   ArrowRight,
   Sparkles,
+  AlertCircle,
+  Lightbulb,
+  CheckCircle2,
 } from "lucide-react";
 
 interface WorkflowScenario {
@@ -79,14 +82,15 @@ const SCENARIOS: WorkflowScenario[] = [
 
 export function ExampleWorkflows() {
   return (
-    <section className="py-16 sm:py-20 bg-slate-50/70 border-b border-slate-200/80">
+    <section className="py-16 sm:py-22 bg-slate-50/70 border-b border-slate-200/80">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <p className="text-xs font-mono font-bold uppercase tracking-wider text-teal-700 mb-2">
-            CONCEPTUAL SCENARIOS
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="h-3 w-3 text-teal-600" />
+            <span>CONCEPTUAL SCENARIOS</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
             Example Clinical Intelligence Scenarios
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
@@ -101,49 +105,69 @@ export function ExampleWorkflows() {
             return (
               <div
                 key={scenario.id}
-                className="rounded-2xl bg-white border border-slate-200 p-6 shadow-2xs hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between"
+                className="group rounded-3xl bg-white border border-slate-200 p-6 sm:p-7 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between text-left"
               >
                 <div>
+                  {/* Top Bar */}
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200/80">
-                      {scenario.badge}
-                    </span>
-                    <div className="h-9 w-9 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center text-teal-600">
-                      <Icon className="h-5 w-5" />
+                    <div className="flex items-center gap-3">
+                      <div className="h-11 w-11 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono font-bold text-teal-700 uppercase tracking-wider block">
+                          {scenario.actor}
+                        </span>
+                        <h3 className="text-base sm:text-lg font-bold text-slate-950 group-hover:text-teal-700 transition-colors">
+                          {scenario.title}
+                        </h3>
+                      </div>
                     </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 font-medium">
+                      Simulated
+                    </span>
                   </div>
 
-                  <h3 className="text-lg font-bold text-slate-950 mb-1">
-                    {scenario.title}
-                  </h3>
-                  <p className="text-xs font-semibold text-teal-700 mb-4">
-                    {scenario.actor}
-                  </p>
-
-                  <div className="space-y-3 text-xs leading-relaxed">
-                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
-                      <strong className="text-slate-900 block mb-0.5">Clinical Challenge:</strong>
-                      <span className="text-slate-600">{scenario.problem}</span>
+                  {/* 3 Step Boxes: Problem, Solution, Outcome */}
+                  <div className="space-y-3 pt-2">
+                    <div className="p-3 rounded-xl bg-rose-50/50 border border-rose-100 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-rose-800 mb-1">
+                        <AlertCircle className="h-3.5 w-3.5" />
+                        <span>Clinical Challenge</span>
+                      </div>
+                      <p className="text-slate-600 leading-relaxed">
+                        {scenario.problem}
+                      </p>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-teal-50/40 border border-teal-100">
-                      <strong className="text-teal-950 block mb-0.5">HealthNova AI Solution:</strong>
-                      <span className="text-slate-700">{scenario.solution}</span>
+                    <div className="p-3 rounded-xl bg-teal-50/50 border border-teal-100 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-teal-800 mb-1">
+                        <Lightbulb className="h-3.5 w-3.5" />
+                        <span>HealthNova AI Assist</span>
+                      </div>
+                      <p className="text-slate-600 leading-relaxed">
+                        {scenario.solution}
+                      </p>
                     </div>
 
-                    <div className="p-3 rounded-xl bg-emerald-50/40 border border-emerald-100">
-                      <strong className="text-emerald-950 block mb-0.5">Clinical Decision & Outcome:</strong>
-                      <span className="text-slate-700">{scenario.outcome}</span>
+                    <div className="p-3 rounded-xl bg-emerald-50/50 border border-emerald-100 text-xs">
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-800 mb-1">
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        <span>Clinical Outcome</span>
+                      </div>
+                      <p className="text-slate-600 leading-relaxed font-medium">
+                        {scenario.outcome}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
                   <span className="flex items-center gap-1">
-                    <ShieldCheck className="h-3 w-3 text-teal-600" />
-                    Human-in-the-loop approved
+                    <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />
+                    Human Clinician Sign-Off Enforced
                   </span>
-                  <span className="font-mono">Audit Logged</span>
+                  <span className="font-mono text-[10px]">21 CFR Part 11</span>
                 </div>
               </div>
             );

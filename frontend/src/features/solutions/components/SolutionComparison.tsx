@@ -10,6 +10,7 @@ import {
   Layers,
   FileQuestion,
   FileCheck,
+  Sparkles,
 } from "lucide-react";
 
 interface ComparisonPoint {
@@ -22,7 +23,7 @@ const COMPARISONS: ComparisonPoint[] = [
   {
     dimension: "Data Ingestion",
     traditional: "Siloed EHRs, fragmented telemetry spreadsheets, and manual data copy-pasting.",
-    healthNova: "Unified, FHIR-compatible pipeline streaming real-time vitals and historical charts into one view.",
+    healthNova: "Unified, FHIR v4.0.1 pipeline streaming real-time vitals and historical charts into one view.",
   },
   {
     dimension: "Risk Detection",
@@ -48,14 +49,15 @@ const COMPARISONS: ComparisonPoint[] = [
 
 export function SolutionComparison() {
   return (
-    <section className="py-16 sm:py-20 bg-white border-b border-slate-100">
+    <section className="py-16 sm:py-22 bg-white border-b border-slate-100">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <p className="text-xs font-mono font-bold uppercase tracking-wider text-teal-700 mb-2">
-            THE CONNECTED ADVANTAGE
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="h-3 w-3 text-teal-600" />
+            <span>THE CONNECTED ADVANTAGE</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
             One Connected Healthcare Intelligence Platform
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
@@ -67,13 +69,13 @@ export function SolutionComparison() {
         <div className="rounded-3xl border border-slate-200 overflow-hidden bg-white shadow-xs">
           <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-200">
             {/* Left: Traditional Disconnected Healthcare */}
-            <div className="p-6 sm:p-8 bg-slate-50/60">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="h-9 w-9 rounded-xl bg-slate-200/80 text-slate-600 flex items-center justify-center shrink-0">
-                  <XCircle className="h-5 w-5" />
+            <div className="p-6 sm:p-8 bg-slate-50/70 text-left">
+              <div className="flex items-center gap-2.5 mb-6">
+                <div className="h-10 w-10 rounded-xl bg-slate-200/80 text-slate-600 flex items-center justify-center shrink-0">
+                  <XCircle className="h-5 w-5 text-rose-500" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 block">
                     Legacy Workflow
                   </span>
                   <h3 className="text-lg font-bold text-slate-900">
@@ -82,53 +84,50 @@ export function SolutionComparison() {
                 </div>
               </div>
 
-              <div className="space-y-5">
-                {COMPARISONS.map((comp, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <div className="h-5 w-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
-                      &times;
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-slate-800">
-                        {comp.dimension}
-                      </p>
-                      <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
-                        {comp.traditional}
-                      </p>
-                    </div>
+              <div className="space-y-4">
+                {COMPARISONS.map((pt, idx) => (
+                  <div key={idx} className="p-4 rounded-xl bg-white/70 border border-slate-200/80 text-xs space-y-1">
+                    <span className="font-mono font-bold text-slate-500 uppercase tracking-wider text-[10px] block">
+                      {pt.dimension}
+                    </span>
+                    <p className="text-slate-600 leading-relaxed">
+                      {pt.traditional}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right: Connected HealthNova AI Platform */}
-            <div className="p-6 sm:p-8 bg-teal-50/20">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="h-9 w-9 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                  <CheckCircle2 className="h-5 w-5" />
+            {/* Right: HealthNova Connected Platform */}
+            <div className="p-6 sm:p-8 bg-teal-50/30 text-left">
+              <div className="flex items-center justify-between gap-2.5 mb-6">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-10 w-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <CheckCircle2 className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-700 block">
+                      HealthNova Platform
+                    </span>
+                    <h3 className="text-lg font-bold text-slate-950">
+                      Unified Healthcare Intelligence
+                    </h3>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-teal-700">
-                    Intelligent Architecture
-                  </span>
-                  <h3 className="text-lg font-bold text-teal-950">
-                    HealthNova AI Connected Care
-                  </h3>
-                </div>
+                <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
+                  Next-Gen CDS
+                </span>
               </div>
 
-              <div className="space-y-5">
-                {COMPARISONS.map((comp, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-teal-600 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-bold text-teal-950">
-                        {comp.dimension}
-                      </p>
-                      <p className="text-xs text-slate-700 leading-relaxed mt-0.5">
-                        {comp.healthNova}
-                      </p>
-                    </div>
+              <div className="space-y-4">
+                {COMPARISONS.map((pt, idx) => (
+                  <div key={idx} className="p-4 rounded-xl bg-white border border-teal-200/80 text-xs space-y-1 shadow-2xs">
+                    <span className="font-mono font-bold text-teal-700 uppercase tracking-wider text-[10px] block">
+                      {pt.dimension}
+                    </span>
+                    <p className="text-slate-800 leading-relaxed font-medium">
+                      {pt.healthNova}
+                    </p>
                   </div>
                 ))}
               </div>

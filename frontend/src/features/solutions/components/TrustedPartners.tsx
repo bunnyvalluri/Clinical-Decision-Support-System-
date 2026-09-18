@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Shield, Award, Building, Cloud } from "lucide-react";
+import { ArrowRight, Shield, Award, Building, Cloud, Sparkles } from "lucide-react";
 
 interface PartnerItem {
   name: string;
@@ -52,15 +52,15 @@ const PARTNERS: PartnerItem[] = [
 
 export function TrustedPartners() {
   return (
-    <section className="py-12 bg-slate-50/50 border-b border-slate-200/80">
+    <section className="py-14 bg-slate-50/50 border-b border-slate-200/80">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
           <div>
-            <p className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500">
+            <p className="text-xs font-mono font-bold uppercase tracking-wider text-teal-800">
               TRUSTED BY LEADING HEALTHCARE ORGANIZATIONS
             </p>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Collaborating on clinical decision support, secure integrations, and healthcare intelligence.
+            <p className="text-xs text-slate-500 mt-1">
+              Collaborating on clinical decision support, secure FHIR integrations, and healthcare AI governance.
             </p>
           </div>
           <Link
@@ -77,10 +77,10 @@ export function TrustedPartners() {
           {PARTNERS.map((partner) => (
             <div
               key={partner.name}
-              className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all text-center group"
+              className="flex flex-col items-center justify-center p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs hover:border-teal-300 hover:shadow-xs hover:-translate-y-0.5 transition-all text-center group"
             >
               <div
-                className={`h-10 w-10 rounded-xl flex items-center justify-center font-bold text-xs font-mono mb-2 border ${partner.colorScheme} group-hover:scale-105 transition-transform`}
+                className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-xs font-mono mb-2 border ${partner.colorScheme} group-hover:scale-105 transition-transform`}
               >
                 {partner.initials}
               </div>

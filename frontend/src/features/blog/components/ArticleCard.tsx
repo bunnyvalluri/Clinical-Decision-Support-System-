@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Bookmark, Calendar, Clock } from "lucide-react";
+import { Bookmark, Calendar, Clock, ArrowRight } from "lucide-react";
 import { BlogArticle } from "../types/blogTypes";
 import { toggleBookmark } from "../services/blogService";
 
@@ -31,18 +31,18 @@ export function ArticleCard({ article }: ArticleCardProps) {
       const res = await toggleBookmark(article.id);
       setIsBookmarked(res.bookmarked);
     } catch {
-      // Optimistic revert or handled silently
+      setIsBookmarked((prev) => !prev);
     } finally {
       setIsBookmarking(false);
     }
   };
 
   return (
-    <article className="group flex flex-col rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200">
+    <article className="group flex flex-col rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-xs hover:shadow-md hover:border-teal-200 hover:-translate-y-0.5 transition-all duration-200">
       {/* Card Image Container */}
       <Link href={`/blog/${article.slug}`} className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 block">
         <Image
-          src="/landing-full.png"
+          src={article.featured_image || "/landing-full.png"}
           alt={article.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -58,6 +58,17 @@ export function ArticleCard({ article }: ArticleCardProps) {
       {/* Card Content */}
       <div className="flex flex-1 flex-col p-5 text-left justify-between space-y-4">
         <div className="space-y-2">
+          {/* Tags preview */}
+          {article.tags && article.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {article.tags.slice(0, 2).map((t) => (
+                <span key={t} className="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
+                  #{t}
+                </span>
+              ))}
+            </div>
+          )}
+
           <h3 className="text-base font-bold text-slate-950 tracking-tight leading-snug line-clamp-2 group-hover:text-teal-700 transition-colors">
             <Link href={`/blog/${article.slug}`}>
               {article.title}
@@ -84,20 +95,31 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </div>
           </div>
 
-          {/* Bookmark Button */}
-          <button
-            type="button"
-            onClick={handleBookmark}
-            disabled={isBookmarking}
-            aria-label={isBookmarked ? "Remove from bookmarks" : "Save to bookmarks"}
-            className={`touch-target p-1.5 rounded-lg border transition-colors shrink-0 ${
-              isBookmarked
-                ? "bg-teal-50 border-teal-200 text-teal-700"
-                : "bg-white border-slate-200 text-slate-400 hover:text-slate-800 hover:border-slate-300"
-            }`}
-          >
-            <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-teal-600" : ""}`} />
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {/* Read Arrow */}
+            <Link
+              href={`/blog/${article.slug}`}
+              aria-label={`Read article: ${article.title}`}
+              className="p-1.5 text-slate-400 group-hover:text-teal-600 transition-colors"
+            >
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
+
+            {/* Bookmark Button */}
+            <button
+              type="button"
+              onClick={handleBookmark}
+              disabled={isBookmarking}
+              aria-label={isBookmarked ? "Remove from bookmarks" : "Save to bookmarks"}
+              className={`touch-target p-1.5 rounded-lg border transition-colors shrink-0 ${
+                isBookmarked
+                  ? "bg-teal-50 border-teal-200 text-teal-700"
+                  : "bg-white border-slate-200 text-slate-400 hover:text-slate-800 hover:border-slate-300"
+              }`}
+            >
+              <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-teal-600" : ""}`} />
+            </button>
+          </div>
         </div>
       </div>
     </article>

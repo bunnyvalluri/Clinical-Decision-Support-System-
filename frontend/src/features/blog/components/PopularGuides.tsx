@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import { BlogArticle } from "../types/blogTypes";
 
 interface PopularGuidesProps {
@@ -43,7 +43,7 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
         )}
 
         {!loading && guides.length > 0 && (
-          <div className="space-y-4 pt-4">
+          <div className="space-y-3.5 pt-4">
             {guides.map((guide) => {
               const formattedDate = guide.published_at
                 ? new Date(guide.published_at).toLocaleDateString("en-US", {
@@ -57,11 +57,11 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
                 <Link
                   key={guide.id}
                   href={`/blog/${guide.slug}`}
-                  className="group flex items-center gap-3 hover:bg-slate-50 p-1.5 rounded-xl transition-colors"
+                  className="group flex items-center gap-3 hover:bg-slate-50 p-2 rounded-xl transition-colors"
                 >
                   <div className="relative h-12 w-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
                     <Image
-                      src="/landing-full.png"
+                      src={guide.featured_image || "/landing-full.png"}
                       alt={guide.title}
                       fill
                       sizes="48px"
@@ -72,9 +72,14 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
                     <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-teal-700 transition-colors">
                       {guide.title}
                     </h4>
-                    <span className="text-[10px] text-slate-400 font-medium block pt-0.5">
-                      {formattedDate}
-                    </span>
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium pt-1">
+                      <span>{formattedDate}</span>
+                      <span>&bull;</span>
+                      <span className="flex items-center gap-0.5">
+                        <Clock className="h-2.5 w-2.5" />
+                        {guide.reading_time_minutes || 5} min
+                      </span>
+                    </div>
                   </div>
                 </Link>
               );
@@ -85,7 +90,7 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
 
       <div className="pt-3 border-t border-slate-100 text-right">
         <Link
-          href="/blog?is_guide=true"
+          href="/blog"
           className="group inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-teal-700 transition-colors"
         >
           <span>View All Guides</span>

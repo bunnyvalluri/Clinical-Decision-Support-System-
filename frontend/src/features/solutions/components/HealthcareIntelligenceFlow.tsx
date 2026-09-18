@@ -71,18 +71,19 @@ const STEPS: StepItem[] = [
 
 export function HealthcareIntelligenceFlow() {
   return (
-    <section className="py-16 sm:py-20 bg-slate-50/70 border-b border-slate-200/80">
+    <section className="py-16 sm:py-22 bg-slate-50/70 border-b border-slate-200/80">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <p className="text-xs font-mono font-bold uppercase tracking-wider text-teal-700 mb-2">
-            END-TO-END CLINICAL ARCHITECTURE
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="h-3 w-3 text-teal-600" />
+            <span>CLINICAL PIPELINE ARCHITECTURE</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
             From Healthcare Data to Actionable Intelligence
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
-            A transparent, audit-ready five-stage pipeline designed to transform raw clinical data into trusted bedside decision support.
+            A transparent, audit-ready five-stage pipeline designed to transform raw physiological data into trusted bedside decision support.
           </p>
         </div>
 
@@ -93,7 +94,7 @@ export function HealthcareIntelligenceFlow() {
             return (
               <div
                 key={step.number}
-                className="group relative rounded-2xl bg-white border border-slate-200 p-5 shadow-2xs hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between"
+                className="group relative rounded-2xl bg-white border border-slate-200 p-5 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-1 transition-all flex flex-col justify-between"
               >
                 <div>
                   {/* Step Number & Badge */}
@@ -128,7 +129,7 @@ export function HealthcareIntelligenceFlow() {
                 {/* Step Connector Indicator (hidden on last) */}
                 {idx < STEPS.length - 1 && (
                   <div className="hidden lg:block absolute -right-2.5 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
-                    <div className="h-5 w-5 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-400">
+                    <div className="h-5 w-5 rounded-full bg-white border border-slate-300 flex items-center justify-center text-teal-600 shadow-2xs">
                       <ArrowRight className="h-3 w-3" />
                     </div>
                   </div>
@@ -139,7 +140,7 @@ export function HealthcareIntelligenceFlow() {
         </div>
 
         {/* Highlighted Governing Statement Banner */}
-        <div className="mt-12 max-w-2xl mx-auto rounded-2xl bg-teal-50/80 border border-teal-200 p-4 sm:p-5 flex items-center justify-center gap-3 text-center shadow-xs">
+        <div className="mt-12 max-w-2xl mx-auto rounded-2xl bg-teal-50/90 border border-teal-200/90 p-4 sm:p-5 flex items-center justify-center gap-3 text-center shadow-xs">
           <ShieldCheck className="h-5 w-5 text-teal-700 shrink-0" />
           <p className="text-xs sm:text-sm font-bold text-teal-950">
             &ldquo;AI supports healthcare professionals. It does not replace them.&rdquo;

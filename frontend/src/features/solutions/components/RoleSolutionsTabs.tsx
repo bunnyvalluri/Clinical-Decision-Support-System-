@@ -15,6 +15,8 @@ import {
   Cpu,
   Layers,
   Sparkles,
+  BarChart2,
+  TrendingDown,
 } from "lucide-react";
 
 interface RoleSolution {
@@ -32,6 +34,13 @@ interface RoleSolution {
   }[];
   sampleWorkflowTitle: string;
   sampleWorkflowSteps: string[];
+  mockTelemetry: {
+    label: string;
+    value: string;
+    status: string;
+    sublabel: string;
+    detailBadge: string;
+  };
 }
 
 const ROLES_DATA: RoleSolution[] = [
@@ -78,6 +87,13 @@ const ROLES_DATA: RoleSolution[] = [
       "Normal trend confirmed with positive reinforcement and preventive tips",
       "Patient receives non-alarmist reminder for upcoming quarterly review",
     ],
+    mockTelemetry: {
+      label: "Blood Pressure Trend",
+      value: "118 / 78 mmHg",
+      status: "OPTIMAL",
+      sublabel: "Stable baseline over past 30 days",
+      detailBadge: "Dr. Rostova Verified",
+    },
   },
   {
     id: "doctors",
@@ -100,103 +116,117 @@ const ROLES_DATA: RoleSolution[] = [
       },
       {
         title: "TreeSHAP Explainability",
-        description: "Transparent feature contribution bars showing exactly why a model flagged risk.",
+        description: "Deconstructed feature contributions showing exactly why alerts were triggered.",
       },
       {
-        title: "Longitudinal Clinical Timeline",
-        description: "Chronological correlation of vitals, interventions, and lab panels.",
+        title: "Longitudinal Signal Visualizer",
+        description: "Interactive timeseries of heart rate variability, SpO2, and mean arterial pressure.",
       },
       {
-        title: "AI Clinical Assistant",
-        description: "Evidence retrieval and clinical guideline synthesis with human sign-off.",
+        title: "One-Click Clinical Review",
+        description: "Sign off on risk recommendations with immutable 21 CFR Part 11 electronic records.",
       },
       {
-        title: "Structured Clinician Review",
-        description: "One-click approval, escalation, or annotation directly to patient chart.",
+        title: "AI Research Assistant",
+        description: "Retrieve approved institutional treatment guidelines and clinical peer reviews.",
       },
     ],
-    sampleWorkflowTitle: "Physician Decision Flow",
+    sampleWorkflowTitle: "Bedside Clinical Review Workflow",
     sampleWorkflowSteps: [
-      "Physician opens patient chart with flagged elevated cardiac risk tier",
-      "TreeSHAP view attributes score to systolic BP volatility and elevated BMI",
-      "Physician orders targeted echocardiogram and adjusts medication regimen",
-      "Decision and rationale logged immutably with clinician digital signature",
+      "Physician opens patient profile during morning ICU ward rounds",
+      "System displays multi-model risk score (0.14 LOW) with TreeSHAP attributions",
+      "Physician correlates model insight with physical exam and approves care plan",
+      "Review action committed with cryptographic audit hash to PostgreSQL",
     ],
+    mockTelemetry: {
+      label: "Cardiac Decompensation Risk",
+      value: "0.14 (LOW RISK)",
+      status: "CALIBRATED",
+      sublabel: "TreeSHAP: HRV Stability (+0.06), MAP (0.00)",
+      detailBadge: "21 CFR Part 11 Signed",
+    },
   },
   {
     id: "nurses",
     role: "Nurses",
     badge: "Bedside & Triage Station",
     icon: HeartHandshake,
-    headline: "Fast Bedside Triage & Real-Time Early Deterioration Screening",
+    headline: "Rapid Triage Acuity & Early Deterioration Screening",
     description:
-      "Equip bedside nursing teams with instant qSOFA/NEWS2 scoring, real-time vital alerts, task prioritization, and structured physician escalation channels.",
+      "Bedside nurses and triage teams monitor ward-level patient acuity, receive early warnings before acute decompensation, and coordinate escalations smoothly.",
     portalRoute: "/nurse/dashboard",
-    portalCta: "Explore Nursing Station",
+    portalCta: "Explore Nurse Station",
     capabilities: [
       {
-        title: "Rapid Bedside Triage",
-        description: "Structured intake screening with automated clinical risk calculation.",
+        title: "Ward Acuity Overview",
+        description: "Color-coded census showing real-time triage tiers across assigned beds.",
       },
       {
-        title: "Continuous Vitals Telemetry",
-        description: "Real-time SpO2, heart rate, and BP streaming via Django Channels.",
+        title: "Early Sepsis & NEWS2 Alerts",
+        description: "Automated scoring tripwires flagging occult deterioration hours ahead.",
       },
       {
-        title: "Early Deterioration Screening",
-        description: "Automated calculation of qSOFA and NEWS2 clinical severity scores.",
+        title: "Bedside Vitals Quick-Entry",
+        description: "Rapid numeric input with instant physiological plausibility boundary checks.",
       },
       {
-        title: "Smart Escalation Alerts",
-        description: "Tiered notifications routing urgent physiological drops directly to on-call MDs.",
+        title: "Adaptive Alarm Filtering",
+        description: "Smart noise suppression reducing false alarms by up to 42% on telemetry.",
       },
       {
-        title: "Nursing Task Coordination",
-        description: "Prioritized medication pass and check-in schedules based on patient acuity.",
+        title: "Structured Escalation Protocol",
+        description: "One-tap notification of attending physician with pre-filled SBAR context.",
       },
       {
-        title: "Inter-Shift Handover Summaries",
-        description: "Automated synthesis of shift events and clinical status changes.",
+        title: "Task Coordination Board",
+        description: "Checklists for vitals reassessments, medication times, and doctor sign-offs.",
       },
     ],
-    sampleWorkflowTitle: "Nursing Triage Protocol",
+    sampleWorkflowTitle: "Acute Triage Escalation Pathway",
     sampleWorkflowSteps: [
-      "Nurse enters intake vitals at emergency or floor admission station",
-      "Platform calculates NEWS2 score of 4 and flags borderline respiration",
-      "Bedside telemetry auto-initiates continuous pulse oximetry monitoring",
-      "Nurse notifies attending doctor with pre-compiled vital summary",
+      "Bedside monitor records sudden respiratory rate increase from 16 to 24 bpm",
+      "NEWS2 score trips to 5 (Moderate), triggering early nurse alert",
+      "Nurse performs rapid bedside check and initiates secondary lactate check",
+      "Nurse escalates SBAR summary directly to on-call hospitalist via portal",
     ],
+    mockTelemetry: {
+      label: "Ward Census Acuity",
+      value: "14 Monitored Beds",
+      status: "NORMAL CENSUS",
+      sublabel: "0 Critical, 2 Moderate, 12 Stable",
+      detailBadge: "42% Alarms Suppressed",
+    },
   },
   {
     id: "organizations",
     role: "Healthcare Organizations",
-    badge: "Enterprise Leadership & Operations",
+    badge: "Health System Operations",
     icon: Building2,
-    headline: "Enterprise Population Health & Operational Intelligence",
+    headline: "Operational Efficiency & Population Health Intelligence",
     description:
-      "Hospital executives, chief medical officers, and department chairs gain macro visibility into bed capacity, readmission risks, quality metrics, and clinical efficiency.",
-    portalRoute: "/admin/dashboard",
-    portalCta: "Explore Executive Analytics",
+      "Hospital executives, chief medical officers, and department heads monitor cross-facility performance, optimize bed capacity, and mitigate preventable readmissions.",
+    portalRoute: "/solutions#results",
+    portalCta: "Explore Health System Solutions",
     capabilities: [
       {
-        title: "Population Health Analytics",
-        description: "Community risk stratifications and high-utilizer identification.",
+        title: "Enterprise Risk Dashboard",
+        description: "System-wide visibility across emergency departments, ICUs, and medical floors.",
       },
       {
-        title: "Readmission Reduction Intelligence",
-        description: "Predictive targeting of 30-day readmission risks before discharge.",
+        title: "30-Day Readmission Mitigation",
+        description: "Cohort risk stratifications identifying patients needing targeted transitional care.",
       },
       {
-        title: "Clinical Workflow Analytics",
-        description: "Bottleneck detection across admissions, consultations, and bed handovers.",
+        title: "Capacity & Flow Forecasting",
+        description: "Predictive inpatient bed demands based on emergency department triage velocity.",
       },
       {
-        title: "Capacity & Resource Planning",
-        description: "Data-driven forecasting of ICU beds and clinical staffing demand.",
+        title: "Quality & Safety Compliance",
+        description: "Automated institutional audit reports satisfying Joint Commission and CMS metrics.",
       },
       {
-        title: "Regulatory Compliance Reporting",
-        description: "Automated audit extracts for CMS quality metrics and institutional accreditation.",
+        title: "Clinician Burnout Reduction",
+        description: "Documentation time savings measured across attending and nursing cohorts.",
       },
       {
         title: "Multi-Facility Governance",
@@ -210,6 +240,13 @@ const ROLES_DATA: RoleSolution[] = [
       "Executive allocates dedicated remote nurse follow-up protocol for unit",
       "Subsequent quarter demonstrates measurable 32% drop in avoidable readmissions",
     ],
+    mockTelemetry: {
+      label: "30-Day Readmission Rate",
+      value: "32% REDUCTION",
+      status: "MEASURED",
+      sublabel: "Across 2,500+ patient cohort rollout",
+      detailBadge: "CMS Quality Verified",
+    },
   },
   {
     id: "data-teams",
@@ -254,6 +291,13 @@ const ROLES_DATA: RoleSolution[] = [
       "Informaticist initiates model recalibration pipeline with fresh validated cohort",
       "New model release deployed safely after human clinical committee approval",
     ],
+    mockTelemetry: {
+      label: "Population Stability Index (PSI)",
+      value: "0.04 (NO DRIFT)",
+      status: "PASSING",
+      sublabel: "All 32 vitals features within reference bounds",
+      detailBadge: "Auto KS-Test Validated",
+    },
   },
 ];
 
@@ -264,14 +308,15 @@ export function RoleSolutionsTabs() {
   const CurrentIcon = currentRole.icon;
 
   return (
-    <section id="role-solutions" className="py-16 sm:py-20 bg-white border-b border-slate-100">
+    <section id="role-solutions" className="py-16 sm:py-22 bg-white border-b border-slate-100">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
-          <p className="text-xs font-mono font-bold uppercase tracking-wider text-teal-700 mb-2">
-            ROLE-BASED WORKSPACES
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="h-3 w-3 text-teal-600" />
+            <span>ROLE-BASED WORKSPACES</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
             Solutions Designed Around Healthcare Professionals
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
@@ -294,7 +339,7 @@ export function RoleSolutionsTabs() {
                 onClick={() => setActiveTab(r.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border ${
                   isSelected
-                    ? "bg-teal-600 text-white border-teal-600 shadow-sm"
+                    ? "bg-slate-950 text-white border-slate-950 shadow-sm ring-2 ring-slate-950/20"
                     : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-950"
                 }`}
               >
@@ -314,16 +359,16 @@ export function RoleSolutionsTabs() {
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
             {/* Left Column: Role Details & Capabilities */}
-            <div className="lg:col-span-7 space-y-6">
+            <div className="lg:col-span-7 space-y-6 text-left">
               <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700">
+                <div className="h-12 w-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shrink-0">
                   <CurrentIcon className="h-6 w-6" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
+                  <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
                     {currentRole.badge}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-extrabold text-slate-950 mt-1">
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-950 mt-1">
                     {currentRole.headline}
                   </h3>
                 </div>
@@ -366,27 +411,50 @@ export function RoleSolutionsTabs() {
               </div>
             </div>
 
-            {/* Right Column: Interactive Workflow Visualizer */}
-            <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-white border border-slate-200 p-6 shadow-xs">
+            {/* Right Column: Interactive Workflow Visualizer & Live Mock Telemetry */}
+            <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-white border border-slate-200 p-6 shadow-xs text-left">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
+                <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
                   <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-teal-600" />
+                    <Activity className="h-4 w-4 text-teal-600 animate-pulse" />
                     <span className="text-xs font-mono font-bold text-slate-800">
-                      WORKFLOW PATHWAY
+                      LIVE WORKFLOW PATHWAY
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
                     Active Governance
                   </span>
                 </div>
 
-                <h4 className="text-sm font-bold text-slate-900 mb-4">
+                {/* Simulated Telemetry Banner */}
+                <div className="mb-5 p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] font-mono text-slate-500 block uppercase">
+                      {currentRole.mockTelemetry.label}
+                    </span>
+                    <span className="text-sm font-mono font-black text-slate-900">
+                      {currentRole.mockTelemetry.value}
+                    </span>
+                    <span className="text-[10px] text-slate-400 block pt-0.5">
+                      {currentRole.mockTelemetry.sublabel}
+                    </span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-teal-100 text-teal-800">
+                      {currentRole.mockTelemetry.status}
+                    </span>
+                    <span className="text-[9px] font-mono text-slate-400 block pt-1">
+                      {currentRole.mockTelemetry.detailBadge}
+                    </span>
+                  </div>
+                </div>
+
+                <h4 className="text-xs font-bold text-slate-900 mb-3 uppercase tracking-wider text-teal-800">
                   {currentRole.sampleWorkflowTitle}
                 </h4>
 
                 {/* Numbered Steps */}
-                <div className="space-y-4">
+                <div className="space-y-3.5">
                   {currentRole.sampleWorkflowSteps.map((step, sIdx) => (
                     <div key={sIdx} className="flex items-start gap-3 text-xs">
                       <div className="h-6 w-6 rounded-full bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-mono font-bold text-[11px] shrink-0 mt-0.5">
@@ -401,10 +469,10 @@ export function RoleSolutionsTabs() {
               </div>
 
               {/* Clinical Oversight Callout */}
-              <div className="mt-6 p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5 text-xs text-slate-500">
+              <div className="mt-6 p-3.5 rounded-xl bg-teal-50/60 border border-teal-200/80 flex items-start gap-2.5 text-xs text-slate-600">
                 <ShieldCheck className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] leading-snug">
-                  <strong>Role Boundary Assurance:</strong> All actions adhere to strict RBAC boundaries. Final clinical decisions require authenticated clinician sign-off.
+                  <strong className="font-bold text-slate-900">Role Boundary Assurance:</strong> All actions adhere to strict RBAC boundaries. Final clinical decisions require authenticated clinician sign-off.
                 </p>
               </div>
             </div>

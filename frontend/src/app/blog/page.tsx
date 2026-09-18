@@ -40,6 +40,18 @@ function BlogPageContent() {
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  // Global hotkey: Cmd+K / Ctrl+K opens search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Initial load: Categories, Featured, Popular Guides
   useEffect(() => {
     let isMounted = true;
@@ -56,7 +68,7 @@ function BlogPageContent() {
           setPopularGuides(guides);
         }
       } catch {
-        // Handled with graceful empty states
+        // Handled gracefully with fallback dataset
       } finally {
         if (isMounted) setLoadingInitial(false);
       }
@@ -106,8 +118,7 @@ function BlogPageContent() {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(newPage));
     router.push(`/blog?${params.toString()}`);
-    // Smooth scroll back to articles header
-    window.scrollTo({ top: 600, behavior: "smooth" });
+    window.scrollTo({ top: 520, behavior: "smooth" });
   };
 
   return (
@@ -120,16 +131,17 @@ function BlogPageContent() {
 
       <main id="main-content" className="flex-1">
         {/* 3. Blog Hero */}
-        <BlogHero />
+        <BlogHero onOpenSearch={() => setSearchOpen(true)} />
 
         {/* 4. Category Filters Bar */}
         <BlogCategoryFilters
           categories={categories}
           activeCategory={currentCategory}
           onSelectCategory={handleSelectCategory}
+          onOpenSearch={() => setSearchOpen(true)}
         />
 
-        {/* 5. Featured Article (displayed on all or when viewing all categories) */}
+        {/* 5. Featured Article (displayed on "all" categories on first page) */}
         {currentCategory === "all" && currentPage === 1 && (
           <FeaturedArticle
             article={featuredArticle}

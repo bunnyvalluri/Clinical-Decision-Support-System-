@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Minus, HelpCircle, ShieldCheck } from "lucide-react";
+import { Plus, Minus, HelpCircle, ShieldCheck, Sparkles } from "lucide-react";
 
 interface FAQItem {
   id: string;
@@ -80,14 +80,15 @@ export function SolutionsFAQ() {
   };
 
   return (
-    <section id="faq" className="py-16 sm:py-20 bg-slate-50/50 border-b border-slate-200/80">
+    <section id="faq" className="py-16 sm:py-22 bg-slate-50/50 border-b border-slate-200/80">
       <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <p className="text-xs font-mono font-bold uppercase tracking-wider text-teal-700 mb-2">
-            SOLUTIONS FAQ
-          </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="h-3 w-3 text-teal-600" />
+            <span>SOLUTIONS FAQ</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
             Common Questions About Our Solutions
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
@@ -102,7 +103,9 @@ export function SolutionsFAQ() {
             return (
               <div
                 key={item.id}
-                className="rounded-2xl bg-white border border-slate-200/90 overflow-hidden shadow-2xs transition-colors"
+                className={`rounded-2xl bg-white border transition-all ${
+                  isOpen ? "border-teal-300 shadow-sm" : "border-slate-200/90 shadow-2xs"
+                }`}
               >
                 <button
                   type="button"
@@ -112,7 +115,7 @@ export function SolutionsFAQ() {
                   id={`faq-question-${item.id}`}
                   className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 hover:bg-slate-50/70 transition-colors"
                 >
-                  <span className="text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                  <span className="text-sm sm:text-base font-bold text-slate-950 leading-snug">
                     {item.question}
                   </span>
                   <div
