@@ -122,7 +122,7 @@ export function BlogHero({ onOpenSearch }: BlogHeroProps) {
               <div className="relative w-full h-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
                 <Image
                   src="/doctor-hero.jpg"
-                  alt="Attending physician Dr. Marcus Vance reviewing clinical research on tablet"
+                  alt="Attending physician Dr. Vadla Abhinay reviewing clinical research on tablet"
                   width={540}
                   height={540}
                   className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"

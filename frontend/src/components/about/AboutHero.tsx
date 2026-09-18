@@ -172,16 +172,117 @@ export function AboutHero() {
                 </div>
               </div>
 
-              {/* Central Interactive HUD Stage */}
-              <div className="relative w-full h-[360px] sm:h-[380px] flex items-center justify-center">
+              {/* 1. Mobile/Tablet Responsive Connected Flow (< md) */}
+              <div className="w-full flex md:hidden flex-col items-center gap-3 py-2">
+                {/* Tier 1: Ingestion Layer */}
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="h-6 w-6 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
+                        <Database className="h-3 w-3" />
+                      </div>
+                      <span className="text-[8px] font-mono font-bold text-teal-700 bg-teal-50 px-1 py-0.2 rounded border border-teal-200">
+                        HL7 FHIR
+                      </span>
+                    </div>
+                    <h4 className="text-[11px] font-bold text-slate-900 leading-tight">EHR Ingestion</h4>
+                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">Vitals &amp; lab sync</p>
+                  </div>
+
+                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="h-6 w-6 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center">
+                        <Radio className="h-3 w-3" />
+                      </div>
+                      <span className="text-[8px] font-mono font-bold text-blue-700 bg-blue-50 px-1 py-0.2 rounded border border-blue-200">
+                        Sub-20ms
+                      </span>
+                    </div>
+                    <h4 className="text-[11px] font-bold text-slate-900 leading-tight">Bedside Telemetry</h4>
+                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">ECG &amp; SpO2 feed</p>
+                  </div>
+                </div>
+
+                {/* Pipeline Flow Connector */}
+                <div className="flex flex-col items-center justify-center py-0.5">
+                  <div className="w-0.5 h-3 bg-gradient-to-b from-teal-400 to-teal-600" />
+                  <span className="text-[8px] font-mono font-bold text-teal-700 uppercase bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                    Active Telemetry Ingestion ▾
+                  </span>
+                  <div className="w-0.5 h-3 bg-gradient-to-b from-teal-600 to-teal-500" />
+                </div>
+
+                {/* Tier 2: Central Clinical Core */}
+                <div className="flex flex-col items-center justify-center h-28 w-28 rounded-full bg-white border-2 border-teal-500 shadow-lg shadow-teal-500/15 p-2 text-center relative">
+                  <div className="relative">
+                    <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200 flex items-center justify-center text-teal-600 mb-0.5 shadow-xs">
+                      <HeartPulse className="h-4 w-4 animate-pulse" />
+                    </div>
+                    <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-black text-slate-950 leading-tight">
+                    Clinical Core
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-teal-700">
+                    Ruflo AI Swarm
+                  </span>
+                  <span className="text-[8px] font-mono text-slate-400">
+                    v3.42 Active
+                  </span>
+                </div>
+
+                {/* Pipeline Flow Connector */}
+                <div className="flex flex-col items-center justify-center py-0.5">
+                  <div className="w-0.5 h-3 bg-gradient-to-b from-teal-500 to-indigo-500" />
+                  <span className="text-[8px] font-mono font-bold text-indigo-700 uppercase bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                    Deterministic Safety Gate ▾
+                  </span>
+                  <div className="w-0.5 h-3 bg-gradient-to-b from-indigo-500 to-purple-500" />
+                </div>
+
+                {/* Tier 3: Protocols & Sign-Off */}
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="h-6 w-6 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
+                        <FileCheck className="h-3 w-3" />
+                      </div>
+                      <span className="text-[8px] font-mono font-bold text-amber-700 bg-amber-50 px-1 py-0.2 rounded border border-amber-200">
+                        Rule Gate
+                      </span>
+                    </div>
+                    <h4 className="text-[11px] font-bold text-slate-950 leading-tight">Clinical Protocols</h4>
+                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">qSOFA &amp; NEWS2</p>
+                  </div>
+
+                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="h-6 w-6 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center">
+                        <UserCheck className="h-3 w-3" />
+                      </div>
+                      <span className="text-[8px] font-mono font-bold text-purple-700 bg-purple-50 px-1 py-0.2 rounded border border-purple-200">
+                        Authority
+                      </span>
+                    </div>
+                    <h4 className="text-[11px] font-bold text-slate-950 leading-tight">Clinician Sign-Off</h4>
+                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">Physician approval</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Desktop Spacious Orbital HUD (md: and up) */}
+              <div className="hidden md:flex relative w-full h-[390px] lg:h-[410px] items-center justify-center">
                 {/* Concentric Ambient Pulse Rings */}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 flex items-center justify-center pointer-events-none"
                 >
-                  <div className="h-80 w-80 rounded-full border border-slate-200/60 animate-[spin_40s_linear_infinite]" />
-                  <div className="absolute h-64 w-64 rounded-full border border-dashed border-teal-200/70" />
-                  <div className="absolute h-48 w-48 rounded-full border border-teal-100 bg-teal-50/20" />
+                  <div className="h-72 w-72 lg:h-80 lg:w-80 rounded-full border border-slate-200/60 animate-[spin_40s_linear_infinite]" />
+                  <div className="absolute h-56 w-56 lg:h-64 lg:w-64 rounded-full border border-dashed border-teal-200/70" />
+                  <div className="absolute h-40 w-40 lg:h-48 lg:w-48 rounded-full border border-teal-100 bg-teal-50/20" />
                 </div>
 
                 {/* Connecting SVG Circuit Lines */}
@@ -195,17 +296,17 @@ export function AboutHero() {
                       <stop offset="100%" stopColor="#0284c7" stopOpacity="0.6" />
                     </linearGradient>
                   </defs>
-                  <line x1="50%" y1="50%" x2="22%" y2="18%" stroke="url(#lineGrad)" strokeWidth="2" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="78%" y2="18%" stroke="url(#lineGrad)" strokeWidth="2" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="22%" y2="82%" stroke="url(#lineGrad)" strokeWidth="2" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="78%" y2="82%" stroke="url(#lineGrad)" strokeWidth="2" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="18%" y2="16%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="82%" y2="16%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="18%" y2="84%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="82%" y2="84%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
                 </svg>
 
                 {/* 1. Top-Left Satellite Node: EHR / FHIR */}
                 <div
                   onMouseEnter={() => setActiveNode("ehr")}
                   onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute top-2 left-2 sm:top-3 sm:left-3 z-20 w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
+                  className={`absolute top-2 left-0 lg:left-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
                     activeNode === "ehr"
                       ? "border-teal-500 scale-105 shadow-teal-500/10"
                       : "border-slate-200/90 hover:border-slate-300"
@@ -219,9 +320,9 @@ export function AboutHero() {
                       HL7 FHIR v4
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">EHR Clinical Ingestion</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5">
-                    Vitals, lab assays &amp; EHR sync
+                  <h4 className="text-xs font-bold text-slate-900 truncate">EHR Ingestion</h4>
+                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
+                    Vitals &amp; lab assays
                   </p>
                 </div>
 
@@ -229,7 +330,7 @@ export function AboutHero() {
                 <div
                   onMouseEnter={() => setActiveNode("telemetry")}
                   onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute top-2 right-2 sm:top-3 sm:right-3 z-20 w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
+                  className={`absolute top-2 right-0 lg:right-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
                     activeNode === "telemetry"
                       ? "border-blue-500 scale-105 shadow-blue-500/10"
                       : "border-slate-200/90 hover:border-slate-300"
@@ -243,30 +344,30 @@ export function AboutHero() {
                       Sub-20ms
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">Bedside Telemetry</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5">
-                    High-frequency ECG &amp; SpO2
+                  <h4 className="text-xs font-bold text-slate-900 truncate">Bedside Telemetry</h4>
+                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
+                    High-frequency ECG
                   </p>
                 </div>
 
                 {/* 3. Central Clinical Intelligence Core */}
-                <div className="relative z-10 flex flex-col items-center justify-center h-36 w-36 rounded-full bg-white border-2 border-teal-500 shadow-xl shadow-teal-500/15 p-3 text-center transition-transform hover:scale-105">
+                <div className="relative z-10 flex flex-col items-center justify-center h-28 w-28 lg:h-32 lg:w-32 rounded-full bg-white border-2 border-teal-500 shadow-xl shadow-teal-500/15 p-2 text-center transition-transform hover:scale-105">
                   <div className="relative">
-                    <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200 flex items-center justify-center text-teal-600 mb-1 shadow-xs">
-                      <HeartPulse className="h-6 w-6 animate-pulse" />
+                    <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200 flex items-center justify-center text-teal-600 mb-0.5 shadow-xs">
+                      <HeartPulse className="h-5 w-5 animate-pulse" />
                     </div>
-                    <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
+                    <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                     </span>
                   </div>
-                  <span className="text-xs font-black text-slate-950 leading-tight mt-1">
+                  <span className="text-xs font-black text-slate-950 leading-tight">
                     Clinical Core
                   </span>
                   <span className="text-[10px] font-mono font-bold text-teal-700 mt-0.5">
                     Ruflo AI Swarm
                   </span>
-                  <span className="text-[9px] font-mono text-slate-400 mt-0.5">
+                  <span className="text-[9px] font-mono text-slate-400">
                     v3.42 Active
                   </span>
                 </div>
@@ -275,7 +376,7 @@ export function AboutHero() {
                 <div
                   onMouseEnter={() => setActiveNode("rules")}
                   onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute bottom-2 left-2 sm:bottom-3 sm:left-3 z-20 w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
+                  className={`absolute bottom-2 left-0 lg:left-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
                     activeNode === "rules"
                       ? "border-amber-500 scale-105 shadow-amber-500/10"
                       : "border-slate-200/90 hover:border-slate-300"
@@ -289,9 +390,9 @@ export function AboutHero() {
                       Deterministic
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-950">Clinical Protocols</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5">
-                    qSOFA, NEWS2 &amp; sepsis gates
+                  <h4 className="text-xs font-bold text-slate-950 truncate">Clinical Protocols</h4>
+                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
+                    qSOFA &amp; NEWS2 gates
                   </p>
                 </div>
 
@@ -299,7 +400,7 @@ export function AboutHero() {
                 <div
                   onMouseEnter={() => setActiveNode("clinician")}
                   onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute bottom-2 right-2 sm:bottom-3 sm:right-3 z-20 w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
+                  className={`absolute bottom-2 right-0 lg:right-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
                     activeNode === "clinician"
                       ? "border-purple-500 scale-105 shadow-purple-500/10"
                       : "border-slate-200/90 hover:border-slate-300"
@@ -313,15 +414,15 @@ export function AboutHero() {
                       Final Authority
                     </span>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-950">Clinician Sign-Off</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5">
-                    Attending physician verification
+                  <h4 className="text-xs font-bold text-slate-950 truncate">Clinician Sign-Off</h4>
+                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
+                    Physician verification
                   </p>
                 </div>
               </div>
 
               {/* Bottom HUD Security Persistence Badge */}
-              <div className="w-full pt-3 mt-2 border-t border-slate-200/80 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+              <div className="w-full pt-3 mt-2 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500 font-mono gap-1.5">
                 <span className="flex items-center gap-1">
                   <Lock className="h-3 w-3 text-teal-600" />
                   Authoritative Store: Neon PostgreSQL

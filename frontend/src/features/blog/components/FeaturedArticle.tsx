@@ -99,11 +99,11 @@ export function FeaturedArticle({ article, loading }: FeaturedArticleProps) {
           <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-slate-100">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-teal-600 to-emerald-600 text-white shadow-xs shrink-0 flex items-center justify-center font-bold text-xs">
-                {article.author?.name ? article.author.name.slice(0, 2).toUpperCase() : "MV"}
+                {article.author?.name ? article.author.name.slice(0, 2).toUpperCase() : "VA"}
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-950 block leading-tight">
-                  {article.author?.name || "Dr. Marcus Vance, MD"}
+                  {article.author?.name || "Dr. Vadla Abhinay, MD"}
                 </span>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 font-medium">
                   <span className="flex items-center gap-1">

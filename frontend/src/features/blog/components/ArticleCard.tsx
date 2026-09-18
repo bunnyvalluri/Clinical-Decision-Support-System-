@@ -83,11 +83,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
         <div className="flex items-center justify-between pt-3.5 border-t border-slate-100 text-xs">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200 text-teal-700 shrink-0 flex items-center justify-center font-bold text-[11px] shadow-2xs">
-              {article.author?.name ? article.author.name.slice(0, 2).toUpperCase() : "MD"}
+              {article.author?.name ? article.author.name.slice(0, 2).toUpperCase() : "VA"}
             </div>
             <div className="min-w-0">
               <span className="block text-[11px] font-bold text-slate-900 truncate leading-tight">
-                {article.author?.name || "Dr. Marcus Vance, MD"}
+                {article.author?.name || "Dr. Vadla Abhinay, MD"}
               </span>
               <span className="block text-[10px] text-slate-400 font-medium">
                 {formattedDate} &bull; {article.reading_time_minutes || 5}m

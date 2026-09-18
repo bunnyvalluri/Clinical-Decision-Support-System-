@@ -62,7 +62,7 @@ const INITIAL_RECORDS: MedicalRecordItem[] = [
     encounter_type: "OUTPATIENT",
     recorded_at: "2026-09-10 14:30",
     encounter_date: "Sep 10, 2026",
-    clinician_name: "Dr. Marcus Vance, MD",
+    clinician_name: "Dr. Vadla Abhinay, MD",
     clinician_role: "Cardiology Specialist",
     clinician_license: "CA-MD-98421",
     department: "Cardiology Outpatient Clinic",
@@ -293,7 +293,7 @@ export default function PatientMedicalRecordsPage() {
             <span>Attending Cardiologist</span>
             <Stethoscope className="h-4 w-4 text-indigo-600" />
           </div>
-          <div className="text-lg font-bold text-slate-900 truncate">Dr. Marcus Vance</div>
+          <div className="text-lg font-bold text-slate-900 truncate">Dr. Vadla Abhinay</div>
           <div className="text-[11px] text-slate-500 font-medium mt-0.5">
             Heart & Vascular Pavilion
           </div>

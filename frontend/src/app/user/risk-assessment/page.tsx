@@ -59,7 +59,7 @@ const INITIAL_ASSESSMENTS: RiskAssessmentItem[] = [
       { factor: "Serum LDL Cholesterol", impact: "+12%", value: "142 mg/dL" },
       { factor: "Resting Heart Rate", impact: "+5%", value: "76 bpm" },
     ],
-    physician_notes: "Reviewed by Dr. Marcus Vance: Continue regular ambulatory blood pressure monitoring and follow low-sodium dietary instructions.",
+    physician_notes: "Reviewed by Dr. Vadla Abhinay: Continue regular ambulatory blood pressure monitoring and follow low-sodium dietary instructions.",
   },
   {
     id: "assess-002",
@@ -251,7 +251,7 @@ export default function PatientRiskAssessmentListPage() {
             <span>Attending Reviewer</span>
             <ShieldCheck className="h-4 w-4 text-emerald-600" />
           </div>
-          <div className="text-base font-bold text-slate-900 truncate">Dr. Marcus Vance</div>
+          <div className="text-base font-bold text-slate-900 truncate">Dr. Vadla Abhinay</div>
           <div className="text-[11px] text-slate-500 font-medium mt-0.5">
             Cardiology Department
           </div>

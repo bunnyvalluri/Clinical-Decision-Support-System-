@@ -54,7 +54,7 @@ const INITIAL_PREDICTIONS: PatientPredictionItem[] = [
     explanation:
       "The model estimates a moderate 10-year risk level based on reported resting systolic pressure (134 mmHg) and fasting serum cholesterol (210 mg/dL).",
     review_status: "REVIEWED_BY_PHYSICIAN",
-    physician_reviewer: "Dr. Marcus Vance, MD",
+    physician_reviewer: "Dr. Vadla Abhinay, MD",
     contributing_biomarkers: [
       { name: "Resting Systolic BP", weight: "+18%", direction: "UP" },
       { name: "Fasting Serum LDL", weight: "+14%", direction: "UP" },

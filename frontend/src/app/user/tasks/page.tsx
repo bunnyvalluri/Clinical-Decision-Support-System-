@@ -47,7 +47,7 @@ const INITIAL_TASKS: HealthTaskItem[] = [
     status: "PENDING",
     action_href: "/user/vitals",
     action_label: "Open Vitals Logger",
-    prescribed_by: "Dr. Marcus Vance, MD",
+    prescribed_by: "Dr. Vadla Abhinay, MD",
   },
   {
     id: "task-02",
@@ -58,7 +58,7 @@ const INITIAL_TASKS: HealthTaskItem[] = [
     status: "COMPLETED",
     action_href: "/user/health-summary",
     action_label: "View Prescription",
-    prescribed_by: "Dr. Marcus Vance, MD",
+    prescribed_by: "Dr. Vadla Abhinay, MD",
   },
   {
     id: "task-03",
@@ -245,7 +245,7 @@ export default function PatientTasksPage() {
             <span className="text-xs text-slate-500 font-medium block">Care Team Oversight</span>
             <span className="text-sm font-bold text-slate-900">Synchronized with EHR</span>
             <span className="text-[11px] text-slate-500 block mt-0.5">
-              Dr. Marcus Vance, MD
+              Dr. Vadla Abhinay, MD
             </span>
           </div>
         </div>

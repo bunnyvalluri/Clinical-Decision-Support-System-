@@ -286,7 +286,8 @@ export function DifferenceSection() {
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
-                    {idx === 0 ? "Patient A (Sepsis Alert)" : "Patient B (Stable Post-Op)"}
+                    <span className="sm:hidden">{idx === 0 ? "Case A (Sepsis)" : "Case B (Stable)"}</span>
+                    <span className="hidden sm:inline">{idx === 0 ? "Patient A (Sepsis Alert)" : "Patient B (Stable Post-Op)"}</span>
                   </button>
                 ))}
               </div>
@@ -308,7 +309,7 @@ export function DifferenceSection() {
                 </div>
 
                 {/* Vitals Ribbon */}
-                <div className="grid grid-cols-4 gap-1.5 pt-1 text-center font-mono">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-1 text-center font-mono">
                   <div className="p-1.5 rounded-lg bg-white border border-slate-200 text-[10px]">
                     <span className="text-slate-400 block text-[9px]">HR</span>
                     <strong className="text-slate-900">{currentPatient.vitals.hr} bpm</strong>
@@ -430,7 +431,7 @@ export function DifferenceSection() {
                   <CheckCircle2 className="h-4 w-4" />
                   <span>
                     {acknowledged
-                      ? "Signed by Attending M.D. (Dr. Marcus Vance)"
+                      ? "Signed by Attending M.D. (Dr. Vadla Abhinay)"
                       : selectedCaseIndex === 0
                       ? "Acknowledge & Order Bundle"
                       : "Confirm Routine Clinical Surveillance"}

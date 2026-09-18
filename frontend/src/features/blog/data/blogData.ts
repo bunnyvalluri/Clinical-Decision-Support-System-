@@ -9,8 +9,8 @@ import { BlogArticle, BlogCategory, BlogAuthor } from "../types/blogTypes";
 export const CLINICAL_AUTHORS: Record<string, BlogAuthor> = {
   vance: {
     id: "auth-vance",
-    name: "Dr. Marcus Vance, PhD",
-    role_title: "Principal Healthcare AI Scientist & Explainability Researcher",
+    name: "Dr. Vadla Abhinay, MD",
+    role_title: "Principal Healthcare AI Scientist & Clinical Cardiologist",
     avatar_url: "/avatars/vance.jpg",
     bio: "Specializes in game-theoretic feature attribution (TreeSHAP) and high-frequency physiological signal modeling in acute care settings.",
   },

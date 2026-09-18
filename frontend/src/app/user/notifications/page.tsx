@@ -51,7 +51,7 @@ const INITIAL_NOTIFICATIONS: PatientNotification[] = [
   {
     id: "notif-02",
     title: "Upcoming Appointment Reminder",
-    description: "You have an outpatient consultation with Dr. Marcus Vance scheduled for Wednesday at 10:30 AM at Heart & Vascular Pavilion.",
+    description: "You have an outpatient consultation with Dr. Vadla Abhinay scheduled for Wednesday at 10:30 AM at Heart & Vascular Pavilion.",
     category: "APPOINTMENT",
     timestamp: "2 hours ago",
     read: false,
@@ -62,7 +62,7 @@ const INITIAL_NOTIFICATIONS: PatientNotification[] = [
   {
     id: "notif-03",
     title: "New Care Team Message",
-    description: "Dr. Marcus Vance sent a clinical note regarding your latest 30-day ambulatory blood pressure telemetry trends.",
+    description: "Dr. Vadla Abhinay sent a clinical note regarding your latest 30-day ambulatory blood pressure telemetry trends.",
     category: "MESSAGE",
     timestamp: "Yesterday, 04:15 PM",
     read: true,
