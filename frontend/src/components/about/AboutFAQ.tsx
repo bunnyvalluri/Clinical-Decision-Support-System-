@@ -16,44 +16,44 @@ interface FAQItem {
 
 const FAQ_LIST: FAQItem[] = [
   {
-    question: "What is this platform?",
+    question: "What is HealthNova AI?",
     answer:
-      "It is an AI and machine-learning-powered clinical decision-support platform designed to help healthcare professionals understand patient risk and relevant clinical information.",
+      "HealthNova AI is an enterprise Clinical Decision Support System (CDSS) that combines evaluated machine learning ensembles, deterministic clinical scoring (qSOFA, NEWS2), and local explainability (TreeSHAP) to assist healthcare teams in identifying acute patient deterioration and risk trajectories hours in advance.",
   },
   {
-    question: "Does the platform replace healthcare professionals?",
+    question: "Does HealthNova AI replace healthcare professionals or issue diagnoses?",
     answer:
-      "No. The platform is designed to assist qualified healthcare professionals. Clinical decisions remain with appropriately qualified professionals.",
+      "No. In strict compliance with FDA CDSS non-device guidance, HealthNova AI provides assistive decision support. AI models never issue autonomous prescriptions or medical diagnoses. Licensed clinicians retain full authority for all patient diagnostic and therapeutic decisions.",
   },
   {
-    question: "How does patient risk prediction work?",
+    question: "How does the platform integrate with our existing hospital EHR?",
     answer:
-      "The system processes validated patient data through evaluated machine-learning models to generate risk-related predictions and supporting insights.",
+      "We connect bidirectionally through native HL7 FHIR v4.0.1 and SMART-on-FHIR specifications. The system can be embedded directly within Epic Hyperspace, Cerner Millennium, or MEDITECH workflows without requiring duplicate logins or separate tabs.",
   },
   {
-    question: "Can predictions be explained?",
+    question: "What machine learning models and datasets are utilized?",
     answer:
-      "The platform is designed to support explainability through model metadata, relevant features, evaluation information, and explainability techniques such as SHAP where appropriate.",
+      "The system utilizes calibrated ensembles including Random Forest, Gradient Boosted Trees (CatBoost/XGBoost), and support vector machines trained and validated on diverse multi-hospital clinical cohorts. Models undergo continuous Population Stability Index (PSI) and Brier calibration monitoring.",
   },
   {
-    question: "How is healthcare data protected?",
+    question: "How is patient data protected under HIPAA and SOC 2?",
     answer:
-      "The platform uses authentication, role-based authorization, least-privilege access, auditing, secure APIs, database controls, and security monitoring.",
+      "Patient data is protected through AES-256 encryption at rest, TLS 1.3 in transit, and role-based access control (RBAC). The platform operates under a Zero-PHI memory boundary where patient identifiers are redacted before reaching statistical model pipelines.",
   },
   {
-    question: "Can the platform work in real time?",
+    question: "What is TreeSHAP explainability?",
     answer:
-      "Yes. The architecture supports real-time events and updates through Django Channels, WebSockets, and Redis where appropriate.",
+      "TreeSHAP (Tree Shapley Additive Explanations) is a mathematically rigorous game-theoretic approach that calculates the exact pathophysiological contribution of each vital sign, lab assay, and biometric marker toward the final risk score, eliminating black-box opacity.",
   },
   {
-    question: "Is the AI always correct?",
+    question: "Can hospital clinical committees customize alert thresholds and rules?",
     answer:
-      "No machine-learning or AI system should be treated as infallible. Predictions require appropriate validation, uncertainty handling, monitoring, and professional review.",
+      "Yes. Clinical administrators and medical informaticists can calibrate alert sensitivity, adjust epistemic uncertainty thresholds, and align scoring formulas with institution-specific sepsis or rapid response team (RRT) protocols.",
   },
   {
-    question: "Who is the platform designed for?",
+    question: "Who can access the platform across hospital roles?",
     answer:
-      "The platform supports patients/users, doctors, nurses, medical informaticists, and authorized IT administrators through role-specific workflows.",
+      "The system provides tailored, role-gated interfaces for Attending Physicians, Triage Nurses, Medical Informaticists, IT Administrators, and Patients, ensuring each stakeholder interacts only with data and tools relevant to their scope.",
   },
 ];
 
@@ -63,16 +63,16 @@ export function AboutFAQ() {
       <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-semibold tracking-wide uppercase">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-semibold tracking-wide uppercase shadow-2xs">
             <HelpCircle className="h-3.5 w-3.5 text-teal-600" />
-            <span>KNOWLEDGE BASE</span>
+            <span>TRANSPARENCY &amp; FAQS</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-950">
             Frequently Asked Questions
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto">
-            Find answers to common questions regarding our clinical decision support architecture,
-            safety standards, and deployment models.
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            Find answers to critical questions regarding our clinical decision support architecture,
+            safety standards, and hospital deployment models.
           </p>
         </div>
 
@@ -83,12 +83,12 @@ export function AboutFAQ() {
               <AccordionItem
                 key={faq.question}
                 value={`item-${idx}`}
-                className="border border-slate-200/80 rounded-2xl bg-white px-5 shadow-2xs transition-all hover:border-slate-300"
+                className="border border-slate-200/80 rounded-2xl bg-white px-5 shadow-2xs transition-all hover:border-teal-300"
               >
-                <AccordionTrigger className="text-left font-bold text-slate-950 text-sm sm:text-base hover:text-teal-700 py-4 hover:no-underline">
+                <AccordionTrigger className="text-left font-bold text-slate-950 text-sm sm:text-base hover:text-teal-700 py-4.5 hover:no-underline">
                   <span>{faq.question}</span>
                 </AccordionTrigger>
-                <AccordionContent className="text-sm text-slate-600 leading-relaxed pt-1 pb-4">
+                <AccordionContent className="text-sm text-slate-600 leading-relaxed pt-1 pb-4 font-normal">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
