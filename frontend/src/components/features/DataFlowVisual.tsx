@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   Users,
@@ -9,7 +11,6 @@ import {
   Sliders,
   Stethoscope,
   ArrowRight,
-  ArrowDown,
 } from "lucide-react";
 
 interface FlowNode {
@@ -36,13 +37,13 @@ export function DataFlowVisual() {
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
-          <span className="inline-block text-xs font-mono font-bold tracking-wider text-teal-700 uppercase bg-teal-50 border border-teal-200 px-3 py-1 rounded-full">
+          <span className="inline-block text-xs font-mono font-bold tracking-wider text-teal-700 uppercase bg-teal-50 border border-teal-200 px-3.5 py-1 rounded-full shadow-2xs">
             SYSTEM TOPOLOGY
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-950">
             End-to-End Clinical Data Flow
           </h2>
-          <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
             How physiological vitals securely traverse from client input to authoritative database
             persistence, machine-learning inference, and validated clinician review.
           </p>
@@ -57,7 +58,7 @@ export function DataFlowVisual() {
             return (
               <div
                 key={node.step}
-                className="relative rounded-2xl bg-slate-50/70 border border-slate-200 p-5 flex flex-col justify-between shadow-2xs hover:border-teal-300 transition-all"
+                className="relative rounded-2xl bg-slate-50/70 border border-slate-200/90 p-5 flex flex-col justify-between shadow-2xs hover:border-teal-300 transition-all duration-200"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">

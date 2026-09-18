@@ -4,25 +4,23 @@ import React from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  HeartPulse,
   Heart,
   Activity,
   ShieldCheck,
   Sparkles,
-  Play,
-  CheckCircle2,
   ChevronRight,
   Cpu,
   TrendingUp,
   Moon,
   Footprints,
+  Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function FeaturesHero() {
   return (
     <section className="relative overflow-hidden pt-6 pb-16 sm:pt-10 sm:pb-20 lg:pt-12 lg:pb-24 bg-white border-b border-slate-100">
-      {/* Background Soft Glows (Strict Light Theme) */}
+      {/* Background Soft Glows (Strict Pure Light Theme) */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -top-24 right-1/4 h-96 w-96 rounded-full bg-teal-50/70 blur-3xl"
@@ -42,37 +40,39 @@ export function FeaturesHero() {
           <span className="font-semibold text-slate-900">Features</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Left Column: Headline & Action CTAs */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-7 text-left">
             {/* Eyebrow */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-semibold tracking-wide uppercase">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-semibold tracking-wide uppercase shadow-2xs">
               <Sparkles className="h-3.5 w-3.5 text-teal-600 shrink-0" />
               <span>OUR FEATURES</span>
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.15] sm:leading-[1.12]">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-950 leading-[1.12] sm:leading-[1.1]">
               Smarter Tools for{" "}
-              <span className="text-teal-600 block sm:inline">
+              <span className="text-teal-600 block">
                 Everyday Healthcare
               </span>
             </h1>
 
             {/* Supporting Description */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
-              Our clinical decision support platform combines evaluated machine learning, real-time
-              telemetry, and intuitive healthcare design to empower physicians, nurses, informaticists,
-              and patients with actionable risk intelligence.
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
+              HealthNova AI provides a complete suite of intelligent clinical tools designed to enhance
+              medical decision-making, streamline point-of-care workflows, and elevate patient outcomes
+              across hospital wards.
             </p>
 
             {/* Reassurance Disclaimer Badge */}
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-start gap-3 max-w-xl">
-              <ShieldCheck className="h-5 w-5 text-teal-600 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/90 flex items-start gap-3.5 max-w-xl shadow-2xs">
+              <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
               <p className="text-xs text-slate-600 leading-relaxed">
                 <strong className="font-semibold text-slate-900">Clinician-in-the-Loop Standard:</strong>{" "}
-                Risk levels and SHAP attributions are designed to assist healthcare teams.
-                Licensed clinicians retain full final diagnostic and prescription responsibility.
+                Advanced AI and predictive analytics assist clinical judgment; final medical decisions
+                remain with qualified healthcare professionals.
               </p>
             </div>
 
@@ -81,20 +81,20 @@ export function FeaturesHero() {
               <a href="#powerful-features">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold px-7 shadow-sm gap-2 text-sm h-12"
+                  className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold px-7 shadow-xs gap-2 text-sm h-12 rounded-xl"
                 >
                   <span>Explore All Features</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </a>
-              <a href="#ml-workflow">
+              <a href="#ai-intelligence">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-slate-50 font-semibold px-6 text-sm h-12 gap-2"
+                  className="w-full sm:w-auto border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-slate-50 font-semibold px-6 text-sm h-12 gap-2 rounded-xl"
                 >
-                  <Play className="h-4 w-4 text-teal-600 fill-teal-600" />
-                  <span>See How It Works</span>
+                  <Layers className="h-4 w-4 text-teal-600" />
+                  <span>Clinical Intelligence</span>
                 </Button>
               </a>
             </div>
@@ -103,10 +103,10 @@ export function FeaturesHero() {
           {/* Right Column: Realistic Healthcare Intelligence Mobile Device & Dashboard Mockup */}
           <div className="lg:col-span-5 flex justify-center">
             <div className="relative w-full max-w-sm sm:max-w-md">
-              {/* Device Frame (Clean White Healthcare Mobile Mockup) */}
+              {/* Device Frame (Clean White Healthcare Mobile Mockup matching Reference Image) */}
               <div className="relative rounded-[40px] border-4 border-slate-900/10 bg-white p-4 sm:p-5 shadow-xl ring-1 ring-slate-900/5">
                 {/* Device Speaker Notch */}
-                <div className="mx-auto mb-4 h-4 w-28 rounded-full bg-slate-100 border border-slate-200" />
+                <div className="mx-auto mb-4 h-3.5 w-28 rounded-full bg-slate-100 border border-slate-200" />
 
                 {/* Device Screen Content */}
                 <div className="space-y-4">
@@ -227,7 +227,7 @@ export function FeaturesHero() {
                 </div>
                 <div className="text-left pr-1">
                   <p className="text-[10px] font-mono text-slate-400">TreeSHAP</p>
-                  <p className="text-xs font-bold text-slate-900">Explainable</p>
+                  <p className="text-xs font-bold text-slate-950">Explainable</p>
                 </div>
               </div>
 
@@ -237,7 +237,7 @@ export function FeaturesHero() {
                 </div>
                 <div className="text-left pr-1">
                   <p className="text-[10px] font-mono text-slate-400">Governance</p>
-                  <p className="text-xs font-bold text-slate-900">Human Sign-off</p>
+                  <p className="text-xs font-bold text-slate-950">Human Sign-off</p>
                 </div>
               </div>
             </div>
