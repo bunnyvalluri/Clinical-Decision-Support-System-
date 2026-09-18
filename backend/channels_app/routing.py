@@ -18,6 +18,7 @@ from apps.mobile_gateway.consumers import MobileGatewayConsumer
 from apps.ai_agents.consumers import AIAgentConsumer
 from channels_app.security_consumers import SecurityAgentConsumer
 from channels_app.loop_consumers import EngineeringLoopConsumer
+from channels_app.jules_consumers import JulesAutomationConsumer
 
 websocket_urlpatterns = [
     re_path(r"^ws/dashboard/$", consumers.DashboardConsumer.as_asgi()),
@@ -36,6 +37,7 @@ websocket_urlpatterns = [
     re_path(r"^ws/web/$", web_consumers.WebIntelligenceConsumer.as_asgi()),
     re_path(r"^ws/security/agents/$", SecurityAgentConsumer.as_asgi()),
     re_path(r"^ws/engineering/loops/$", EngineeringLoopConsumer.as_asgi()),
+    re_path(r"^ws/automation/jules/$", JulesAutomationConsumer.as_asgi()),
 ]
 
 

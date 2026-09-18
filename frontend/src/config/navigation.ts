@@ -14,8 +14,8 @@ export const PUBLIC_NAV_LINKS: NavLinkItem[] = [
   { name: "Home", href: "/", description: "Platform Landing & Bedside Simulator" },
   { name: "About", href: "/about", description: "Mission, Architecture & Clinical Governance" },
   { name: "Features", href: "/features", description: "AI/ML Capabilities & Healthcare Intelligence" },
-  { name: "Solutions", href: "/#workflow", description: "Integrated Care Pathways & Workflows" },
-  { name: "Blog", href: "/about#principles", description: "Clinical Intelligence & Research Updates" },
+  { name: "Solutions", href: "/solutions", description: "Integrated Care Pathways & Workflows" },
+  { name: "Blog", href: "/blog", description: "Clinical Intelligence, AI & Research Updates" },
   { name: "Contact", href: "/about#faq", description: "Institutional Deployment & Support" },
 ];
 

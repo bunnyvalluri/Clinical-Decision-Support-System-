@@ -1,0 +1,26 @@
+meta {
+  name: BLOG-NEWSLETTER-001
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/v1/blog/newsletter/subscribe/
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "clinical.fellow@hospital.org"
+  }
+}
+
+assert {
+  res.status: in [200, 400]
+}

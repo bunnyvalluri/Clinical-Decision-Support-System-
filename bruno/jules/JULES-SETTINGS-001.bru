@@ -1,0 +1,23 @@
+meta {
+  name: JULES-SETTINGS-001
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_url}}/api/v1/automation/jules/settings/
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{admin_access_token}}
+}
+
+assert {
+  res.status: in [200, 401, 403]
+}

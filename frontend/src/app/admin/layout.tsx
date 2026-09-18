@@ -19,6 +19,7 @@ import {
   User,
   Users,
   Wifi,
+  Wrench,
   Zap,
 } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
@@ -27,6 +28,7 @@ import { ResponsiveAppShell, NavItem } from "@/components/responsive/ResponsiveA
 const ADMIN_NAV_ITEMS: NavItem[] = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", mobileQuick: true },
   { href: "/admin/ai", icon: Bot, label: "Ruflo AI Swarm", mobileQuick: true },
+  { href: "/admin/automation/jules", icon: Wrench, label: "Jules Automation", mobileQuick: true },
   { href: "/admin/users", icon: Users, label: "Users & Staff", mobileQuick: true },
   { href: "/admin/health", icon: Monitor, label: "System Health", mobileQuick: true },
   { href: "/admin/security", icon: ShieldCheck, label: "Security & 2FA", mobileQuick: true },

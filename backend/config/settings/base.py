@@ -86,6 +86,8 @@ LOCAL_APPS = [
     "apps.ai_agents.apps.AiAgentsConfig",
     "apps.web_intelligence.apps.WebIntelligenceConfig",
     "apps.engineering_loops.apps.EngineeringLoopsConfig",
+    "apps.blog.apps.BlogConfig",
+    "integrations.jules.apps.JulesConfig",
 ]
 
 

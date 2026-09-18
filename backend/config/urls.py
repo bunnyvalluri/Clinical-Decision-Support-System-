@@ -46,6 +46,10 @@ urlpatterns = [
     path("api/web/", include(("apps.web_intelligence.urls", "web_intelligence"), namespace="web_intelligence_compat")),
     path("api/v1/engineering/", include("apps.engineering_loops.urls", namespace="engineering_loops")),
     path("api/engineering/", include("apps.engineering_loops.urls", namespace="engineering_loops_compat")),
+    path("api/v1/blog/", include("apps.blog.urls", namespace="blog")),
+    path("api/blog/", include(("apps.blog.urls", "blog"), namespace="blog_compat")),
+    path("api/v1/automation/jules/", include("integrations.jules.urls", namespace="jules")),
+    path("api/admin/automation/jules/", include("integrations.jules.urls", namespace="jules_admin_compat")),
 ]
 
 
