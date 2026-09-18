@@ -6,7 +6,9 @@ from apps.model_registry.informatics_views import (
     ai_evaluation_metrics_view,
     data_quality_metrics_view,
     drift_monitoring_view,
+    fairness_evaluation_view,
     informatics_overview_view,
+    research_benchmarks_view,
 )
 from apps.model_registry.views import ModelVersionViewSet
 
@@ -20,5 +22,10 @@ urlpatterns = [
     path("informatics/data-quality/", data_quality_metrics_view, name="data_quality_metrics"),
     path("informatics/drift/", drift_monitoring_view, name="drift_monitoring"),
     path("informatics/ai-eval/", ai_evaluation_metrics_view, name="ai_eval_metrics"),
+    path("informatics/research-benchmarks/", research_benchmarks_view, name="research_benchmarks"),
+    path("informatics/fairness/", fairness_evaluation_view, name="fairness_evaluation"),
+    path("research-benchmarks/", research_benchmarks_view, name="research_benchmarks_direct"),
+    path("drift/", drift_monitoring_view, name="drift_direct"),
+    path("fairness/", fairness_evaluation_view, name="fairness_direct"),
     path("", include(router.urls)),
 ]

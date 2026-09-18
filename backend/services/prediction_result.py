@@ -45,6 +45,9 @@ class PredictionResult:
     feature_snapshot: dict[str, Any]
     feature_schema_version: str = "v1.0"
     confidence_score: float | None = None
+    uncertainty_score: float | None = None
+    is_abstaining: bool = False
+    ood_status: str = "IN_DISTRIBUTION"
     clinical_record_id: UUID | str | None = None
     prediction_id: UUID | str | None = None
     explanation: ExplanationResult | None = None
@@ -59,6 +62,9 @@ class PredictionResult:
             "risk_level": self.risk_level,
             "probability": round(self.probability, 4),
             "confidence_score": round(self.confidence_score, 4) if self.confidence_score is not None else None,
+            "uncertainty_score": round(self.uncertainty_score, 4) if self.uncertainty_score is not None else None,
+            "is_abstaining": self.is_abstaining,
+            "ood_status": self.ood_status,
             "model_name": self.model_name,
             "model_version": self.model_version,
             "inference_latency_ms": round(self.inference_latency_ms, 2),

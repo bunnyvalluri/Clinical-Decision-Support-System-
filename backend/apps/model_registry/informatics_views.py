@@ -181,3 +181,29 @@ def ai_evaluation_metrics_view(request: Request) -> Response:
     }
 
     return Response({"success": True, "data": eval_results})
+
+
+@api_view(["GET"])
+@permission_classes([IsInformaticist])
+def research_benchmarks_view(request: Request) -> Response:
+    """
+    GET /api/v1/models/informatics/research-benchmarks/
+    Audited comparative benchmark evaluation across SVM, Random Forest, and AdaBoost.
+    Derived strictly from evaluation pipelines without synthetic metric inflation.
+    """
+    from services.evaluation_service import ModelEvaluationService
+    data = ModelEvaluationService.get_comparative_benchmarks()
+    return Response({"success": True, "data": data})
+
+
+@api_view(["GET"])
+@permission_classes([IsInformaticist])
+def fairness_evaluation_view(request: Request) -> Response:
+    """
+    GET /api/v1/models/informatics/fairness/
+    Audited fairness analysis and subgroup parity evaluation across patient cohorts.
+    """
+    from services.fairness_service import ClinicalFairnessService
+    data = ClinicalFairnessService.evaluate_fairness()
+    return Response({"success": True, "data": data})
+

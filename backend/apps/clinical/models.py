@@ -399,3 +399,97 @@ class Escalation(SoftDeleteModel):
     def __str__(self) -> str:
         return f"Escalation for {self.patient.mrn} by {self.escalated_by.username} [{self.status}]"
 
+
+class DataQualityIssueType(models.TextChoices):
+    INVALID_VALUE = "INVALID_VALUE", "Physiologically Invalid Value"
+    OUTLIER = "OUTLIER", "Statistical Outlier"
+    MISSING_CRITICAL = "MISSING_CRITICAL", "Missing Critical Clinical Feature"
+    UNIT_MISMATCH = "UNIT_MISMATCH", "Inconsistent Units"
+    DUPLICATE = "DUPLICATE", "Duplicate Encounter Record"
+    SCHEMA_MISMATCH = "SCHEMA_MISMATCH", "Schema Mismatch"
+    DISTRIBUTION_DRIFT = "DISTRIBUTION_DRIFT", "Distribution Drift"
+
+
+class DataQualitySeverity(models.TextChoices):
+    LOW = "LOW", "Low"
+    MEDIUM = "MEDIUM", "Medium"
+    HIGH = "HIGH", "High"
+    CRITICAL = "CRITICAL", "Critical"
+
+
+class DataQualityStatus(models.TextChoices):
+    OPEN = "OPEN", "Open"
+    INVESTIGATING = "INVESTIGATING", "Investigating"
+    RESOLVED = "RESOLVED", "Resolved"
+    DISMISSED = "DISMISSED", "Dismissed"
+
+
+class DataQualityIssue(SoftDeleteModel):
+    """
+    Granular clinical data quality anomaly record.
+    Tracks missing values, outliers, invalid physiological bounds, and schema drift.
+    """
+
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="data_quality_issues",
+        help_text="Patient record linked to this data anomaly.",
+    )
+    clinical_record = models.ForeignKey(
+        ClinicalRecord,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="data_quality_issues",
+        help_text="Clinical record containing anomalous measurement.",
+    )
+    issue_type = models.CharField(
+        max_length=50,
+        choices=DataQualityIssueType.choices,
+        default=DataQualityIssueType.INVALID_VALUE,
+        db_index=True,
+    )
+    severity = models.CharField(
+        max_length=20,
+        choices=DataQualitySeverity.choices,
+        default=DataQualitySeverity.MEDIUM,
+        db_index=True,
+    )
+    feature_name = models.CharField(max_length=100, db_index=True)
+    observed_value = models.TextField(blank=True)
+    expected_range = models.CharField(max_length=100, blank=True)
+    source = models.CharField(max_length=100, default="ClinicalRecord")
+    status = models.CharField(
+        max_length=30,
+        choices=DataQualityStatus.choices,
+        default=DataQualityStatus.OPEN,
+        db_index=True,
+    )
+    assigned_to = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_data_issues",
+        help_text="Clinician or informaticist assigned to audit/remediate the issue.",
+    )
+    resolution = models.TextField(blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "clinical_data_quality_issues"
+        verbose_name = "Clinical Data Quality Issue"
+        verbose_name_plural = "Clinical Data Quality Issues"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["status", "severity"]),
+            models.Index(fields=["patient", "status"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"DataQualityIssue [{self.severity}] {self.feature_name}: {self.issue_type} ({self.status})"
+
+

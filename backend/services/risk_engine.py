@@ -86,13 +86,37 @@ class RiskPredictionEngine:
 
         latency_ms = (time.perf_counter() - start_time) * 1000.0
 
-        # Resolve discrete risk level
+        # Resolve discrete risk level via Configurable Policy Service
+        from services.policy_service import RiskThresholdPolicyService
         if raw_pred_class.upper() in RiskLevel.values:
             risk_level = raw_pred_class.upper()
         else:
-            risk_level = self.map_probability_to_risk(prob_float)
+            risk_level = RiskThresholdPolicyService.resolve_risk_level(prob_float, model_version_id=str(model_ver.id) if hasattr(model_ver, "id") else None)
 
-        # 4. Clinical Safety Layer: Evaluate deterministic clinical rules override
+        # 4. Out-of-Distribution & Uncertainty Quality Gates
+        ood_status_val = "IN_DISTRIBUTION"
+        uncertainty_score_val = None
+        should_abstain_val = False
+        try:
+            from services.ood_service import OODDetectionService
+            ood_service = OODDetectionService()
+            ood_res = ood_service.evaluate(snapshot)
+            ood_status_val = ood_res.status.value if hasattr(ood_res.status, "value") else str(ood_res.status)
+
+            from services.confidence_service import PredictionConfidenceService
+            conf_service = PredictionConfidenceService()
+            prob_dist = {cls_name: float(proba_raw[i]) for i, cls_name in enumerate(classes)} if hasattr(pipeline, "predict_proba") and len(proba_raw) == len(classes) else {risk_level: prob_float}
+            uncertainty_res = conf_service.evaluate(
+                probabilities=prob_dist,
+                is_ood=(ood_status_val == "OUT-OF-DISTRIBUTION"),
+                ood_reason=ood_res.details if ood_status_val == "OUT-OF-DISTRIBUTION" else None,
+            )
+            uncertainty_score_val = float(uncertainty_res.normalized_entropy)
+            should_abstain_val = uncertainty_res.should_abstain
+        except Exception as ood_err:
+            logger.debug("OOD/Uncertainty gate check skipped: %s", ood_err)
+
+        # 5. Clinical Safety Layer: Evaluate deterministic clinical rules override
         try:
             from services.clinical_rules_engine import ClinicalRulesEngine
             rules_engine = ClinicalRulesEngine()
@@ -108,7 +132,14 @@ class RiskPredictionEngine:
         except Exception as rule_err:
             logger.debug("Clinical safety rule check skipped: %s", rule_err)
 
-        # 5. Explainability attributions via SHAP or fallback
+        # 6. Data Quality Audit
+        try:
+            from services.data_quality_service import ClinicalDataQualityService
+            ClinicalDataQualityService.audit_record(snapshot, persist_issues=True)
+        except Exception as dq_err:
+            logger.debug("Data quality audit check skipped: %s", dq_err)
+
+        # 7. Explainability attributions via SHAP or fallback
         explanation_res: ExplanationResult | None = None
         try:
             from services.explanation_service import ExplanationService
@@ -140,6 +171,9 @@ class RiskPredictionEngine:
             risk_level=risk_level,
             probability=prob_float,
             confidence_score=confidence,
+            uncertainty_score=uncertainty_score_val,
+            is_abstaining=should_abstain_val,
+            ood_status=ood_status_val,
             model_name=model_ver.model_name,
             model_version=model_ver.version,
             model_version_id=model_ver.id,

@@ -176,3 +176,46 @@ class PatientViewSet(AuditLogMixin, viewsets.ModelViewSet):
 
         out_serializer = ClinicalRecordSerializer(record)
         return Response(out_serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["get"], url_path="timeline")
+    def timeline(self, request: Request, pk=None) -> Response:
+        """
+        GET /api/v1/patients/{id}/timeline/
+        Aggregated chronological clinical timeline (admissions, vitals, predictions, reviews, triage, alerts).
+        """
+        patient = self.get_object()
+        from services.timeline_service import PatientTimelineService
+        timeline_events = PatientTimelineService.get_timeline_for_patient(patient.id)
+        return Response({"success": True, "patient_id": str(patient.id), "events": timeline_events, "count": len(timeline_events)})
+
+    @action(detail=True, methods=["get"], url_path="predictions")
+    def predictions(self, request: Request, pk=None) -> Response:
+        """
+        GET /api/v1/patients/{id}/predictions/
+        Historical prediction sequence for patient with numbered iterations (Prediction #1, #2...).
+        """
+        patient = self.get_object()
+        from apps.predictions.models import Prediction
+        from apps.predictions.serializers import PredictionSerializer
+
+        qs = Prediction.objects.filter(patient=patient).select_related("model_version", "explanation", "clinical_review").order_by("prediction_timestamp")
+        preds = list(qs)
+        data = []
+        for idx, p in enumerate(preds, start=1):
+            s_data = PredictionSerializer(p).data
+            s_data["prediction_number"] = idx
+            s_data["display_label"] = f"Prediction #{idx}"
+            data.append(s_data)
+
+        # Return latest first
+        data.reverse()
+        return Response({"success": True, "patient_id": str(patient.id), "results": data, "count": len(data)})
+
+    @action(detail=True, methods=["get"], url_path="vitals")
+    def vitals(self, request: Request, pk=None) -> Response:
+        """
+        GET /api/v1/patients/{id}/vitals/
+        Convenience alias returning patient vitals history.
+        """
+        return self.clinical_records(request, pk=pk)
+

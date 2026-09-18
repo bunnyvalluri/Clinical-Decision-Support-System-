@@ -84,6 +84,26 @@ class Prediction(BaseModel):
         help_text="Timestamp when the inference was executed.",
     )
 
+    # Uncertainty, Abstention & Out-of-Distribution Quality Gates
+    uncertainty_score = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Normalized predictive uncertainty / entropy (0.0000 - 1.0000).",
+    )
+    is_abstaining = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="True if model abstained due to high uncertainty or OOD, requiring review.",
+    )
+    ood_status = models.CharField(
+        max_length=50,
+        default="IN_DISTRIBUTION",
+        db_index=True,
+        help_text="Out-of-distribution detection status (IN_DISTRIBUTION, WARNING, OUT_OF_DISTRIBUTION).",
+    )
+
     # Clinician Overrides & Review
     clinician_override = models.CharField(
         max_length=20,
@@ -240,4 +260,75 @@ class ClinicalReview(BaseModel):
 
     def __str__(self) -> str:
         return f"Review for {self.prediction.id} by {self.doctor} [{self.status}]"
+
+
+class RiskThresholdPolicy(BaseModel):
+    """
+    Configurable risk threshold policy for clinical severity tiers.
+    Replaces hardcoded thresholds with versioned, auditable, and clinician-approved rules.
+    """
+
+    policy_version = models.CharField(max_length=50, unique=True, db_index=True)
+    model_version = models.ForeignKey(
+        "model_registry.ModelVersion",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="threshold_policies",
+        help_text="Model version to which this policy applies (null for global baseline).",
+    )
+    low_threshold = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        default=0.2500,
+        help_text="Upper probability threshold for LOW risk tier (0.0000 - 1.0000).",
+    )
+    medium_threshold = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        default=0.5000,
+        help_text="Upper probability threshold for MEDIUM risk tier (0.0000 - 1.0000).",
+    )
+    high_threshold = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        default=0.7500,
+        help_text="Upper probability threshold for HIGH risk tier (0.0000 - 1.0000).",
+    )
+    effective_date = models.DateTimeField(default=timezone.now, db_index=True)
+    approval_status = models.CharField(max_length=30, default="APPROVED", db_index=True)
+    author = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="authored_policies",
+        help_text="Medical informaticist or clinical lead who authored the policy.",
+    )
+    clinical_rationale = models.TextField(
+        blank=True,
+        help_text="Clinical justification and validation evidence for threshold configuration.",
+    )
+    is_active = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        db_table = "risk_threshold_policies"
+        verbose_name = "Risk Threshold Policy"
+        verbose_name_plural = "Risk Threshold Policies"
+        ordering = ["-effective_date"]
+
+    def __str__(self) -> str:
+        return f"Policy {self.policy_version} [Low<{self.low_threshold}, Med<{self.medium_threshold}, High<{self.high_threshold}]"
+
+    def classify_probability(self, probability: float) -> str:
+        """Categorize continuous probability into discrete risk level based on configured policy thresholds."""
+        p = float(probability)
+        if p < float(self.low_threshold):
+            return RiskLevel.LOW
+        if p < float(self.medium_threshold):
+            return RiskLevel.MEDIUM
+        if p < float(self.high_threshold):
+            return RiskLevel.HIGH
+        return RiskLevel.CRITICAL
+
 

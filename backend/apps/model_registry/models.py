@@ -366,3 +366,88 @@ class DataQualityReport(BaseModel):
     class Meta:
         db_table = "data_quality_reports"
         ordering = ["-created_at"]
+
+
+class DriftStatus(models.TextChoices):
+    NORMAL = "NORMAL", "Normal (No Drift)"
+    WARNING = "WARNING", "Warning (Moderate Distribution Shift)"
+    CRITICAL = "CRITICAL", "Critical (Significant Drift Detected)"
+
+
+class DriftReport(BaseModel):
+    """
+    Periodic feature, prediction, and calibration drift evaluations.
+    """
+    model_version = models.ForeignKey(
+        ModelVersion,
+        on_delete=models.CASCADE,
+        related_name="drift_reports",
+    )
+    evaluation_timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+    status = models.CharField(
+        max_length=20,
+        choices=DriftStatus.choices,
+        default=DriftStatus.NORMAL,
+        db_index=True,
+    )
+    feature_drift_scores = models.JSONField(
+        default=dict,
+        help_text="Feature-level PSI and KS-test statistics.",
+    )
+    prediction_drift_score = models.DecimalField(
+        max_digits=6,
+        decimal_places=4,
+        default=0.0,
+    )
+    features_drifted = models.JSONField(
+        default=list,
+        help_text="List of feature names that exceeded drift thresholds.",
+    )
+    summary = models.TextField(blank=True)
+    evaluated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="conducted_drift_reports",
+    )
+
+    class Meta:
+        db_table = "model_drift_reports"
+        ordering = ["-evaluation_timestamp"]
+
+
+class FairnessEvaluation(BaseModel):
+    """
+    Audited fairness and subgroup parity evaluations across patient cohorts.
+    """
+    model_version = models.ForeignKey(
+        ModelVersion,
+        on_delete=models.CASCADE,
+        related_name="fairness_evaluations",
+    )
+    subgroup_field = models.CharField(max_length=50, default="gender", db_index=True)
+    subgroup_metrics = models.JSONField(
+        default=dict,
+        help_text="Per-subgroup accuracy, sensitivity, specificity, FPR, FNR, sample_size.",
+    )
+    disparate_impact_ratio = models.DecimalField(
+        max_digits=5,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
+    sample_size_warnings = models.JSONField(default=list)
+    evaluated_at = models.DateTimeField(default=timezone.now, db_index=True)
+    evaluated_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="conducted_fairness_evaluations",
+    )
+
+    class Meta:
+        db_table = "model_fairness_evaluations"
+        ordering = ["-evaluated_at"]
+
