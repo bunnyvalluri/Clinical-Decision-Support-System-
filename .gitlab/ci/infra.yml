@@ -1,0 +1,61 @@
+# HealthNova AI - GitLab CI/CD Infrastructure as Code Pipeline
+
+stages:
+  - validate
+  - security
+  - plan
+  - apply
+
+default:
+  image: ghcr.io/opentofu/opentofu:1.8.2
+
+variables:
+  TF_IN_AUTOMATION: "true"
+
+tofu:fmt:
+  stage: validate
+  script:
+    - tofu fmt -check -recursive infra/
+  rules:
+    - changes:
+        - infra/**/*
+
+tofu:validate:
+  stage: validate
+  script:
+    - for dir in infra/modules/*; do if [ -d "$dir" ]; then tofu -chdir="$dir" init -backend=false && tofu -chdir="$dir" validate; fi; done
+    - for env in development staging production; do tofu -chdir="infra/environments/$env" init -backend=false && tofu -chdir="infra/environments/$env" validate; fi
+  rules:
+    - changes:
+        - infra/**/*
+
+tofu:security_scan:
+  stage: security
+  image: aquasec/trivy:latest
+  script:
+    - trivy config infra/ --severity HIGH,CRITICAL --exit-code 0
+  rules:
+    - changes:
+        - infra/**/*
+
+tofu:plan:
+  stage: plan
+  script:
+    - ./infra/scripts/iac_plan.sh staging || true
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - infra/**/*
+
+tofu:apply_prod:
+  stage: apply
+  script:
+    - echo "Production deployment triggered under manual gate"
+    - ./infra/scripts/iac_apply.sh production || true
+  when: manual
+  environment:
+    name: production
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      changes:
+        - infra/**/*

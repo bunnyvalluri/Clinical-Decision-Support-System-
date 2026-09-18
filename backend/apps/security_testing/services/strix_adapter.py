@@ -358,7 +358,7 @@ class StrixSecurityAdapter(SecurityScannerInterface):
             k: v for k, v in os.environ.items()
             if k not in BLOCKED_ENV_KEYS and "SECRET" not in k.upper() and "KEY" not in k.upper() and "PASSWORD" not in k.upper()
         }
-        safe_env["STRIX_WORKSPACE"] = self.workspace or "/tmp"
+        safe_env["STRIX_WORKSPACE"] = self.workspace or tempfile.gettempdir()
         return safe_env
 
     def _emit_audit(self, scan: SecurityScan, event_type: str, details: Dict) -> None:

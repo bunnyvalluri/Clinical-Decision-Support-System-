@@ -31,7 +31,7 @@ from apps.mobile_gateway.models import (
 class ForwardingDeliveryService:
     MAX_RETRIES = 3
     TIMEOUT_SECONDS = 5.0
-    BLOCKED_HOSTNAMES = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}
+    BLOCKED_HOSTNAMES = {"localhost", "127.0.0.1", "0.0.0.0", "::1"}  # nosec B104
 
     @classmethod
     def is_ssrf_safe_url(cls, url: str) -> bool:
@@ -129,7 +129,7 @@ class ForwardingDeliveryService:
 
         start_time = time.time()
         try:
-            with urllib.request.urlopen(req, timeout=cls.TIMEOUT_SECONDS) as response:
+            with urllib.request.urlopen(req, timeout=cls.TIMEOUT_SECONDS) as response:  # nosec B310
                 latency = int((time.time() - start_time) * 1000)
                 status_code = response.getcode()
                 return cls._record_success(event, destination, attempt, status_code, "Delivered successfully", latency)

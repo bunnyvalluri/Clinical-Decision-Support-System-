@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HeartPulse, Lock, ExternalLink, ShieldCheck } from "lucide-react";
+import { HeartPulse, Lock, ShieldCheck } from "lucide-react";
 import { BRAND_CONFIG } from "@/config/brand";
 
 export function PublicFooter() {
@@ -36,22 +36,13 @@ export function PublicFooter() {
               Real-time machine learning risk prediction and TreeSHAP explainability engineered to assist hospital cardiologists, triage nurses, and multidisciplinary care teams.
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              <a
-                href="https://github.com/bunnyvalluri/Clinical-Decision-Support-System-"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="View Source Code on GitHub"
-                className="h-9 px-3 rounded-xl bg-white border border-slate-200 flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-teal-700 hover:border-teal-300 transition-colors shadow-xs"
-              >
-                <ExternalLink className="h-3.5 w-3.5 text-slate-500" />
-                <span>GitHub Repository</span>
-              </a>
               <div className="h-9 px-3 rounded-xl bg-white border border-slate-200 flex items-center gap-2 text-[11px] font-mono font-medium text-emerald-700 shadow-xs">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Authoritative Neon DB Live</span>
               </div>
             </div>
           </div>
+
 
           {/* Product Column */}
           <div className="space-y-4">

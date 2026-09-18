@@ -81,6 +81,12 @@ class DeploymentRecord(models.Model):
         blank=True,
     )
     commit_sha = models.CharField(max_length=40, blank=True, default="")
+    image_digest = models.CharField(max_length=255, blank=True, default="")
+    frontend_version = models.CharField(max_length=50, blank=True, default="")
+    backend_version = models.CharField(max_length=50, blank=True, default="")
+    model_version = models.CharField(max_length=50, blank=True, default="")
+    dataset_version = models.CharField(max_length=50, blank=True, default="")
+    metadata = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.QUEUED)
     started_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
@@ -102,3 +108,33 @@ class DeploymentRecord(models.Model):
 
     def __str__(self):
         return f"Deployment {self.coolify_deployment_id} ({self.status}) - {self.environment}"
+
+
+# Re-export Disaster Recovery and Backup Models
+from .recovery_models import (  # noqa: E402
+    RecoveryTargetConfig,
+    BackupRecord,
+    DisasterRecoveryDrill,
+    RollbackRecord,
+)
+
+# Re-export Platform Governance & IaC Models
+from .governance_models import (  # noqa: E402
+    IaCPlanRecord,
+    InfrastructureDriftRecord,
+    InfrastructurePolicyCheck,
+)
+
+__all__ = [
+    "InfrastructureServer",
+    "DeploymentApplication",
+    "DeploymentRecord",
+    "RecoveryTargetConfig",
+    "BackupRecord",
+    "DisasterRecoveryDrill",
+    "RollbackRecord",
+    "IaCPlanRecord",
+    "InfrastructureDriftRecord",
+    "InfrastructurePolicyCheck",
+]
+

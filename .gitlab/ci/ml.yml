@@ -1,0 +1,74 @@
+# =============================================================================
+# HealthNova AI — GitLab CI: Machine Learning & Kaggle Pipeline
+# =============================================================================
+
+.ml_base:
+  image: python:3.11-slim
+  variables:
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    DJANGO_SETTINGS_MODULE: "config.settings.development"
+    DATABASE_URL: "postgres://postgres:postgres@postgres:5432/test_db"
+    REDIS_URL: "redis://redis:6379/0"
+    KAGGLE_USERNAME: "ci_mock_user"
+    KAGGLE_KEY: "ci_mock_key"
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends libpq-dev build-essential curl && rm -rf /var/lib/apt/lists/*
+    - cd backend
+    - python -m pip install --upgrade pip setuptools wheel
+    - pip install -r requirements.txt
+  cache:
+    key:
+      files:
+        - backend/requirements.txt
+    paths:
+      - .cache/pip
+    policy: pull
+
+# Fast CI ML Validation (Every commit / MR)
+ml:unit-validation:
+  stage: ml-validation
+  extends: .ml_base
+  services:
+    - name: postgres:15
+      alias: postgres
+      variables:
+        POSTGRES_DB: test_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+  script:
+    - python -c "import socket, time; [time.sleep(1) for _ in range(30) if not socket.socket().connect_ex(('postgres', 5432)) == 0]"
+    - python manage.py migrate --noinput
+    - pytest tests/ml/ -v --junitxml=ml-report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: backend/ml-report.xml
+    expire_in: 14 days
+  rules:
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
+
+# Scheduled Full ML & Kaggle Benchmarking Pipeline (Off peak hours / Scheduled triggers only)
+ml:kaggle-scheduled-pipeline:
+  stage: ml-validation
+  extends: .ml_base
+  services:
+    - name: postgres:15
+      alias: postgres
+      variables:
+        POSTGRES_DB: test_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+    - name: redis:7
+      alias: redis
+  script:
+    - echo "==> Running Enterprise Kaggle Discovery, Ingestion & Model Registry Benchmark..."
+    - python -c "import socket, time; [time.sleep(1) for _ in range(30) if not socket.socket().connect_ex(('postgres', 5432)) == 0]"
+    - python manage.py migrate --noinput
+    - pytest tests/test_kaggle_integration.py tests/test_model_registry.py tests/test_explainable_ml.py -v
+  artifacts:
+    paths:
+      - ml/artifacts/experiments/
+    expire_in: 30 days
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'

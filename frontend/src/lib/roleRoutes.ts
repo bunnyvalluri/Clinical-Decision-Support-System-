@@ -155,6 +155,8 @@ export const ROLE_ROUTE_REGISTRY: Record<RoleCategory, string[]> = {
     "/admin/services",
     "/admin/services/:service",
     "/admin/health",
+    "/admin/monitoring",
+    "/admin/incidents",
     "/admin/database",
     "/admin/redis",
     "/admin/celery",

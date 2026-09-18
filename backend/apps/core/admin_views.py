@@ -58,6 +58,15 @@ def admin_health_overview_view(request: Request) -> Response:
     elif db_status == "DEGRADED" or cache_status == "DEGRADED":
         overall = "DEGRADED"
 
+    from integrations.observability import MetricsService, HealthCheckService
+    m_svc = MetricsService()
+    metrics_snapshot = m_svc.get_metrics_snapshot()
+    fe_check = HealthCheckService().check_frontend()
+
+    django_latency = metrics_snapshot["http"]["avg_latency_ms"]
+    fe_latency = fe_check.get("latency_ms", 0.0)
+    fe_status = fe_check.get("status", "UNKNOWN")
+
     services = [
         {
             "name": "Neon PostgreSQL 16",
@@ -79,23 +88,23 @@ def admin_health_overview_view(request: Request) -> Response:
             "name": "Django 5.0 + Daphne ASGI",
             "type": "REST API & WebSocket Server",
             "status": "HEALTHY",
-            "latency_ms": 0.45,
+            "latency_ms": django_latency,
             "endpoint": "http://localhost:8000 (ws://...)",
             "ssl": "Standard HTTP/WS",
         },
         {
             "name": "Celery Worker 5.4.0",
             "type": "Distributed Asynchronous Queue",
-            "status": "HEALTHY",
-            "latency_ms": 1.20,
+            "status": "HEALTHY" if cache_status == "HEALTHY" else "DEGRADED",
+            "latency_ms": cache_latency_ms,
             "endpoint": "Pool: Solo (Async Engine)",
             "ssl": "Broker TLS",
         },
         {
             "name": "Next.js 16 + Turbopack",
             "type": "Frontend Clinical Portal",
-            "status": "HEALTHY",
-            "latency_ms": 1.80,
+            "status": fe_status,
+            "latency_ms": fe_latency,
             "endpoint": "http://localhost:3000",
             "ssl": "Localhost Dev",
         },
@@ -206,24 +215,38 @@ def admin_assign_user_role_view(request: Request, pk: str) -> Response:
 @permission_classes([IsITAdmin])
 def admin_celery_status_view(request: Request) -> Response:
     """Celery background worker queue depth and task execution telemetry."""
+    from integrations.observability import MetricsService
+    celery_stats = MetricsService().get_metrics_snapshot().get("celery", {})
+
+    recent_tasks = []
+    try:
+        from django_celery_results.models import TaskResult
+        for tr in TaskResult.objects.order_by("-date_done")[:10]:
+            recent_tasks.append({
+                "task_id": tr.task_id,
+                "task_name": tr.task_name or "unknown_task",
+                "status": tr.status,
+                "runtime": f"{round(tr.meta.get('runtime', 0), 2)}s" if isinstance(tr.meta, dict) and "runtime" in tr.meta else "N/A",
+                "timestamp": tr.date_done.isoformat() if tr.date_done else None,
+            })
+    except Exception:
+        # If database backend not populated yet, maintain real empty state
+        recent_tasks = []
+
     return Response({
         "success": True,
         "data": {
-            "worker_status": "ONLINE (Solo pool)",
-            "broker": "Upstash Redis TLS",
+            "worker_status": "ONLINE (Celery Distributed)",
+            "broker": "Redis TLS Layer",
             "active_tasks_count": 0,
-            "processed_tasks_count": 48,
-            "failed_tasks_count": 0,
+            "processed_tasks_count": celery_stats.get("tasks_completed", 0),
+            "failed_tasks_count": celery_stats.get("tasks_failed", 0),
             "queues": [
                 {"name": "celery", "depth": 0, "routing_key": "default"},
                 {"name": "ml_tasks", "depth": 0, "routing_key": "ml.evaluation"},
                 {"name": "reports", "depth": 0, "routing_key": "reports.pdf"},
             ],
-            "recent_tasks": [
-                {"task_name": "compile_clinical_pdf", "status": "SUCCESS", "runtime": "0.42s", "timestamp": "10 min ago"},
-                {"task_name": "evaluate_model_drift", "status": "SUCCESS", "runtime": "1.15s", "timestamp": "30 min ago"},
-                {"task_name": "prune_stale_tokens", "status": "SUCCESS", "runtime": "0.08s", "timestamp": "1 hour ago"},
-            ],
+            "recent_tasks": recent_tasks,
         },
     })
 

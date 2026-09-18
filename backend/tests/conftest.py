@@ -4,11 +4,30 @@ Shared pytest fixtures for the test suite.
 Fixtures here are available to all tests without explicit import.
 Domain-specific fixtures live in their respective test module conftest.py files.
 """
+import random
+import numpy as np
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 
 User = get_user_model()
+
+
+@pytest.fixture(autouse=True)
+def set_deterministic_seed():
+    """Ensure tests run with deterministic random seeds to eliminate flakiness."""
+    random.seed(42)
+    np.random.seed(42)
+
+
+@pytest.fixture(autouse=True)
+def mock_external_services(monkeypatch):
+    """Ensure tests run hermetically without external network dependencies."""
+    # Ensure offline mode for Kaggle client so it always uses deterministic curated benchmarks
+    from integrations.kaggle.client import KaggleClient
+    monkeypatch.setattr(KaggleClient, "_get_api", lambda self: None)
+    monkeypatch.setenv("FIRECRAWL_API_KEY", "ci_test_firecrawl_key")
+
 
 
 @pytest.fixture

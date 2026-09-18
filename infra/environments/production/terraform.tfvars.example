@@ -1,0 +1,5 @@
+aws_region         = "us-east-1"
+vpc_cidr           = "10.0.0.0/16"
+instance_type      = "c6i.2xlarge"
+key_name           = "healthnova-prod-key"
+admin_cidr_blocks  = ["198.51.100.0/24"] # Replace with hospital/corporate VPN gateway only

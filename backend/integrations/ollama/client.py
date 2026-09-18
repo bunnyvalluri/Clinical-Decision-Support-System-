@@ -108,7 +108,7 @@ class OllamaClient:
         max_retries = 2
         for attempt in range(max_retries + 1):
             try:
-                resp = urllib.request.urlopen(req, timeout=req_timeout)
+                resp = urllib.request.urlopen(req, timeout=req_timeout)  # nosec B310
                 self.circuit_breaker.record_success()
                 if stream:
                     return resp

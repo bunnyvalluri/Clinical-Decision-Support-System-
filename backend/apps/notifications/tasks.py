@@ -106,7 +106,7 @@ def send_email_notification_task(
     logger.info("send_email_notification_task triggered for: %s | Subject: %s", recipient_email, subject)
 
     # Email deduplication lock
-    subject_hash = hashlib.md5(f"{recipient_email}:{subject}".encode()).hexdigest()
+    subject_hash = hashlib.md5(f"{recipient_email}:{subject}".encode(), usedforsecurity=False).hexdigest()
     lock_key = f"email_dedup:{subject_hash}"
     if not self.acquire_idempotency_lock(lock_key, ttl_seconds=300):
         logger.info("Duplicate email suppressed within 5m window for %s: %s", recipient_email, subject)

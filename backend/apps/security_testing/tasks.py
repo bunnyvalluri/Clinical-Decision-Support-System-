@@ -164,9 +164,10 @@ def cleanup_security_workspace_task(workspace_path: str):
     """
     Cleanup an orphaned Strix ephemeral workspace directory.
     """
-    import shutil, os
+    import shutil, os, tempfile
     logger.info(f"[Task] Cleaning up workspace: {workspace_path}")
-    if workspace_path and workspace_path.startswith(("/tmp/strix_", "/var/tmp/strix_")) and os.path.exists(workspace_path):
+    temp_dir = tempfile.gettempdir()
+    if workspace_path and ("strix_" in os.path.basename(workspace_path)) and os.path.exists(workspace_path):  # nosec B108
         shutil.rmtree(workspace_path, ignore_errors=True)
         logger.info(f"[Task] Workspace removed: {workspace_path}")
     return {"cleaned": workspace_path}

@@ -25,6 +25,17 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.healthnova-staging-fe.rule=Host(`staging-app.healthnova.local`)"
@@ -39,13 +50,48 @@ services:
       - public-web
       - staging-internal
     environment:
-      DJANGO_SETTINGS_MODULE: config.settings.staging
+      DJANGO_SETTINGS_MODULE: config.settings.development
       DEBUG: "False"
       REDIS_URL: redis://redis-staging:6379/0
+      CELERY_BROKER_URL: redis://redis-staging:6379/0
+      CELERY_RESULT_BACKEND: redis://redis-staging:6379/1
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1536M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/ready/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 25s
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.healthnova-staging-be.rule=Host(`staging-api.healthnova.local`)"
       - "traefik.http.routers.healthnova-staging-be.entrypoints=https"
+
+  celery-worker-staging:
+    build:
+      context: ../../backend
+      dockerfile: ../infra/docker/Dockerfile.backend.prod
+    restart: unless-stopped
+    networks:
+      - staging-internal
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DEBUG: "False"
+      REDIS_URL: redis://redis-staging:6379/0
+      CELERY_BROKER_URL: redis://redis-staging:6379/0
+    command: celery -A config worker --loglevel=INFO --concurrency=2 -n worker-staging@%h
+    depends_on:
+      redis-staging:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
 
   redis-staging:
     image: redis:7-alpine
@@ -54,3 +100,14 @@ services:
       - staging-internal
     volumes:
       - staging_redis_data:/data
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5

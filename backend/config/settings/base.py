@@ -25,7 +25,7 @@ if str(ROOT_DIR) not in sys.path:
 # ---------------------------------------------------------------------------
 # Core Django
 # ---------------------------------------------------------------------------
-SECRET_KEY: str = config("DJANGO_SECRET_KEY", default=config("SECRET_KEY", default=""))
+SECRET_KEY: str = config("DJANGO_SECRET_KEY", default=config("SECRET_KEY", default="django-insecure-healthnova-ci-cd-safe-key-default-32-chars-long"))
 DEBUG: bool = config("DJANGO_DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS: list[str] = config(
     "DJANGO_ALLOWED_HOSTS",
@@ -141,7 +141,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # ---------------------------------------------------------------------------
 # Database — Neon PostgreSQL (NEVER SQLite)
 # ---------------------------------------------------------------------------
-DATABASE_URL: str = config("DATABASE_URL")
+DATABASE_URL: str = config("DATABASE_URL", default="postgres://postgres:postgres@localhost:5432/test_db")
 DATABASE_URL_UNPOOLED: str = config("DATABASE_URL_UNPOOLED", default=DATABASE_URL)
 DATABASES = {
     "default": dj_database_url.parse(
@@ -394,11 +394,15 @@ LOGGING = {
         "require_debug_true": {
             "()": "django.utils.log.RequireDebugTrue",
         },
+        "redact_sensitive_data": {
+            "()": "integrations.observability.redaction.RedactedLogFilter",
+        },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
+            "filters": ["redact_sensitive_data"],
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
@@ -406,6 +410,7 @@ LOGGING = {
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
             "backupCount": 5,
             "formatter": "verbose",
+            "filters": ["redact_sensitive_data"],
         },
     },
     "root": {

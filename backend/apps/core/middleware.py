@@ -26,25 +26,51 @@ class AuditLogMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
+        from integrations.observability import CorrelationContext, MetricsService
+
+        inbound_req_id = request.META.get("HTTP_X_REQUEST_ID")
+        inbound_corr_id = request.META.get("HTTP_X_CORRELATION_ID")
+        user = getattr(request, "user", None)
+        user_id = str(getattr(user, "id", "")) if getattr(user, "is_authenticated", False) else None
+
+        req_id, corr_id = CorrelationContext.set_request_context(
+            request_id=inbound_req_id,
+            correlation_id=inbound_corr_id,
+            user_id=user_id,
+        )
+
         start = time.monotonic()
-        response = self.get_response(request)
-        elapsed_ms = int((time.monotonic() - start) * 1000)
+        try:
+            response = self.get_response(request)
+        finally:
+            elapsed_ms = round((time.monotonic() - start) * 1000, 2)
+
+        # Inject tracing headers into response
+        response["X-Request-ID"] = req_id
+        response["X-Correlation-ID"] = corr_id
 
         # Only log API requests
         if request.path.startswith("/api/"):
-            user = getattr(request, "user", None)
             from apps.core.metrics import metrics
             metrics.record_request(elapsed_ms, response.status_code)
+            MetricsService().record_http_request(
+                method=request.method,
+                path=request.path,
+                status_code=response.status_code,
+                duration_ms=elapsed_ms,
+            )
 
             logger.info(
-                "API %s %s -> %d [%dms] user=%s ip=%s",
+                "API %s %s -> %d [%sms] user=%s ip=%s [corr=%s]",
                 request.method,
                 request.path,
                 response.status_code,
                 elapsed_ms,
                 getattr(user, "id", "anonymous"),
                 _get_client_ip(request),
+                corr_id,
             )
+        CorrelationContext.clear()
         return response
 
 

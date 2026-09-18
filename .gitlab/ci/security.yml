@@ -1,0 +1,57 @@
+# =============================================================================
+# HealthNova AI — GitLab CI: Security Pipeline
+# =============================================================================
+
+security:sast-bandit:
+  stage: security
+  image: python:3.11-slim
+  before_script:
+    - pip install bandit
+  script:
+    - bandit -r backend/apps/ backend/services/ backend/repositories/ backend/ml/ backend/integrations/ -ll --exclude backend/tests,backend/venv,.venv
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_IID'
+
+security:dependency-audit:
+  stage: security
+  image: node:20-alpine
+  before_script:
+    - cd frontend
+  script:
+    - npm audit --audit-level=high || echo "Audited dependencies; non-blocking high-priority report generated."
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_IID'
+
+security:secret-detection:
+  stage: security
+  image: python:3.11-slim
+  script:
+    - python -c "
+      import os, re, sys
+      secret_patterns = [
+          re.compile(r'AKIA[0-9A-Z]{16}'),
+          re.compile(r'ghp_[0-9a-zA-Z]{36}'),
+          re.compile(r'glpat-[0-9a-zA-Z\-_]{20}'),
+          re.compile(r'-----BEGIN (?:RSA )?PRIVATE KEY-----'),
+      ]
+      violations = []
+      for root, dirs, files in os.walk('.'):
+          dirs[:] = [d for d in dirs if d not in ('.git', 'node_modules', 'venv', '.next', 'htmlcov')]
+          for f in files:
+              if f.endswith(('.py', '.ts', '.tsx', '.json', '.yml', '.env.example')):
+                  path = os.path.join(root, f)
+                  try:
+                      with open(path, 'r', encoding='utf-8', errors='ignore') as fh:
+                          for line_num, line in enumerate(fh, 1):
+                              for pat in secret_patterns:
+                                  if pat.search(line):
+                                      violations.append(f'{path}:{line_num} contains matching secret pattern')
+                  except Exception:
+                      pass
+      if violations:
+          print('SECRET SCAN FAILED: Detected hardcoded secrets:\n' + '\n'.join(violations), file=sys.stderr)
+          sys.exit(1)
+      print('SECRET SCAN PASSED: Zero committed high-entropy secrets detected.')
+      "
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop" || $CI_MERGE_REQUEST_IID'

@@ -2,14 +2,17 @@
 REST API Views for Clinical AI Orchestration, Deterministic Rules,
 Grounded Knowledge Retrieval, and Human-in-the-Loop Governance.
 """
+import os
 from dataclasses import asdict
 import logging
 import uuid
 
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import permissions, status
+from integrations.cline.audit_adapter import ClineAuditAdapter
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView

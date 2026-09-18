@@ -35,7 +35,7 @@ RUN mkdir -p /app/logs /app/staticfiles /app/media && \
 USER appuser
 
 # Collect static files
-RUN python manage.py collectstatic --noinput --settings=config.settings.production || true
+RUN DJANGO_SECRET_KEY=build-static-dummy-key python manage.py collectstatic --noinput
 
 EXPOSE 8000
 

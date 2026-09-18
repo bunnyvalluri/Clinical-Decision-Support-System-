@@ -85,3 +85,18 @@ bruno/**/.env*
 reports/bruno/
 *.bru.bak
 
+# Infrastructure as Code (OpenTofu / Terraform)
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform/
+.tofu/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+

@@ -11,6 +11,14 @@ from apps.core.admin_views import (
     admin_toggle_user_active_view,
     admin_users_list_view,
 )
+from apps.core.observability_views import (
+    ObservabilityAlertsView,
+    ObservabilityHealthView,
+    ObservabilityIncidentsView,
+    ObservabilityIncidentTransitionView,
+    ObservabilityMetricsView,
+    ObservabilityOverviewView,
+)
 from apps.core.task_views import TaskStatusView
 from apps.core.views import (
     CeleryHealthView,
@@ -31,6 +39,13 @@ urlpatterns = [
     path("health/redis/", RedisHealthView.as_view(), name="health_redis"),
     path("health/celery/", CeleryHealthView.as_view(), name="health_celery"),
     path("tasks/<str:task_id>/", TaskStatusView.as_view(), name="task_status"),
+    # Observability & Reliability Platform Endpoints
+    path("observability/overview/", ObservabilityOverviewView.as_view(), name="observability_overview"),
+    path("observability/health/", ObservabilityHealthView.as_view(), name="observability_health"),
+    path("observability/metrics/", ObservabilityMetricsView.as_view(), name="observability_metrics"),
+    path("observability/alerts/", ObservabilityAlertsView.as_view(), name="observability_alerts"),
+    path("observability/incidents/", ObservabilityIncidentsView.as_view(), name="observability_incidents"),
+    path("observability/incidents/<str:incident_id>/", ObservabilityIncidentTransitionView.as_view(), name="observability_incident_transition"),
     # IT System Administrator endpoints
     path("admin/health/", admin_health_overview_view, name="admin_health_overview"),
     path("admin/users/", admin_users_list_view, name="admin_users_list"),

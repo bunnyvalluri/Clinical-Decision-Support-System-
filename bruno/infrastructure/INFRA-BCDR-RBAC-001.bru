@@ -1,0 +1,32 @@
+meta {
+  name: INFRA-BCDR-RBAC-001
+  type: http
+  seq: 5
+}
+
+# Doctor attempting to trigger backup or rollback must receive 403 Forbidden
+post {
+  url: {{base_url}}/api/v1/infrastructure/backup/
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{doctor_access_token}}
+}
+
+body:json {
+  {
+    "backup_type": "DATABASE_LOGICAL",
+    "storage_destination": "AWS_S3_KMS"
+  }
+}
+
+assert {
+  res.status: in [401, 403]
+}

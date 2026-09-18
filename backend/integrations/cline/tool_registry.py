@@ -4,6 +4,7 @@ Maintains declarative schemas, risk levels, and handlers under default-deny.
 """
 from dataclasses import dataclass, field
 import logging
+import os
 from typing import Any, Callable, Dict, List, Optional
 from .sandboxes import SandboxedExecutionEngine, ClinicalQueryTool, CoolifyDeploymentTool
 

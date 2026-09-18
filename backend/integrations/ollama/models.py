@@ -117,7 +117,7 @@ class OllamaModelService:
                     "context_length": context_len,
                     "capabilities": capabilities,
                     "license": license_id,
-                    "status": LLMModelRegistry.Status.DISCOVERED if created else LLMModelRegistry.Status.APPROVED,
+                    "status": LLMModelRegistry.Status.DISCOVERED,
                     "approved_roles": allowed_roles,
                     "data_classification": "RESTRICTED_PHI",
                     "parameters_summary": {

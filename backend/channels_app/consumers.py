@@ -12,6 +12,7 @@ Close codes:
   4003: Unauthorized / Forbidden (role cannot join this group)
   4004: Resource Not Found (e.g. invalid patient UUID)
 """
+from datetime import datetime, timezone
 import json
 import logging
 from typing import Any
@@ -23,6 +24,11 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels_app.events import HeartbeatPongEvent
 
 logger = logging.getLogger(__name__)
+
+
+def _utc_now_iso() -> str:
+    """Return current UTC timestamp in ISO 8601 format."""
+    return datetime.now(timezone.utc).isoformat()
 
 
 class BaseConsumer(AsyncWebsocketConsumer):

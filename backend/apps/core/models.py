@@ -117,6 +117,21 @@ class AuditLog(models.Model):
         EXPORT = "EXPORT", "Export"
         TRAIN = "TRAIN", "Train Model"
 
+        # BCDR Audit Actions (Prompt 61)
+        BACKUP_CREATED = "backup.created", "Backup Created"
+        BACKUP_VALIDATED = "backup.validated", "Backup Validated"
+        BACKUP_FAILED = "backup.failed", "Backup Failed"
+        RESTORE_STARTED = "restore.started", "Restore Started"
+        RESTORE_COMPLETED = "restore.completed", "Restore Completed"
+        RESTORE_FAILED = "restore.failed", "Restore Failed"
+        ROLLBACK_STARTED = "rollback.started", "Rollback Started"
+        ROLLBACK_COMPLETED = "rollback.completed", "Rollback Completed"
+        ROLLBACK_FAILED = "rollback.failed", "Rollback Failed"
+        RECOVERY_STARTED = "recovery.started", "Recovery Started"
+        RECOVERY_COMPLETED = "recovery.completed", "Recovery Completed"
+        SECRET_ROTATED = "secret.rotated", "Secret Rotated"
+        CONFIG_UPDATED = "config.updated", "Configuration Updated"
+
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(
         "accounts.User",
@@ -127,7 +142,7 @@ class AuditLog(models.Model):
         db_index=True,
     )
     action = models.CharField(
-        max_length=20,
+        max_length=50,
         choices=Action.choices,
         db_index=True,
     )

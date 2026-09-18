@@ -1,0 +1,2 @@
+# Requirements entrypoint for CI and local development
+-r requirements/development.txt

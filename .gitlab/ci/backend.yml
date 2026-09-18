@@ -1,0 +1,113 @@
+# =============================================================================
+# HealthNova AI — GitLab CI: Backend Pipeline
+# =============================================================================
+
+.backend_base:
+  image: python:3.11-slim
+  variables:
+    PYTHONUNBUFFERED: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PIP_NO_CACHE_DIR: "0"
+    DATABASE_URL: "postgres://postgres:postgres@postgres:5432/test_db"
+    REDIS_URL: "redis://redis:6379/0"
+    CELERY_BROKER_URL: "redis://redis:6379/0"
+    CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+    DJANGO_SETTINGS_MODULE: "config.settings.development"
+    DJANGO_SECRET_KEY: "gitlab-ci-deterministic-key-safe-default-32-chars"
+    KAGGLE_USERNAME: "ci_mock_user"
+    KAGGLE_KEY: "ci_mock_key"
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends libpq-dev build-essential curl netcat-traditional && rm -rf /var/lib/apt/lists/*
+    - cd backend
+    - python -m pip install --upgrade pip setuptools wheel
+    - pip install -r requirements.txt
+  cache:
+    key:
+      files:
+        - backend/requirements.txt
+        - backend/requirements/base.txt
+        - backend/requirements/development.txt
+    paths:
+      - .cache/pip
+    policy: pull
+
+backend:install:
+  stage: install
+  extends: .backend_base
+  cache:
+    key:
+      files:
+        - backend/requirements.txt
+        - backend/requirements/base.txt
+        - backend/requirements/development.txt
+    paths:
+      - .cache/pip
+    policy: pull-push
+  script:
+    - pip install -r requirements.txt
+    - pip install flake8 bandit
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab/ci/backend.yml
+        - .gitlab-ci.yml
+
+backend:lint:
+  stage: lint
+  extends: .backend_base
+  script:
+    - flake8 .
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab/ci/backend.yml
+        - .gitlab-ci.yml
+
+backend:validate:
+  stage: validate
+  extends: .backend_base
+  services:
+    - name: postgres:15
+      alias: postgres
+      variables:
+        POSTGRES_DB: test_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+    - name: redis:7
+      alias: redis
+  script:
+    - python -c "import socket, time, sys; [time.sleep(1) for _ in range(30) if not socket.socket().connect_ex(('postgres', 5432)) == 0]"
+    - python manage.py check
+    - python manage.py migrate --noinput
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab/ci/backend.yml
+        - .gitlab-ci.yml
+
+backend:test:
+  stage: test
+  extends: .backend_base
+  services:
+    - name: postgres:15
+      alias: postgres
+      variables:
+        POSTGRES_DB: test_db
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+    - name: redis:7
+      alias: redis
+  script:
+    - python -c "import socket, time, sys; [time.sleep(1) for _ in range(30) if not socket.socket().connect_ex(('postgres', 5432)) == 0]"
+    - python manage.py migrate --noinput
+    - pytest tests/test_auth.py tests/test_brand.py tests/test_health.py tests/test_external_apis_security.py tests/test_kaggle_integration.py tests/test_ai_orchestrator.py -v --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: backend/report.xml
+    expire_in: 14 days
+  rules:
+    - changes:
+        - backend/**/*
+        - .gitlab/ci/backend.yml
+        - .gitlab-ci.yml

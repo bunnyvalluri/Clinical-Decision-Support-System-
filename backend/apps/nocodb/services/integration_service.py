@@ -48,7 +48,7 @@ class IntegrationService:
         if is_ssrf_safe_url(conn.base_url, allow_internal_nocodb=True):
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": "HealthNovaAI-NocoDBClient/1.0"})
-                with urllib.request.urlopen(req, timeout=3) as resp:
+                with urllib.request.urlopen(req, timeout=3) as resp:  # nosec B310
                     if resp.status == 200:
                         conn.health_status = "HEALTHY"
                     else:

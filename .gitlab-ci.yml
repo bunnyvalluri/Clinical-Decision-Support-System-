@@ -1,0 +1,44 @@
+# =============================================================================
+# HealthNova AI — Enterprise GitLab CI/CD Orchestration Pipeline
+# =============================================================================
+# Architecture: Dual-pipeline model complementing GitHub Actions.
+# Portability: Fully mirrorable between GitHub and GitLab repositories.
+# Authoritative Source of Truth: Neon PostgreSQL (NEVER modified by CI/CD tests).
+# =============================================================================
+
+stages:
+  - validate
+  - install
+  - lint
+  - typecheck
+  - test
+  - ml-validation
+  - security
+  - build
+  - docker
+  - deploy
+  - verify
+
+variables:
+  GIT_DEPTH: "20"
+  DOCKER_DRIVER: "overlay2"
+  NODE_VERSION: "20"
+  PYTHON_VERSION: "3.11"
+  CI_DISPOSABLE_DB: "test_db"
+  CI_DISPOSABLE_USER: "postgres"
+  CI_DISPOSABLE_PASS: "postgres"
+
+default:
+  retry:
+    max: 1
+    when:
+      - runner_system_failure
+      - api_failure
+
+include:
+  - local: .gitlab/ci/frontend.yml
+  - local: .gitlab/ci/backend.yml
+  - local: .gitlab/ci/ml.yml
+  - local: .gitlab/ci/security.yml
+  - local: .gitlab/ci/docker.yml
+  - local: .gitlab/ci/deploy.yml
