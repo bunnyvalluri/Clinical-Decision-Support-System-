@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Layers, ChevronRight } from "lucide-react";
+import { Layers, ChevronRight, RotateCcw } from "lucide-react";
 import { BlogCategory } from "../types/blogTypes";
 
 interface BrowseByTopicProps {
@@ -53,21 +53,27 @@ export function BrowseByTopic({
                   key={cat.id}
                   type="button"
                   onClick={() => onSelectCategory(cat.slug)}
-                  className={`w-full flex items-center justify-between py-2.5 px-2 rounded-xl text-xs font-semibold transition-colors group ${
+                  className={`w-full flex items-center justify-between py-2.5 px-2.5 rounded-xl text-xs font-semibold transition-all duration-200 group cursor-pointer ${
                     isActive
-                      ? "bg-teal-50 text-teal-900 font-bold"
+                      ? "bg-teal-50 text-teal-900 font-bold shadow-2xs border border-teal-200/60"
                       : "text-slate-700 hover:bg-slate-50 hover:text-slate-950"
                   }`}
                 >
-                  <span className="flex items-center gap-1.5">
-                    <ChevronRight className={`h-3 w-3 text-slate-400 group-hover:text-teal-600 transition-colors ${isActive ? "text-teal-600" : ""}`} />
+                  <span className="flex items-center gap-2">
+                    <ChevronRight
+                      className={`h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 ${
+                        isActive ? "text-teal-600 font-bold" : "text-slate-400 group-hover:text-teal-600"
+                      }`}
+                    />
                     <span>{cat.name}</span>
                   </span>
-                  <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${
-                    isActive
-                      ? "bg-teal-200/80 text-teal-900 font-bold"
-                      : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
-                  }`}>
+                  <span
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                      isActive
+                        ? "bg-teal-200 text-teal-950 font-bold"
+                        : "bg-slate-100 text-slate-500 group-hover:bg-slate-200"
+                    }`}
+                  >
                     {cat.article_count || 0}
                   </span>
                 </button>
@@ -77,13 +83,14 @@ export function BrowseByTopic({
         )}
       </div>
 
-      <div className="pt-2 text-center">
+      <div className="pt-3 border-t border-slate-100 text-center">
         <button
           type="button"
           onClick={() => onSelectCategory("all")}
-          className="text-xs font-bold text-teal-700 hover:text-teal-900 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-700 hover:text-teal-900 transition-colors cursor-pointer"
         >
-          Reset Filter to All Topics
+          <RotateCcw className="h-3 w-3" />
+          <span>Reset Filter to All Topics</span>
         </button>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, Lock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { Mail, Lock, CheckCircle2, AlertCircle, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { subscribeNewsletter } from "../services/blogService";
@@ -42,10 +42,10 @@ export function NewsletterSignup() {
   };
 
   return (
-    <div className="flex flex-col justify-between rounded-3xl border border-teal-200/90 bg-gradient-to-b from-teal-50/90 to-emerald-50/60 p-6 sm:p-7 text-center shadow-xs h-full">
+    <div className="flex flex-col justify-between rounded-3xl border border-teal-200/90 bg-gradient-to-b from-teal-50/90 via-white to-emerald-50/50 p-6 sm:p-7 text-center shadow-md shadow-teal-500/5 h-full">
       <div className="space-y-4">
-        {/* Envelope Icon */}
-        <div className="h-12 w-12 rounded-2xl bg-teal-600 text-white flex items-center justify-center mx-auto shadow-sm">
+        {/* Envelope Icon with Glow */}
+        <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-600 text-white flex items-center justify-center mx-auto shadow-md shadow-teal-600/20">
           <Mail className="h-5 w-5" />
         </div>
 
@@ -53,8 +53,8 @@ export function NewsletterSignup() {
           <h3 className="text-lg font-black text-slate-950 tracking-tight">
             Stay Ahead in Healthcare
           </h3>
-          <p className="text-xs text-slate-600 leading-relaxed max-w-xs mx-auto">
-            Get the latest articles, research and insights delivered directly to your inbox.
+          <p className="text-xs text-slate-600 leading-relaxed max-w-xs mx-auto font-normal">
+            Get the latest peer-reviewed studies, clinical AI research, and telemetry insights delivered directly to your inbox.
           </p>
         </div>
 
@@ -62,19 +62,19 @@ export function NewsletterSignup() {
         <form onSubmit={handleSubmit} className="space-y-2.5 pt-2">
           <Input
             type="email"
-            placeholder="Enter your email address"
+            placeholder="Enter your clinical email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === "loading"}
             required
             aria-label="Email address for healthcare newsletter"
-            className="h-10 text-xs bg-white border-slate-200 rounded-xl placeholder:text-slate-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+            className="h-11 text-xs bg-white border-slate-200 rounded-xl placeholder:text-slate-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 shadow-2xs"
           />
 
           <Button
             type="submit"
             disabled={status === "loading"}
-            className="w-full h-10 bg-slate-950 hover:bg-slate-900 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+            className="w-full h-11 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shadow-teal-600/20 transition-all hover:-translate-y-0.5 border-0 cursor-pointer"
           >
             {status === "loading" ? (
               <span className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export function NewsletterSignup() {
                 <span>Subscribing...</span>
               </span>
             ) : (
-              <span>Subscribe</span>
+              <span>Subscribe to Updates</span>
             )}
           </Button>
         </form>
@@ -113,7 +113,7 @@ export function NewsletterSignup() {
       {/* Privacy Notice */}
       <div className="flex items-center justify-center gap-1.5 pt-4 text-[11px] text-slate-500 font-medium">
         <Lock className="h-3 w-3 text-slate-400 shrink-0" />
-        <span>We respect your privacy. No spam.</span>
+        <span>We respect your privacy. Zero spam &bull; Unsubscribe anytime.</span>
       </div>
     </div>
   );

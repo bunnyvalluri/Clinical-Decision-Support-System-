@@ -43,7 +43,7 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
         )}
 
         {!loading && guides.length > 0 && (
-          <div className="space-y-3.5 pt-4">
+          <div className="space-y-3 pt-4">
             {guides.map((guide) => {
               const formattedDate = guide.published_at
                 ? new Date(guide.published_at).toLocaleDateString("en-US", {
@@ -57,15 +57,15 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
                 <Link
                   key={guide.id}
                   href={`/blog/${guide.slug}`}
-                  className="group flex items-center gap-3 hover:bg-slate-50 p-2 rounded-xl transition-colors"
+                  className="group flex items-center gap-3 p-2.5 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-200/80 transition-all duration-200"
                 >
-                  <div className="relative h-12 w-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0">
+                  <div className="relative h-12 w-12 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shrink-0 shadow-2xs">
                     <Image
                       src={guide.featured_image || "/landing-full.png"}
                       alt={guide.title}
                       fill
                       sizes="48px"
-                      className="object-cover group-hover:scale-105 transition-transform"
+                      className="object-cover group-hover:scale-108 transition-transform duration-300"
                     />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
@@ -75,9 +75,9 @@ export function PopularGuides({ guides, loading }: PopularGuidesProps) {
                     <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium pt-1">
                       <span>{formattedDate}</span>
                       <span>&bull;</span>
-                      <span className="flex items-center gap-0.5">
-                        <Clock className="h-2.5 w-2.5" />
-                        {guide.reading_time_minutes || 5} min
+                      <span className="flex items-center gap-0.5 font-mono">
+                        <Clock className="h-2.5 w-2.5 text-teal-600" />
+                        {guide.reading_time_minutes || 5}m
                       </span>
                     </div>
                   </div>
