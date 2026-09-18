@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -30,7 +30,7 @@ const INITIAL_LOGS: LogMessage[] = [
     timestamp: "2026-09-13 17:42:01.129",
     level: "INFO",
     service: "DJANGO_API",
-    message: "GET /api/v1/doctor/summary/ 200 OK (latency: 34ms, user: dr.elena.vance@hospital.org)",
+    message: "GET /api/v1/doctor/summary/ 200 OK (latency: 34ms, user: dr.abhinay.vadla@hospital.org)",
   },
   {
     id: "log-2",
@@ -184,3 +184,4 @@ export default function AdminLogsPage() {
     </div>
   );
 }
+

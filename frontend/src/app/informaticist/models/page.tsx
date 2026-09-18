@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -92,7 +92,7 @@ const DEFAULT_MODELS: ExtendedModel[] = [
     target_task: "Early Sepsis Decompensation Alerting",
     framework: "XGBoost 2.0.3 (Treelite C-API)",
     training_cohort: "Retrospective Multicenter ICU Cohort (N=35,400)",
-    deployed_by: "Dr. Elena Vance, MD",
+    deployed_by: "Dr. Vadla Abhinay, MD",
     parameters_count: "200 Estimators · Depth 6",
   },
   {
@@ -1014,3 +1014,4 @@ export default function InformaticistModelsPage() {
     </div>
   );
 }
+

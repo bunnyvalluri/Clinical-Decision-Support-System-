@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default function CreatePatientPage() {
   const [department, setDepartment] = React.useState("Cardiology");
   const [room, setRoom] = React.useState("Telemetry-304");
   const [bloodType, setBloodType] = React.useState("O+");
-  const [doctor, setDoctor] = React.useState("Dr. Elena Vance, MD");
+  const [doctor, setDoctor] = React.useState("Dr. Vadla Abhinay, MD");
   const [systolicBp, setSystolicBp] = React.useState("132");
   const [diastolicBp, setDiastolicBp] = React.useState("84");
   const [heartRate, setHeartRate] = React.useState("76");
@@ -203,7 +203,7 @@ export default function CreatePatientPage() {
                     label="Attending Physician"
                     value={doctor}
                     onChange={(e) => setDoctor(e.target.value)}
-                    placeholder="e.g. Dr. Elena Vance, MD"
+                    placeholder="e.g. Dr. Vadla Abhinay, MD"
                     required
                   />
                 </div>
@@ -270,3 +270,4 @@ export default function CreatePatientPage() {
     </Shell>
   );
 }
+

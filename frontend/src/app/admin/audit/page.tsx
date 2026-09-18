@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -48,7 +48,7 @@ const AUDIT_DATA: AuditEntry[] = [
   {
     id: "aud-901",
     timestamp: "2026-09-14 17:42:10",
-    actor: "Dr. Elena Vance, MD",
+    actor: "Dr. Vadla Abhinay, MD",
     actor_role: "DOCTOR",
     action: "PREDICTION_EVALUATED",
     category: "PREDICTION",
@@ -62,7 +62,7 @@ const AUDIT_DATA: AuditEntry[] = [
   {
     id: "aud-902",
     timestamp: "2026-09-14 17:38:05",
-    actor: "Dr. Elena Vance, MD",
+    actor: "Dr. Vadla Abhinay, MD",
     actor_role: "DOCTOR",
     action: "PHYSICIAN_OVERRIDE",
     category: "CLINICAL",
@@ -543,3 +543,4 @@ export default function AuditLogsPage() {
     </div>
   );
 }
+

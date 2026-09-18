@@ -1,4 +1,4 @@
-import type { RiskLevel } from "@/types";
+﻿import type { RiskLevel } from "@/types";
 
 export interface Patient {
   id: string;
@@ -122,7 +122,7 @@ export const INITIAL_PATIENTS: Patient[] = [
     blood_type: "A+",
     admission_date: "2026-09-11 08:30",
     room_number: "ICU-Bed-04",
-    primary_doctor: "Dr. Elena Vance, MD",
+    primary_doctor: "Dr. Vadla Abhinay, MD",
     department: "Cardiology",
     status: "ICU",
     latest_risk_level: "CRITICAL",
@@ -143,7 +143,7 @@ export const INITIAL_PATIENTS: Patient[] = [
     blood_type: "O+",
     admission_date: "2026-09-12 14:15",
     room_number: "Telemetry-210",
-    primary_doctor: "Dr. Elena Vance, MD",
+    primary_doctor: "Dr. Vadla Abhinay, MD",
     department: "Cardiology",
     status: "INPATIENT",
     latest_risk_level: "HIGH",
@@ -185,7 +185,7 @@ export const INITIAL_PATIENTS: Patient[] = [
     blood_type: "O-",
     admission_date: "2026-09-13 11:20",
     room_number: "Day-Observation-08",
-    primary_doctor: "Dr. Elena Vance, MD",
+    primary_doctor: "Dr. Vadla Abhinay, MD",
     department: "Emergency",
     status: "OUTPATIENT",
     latest_risk_level: "LOW",
@@ -206,7 +206,7 @@ export const INITIAL_PATIENTS: Patient[] = [
     blood_type: "AB+",
     admission_date: "2026-09-10 19:45",
     room_number: "ICU-Bed-02",
-    primary_doctor: "Dr. Elena Vance, MD",
+    primary_doctor: "Dr. Vadla Abhinay, MD",
     department: "Cardiology",
     status: "ICU",
     latest_risk_level: "HIGH",
@@ -252,7 +252,7 @@ export const INITIAL_PREDICTIONS: PredictionRecord[] = [
     confidence_interval: [0.84, 0.94],
     model_name: "CardioEnsemble-RF",
     model_version: "v1.4.2",
-    clinician_name: "Dr. Elena Vance, MD",
+    clinician_name: "Dr. Vadla Abhinay, MD",
     chief_complaint: "Acute retrosternal chest pain radiating to left jaw, diaphoresis",
     clinical_factors: {
       age: 68,
@@ -296,7 +296,7 @@ export const INITIAL_PREDICTIONS: PredictionRecord[] = [
     confidence_interval: [0.68, 0.81],
     model_name: "CardioEnsemble-RF",
     model_version: "v1.4.2",
-    clinician_name: "Dr. Elena Vance, MD",
+    clinician_name: "Dr. Vadla Abhinay, MD",
     chief_complaint: "Exertional dyspnea and tightness during moderate walking",
     clinical_factors: {
       age: 54,
@@ -379,7 +379,7 @@ export const INITIAL_PREDICTIONS: PredictionRecord[] = [
     confidence_interval: [0.12, 0.23],
     model_name: "CardioEnsemble-RF",
     model_version: "v1.4.2",
-    clinician_name: "Dr. Elena Vance, MD",
+    clinician_name: "Dr. Vadla Abhinay, MD",
     chief_complaint: "Routine pre-operative clearance",
     clinical_factors: {
       age: 41,
@@ -547,3 +547,4 @@ export async function fetchWithFallback<T>(
     return fallbackData;
   }
 }
+

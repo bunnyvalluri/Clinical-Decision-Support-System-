@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -47,7 +47,7 @@ export interface UserItem {
 }
 
 const INITIAL_DEMO_USERS: UserItem[] = [
-  { id: "u1", name: "Dr. Elena Vance, MD", email: "dr.elena.vance@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology", license: "MD-883921", lastLogin: "Just now", twoFactorEnabled: true },
+  { id: "u1", name: "Dr. Vadla Abhinay, MD", email: "dr.abhinay.vadla@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology", license: "MD-883921", lastLogin: "Just now", twoFactorEnabled: true },
   { id: "u2", name: "Sarah Jenkins, RN", email: "s.jenkins@hospital.org", role: "NURSE", status: "ACTIVE", department: "Emergency Triage", license: "RN-449102", lastLogin: "4 mins ago", twoFactorEnabled: true },
   { id: "u3", name: "Alex Rivera, MSc", email: "alex.rivera@hospital.org", role: "MEDICAL_INFORMATICIST", status: "ACTIVE", department: "Clinical Informatics", license: "BIO-10923", lastLogin: "22 mins ago", twoFactorEnabled: true },
   { id: "u4", name: "Marcus Chen", email: "m.chen@hospital.org", role: "IT_ADMIN", status: "ACTIVE", department: "IT Systems", license: "CISSP-98210", lastLogin: "Active session", twoFactorEnabled: true },
@@ -526,3 +526,4 @@ export default function AdminUsersPage() {
     </ResponsivePageContainer>
   );
 }
+

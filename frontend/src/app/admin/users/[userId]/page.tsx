@@ -17,7 +17,7 @@ interface DemoUserRecord {
 }
 
 const DEMO_USERS: Record<string, DemoUserRecord> = {
-  u1: { name: "Dr. Elena Vance, MD", email: "dr.elena.vance@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology", license: "MD-883921" },
+  u1: { name: "Dr. Vadla Abhinay, MD", email: "dr.abhinay.vadla@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology", license: "MD-883921" },
   u2: { name: "Sarah Jenkins, RN", email: "s.jenkins@hospital.org", role: "NURSE", status: "ACTIVE", department: "Emergency Triage", license: "RN-449102" },
   u3: { name: "Alex Rivera, MSc", email: "alex.rivera@hospital.org", role: "MEDICAL_INFORMATICIST", status: "ACTIVE", department: "Clinical Informatics", license: "BIO-10923" },
   u4: { name: "Marcus Chen", email: "m.chen@hospital.org", role: "IT_ADMIN", status: "ACTIVE", department: "IT Systems", license: "CISSP-98210" },

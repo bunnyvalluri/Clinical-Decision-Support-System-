@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -49,9 +49,9 @@ interface AuditLogEntry {
 const INITIAL_USERS: ManagedUser[] = [
   {
     id: "u-01",
-    full_name: "Dr. Elena Vance, MD",
+    full_name: "Dr. Vadla Abhinay, MD",
     username: "evance",
-    email: "dr.elena.vance@hospital.org",
+    email: "dr.abhinay.vadla@hospital.org",
     role: "DOCTOR",
     department: "Cardiology & Intensive Care",
     is_active: true,
@@ -859,3 +859,4 @@ export function AdminWorkspace() {
     </div>
   );
 }
+

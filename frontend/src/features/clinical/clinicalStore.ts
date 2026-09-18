@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { create } from "zustand";
 import apiClient from "@/services/apiClient";
@@ -390,7 +390,7 @@ export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
       ],
       model_name: payload.model_name || "CardioEnsemble-RF",
       model_version: "v1.4.2",
-      clinician_name: "Dr. Elena Vance, MD",
+      clinician_name: "Dr. Vadla Abhinay, MD",
       chief_complaint: payload.chief_complaint || "Live Telemetry Cardiac Assessment",
       clinical_factors: {
         age: existingPatient ? existingPatient.age : 58,
@@ -473,3 +473,4 @@ export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
     get().updateReportStatus(task.task_id, task.status, task.progress);
   },
 }));
+

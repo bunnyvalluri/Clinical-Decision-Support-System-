@@ -67,7 +67,7 @@ const KEY_NAMESPACES: KeyNamespace[] = [
 ];
 
 const RECENT_COMMANDS = [
-  { time: "18:01:22.104", cmd: "GET", key: "session:dr_elena_vance", client: "django_api_1", latency: "1.2ms" },
+  { time: "18:01:22.104", cmd: "GET", key: "session:dr_abhinay_vadla", client: "django_api_1", latency: "1.2ms" },
   { time: "18:01:21.840", cmd: "SETEX", key: "rate_limit:10.240.12.84", client: "django_api_1", latency: "1.8ms" },
   { time: "18:01:19.420", cmd: "PUBLISH", key: "channels:alerts_emergency", client: "channels_asgi", latency: "0.9ms" },
   { time: "18:01:18.112", cmd: "BRPOP", key: "celery:triage_priority", client: "celery_worker_1", latency: "2.1ms" },

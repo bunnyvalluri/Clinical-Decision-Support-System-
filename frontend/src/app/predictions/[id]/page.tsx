@@ -57,7 +57,7 @@ export default function PredictionExplanationPage() {
     overridePrediction(prediction.id, {
       new_risk_level: overrideRisk,
       rationale: overrideRationale,
-      overridden_by: user?.full_name || "Dr. Elena Vance, MD",
+      overridden_by: user?.full_name || "Dr. Vadla Abhinay, MD",
     });
 
     setOverrideSuccess(true);

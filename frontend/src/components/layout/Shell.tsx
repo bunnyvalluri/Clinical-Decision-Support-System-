@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Image from "next/image";
@@ -310,7 +310,7 @@ export function Shell({ children }: ShellProps) {
             </div>
             <div className="min-w-0">
               <p className="truncate text-xs font-semibold text-foreground">
-                {user?.full_name || "Dr. Elena Vance, MD"}
+                {user?.full_name || "Dr. Vadla Abhinay, MD"}
               </p>
               <p className="truncate text-[10px] font-medium text-muted-foreground">
                 {user?.department || "Cardiology"}
@@ -534,3 +534,4 @@ export function Shell({ children }: ShellProps) {
     </div>
   );
 }
+

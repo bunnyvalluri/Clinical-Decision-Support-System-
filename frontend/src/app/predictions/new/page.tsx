@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -131,7 +131,7 @@ function NewPredictionContent() {
         ] as [number, number],
         model_name: modelType,
         model_version: "v1.4.2",
-        clinician_name: user?.full_name || "Dr. Elena Vance, MD",
+        clinician_name: user?.full_name || "Dr. Vadla Abhinay, MD",
         chief_complaint: "Acute clinical risk evaluation",
         clinical_factors: {
           age: parseInt(age) || 60,
@@ -499,3 +499,4 @@ export default function NewPredictionPage() {
     </React.Suspense>
   );
 }
+

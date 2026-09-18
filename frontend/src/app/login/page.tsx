@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Image from "next/image";
@@ -42,7 +42,7 @@ const DEMO_ROLES = [
     accentBg: "bg-emerald-600 hover:bg-emerald-700",
     title: "Attending Physician / Cardiologist",
     department: "Cardiology & Intensive Care Unit",
-    credentials: "dr.elena.vance@hospital.org",
+    credentials: "dr.abhinay.vadla@hospital.org",
     scope: "Full EHR, TreeSHAP feature attributions, sovereign overrides",
     icon: Stethoscope,
   },
@@ -316,7 +316,7 @@ export default function LoginPage() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-slate-900 truncate">Dr. Elena Vance, MD</span>
+                <span className="text-xs font-bold text-slate-900 truncate">Dr. Vadla Abhinay, MD</span>
                 <CheckCircle2 className="h-3.5 w-3.5 text-teal-600 shrink-0" />
                 <Badge variant="outline" className="text-[9px] py-0 px-1 font-mono text-slate-500">
                   NPI-948201
@@ -538,7 +538,7 @@ export default function LoginPage() {
                 <Input
                   label="Hospital Staff or Patient Email"
                   type="email"
-                  placeholder="e.g. dr.elena.vance@hospital.org"
+                  placeholder="e.g. dr.abhinay.vadla@hospital.org"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   prefixIcon={<Mail className="h-4 w-4" />}
@@ -647,3 +647,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

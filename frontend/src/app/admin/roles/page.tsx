@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -183,7 +183,7 @@ const ROLES_OVERVIEW = [
     label: "Attending Physician / Doctor",
     description: "Full clinical diagnostics authority, SaMD AI inference execution, and clinical decision sign-offs.",
     staffCount: 2,
-    activeStaff: ["Dr. Elena Vance, MD", "Dr. James Park, MD"],
+    activeStaff: ["Dr. Vadla Abhinay, MD", "Dr. James Park, MD"],
     riskLevel: "High Clinical Impact",
     icon: Stethoscope,
     color: "text-emerald-600",
@@ -697,3 +697,4 @@ export default function AdminRolesPage() {
     </div>
   );
 }
+

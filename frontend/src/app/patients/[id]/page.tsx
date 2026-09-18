@@ -236,7 +236,7 @@ export default function PatientDetailsPage() {
                   Evaluated for persistent substernal chest discomfort. ECG shows minor ST changes. High sensitivity
                   troponin ordered.
                 </p>
-                <div className="text-[10px] text-emerald-700 font-mono font-semibold">Dr. Elena Vance, MD</div>
+                <div className="text-[10px] text-emerald-700 font-mono font-semibold">Dr. Vadla Abhinay, MD</div>
               </div>
 
               <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -333,7 +333,7 @@ export function DoctorWorkspace() {
           <div>
             <h1 className="text-lg font-bold text-slate-900">Physician Clinical Decision Center</h1>
             <p className="text-xs text-slate-500 mt-0.5">
-              Attending: <span className="font-semibold text-slate-700">{user?.full_name || "Dr. Elena Vance, MD"}</span>
+              Attending: <span className="font-semibold text-slate-700">{user?.full_name || "Dr. Vadla Abhinay, MD"}</span>
               {" · "}
               Dept: <span className="font-semibold text-slate-700">{user?.department || "Cardiology & ICU"}</span>
             </p>
@@ -869,3 +869,4 @@ function ClipboardReview(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+

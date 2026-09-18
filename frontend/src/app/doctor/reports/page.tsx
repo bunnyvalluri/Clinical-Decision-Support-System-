@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -47,7 +47,7 @@ const DEMO_REPORTS: ClinicalReport[] = [
     periodCovered: "Sep 1–14, 2026",
     patientCount: 12,
     status: "SIGNED",
-    author: "Dr. Elena Vance, MD",
+    author: "Dr. Vadla Abhinay, MD",
     fileSize: "1.4 MB",
   },
   {
@@ -68,7 +68,7 @@ const DEMO_REPORTS: ClinicalReport[] = [
     periodCovered: "Admission Sep 14, 2026",
     patientCount: 1,
     status: "PENDING_SIGN",
-    author: "Dr. Elena Vance, MD",
+    author: "Dr. Vadla Abhinay, MD",
     fileSize: "560 KB",
   },
   {
@@ -79,7 +79,7 @@ const DEMO_REPORTS: ClinicalReport[] = [
     periodCovered: "Aug 10 – Sep 10, 2026",
     patientCount: 28,
     status: "SIGNED",
-    author: "Dr. Elena Vance, MD",
+    author: "Dr. Vadla Abhinay, MD",
     fileSize: "2.1 MB",
   },
   {
@@ -269,3 +269,4 @@ export default function DoctorReportsPage() {
     </ResponsivePageContainer>
   );
 }
+

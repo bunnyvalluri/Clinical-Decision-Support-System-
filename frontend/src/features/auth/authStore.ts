@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { create } from "zustand";
 import apiClient, { tokenStorage } from "@/services/apiClient";
@@ -50,7 +50,7 @@ export function getRoleHomeRoute(role?: RoleType): string {
 const EVALUATOR_PROFILES: Record<RoleType, UserProfile> = {
   DOCTOR: {
     id: "u-doc-001",
-    email: "dr.elena.vance@hospital.org",
+    email: "dr.abhinay.vadla@hospital.org",
     username: "evance",
     full_name: "Doctor",
     role: "DOCTOR",
@@ -422,4 +422,5 @@ export const useAuthStore = create<AuthState>((set) => {
   },
   };
 });
+
 

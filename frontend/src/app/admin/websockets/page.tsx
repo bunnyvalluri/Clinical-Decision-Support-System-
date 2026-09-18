@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import {
@@ -32,7 +32,7 @@ interface SocketClient {
 const ACTIVE_CLIENTS: SocketClient[] = [
   {
     id: "ws-901a",
-    email: "dr.elena.vance@hospital.org",
+    email: "dr.abhinay.vadla@hospital.org",
     role: "DOCTOR",
     ip: "10.240.12.84",
     groups: ["alerts_emergency", "vitals_live_stream"],
@@ -402,3 +402,4 @@ export default function AdminWebSocketsPage() {
     </div>
   );
 }
+
