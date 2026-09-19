@@ -135,24 +135,13 @@ export function PublicNavbar() {
             </Button>
           </Link>
 
-          <Link href="/register" className="hidden 2xl:inline-flex">
+          <Link href="/register" className="hidden sm:inline-flex">
             <Button
               variant="outline"
               size="sm"
               className="text-xs font-semibold border-slate-200 text-slate-700 hover:text-slate-950 hover:bg-slate-50 whitespace-nowrap px-3"
             >
               Register
-            </Button>
-          </Link>
-
-          <Link href="/dashboard" className="hidden min-[360px]:inline-flex sm:inline-flex">
-            <Button
-              size="sm"
-              className="h-8 sm:h-9 text-xs font-bold gap-1 sm:gap-1.5 shadow-sm bg-teal-600 hover:bg-teal-700 text-white border border-teal-700 hover:border-teal-800 transition-all px-2.5 sm:px-3.5 whitespace-nowrap"
-            >
-              <span className="hidden sm:inline">Launch </span>
-              <span>Portal</span>
-              <ArrowRight className="h-3.5 w-3.5 text-white shrink-0" />
             </Button>
           </Link>
 
@@ -259,17 +248,7 @@ export function PublicNavbar() {
           </div>
 
           {/* Mobile Actions */}
-          <div className="pt-4 border-t border-slate-200 space-y-2.5">
-            <Link
-              href="/dashboard"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full block"
-            >
-              <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold gap-2 shadow-sm py-2.5">
-                Launch Clinician Portal
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
+          <div className="pt-4 border-t border-slate-200">
             <div className="grid grid-cols-2 gap-2">
               <Link
                 href="/login"
