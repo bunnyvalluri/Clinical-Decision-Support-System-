@@ -226,8 +226,8 @@ export function SolutionsHero() {
               </svg>
             </div>
 
-            <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
-              {/* Doctor Main Image Frame */}
+            <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg flex flex-col items-center">
+              {/* Doctor Main Image Frame: Unobstructed and 100% completely visible on mobile & desktop */}
               <div className="relative aspect-square w-full rounded-3xl overflow-hidden border border-slate-200/90 bg-gradient-to-b from-teal-50/50 via-white to-sky-50/50 shadow-xl p-2 group">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden bg-slate-100">
                   <Image
@@ -241,16 +241,17 @@ export function SolutionsHero() {
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/15 via-transparent to-transparent pointer-events-none" />
 
                   {/* Bottom Image Tag - Crisp Pure Light Glass Pill */}
-                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 border border-slate-200/90 shadow-sm">
-                    <Activity className="h-3.5 w-3.5 text-teal-600 animate-pulse shrink-0" />
-                    <span className="text-[10px] sm:text-[11px] font-semibold tracking-tight">Continuous Telemetry Ingestion</span>
-                    <span className="text-[9px] font-mono text-teal-800 font-bold bg-teal-100/90 px-1.5 py-0.5 rounded border border-teal-300">LIVE</span>
+                  <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 z-10 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 border border-slate-200/90 shadow-sm">
+                    <Activity className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-teal-600 animate-pulse shrink-0" />
+                    <span className="text-[9px] sm:text-[11px] font-semibold tracking-tight">Continuous Telemetry Ingestion</span>
+                    <span className="text-[8px] sm:text-[9px] font-mono text-teal-800 font-bold bg-teal-100/90 px-1.5 py-0.5 rounded border border-teal-300">LIVE</span>
                   </div>
                 </div>
               </div>
 
+              {/* Desktop Floating Badges (Hidden on mobile to keep doctor image 100% visible and un-obscured) */}
               {/* Floating Badge 1: Top Left - Better Decisions */}
-              <div className="absolute -top-3 -left-3 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              <div className="hidden sm:flex absolute -top-3 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
                   <BarChart2 className="h-4 w-4" />
                 </div>
@@ -261,7 +262,7 @@ export function SolutionsHero() {
               </div>
 
               {/* Floating Badge 2: Top Right - Empowered Providers */}
-              <div className="absolute top-8 -right-3 sm:-right-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              <div className="hidden sm:flex absolute top-8 sm:-right-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
                   <Users className="h-4 w-4" />
                 </div>
@@ -272,7 +273,7 @@ export function SolutionsHero() {
               </div>
 
               {/* Floating Badge 3: Mid Left - Healthier Communities */}
-              <div className="absolute top-1/2 -translate-y-1/2 -left-3 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              <div className="hidden sm:flex absolute top-1/2 -translate-y-1/2 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
                   <Heart className="h-4 w-4" />
                 </div>
@@ -283,13 +284,56 @@ export function SolutionsHero() {
               </div>
 
               {/* Floating Badge 4: Bottom Right - Safer Care */}
-              <div className="absolute -bottom-4 -right-2 sm:-right-4 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              <div className="hidden sm:flex absolute -bottom-4 sm:-right-4 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100">
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <div className="text-left">
                   <p className="text-xs font-bold text-slate-900 leading-tight">Safer Care</p>
                   <p className="text-[10px] font-medium text-slate-500">Continuous audit</p>
+                </div>
+              </div>
+
+              {/* Mobile View Clean Value Props Grid: Displayed directly below the image so doctor is 100% visible */}
+              <div className="grid grid-cols-2 gap-2 mt-4 w-full sm:hidden">
+                <div className="rounded-xl bg-white border border-slate-200/90 p-2.5 shadow-2xs flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+                    <BarChart2 className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Better Decisions</p>
+                    <p className="text-[9px] font-medium text-slate-500 truncate">Evidence-informed</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-white border border-slate-200/90 p-2.5 shadow-2xs flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                    <Users className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Empowered Providers</p>
+                    <p className="text-[9px] font-medium text-slate-500 truncate">Reduced burden</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-white border border-slate-200/90 p-2.5 shadow-2xs flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
+                    <Heart className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Healthier Communities</p>
+                    <p className="text-[9px] font-medium text-slate-500 truncate">Early risk awareness</p>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-white border border-slate-200/90 p-2.5 shadow-2xs flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100">
+                    <ShieldCheck className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Safer Care</p>
+                    <p className="text-[9px] font-medium text-slate-500 truncate">Continuous audit</p>
+                  </div>
                 </div>
               </div>
             </div>

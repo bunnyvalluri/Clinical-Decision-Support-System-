@@ -18,6 +18,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { RealtimeEcgWaveform } from "@/components/clinical/RealtimeEcgWaveform";
 
 export function AboutHero() {
   const [hudMode, setHudMode] = useState<"telemetry" | "swarm">("telemetry");
@@ -237,16 +238,12 @@ export function AboutHero() {
                       </span>
                       <span className="text-teal-800 font-bold">Sinus Tachycardia (118 bpm)</span>
                     </div>
-                    {/* Simulated ECG Rhythm SVG Waveform */}
-                    <div className="h-9 w-full bg-slate-50/90 rounded-xl border border-slate-200 overflow-hidden relative flex items-center px-2">
-                      <svg
-                        className="w-full h-8 text-teal-700 stroke-current fill-none stroke-[2]"
-                        viewBox="0 0 300 32"
-                        preserveAspectRatio="none"
-                      >
-                        <path d="M0,16 L30,16 L35,10 L40,22 L45,16 L60,16 L65,16 L70,8 L75,28 L80,4 L85,20 L90,16 L120,16 L125,10 L130,22 L135,16 L150,16 L155,16 L160,8 L165,28 L170,4 L175,20 L180,16 L210,16 L215,10 L220,22 L225,16 L240,16 L245,16 L250,8 L255,28 L260,4 L265,20 L270,16 L300,16" />
-                      </svg>
-                    </div>
+                    {/* Real-Time Moving ECG Rhythm Waveform */}
+                    <RealtimeEcgWaveform
+                      heartRate={118}
+                      stDepression={1.2}
+                      className="h-10 w-full"
+                    />
 
                     {/* Vitals Quadrant */}
                     <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100 text-center font-mono">

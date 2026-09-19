@@ -13,3 +13,4 @@ export * from "./ClinicalMetricCard";
 export * from "./EvidenceCard";
 export * from "./AIExplanationCard";
 export * from "./AIReviewPanel";
+export * from "./RealtimeEcgWaveform";
