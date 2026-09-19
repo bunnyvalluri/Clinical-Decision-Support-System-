@@ -12,6 +12,7 @@ import {
   Quote,
   Sparkles,
   CheckCircle2,
+  Award,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -38,7 +39,7 @@ export function SolutionsRealResults() {
             <div className="pt-2">
               <Link href="/features">
                 <Button
-                  className="bg-slate-950 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl shadow-xs gap-2 text-xs sm:text-sm"
+                  className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-2.5 rounded-xl shadow-xs gap-2 text-xs sm:text-sm"
                 >
                   <span>Explore Clinical Evidence</span>
                   <ArrowRight className="h-4 w-4" />
@@ -81,7 +82,7 @@ export function SolutionsRealResults() {
           <div className="lg:col-span-3 space-y-4 text-left">
             {/* Stat 1 */}
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
-              <div className="h-12 w-12 rounded-xl bg-teal-50 text-teal-600 border border-teal-100 flex items-center justify-center shrink-0">
+              <div className="h-12 w-12 rounded-xl bg-teal-50 text-teal-700 border border-teal-100 flex items-center justify-center shrink-0">
                 <TrendingDown className="h-6 w-6" />
               </div>
               <div>
@@ -96,7 +97,7 @@ export function SolutionsRealResults() {
 
             {/* Stat 2 */}
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
-              <div className="h-12 w-12 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+              <div className="h-12 w-12 rounded-xl bg-blue-50 text-blue-700 border border-blue-100 flex items-center justify-center shrink-0">
                 <Users className="h-6 w-6" />
               </div>
               <div>
@@ -111,7 +112,7 @@ export function SolutionsRealResults() {
 
             {/* Stat 3 */}
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
-              <div className="h-12 w-12 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center shrink-0">
+              <div className="h-12 w-12 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center justify-center shrink-0">
                 <Clock className="h-6 w-6" />
               </div>
               <div>
@@ -132,7 +133,7 @@ export function SolutionsRealResults() {
             <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />
             Clinical benchmark simulation &amp; study outcomes. Individual institutional performance varies based on baseline telemetry adherence.
           </span>
-          <span className="font-mono">HealthNova Research Registry</span>
+          <span className="font-mono text-slate-500">HealthNova Research Registry • IRB Protocol Approved</span>
         </div>
       </div>
     </section>

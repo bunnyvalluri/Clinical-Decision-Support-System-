@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -14,14 +14,70 @@ import {
   PlayCircle,
   Activity,
   CheckCircle2,
+  Stethoscope,
+  Cpu,
+  Radio,
+  Sliders,
+  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+interface HeroTelemetryState {
+  ward: string;
+  patientId: string;
+  vitalSummary: string;
+  metricLabel: string;
+  metricValue: string;
+  delta: string;
+  statusColor: string;
+  statusBg: string;
+  statusBorder: string;
+}
+
+const HERO_SCENARIOS: HeroTelemetryState[] = [
+  {
+    ward: "ICU Bed 04 • Acute Care",
+    patientId: "ENC-8921 • Post-Op Colorectal",
+    vitalSummary: "HR 114 bpm • BP 92/58 mmHg • SpO2 93%",
+    metricLabel: "qSOFA Decompensation Index",
+    metricValue: "18.4% (STABLE)",
+    delta: "Normative Baseline",
+    statusColor: "text-teal-700",
+    statusBg: "bg-teal-50",
+    statusBorder: "border-teal-200",
+  },
+  {
+    ward: "Cardiology Suite • Bed 02",
+    patientId: "ENC-4410 • Post-PTCA Day 1",
+    vitalSummary: "HR 74 bpm • BP 118/76 mmHg • MAP 90",
+    metricLabel: "Hemodynamic Stability",
+    metricValue: "99.2% (OPTIMAL)",
+    delta: "+0.4h Steady Margin",
+    statusColor: "text-emerald-700",
+    statusBg: "bg-emerald-50",
+    statusBorder: "border-emerald-200",
+  },
+  {
+    ward: "Emergency Triage • Bay 07",
+    patientId: "ENC-3109 • Acute Dyspnea",
+    vitalSummary: "HR 102 bpm • SpO2 91% (RA) • RR 24",
+    metricLabel: "NEWS2 Escalation Tripwire",
+    metricValue: "3 (MONITORING)",
+    delta: "Triage Alert Armed",
+    statusColor: "text-amber-700",
+    statusBg: "bg-amber-50",
+    statusBorder: "border-amber-200",
+  },
+];
+
 export function SolutionsHero() {
+  const [activeScenarioIdx, setActiveScenarioIdx] = useState<number>(0);
+  const activeScenario = HERO_SCENARIOS[activeScenarioIdx];
+
   return (
-    <section className="relative overflow-hidden pt-4 pb-14 sm:pt-8 sm:pb-20 lg:pt-10 lg:pb-24 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.07),rgba(2,132,199,0.03),transparent)] border-b border-slate-200/80">
+    <section className="relative overflow-hidden pt-4 pb-14 sm:pt-8 sm:pb-20 lg:pt-10 lg:pb-24 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.08),rgba(2,132,199,0.04),transparent)] border-b border-slate-200/80">
       {/* Background medical grid pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_35%,#000_70%,transparent_100%)] pointer-events-none opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_35%,#000_70%,transparent_100%)] pointer-events-none opacity-35" />
 
       {/* Ambient soft glow */}
       <div
@@ -66,18 +122,52 @@ export function SolutionsHero() {
             </p>
 
             {/* Reassurance Governance Disclaimer */}
-            <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200/80 flex items-start gap-3 max-w-xl shadow-2xs">
+            <div className="p-4 rounded-2xl bg-white/95 border border-slate-200/90 flex items-start gap-3.5 max-w-xl shadow-xs">
               <ShieldCheck className="h-5 w-5 text-teal-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs text-slate-600 leading-relaxed">
                   <strong className="font-bold text-slate-900">Clinical Decision Support Invariant:</strong>{" "}
                   HealthNova AI assists clinical teams with validated risk models and explainable telemetry. Licensed healthcare professionals retain complete diagnostic and prescription authority.
                 </p>
-                <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono pt-1">
-                  <span>● 21 CFR Part 11 Compliant</span>
-                  <span>● Zero PHI Leakage</span>
-                  <span>● Non-Autonomous</span>
+                <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 font-mono pt-1">
+                  <span className="flex items-center gap-1 font-semibold text-teal-700">
+                    <CheckCircle2 className="h-3 w-3" /> 21 CFR Part 11 Compliant
+                  </span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-600">Zero PHI Leakage</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-600 font-semibold">Non-Autonomous</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Interactive Bedside Telemetry Scenario Switcher */}
+            <div className="pt-1 max-w-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold flex items-center gap-1.5">
+                  <Radio className="h-3.5 w-3.5 text-teal-600 animate-pulse" />
+                  Live Telemetry Simulator Feed:
+                </span>
+                <span className="text-[10px] font-mono text-teal-700 font-semibold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  FHIR v4.0.1 Connected
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {HERO_SCENARIOS.map((item, idx) => (
+                  <button
+                    key={item.ward}
+                    type="button"
+                    onClick={() => setActiveScenarioIdx(idx)}
+                    className={`text-left p-2.5 rounded-xl border text-xs transition-all ${
+                      activeScenarioIdx === idx
+                        ? "bg-teal-50/90 border-teal-300 shadow-xs ring-1 ring-teal-500/20"
+                        : "bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    <p className="font-bold text-slate-900 text-[11px] truncate">{item.ward.split("•")[0]}</p>
+                    <p className="text-[10px] text-slate-500 truncate">{item.metricValue.split("(")[0]}</p>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -86,7 +176,7 @@ export function SolutionsHero() {
               <a href="#core-solutions">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-slate-950 hover:bg-slate-800 text-white font-bold px-7 shadow-sm gap-2 text-sm h-12 rounded-xl transition-all"
+                  className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold px-7 shadow-sm gap-2 text-sm h-12 rounded-xl transition-all"
                 >
                   <span>Explore Solutions</span>
                   <ArrowRight className="h-4 w-4" />
@@ -96,7 +186,7 @@ export function SolutionsHero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-slate-50 font-semibold px-6 text-sm h-12 gap-2 rounded-xl"
+                  className="w-full sm:w-auto bg-white border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-slate-50 font-semibold px-6 text-sm h-12 gap-2 rounded-xl shadow-2xs"
                 >
                   <PlayCircle className="h-4 w-4 text-teal-600" />
                   <span>Watch Clinical Workflow</span>
@@ -109,7 +199,7 @@ export function SolutionsHero() {
           <div className="lg:col-span-6 xl:col-span-5 flex justify-center relative">
             {/* Top-right Cursive Annotation with Arrow */}
             <div className="absolute -top-8 right-2 sm:right-6 z-20 hidden sm:flex flex-col items-end pointer-events-none">
-              <span className="font-serif italic text-xs sm:text-sm font-semibold text-teal-700 tracking-wide bg-white/90 px-2 py-0.5 rounded-lg border border-teal-100 shadow-2xs">
+              <span className="font-serif italic text-xs sm:text-sm font-semibold text-teal-700 tracking-wide bg-white/95 px-2.5 py-1 rounded-lg border border-teal-100 shadow-xs">
                 Technology for a healthier tomorrow ✨
               </span>
               <svg
@@ -148,13 +238,13 @@ export function SolutionsHero() {
                     className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/15 via-transparent to-transparent pointer-events-none" />
 
-                  {/* Bottom Image Tag - Compact Left Pill avoiding the tablet on the right */}
-                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 backdrop-blur-md text-white border border-white/15 shadow-sm">
-                    <Activity className="h-3.5 w-3.5 text-teal-400 animate-pulse shrink-0" />
-                    <span className="text-[10px] sm:text-[11px] font-medium tracking-tight">Continuous Telemetry Ingestion</span>
-                    <span className="text-[9px] font-mono text-teal-300 font-bold bg-teal-950/60 px-1.5 py-0.5 rounded border border-teal-500/30">LIVE</span>
+                  {/* Bottom Image Tag - Crisp Pure Light Glass Pill */}
+                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 border border-slate-200/90 shadow-sm">
+                    <Activity className="h-3.5 w-3.5 text-teal-600 animate-pulse shrink-0" />
+                    <span className="text-[10px] sm:text-[11px] font-semibold tracking-tight">Continuous Telemetry Ingestion</span>
+                    <span className="text-[9px] font-mono text-teal-800 font-bold bg-teal-100/90 px-1.5 py-0.5 rounded border border-teal-300">LIVE</span>
                   </div>
                 </div>
               </div>
@@ -181,7 +271,7 @@ export function SolutionsHero() {
                 </div>
               </div>
 
-              {/* Floating Badge 3: Mid Left - Healthier Communities (positioned above doctor's pointing hand) */}
+              {/* Floating Badge 3: Mid Left - Healthier Communities */}
               <div className="absolute top-1/2 -translate-y-1/2 -left-3 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
                   <Heart className="h-4 w-4" />

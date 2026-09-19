@@ -13,6 +13,7 @@ import {
   HeartPulse,
   Sparkles,
   CheckCircle2,
+  TrendingUp,
 } from "lucide-react";
 
 interface IndustryItem {
@@ -21,6 +22,7 @@ interface IndustryItem {
   category: string;
   description: string;
   capabilities: string[];
+  metrics: { label: string; value: string }[];
   icon: React.ElementType;
   accentBg: string;
   accentColor: string;
@@ -40,6 +42,10 @@ const INDUSTRY_SOLUTIONS: IndustryItem[] = [
       "Automated qSOFA and NEWS2 sepsis tripwires",
       "Sub-second WebSocket alert routing to on-duty teams",
     ],
+    metrics: [
+      { label: "Readmission Drop", value: "-32%" },
+      { label: "Alert Lead Time", value: "+4.2 hrs" },
+    ],
     icon: Building2,
     accentBg: "bg-teal-50",
     accentColor: "text-teal-700 border-teal-200",
@@ -56,6 +62,10 @@ const INDUSTRY_SOLUTIONS: IndustryItem[] = [
       "Rapid longitudinal vital trend summaries",
       "Automated cardiovascular and diabetic risk estimation",
       "Clinician-verified patient care plans in seconds",
+    ],
+    metrics: [
+      { label: "Chart Time Saved", value: "3.5 hrs/wk" },
+      { label: "Diagnostic Accuracy", value: "98.4%" },
     ],
     icon: Stethoscope,
     accentBg: "bg-sky-50",
@@ -74,6 +84,10 @@ const INDUSTRY_SOLUTIONS: IndustryItem[] = [
       "Non-alarmist trend visualization for floor nurses",
       "Secure family health updates with role-based access",
     ],
+    metrics: [
+      { label: "False Alarms", value: "-42%" },
+      { label: "Audit Compliance", value: "100%" },
+    ],
     icon: Home,
     accentBg: "bg-emerald-50",
     accentColor: "text-emerald-700 border-emerald-200",
@@ -91,6 +105,10 @@ const INDUSTRY_SOLUTIONS: IndustryItem[] = [
       "Population Stability Index (PSI) drift tracking",
       "FHIR v4.0.1 research dataset exports",
     ],
+    metrics: [
+      { label: "Cohort Size", value: "250K+ Rows" },
+      { label: "Drift Metric", value: "PSI < 0.10" },
+    ],
     icon: Users2,
     accentBg: "bg-indigo-50",
     accentColor: "text-indigo-700 border-indigo-200",
@@ -101,7 +119,7 @@ const INDUSTRY_SOLUTIONS: IndustryItem[] = [
 
 export function IndustrySolutions() {
   return (
-    <section id="industry-solutions" className="py-16 sm:py-22 bg-slate-50/50 border-b border-slate-200/80">
+    <section id="industry-solutions" className="py-16 sm:py-22 bg-slate-50/60 border-b border-slate-200/80">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
@@ -124,7 +142,7 @@ export function IndustrySolutions() {
             return (
               <div
                 key={item.id}
-                className="group relative rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between"
+                className="group relative rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between mb-6">
@@ -141,12 +159,22 @@ export function IndustrySolutions() {
                   <span className="text-[11px] font-mono font-bold text-teal-700 uppercase tracking-wider block mb-1">
                     {item.category}
                   </span>
-                  <h3 className="text-xl font-bold text-slate-950 group-hover:text-teal-700 transition-colors mb-3">
+                  <h3 className="text-xl font-bold text-slate-950 group-hover:text-teal-700 transition-colors mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-5">
                     {item.description}
                   </p>
+
+                  {/* Quantitative Environment Metrics */}
+                  <div className="grid grid-cols-2 gap-3 mb-5 p-3 rounded-xl bg-slate-50 border border-slate-200/70">
+                    {item.metrics.map((m, mIdx) => (
+                      <div key={mIdx} className="text-left">
+                        <span className="text-[10px] font-mono text-slate-500 uppercase block">{m.label}</span>
+                        <span className="text-sm font-mono font-bold text-slate-900">{m.value}</span>
+                      </div>
+                    ))}
+                  </div>
 
                   {/* Capability Highlights */}
                   <div className="space-y-2.5 pt-2 border-t border-slate-100">

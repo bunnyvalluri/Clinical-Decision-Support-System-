@@ -60,14 +60,18 @@ export function SolutionsCTA() {
                 <p className="text-sm sm:text-base text-slate-600 max-w-xl">
                   Discover how HealthNova AI can create value for your organization, support your clinical teams, and enhance patient outcomes.
                 </p>
-                <div className="flex items-center gap-4 text-xs text-slate-500 pt-1">
-                  <span className="flex items-center gap-1 font-medium">
+                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-1">
+                  <span className="flex items-center gap-1 font-semibold text-teal-800">
                     <CheckCircle2 className="h-3.5 w-3.5 text-teal-600" />
                     HIPAA Safe Harbor Ready
                   </span>
-                  <span className="flex items-center gap-1 font-medium">
+                  <span className="flex items-center gap-1 font-semibold text-teal-800">
                     <CheckCircle2 className="h-3.5 w-3.5 text-teal-600" />
                     Zero PHI Ingestion
+                  </span>
+                  <span className="flex items-center gap-1 font-semibold text-teal-800">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-teal-600" />
+                    21 CFR Part 11 Audit Trail
                   </span>
                 </div>
               </div>
@@ -78,7 +82,7 @@ export function SolutionsCTA() {
               <Link href="/about#faq" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-slate-950 hover:bg-slate-800 text-white font-bold px-7 h-12 rounded-xl shadow-xs gap-2 text-sm"
+                  className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold px-7 h-12 rounded-xl shadow-xs gap-2 text-sm transition-all"
                 >
                   <span>Get in Touch</span>
                   <ArrowRight className="h-4 w-4" />
@@ -89,7 +93,7 @@ export function SolutionsCTA() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto bg-white/90 border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-white font-semibold px-6 h-12 rounded-xl gap-2 text-sm shadow-2xs"
+                  className="w-full sm:w-auto bg-white/95 border-slate-300 text-slate-700 hover:text-slate-950 hover:bg-white font-semibold px-6 h-12 rounded-xl gap-2 text-sm shadow-2xs transition-all"
                 >
                   <Calendar className="h-4 w-4 text-teal-600" />
                   <span>Request a Demo</span>

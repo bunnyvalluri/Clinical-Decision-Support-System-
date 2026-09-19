@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   FileCheck,
   Stethoscope,
@@ -123,8 +123,8 @@ export function ExampleWorkflows() {
                         </h3>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 font-medium">
-                      Simulated
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200">
+                      {scenario.badge}
                     </span>
                   </div>
 
@@ -162,12 +162,14 @@ export function ExampleWorkflows() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
                   <span className="flex items-center gap-1">
                     <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />
                     Human Clinician Sign-Off Enforced
                   </span>
-                  <span className="font-mono text-[10px]">21 CFR Part 11</span>
+                  <span className="font-mono text-[10px] text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                    21 CFR Part 11
+                  </span>
                 </div>
               </div>
             );

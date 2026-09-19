@@ -4,111 +4,121 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
-  Sparkles,
-  Database,
-  Radio,
   ShieldCheck,
-  UserCheck,
+  Radio,
+  Zap,
+  Cpu,
   HeartPulse,
   ChevronDown,
-  FileCheck,
   Activity,
-  Zap,
-  Lock,
-  Cpu,
   CheckCircle2,
+  Sliders,
+  Sparkles,
+  Terminal,
+  UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function AboutHero() {
-  const [activeNode, setActiveNode] = useState<string | null>(null);
+  const [hudMode, setHudMode] = useState<"telemetry" | "swarm">("telemetry");
+  const [signedOff, setSignedOff] = useState(false);
 
   const stats = [
-    { label: "Inference Latency", value: "0.136 ms", sub: "Sub-millisecond scoring", icon: Zap },
-    { label: "Cohort Accuracy", value: "ROC-AUC 0.94", sub: "Multi-hospital evaluated", icon: Cpu },
-    { label: "Telemetry Sync", value: "<20 ms", sub: "WebSocket live stream", icon: Radio },
-    { label: "Human Oversight", value: "100% Enforced", sub: "Physician sign-off gate", icon: ShieldCheck },
+    { label: "Inference Latency", value: "0.136 ms", sub: "Sub-millisecond p99 scoring", icon: Zap },
+    { label: "Cohort Discrimination", value: "ROC-AUC 0.94", sub: "Multi-center validated", icon: Cpu },
+    { label: "Telemetry Sync", value: "<20 ms", sub: "ASGI WebSocket stream", icon: Radio },
+    { label: "Human Oversight", value: "100% Enforced", sub: "Mandatory physician sign-off", icon: ShieldCheck },
   ];
 
   return (
-    <section className="relative overflow-hidden pt-10 pb-16 sm:pt-16 sm:pb-24 lg:pt-20 lg:pb-28 bg-gradient-to-b from-slate-50/80 via-white to-white border-b border-slate-200/80">
-      {/* High-end ambient clinical gradient glows */}
+    <section className="relative overflow-hidden pt-8 pb-16 sm:pt-14 sm:pb-24 lg:pt-16 lg:pb-28 bg-gradient-to-b from-slate-50/90 via-white to-slate-50/40 border-b border-slate-200">
+      {/* Precision subtle engineering grid */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-24 right-1/4 h-[500px] w-[500px] rounded-full bg-gradient-to-br from-teal-400/15 via-cyan-300/10 to-transparent blur-3xl"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px] opacity-40 [mask-image:radial-gradient(ellipse_75%_55%_at_50%_30%,#000_65%,transparent_100%)]"
+      />
+
+      {/* Atmospheric clinical gradient orbs */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-28 right-1/4 h-[550px] w-[550px] rounded-full bg-teal-500/10 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-1/3 -left-20 h-[450px] w-[450px] rounded-full bg-gradient-to-tr from-sky-400/12 via-indigo-300/8 to-transparent blur-3xl"
-      />
-      {/* Subtle clinical grid background texture */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:24px_24px] opacity-35 [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,#000_60%,transparent_100%)]"
+        className="pointer-events-none absolute top-1/3 -left-24 h-[500px] w-[500px] rounded-full bg-sky-500/8 blur-3xl"
       />
 
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-          {/* Left Column: Hero Copy & Actions */}
-          <div className="lg:col-span-7 space-y-6 sm:space-y-8 text-left">
-            {/* Regulatory & Institutional Eyebrow */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-teal-200/80 text-teal-900 text-xs font-mono font-bold tracking-wide shadow-xs">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+          {/* Left Column: Executive Value Proposition */}
+          <div className="lg:col-span-7 space-y-6 text-left">
+            {/* Regulatory & Institutional Status Pill */}
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-300 text-slate-800 text-xs font-mono font-semibold shadow-xs">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-600" />
               </span>
-              <span className="uppercase text-teal-800">ENTERPRISE CLINICAL DECISION SUPPORT</span>
+              <span className="tracking-wide uppercase text-teal-800 font-bold">
+                ENTERPRISE CLINICAL DECISION SUPPORT
+              </span>
               <span className="text-slate-300">•</span>
-              <span className="text-slate-600 font-sans font-semibold">FDA SaMD Aligned</span>
+              <span className="text-slate-600 font-sans">FDA SaMD Aligned</span>
+              <span className="text-slate-300 hidden sm:inline">•</span>
+              <span className="text-teal-700 font-sans hidden sm:inline">HL7 FHIR R4 Ready</span>
             </div>
 
-            {/* Main Headline with Curated Gradient */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.12] sm:leading-[1.08]">
-              Building the Future of{" "}
-              <span className="bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 bg-clip-text text-transparent block sm:inline">
-                Intelligent Clinical
-              </span>{" "}
-              <span className="text-slate-950">Decision Support</span>
-            </h1>
+            {/* Main Commanding Headline */}
+            <div className="space-y-2">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08]">
+                Precision Intelligence at the{" "}
+                <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
+                  Point of Care
+                </span>
+              </h1>
+              <p className="text-lg sm:text-xl font-medium text-slate-700 tracking-tight">
+                Anticipating Acute Patient Deterioration Hours Before Bedside Crisis
+              </p>
+            </div>
 
-            {/* Supporting Paragraph */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
-              HealthNova AI bridges complex clinical telemetry, longitudinal EHR records,
-              and real-time bedside decision-making. We build calibrated, transparent,
-              and clinically-validated intelligence tools that empower physicians, nurses,
-              and hospital teams to anticipate critical patient deteriorations hours before crises occur.
+            {/* Authoritative Subtitle */}
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl font-normal">
+              HealthNova AI bridges high-frequency bedside telemetry, longitudinal EHR records, and
+              calibrated ensemble machine learning. Built from the ICU up, our dual-gated system delivers
+              transparent TreeSHAP pathophysiological drivers and deterministic clinical safety interlocks (qSOFA, NEWS2),
+              enabling acute care teams to act with swift clinical certainty.
             </p>
 
-            {/* Reassurance Invariant Banner (Strict Clinical Compliance) */}
-            <div className="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-r from-teal-50/90 via-slate-50/90 to-white border border-teal-200/70 flex items-start gap-3.5 max-w-xl shadow-xs">
-              <div className="h-10 w-10 rounded-xl bg-teal-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-teal-600/20">
+            {/* Mandatory Clinical Safety Invariant Banner */}
+            <div className="p-4 sm:p-4.5 rounded-2xl bg-white border border-teal-200/90 shadow-sm flex items-start gap-3.5 max-w-xl">
+              <div className="h-10 w-10 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-teal-700/20">
                 <ShieldCheck className="h-5 w-5" />
               </div>
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <strong className="text-xs font-bold text-slate-950 uppercase tracking-wide">
-                    Human-in-the-Loop Architecture
+                  <strong className="text-xs font-bold text-slate-950 uppercase tracking-wider">
+                    Human-in-the-Loop Clinical Architecture
                   </strong>
-                  <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-100/70 px-1.5 py-0.2 rounded border border-teal-200">
+                  <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                     MANDATORY
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  AI/ML models calculate calibrated risk signals and localized TreeSHAP factor attributions.
-                  Licensed clinical professionals retain sole final diagnostic, prescription, and treatment authority.
+                  AI/ML models compute calibrated risk trajectories with transparent factor attributions.
+                  Licensed attending physicians retain sole and absolute authority for all diagnostic,
+                  therapeutic, and prescription decisions.
                 </p>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <Link href="/dashboard">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-bold px-7 shadow-md shadow-teal-600/20 hover:shadow-lg hover:shadow-teal-600/30 gap-2 text-sm h-12 rounded-xl transition-all hover:-translate-y-0.5 border-0"
+                  className="w-full sm:w-auto bg-teal-700 hover:bg-teal-800 text-white font-bold px-7 shadow-md shadow-teal-900/10 gap-2 text-sm h-12 rounded-xl transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <HeartPulse className="h-4 w-4" />
-                  <span>Launch Live Platform</span>
+                  <HeartPulse className="h-4 w-4 text-teal-200" />
+                  <span>Launch Live Bedside Demo</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
@@ -116,33 +126,33 @@ export function AboutHero() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-300 text-slate-700 hover:text-slate-950 font-semibold px-6 text-sm h-12 rounded-xl shadow-2xs gap-2 transition-all hover:-translate-y-0.5"
+                  className="w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-300 text-slate-700 hover:text-slate-950 font-semibold px-6 text-sm h-12 rounded-xl shadow-2xs gap-2 transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
-                  <span>Our Clinical Principles</span>
+                  <span>Inspect Clinical Paradigm</span>
                   <ChevronDown className="h-4 w-4 text-slate-400" />
                 </Button>
               </a>
             </div>
 
-            {/* Proof Metric Ribbon */}
-            <div className="pt-4 border-t border-slate-200/80 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {/* Proof Metrics Ribbon */}
+            <div className="pt-5 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3">
               {stats.map((item) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={item.label}
-                    className="p-3 rounded-xl bg-white border border-slate-200/90 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all"
+                    className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all"
                   >
-                    <div className="flex items-center gap-1.5 text-teal-600 mb-1">
-                      <Icon className="h-3.5 w-3.5" />
-                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
+                    <div className="flex items-center gap-1.5 text-teal-700 mb-1">
+                      <Icon className="h-3.5 w-3.5 shrink-0" />
+                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider truncate">
                         {item.label}
                       </span>
                     </div>
-                    <div className="text-sm sm:text-base font-extrabold text-slate-950 font-mono">
+                    <div className="text-base sm:text-lg font-black text-slate-950 font-mono tracking-tight">
                       {item.value}
                     </div>
-                    <div className="text-[10px] text-slate-500 truncate mt-0.5">
+                    <div className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
                       {item.sub}
                     </div>
                   </div>
@@ -151,286 +161,241 @@ export function AboutHero() {
             </div>
           </div>
 
-          {/* Right Column: Architectural Satellite Node Ecosystem HUD */}
+          {/* Right Column: 100% Light Clinical Bedside HUD Console */}
           <div className="lg:col-span-5 flex justify-center">
-            <div className="relative w-full max-w-lg rounded-3xl bg-gradient-to-b from-white via-slate-50/90 to-slate-100/80 border border-slate-200/90 p-5 sm:p-6 shadow-xl shadow-slate-200/50 flex flex-col items-center justify-between overflow-hidden">
-              {/* Subtle top console header */}
-              <div className="w-full flex items-center justify-between pb-3.5 mb-2 border-b border-slate-200/80">
+            <div className="w-full max-w-lg rounded-3xl bg-white text-slate-900 p-5 sm:p-6 shadow-xl border border-slate-300 space-y-4">
+              {/* Console Header Bar */}
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-200">
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-rose-400" />
                     <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-slate-600 ml-1 tracking-wider uppercase">
-                    SYSTEM TOPOLOGY HUD
+                  <span className="text-[11px] font-mono font-bold text-slate-700 ml-1 tracking-wider uppercase">
+                    BEDSIDE INTELLIGENCE HUD
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] font-mono font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-                  <span className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
-                  <span>SYNCHRONIZED</span>
+                {/* HUD Mode Switcher */}
+                <div className="flex items-center bg-slate-100 p-1 rounded-xl text-[10px] font-mono font-bold border border-slate-200">
+                  <button
+                    type="button"
+                    onClick={() => setHudMode("telemetry")}
+                    className={`px-2.5 py-1 rounded-lg cursor-pointer transition-all ${
+                      hudMode === "telemetry"
+                        ? "bg-white text-teal-900 shadow-xs border border-slate-200"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Telemetry
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHudMode("swarm")}
+                    className={`px-2.5 py-1 rounded-lg cursor-pointer transition-all ${
+                      hudMode === "swarm"
+                        ? "bg-white text-teal-900 shadow-xs border border-slate-200"
+                        : "text-slate-600 hover:text-slate-900"
+                    }`}
+                  >
+                    Swarm Consensus
+                  </button>
                 </div>
               </div>
 
-              {/* 1. Mobile/Tablet Responsive Connected Flow (< md) */}
-              <div className="w-full flex md:hidden flex-col items-center gap-3 py-2">
-                {/* Tier 1: Ingestion Layer */}
-                <div className="grid grid-cols-2 gap-2 w-full">
-                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="h-6 w-6 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
-                        <Database className="h-3 w-3" />
+              {hudMode === "telemetry" ? (
+                /* Telemetry & Deterioration View */
+                <div className="space-y-3.5">
+                  {/* Patient Header & Risk Flag */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">ICU-04</span>
+                        <span className="text-xs font-bold text-slate-950">Eleanor Vance, 68F</span>
                       </div>
-                      <span className="text-[8px] font-mono font-bold text-teal-700 bg-teal-50 px-1 py-0.2 rounded border border-teal-200">
-                        HL7 FHIR
+                      <span className="text-[10px] font-mono text-slate-500 mt-1 block">
+                        MRN-882910 • Post-Op Colorectal Day 2
                       </span>
                     </div>
-                    <h4 className="text-[11px] font-bold text-slate-900 leading-tight">EHR Ingestion</h4>
-                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">Vitals &amp; lab sync</p>
-                  </div>
-
-                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="h-6 w-6 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center">
-                        <Radio className="h-3 w-3" />
-                      </div>
-                      <span className="text-[8px] font-mono font-bold text-blue-700 bg-blue-50 px-1 py-0.2 rounded border border-blue-200">
-                        Sub-20ms
+                    <div className="text-right">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-800 animate-pulse">
+                        <span className="h-1.5 w-1.5 rounded-full bg-rose-600" />
+                        SEPSIS ALERT
+                      </span>
+                      <span className="block text-[9px] font-mono text-slate-500 mt-0.5">
+                        +6.2h Anticipatory Lead
                       </span>
                     </div>
-                    <h4 className="text-[11px] font-bold text-slate-900 leading-tight">Bedside Telemetry</h4>
-                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">ECG &amp; SpO2 feed</p>
                   </div>
-                </div>
 
-                {/* Pipeline Flow Connector */}
-                <div className="flex flex-col items-center justify-center py-0.5">
-                  <div className="w-0.5 h-3 bg-gradient-to-b from-teal-400 to-teal-600" />
-                  <span className="text-[8px] font-mono font-bold text-teal-700 uppercase bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-                    Active Telemetry Ingestion ▾
-                  </span>
-                  <div className="w-0.5 h-3 bg-gradient-to-b from-teal-600 to-teal-500" />
-                </div>
-
-                {/* Tier 2: Central Clinical Core */}
-                <div className="flex flex-col items-center justify-center h-28 w-28 rounded-full bg-white border-2 border-teal-500 shadow-lg shadow-teal-500/15 p-2 text-center relative">
-                  <div className="relative">
-                    <div className="h-8 w-8 rounded-xl bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200 flex items-center justify-center text-teal-600 mb-0.5 shadow-xs">
-                      <HeartPulse className="h-4 w-4 animate-pulse" />
+                  {/* Real-Time Telemetry Sparkline & Vitals Grid */}
+                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-2xs">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-600">
+                      <span className="flex items-center gap-1.5 font-bold">
+                        <Activity className="h-3.5 w-3.5 text-teal-700" />
+                        Lead II ECG Rhythm
+                      </span>
+                      <span className="text-teal-800 font-bold">Sinus Tachycardia (118 bpm)</span>
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                    </span>
-                  </div>
-                  <span className="text-[11px] font-black text-slate-950 leading-tight">
-                    Clinical Core
-                  </span>
-                  <span className="text-[9px] font-mono font-bold text-teal-700">
-                    Ruflo AI Swarm
-                  </span>
-                  <span className="text-[8px] font-mono text-slate-400">
-                    v3.42 Active
-                  </span>
-                </div>
+                    {/* Simulated ECG Rhythm SVG Waveform */}
+                    <div className="h-9 w-full bg-slate-50/90 rounded-xl border border-slate-200 overflow-hidden relative flex items-center px-2">
+                      <svg
+                        className="w-full h-8 text-teal-700 stroke-current fill-none stroke-[2]"
+                        viewBox="0 0 300 32"
+                        preserveAspectRatio="none"
+                      >
+                        <path d="M0,16 L30,16 L35,10 L40,22 L45,16 L60,16 L65,16 L70,8 L75,28 L80,4 L85,20 L90,16 L120,16 L125,10 L130,22 L135,16 L150,16 L155,16 L160,8 L165,28 L170,4 L175,20 L180,16 L210,16 L215,10 L220,22 L225,16 L240,16 L245,16 L250,8 L255,28 L260,4 L265,20 L270,16 L300,16" />
+                      </svg>
+                    </div>
 
-                {/* Pipeline Flow Connector */}
-                <div className="flex flex-col items-center justify-center py-0.5">
-                  <div className="w-0.5 h-3 bg-gradient-to-b from-teal-500 to-indigo-500" />
-                  <span className="text-[8px] font-mono font-bold text-indigo-700 uppercase bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
-                    Deterministic Safety Gate ▾
-                  </span>
-                  <div className="w-0.5 h-3 bg-gradient-to-b from-indigo-500 to-purple-500" />
-                </div>
-
-                {/* Tier 3: Protocols & Sign-Off */}
-                <div className="grid grid-cols-2 gap-2 w-full">
-                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="h-6 w-6 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
-                        <FileCheck className="h-3 w-3" />
+                    {/* Vitals Quadrant */}
+                    <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100 text-center font-mono">
+                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block">HR</span>
+                        <span className="text-xs font-bold text-rose-600">118 bpm</span>
                       </div>
-                      <span className="text-[8px] font-mono font-bold text-amber-700 bg-amber-50 px-1 py-0.2 rounded border border-amber-200">
-                        Rule Gate
+                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block">MAP / BP</span>
+                        <span className="text-xs font-bold text-rose-600">58 / 86/52</span>
+                      </div>
+                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block">SpO2</span>
+                        <span className="text-xs font-bold text-amber-600">91% (RA)</span>
+                      </div>
+                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-200">
+                        <span className="text-[9px] text-slate-500 block">Resp Rate</span>
+                        <span className="text-xs font-bold text-rose-600">26 /min</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Risk Probability & TreeSHAP Factor Drivers */}
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 font-mono">
+                        <Sliders className="h-3.5 w-3.5 text-teal-700" />
+                        <span className="font-bold text-slate-900">Ensemble Sepsis Risk</span>
+                      </div>
+                      <span className="font-mono font-black text-rose-600 text-sm">84.7%</span>
+                    </div>
+
+                    {/* Calibrated Risk Bar */}
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden border border-slate-200">
+                      <div
+                        className="bg-gradient-to-r from-amber-500 via-rose-500 to-red-600 h-2 rounded-full transition-all duration-500"
+                        style={{ width: "85%" }}
+                      />
+                    </div>
+
+                    {/* Local TreeSHAP Factor Attributions */}
+                    <div className="space-y-1.5 pt-1">
+                      <span className="text-[10px] font-mono text-slate-500 font-bold block uppercase">
+                        Top TreeSHAP Biomarker Drivers:
+                      </span>
+                      <div className="grid grid-cols-3 gap-1.5 text-[10px] font-mono">
+                        <div className="p-1.5 rounded-xl bg-white border border-rose-200 text-rose-800">
+                          <span className="block text-[8px] text-slate-500">Serum Lactate</span>
+                          <span className="font-bold">3.8 (+0.21)</span>
+                        </div>
+                        <div className="p-1.5 rounded-xl bg-white border border-rose-200 text-rose-800">
+                          <span className="block text-[8px] text-slate-500">MAP Depressed</span>
+                          <span className="font-bold">58 mmHg (+0.17)</span>
+                        </div>
+                        <div className="p-1.5 rounded-xl bg-white border border-emerald-200 text-emerald-800">
+                          <span className="block text-[8px] text-slate-500">WBC Elevation</span>
+                          <span className="font-bold">14.8k (+0.11)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Deterministic Rule Interlock & Interactive Sign-Off Action */}
+                  <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-200 space-y-2.5">
+                    <div className="flex items-center justify-between text-[11px] font-mono">
+                      <span className="text-teal-900 font-bold">Deterministic Clinical Gate:</span>
+                      <span className="text-rose-700 font-bold bg-white px-2 py-0.5 rounded border border-rose-200">qSOFA = 2 • NEWS2 = 8</span>
+                    </div>
+                    {signedOff ? (
+                      <div className="p-2.5 rounded-xl bg-white border border-teal-300 text-teal-900 text-xs font-mono flex items-center justify-between shadow-2xs">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-teal-700 shrink-0" />
+                          <div>
+                            <span className="font-bold block">Dr. R. Vance, MD (ID: #4481)</span>
+                            <span className="text-[10px] text-teal-700">1-Hour Sepsis Bundle Authorized</span>
+                          </div>
+                        </div>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-teal-100 text-teal-900 border border-teal-200">
+                          AUDITED
+                        </span>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setSignedOff(true)}
+                        className="w-full py-2.5 px-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-mono font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:shadow-teal-900/10"
+                      >
+                        <UserCheck className="h-3.5 w-3.5" />
+                        <span>Authorize 1-Hour Sepsis Bundle (Attending Sign-Off)</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Ruflo Multi-Agent Swarm Consensus View */
+                <div className="space-y-3 font-mono text-xs">
+                  <div className="p-3.5 rounded-2xl bg-teal-50 border border-teal-200 space-y-1">
+                    <div className="flex items-center justify-between text-teal-900 text-[11px] font-bold">
+                      <span className="flex items-center gap-1.5">
+                        <Terminal className="h-3.5 w-3.5 text-teal-700" />
+                        Ruflo v3.42.0 Policy Swarm
+                      </span>
+                      <span className="text-emerald-800 font-bold bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300">
+                        CONSENSUS VERIFIED
                       </span>
                     </div>
-                    <h4 className="text-[11px] font-bold text-slate-950 leading-tight">Clinical Protocols</h4>
-                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">qSOFA &amp; NEWS2</p>
+                    <p className="text-[10px] text-slate-600 font-sans">
+                      Hierarchical 6-agent deterministic policy evaluation before alerting bedside clinician.
+                    </p>
                   </div>
 
-                  <div className="rounded-xl bg-white border border-slate-200 p-2.5 shadow-xs">
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="h-6 w-6 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center">
-                        <UserCheck className="h-3 w-3" />
+                  <div className="space-y-1.5">
+                    {[
+                      { role: "coordinator", action: "Dispatched vitals & context minimization", status: "CLEARED" },
+                      { role: "clinical-safety-agent", action: "Cross-audited qSOFA=2 & NEWS2=8 rules", status: "ALERT READY" },
+                      { role: "ml-engineer-agent", action: "Platt calibration Brier=0.08, AUC=0.94", status: "VALIDATED" },
+                      { role: "mlops-agent", action: "PSI drift check = 0.024 (< 0.100 threshold)", status: "STABLE" },
+                      { role: "clinical-explainability-agent", action: "Computed 18 exact TreeSHAP feature attributions", status: "COMPILED" },
+                      { role: "privacy-agent", action: "Zero-PHI memory boundary enforced via Neon", status: "SECURE" },
+                    ].map((agent) => (
+                      <div
+                        key={agent.role}
+                        className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-[11px]"
+                      >
+                        <div className="space-y-0.5">
+                          <span className="text-teal-900 font-bold block">{agent.role}</span>
+                          <span className="text-[10px] text-slate-500">{agent.action}</span>
+                        </div>
+                        <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-white text-slate-700 border border-slate-200">
+                          {agent.status}
+                        </span>
                       </div>
-                      <span className="text-[8px] font-mono font-bold text-purple-700 bg-purple-50 px-1 py-0.2 rounded border border-purple-200">
-                        Authority
-                      </span>
-                    </div>
-                    <h4 className="text-[11px] font-bold text-slate-950 leading-tight">Clinician Sign-Off</h4>
-                    <p className="text-[9px] text-slate-500 leading-tight mt-0.5">Physician approval</p>
+                    ))}
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[10px] text-slate-600 flex items-center justify-between">
+                    <span>Authoritative Store: Neon PostgreSQL</span>
+                    <span className="text-teal-800 font-bold">100% ACID Logged</span>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {/* 2. Desktop Spacious Orbital HUD (md: and up) */}
-              <div className="hidden md:flex relative w-full h-[390px] lg:h-[410px] items-center justify-center">
-                {/* Concentric Ambient Pulse Rings */}
-                <div
-                  aria-hidden="true"
-                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                >
-                  <div className="h-72 w-72 lg:h-80 lg:w-80 rounded-full border border-slate-200/60 animate-[spin_40s_linear_infinite]" />
-                  <div className="absolute h-56 w-56 lg:h-64 lg:w-64 rounded-full border border-dashed border-teal-200/70" />
-                  <div className="absolute h-40 w-40 lg:h-48 lg:w-48 rounded-full border border-teal-100 bg-teal-50/20" />
-                </div>
-
-                {/* Connecting SVG Circuit Lines */}
-                <svg
-                  aria-hidden="true"
-                  className="absolute inset-0 h-full w-full pointer-events-none"
-                >
-                  <defs>
-                    <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#0d9488" stopOpacity="0.6" />
-                      <stop offset="100%" stopColor="#0284c7" stopOpacity="0.6" />
-                    </linearGradient>
-                  </defs>
-                  <line x1="50%" y1="50%" x2="18%" y2="16%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="82%" y2="16%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="18%" y2="84%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="82%" y2="84%" stroke="url(#lineGrad)" strokeWidth="1.5" strokeDasharray="4 4" />
-                </svg>
-
-                {/* 1. Top-Left Satellite Node: EHR / FHIR */}
-                <div
-                  onMouseEnter={() => setActiveNode("ehr")}
-                  onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute top-2 left-0 lg:left-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
-                    activeNode === "ehr"
-                      ? "border-teal-500 scale-105 shadow-teal-500/10"
-                      : "border-slate-200/90 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="h-7 w-7 rounded-lg bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
-                      <Database className="h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-[9px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
-                      HL7 FHIR v4
-                    </span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-900 truncate">EHR Ingestion</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
-                    Vitals &amp; lab assays
-                  </p>
-                </div>
-
-                {/* 2. Top-Right Satellite Node: Diagnostic Telemetry */}
-                <div
-                  onMouseEnter={() => setActiveNode("telemetry")}
-                  onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute top-2 right-0 lg:right-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
-                    activeNode === "telemetry"
-                      ? "border-blue-500 scale-105 shadow-blue-500/10"
-                      : "border-slate-200/90 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="h-7 w-7 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center">
-                      <Radio className="h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-[9px] font-mono font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-                      Sub-20ms
-                    </span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-900 truncate">Bedside Telemetry</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
-                    High-frequency ECG
-                  </p>
-                </div>
-
-                {/* 3. Central Clinical Intelligence Core */}
-                <div className="relative z-10 flex flex-col items-center justify-center h-28 w-28 lg:h-32 lg:w-32 rounded-full bg-white border-2 border-teal-500 shadow-xl shadow-teal-500/15 p-2 text-center transition-transform hover:scale-105">
-                  <div className="relative">
-                    <div className="h-9 w-9 rounded-2xl bg-gradient-to-tr from-teal-50 to-emerald-50 border border-teal-200 flex items-center justify-center text-teal-600 mb-0.5 shadow-xs">
-                      <HeartPulse className="h-5 w-5 animate-pulse" />
-                    </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-                    </span>
-                  </div>
-                  <span className="text-xs font-black text-slate-950 leading-tight">
-                    Clinical Core
-                  </span>
-                  <span className="text-[10px] font-mono font-bold text-teal-700 mt-0.5">
-                    Ruflo AI Swarm
-                  </span>
-                  <span className="text-[9px] font-mono text-slate-400">
-                    v3.42 Active
-                  </span>
-                </div>
-
-                {/* 4. Bottom-Left Satellite Node: Deterministic Safety Rules */}
-                <div
-                  onMouseEnter={() => setActiveNode("rules")}
-                  onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute bottom-2 left-0 lg:left-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
-                    activeNode === "rules"
-                      ? "border-amber-500 scale-105 shadow-amber-500/10"
-                      : "border-slate-200/90 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="h-7 w-7 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
-                      <FileCheck className="h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-[9px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                      Deterministic
-                    </span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-950 truncate">Clinical Protocols</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
-                    qSOFA &amp; NEWS2 gates
-                  </p>
-                </div>
-
-                {/* 5. Bottom-Right Satellite Node: Clinician Review Authority */}
-                <div
-                  onMouseEnter={() => setActiveNode("clinician")}
-                  onMouseLeave={() => setActiveNode(null)}
-                  className={`absolute bottom-2 right-0 lg:right-2 z-20 w-38 lg:w-42 xl:w-44 rounded-2xl bg-white border p-3 shadow-md transition-all duration-300 cursor-pointer ${
-                    activeNode === "clinician"
-                      ? "border-purple-500 scale-105 shadow-purple-500/10"
-                      : "border-slate-200/90 hover:border-slate-300"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="h-7 w-7 rounded-lg bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center">
-                      <UserCheck className="h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-[9px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
-                      Final Authority
-                    </span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-950 truncate">Clinician Sign-Off</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight mt-0.5 truncate">
-                    Physician verification
-                  </p>
-                </div>
-              </div>
-
-              {/* Bottom HUD Security Persistence Badge */}
-              <div className="w-full pt-3 mt-2 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between text-[10px] text-slate-500 font-mono gap-1.5">
-                <span className="flex items-center gap-1">
-                  <Lock className="h-3 w-3 text-teal-600" />
-                  Authoritative Store: Neon PostgreSQL
+              {/* Console Footer Live Heartbeat */}
+              <div className="flex items-center justify-between pt-1 text-[10px] font-mono text-slate-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  <span>Real-time Telemetry Loop</span>
                 </span>
-                <span className="text-emerald-700 font-bold flex items-center gap-1">
-                  <CheckCircle2 className="h-3 w-3" />
-                  Zero PHI Memory
-                </span>
+                <span>Latency: 0.136ms • Sub-20ms WebSocket</span>
               </div>
             </div>
           </div>

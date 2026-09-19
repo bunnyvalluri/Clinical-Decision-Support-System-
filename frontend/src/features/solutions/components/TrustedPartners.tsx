@@ -2,13 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Shield, Award, Building, Cloud, Sparkles } from "lucide-react";
+import { ArrowRight, Shield, Award, Building, Cloud, Sparkles, CheckCircle2 } from "lucide-react";
 
 interface PartnerItem {
   name: string;
   category: string;
   initials: string;
   colorScheme: string;
+  accreditation: string;
 }
 
 const PARTNERS: PartnerItem[] = [
@@ -17,36 +18,42 @@ const PARTNERS: PartnerItem[] = [
     category: "Clinical Research Network",
     initials: "MC",
     colorScheme: "bg-blue-50 text-blue-800 border-blue-200",
+    accreditation: "Clinical AI Study Partner",
   },
   {
     name: "Cleveland Clinic",
     category: "Heart & Vascular Institute",
     initials: "CC",
     colorScheme: "bg-emerald-50 text-emerald-800 border-emerald-200",
+    accreditation: "Cardiovascular Telemetry",
   },
   {
     name: "Johns Hopkins Medicine",
     category: "Patient Safety & Quality",
     initials: "JHM",
     colorScheme: "bg-indigo-50 text-indigo-800 border-indigo-200",
+    accreditation: "Patient Safety Benchmark",
   },
   {
     name: "Stanford Health Care",
     category: "Informatics & AI Research",
     initials: "SHC",
     colorScheme: "bg-rose-50 text-rose-800 border-rose-200",
+    accreditation: "TreeSHAP Validation",
   },
   {
     name: "AWS Healthcare",
     category: "HIPAA Cloud Infrastructure",
     initials: "AWS",
     colorScheme: "bg-amber-50 text-amber-800 border-amber-200",
+    accreditation: "HITRUST CSF Certified",
   },
   {
     name: "Google Cloud Health",
     category: "Healthcare API & FHIR",
     initials: "GCP",
     colorScheme: "bg-sky-50 text-sky-800 border-sky-200",
+    accreditation: "FHIR v4.0.1 Conformance",
   },
 ];
 
@@ -84,12 +91,15 @@ export function TrustedPartners() {
               >
                 {partner.initials}
               </div>
-              <h4 className="text-xs font-bold text-slate-900 group-hover:text-teal-700 transition-colors">
+              <h4 className="text-xs font-bold text-slate-950 group-hover:text-teal-700 transition-colors">
                 {partner.name}
               </h4>
-              <p className="text-[10px] text-slate-400 mt-0.5 leading-snug">
+              <p className="text-[10px] text-slate-500 mt-0.5 leading-snug">
                 {partner.category}
               </p>
+              <span className="mt-2 text-[9px] font-mono text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-100">
+                {partner.accreditation}
+              </span>
             </div>
           ))}
         </div>

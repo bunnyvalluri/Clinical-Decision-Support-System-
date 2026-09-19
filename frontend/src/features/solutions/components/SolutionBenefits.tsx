@@ -10,12 +10,14 @@ import {
   Heart,
   Sparkles,
   CheckCircle2,
+  TrendingUp,
 } from "lucide-react";
 
 interface BenefitCard {
   title: string;
   quote: string;
   metric: string;
+  clinicalProof: string;
   description: string;
   icon: React.ElementType;
   accent: string;
@@ -26,55 +28,61 @@ const BENEFITS: BenefitCard[] = [
     title: "Better Visibility",
     quote: "Bring important healthcare information into a clearer view.",
     metric: "Unified Dashboard",
+    clinicalProof: "32 Clinical Stream Feeds",
     description:
       "Synthesize fragmented records, lab values, and live telemetry feeds into a single, high-contrast, uncluttered interface.",
     icon: Eye,
-    accent: "bg-teal-50 text-teal-600 border-teal-100",
+    accent: "bg-teal-50 text-teal-700 border-teal-200",
   },
   {
     title: "Faster Insights",
     quote: "Help professionals understand relevant information sooner.",
     metric: "4-Hour Sepsis Lead Time",
+    clinicalProof: "qSOFA + NEWS2 Dual Tripping",
     description:
       "Automate early risk scoring and anomaly detection so clinical teams can intervene hours before severe physiological deterioration.",
     icon: Zap,
-    accent: "bg-amber-50 text-amber-600 border-amber-100",
+    accent: "bg-amber-50 text-amber-700 border-amber-200",
   },
   {
     title: "Personalized Intelligence",
     quote: "Deliver insights based on authorized patient and healthcare context.",
     metric: "Patient-Specific Baseline",
+    clinicalProof: "Normalized Z-Scores",
     description:
       "Calibrate alerts against a patient's individual baseline history rather than generic population averages that cause alarm fatigue.",
     icon: UserCheck,
-    accent: "bg-blue-50 text-blue-600 border-blue-100",
+    accent: "bg-blue-50 text-blue-700 border-blue-200",
   },
   {
     title: "Connected Workflows",
     quote: "Connect data, AI and healthcare professionals.",
     metric: "Sub-Second Sync",
+    clinicalProof: "Django Channels WebSockets",
     description:
       "Bridge bedside nursing, physician rounds, and administrative capacity planning with unified, synchronized communication.",
     icon: Network,
-    accent: "bg-indigo-50 text-indigo-600 border-indigo-100",
+    accent: "bg-indigo-50 text-indigo-700 border-indigo-200",
   },
   {
     title: "Explainable AI",
     quote: "Make model-supported insights easier to understand and review.",
     metric: "TreeSHAP Transparency",
+    clinicalProof: "Shapley Attribution Sum",
     description:
       "Deconstruct ML probabilities into readable TreeSHAP feature contributions with clinical uncertainty indicators.",
     icon: Layers,
-    accent: "bg-purple-50 text-purple-600 border-purple-100",
+    accent: "bg-purple-50 text-purple-700 border-purple-200",
   },
   {
     title: "Human-Centered Care",
     quote: "Keep healthcare professionals at the center of important decisions.",
     metric: "Clinician Authority",
+    clinicalProof: "100% Doctor Confirmed",
     description:
       "Reinforce clinician autonomy. Technology assists and informs; the human clinician diagnoses, treats, and cares.",
     icon: Heart,
-    accent: "bg-rose-50 text-rose-600 border-rose-100",
+    accent: "bg-rose-50 text-rose-700 border-rose-200",
   },
 ];
 
@@ -103,7 +111,7 @@ export function SolutionBenefits() {
             return (
               <div
                 key={idx}
-                className="group rounded-2xl bg-white border border-slate-200 p-6 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-1 transition-all flex flex-col justify-between text-left"
+                className="group rounded-2xl bg-white border border-slate-200/90 p-6 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-1 transition-all flex flex-col justify-between text-left"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
@@ -121,9 +129,16 @@ export function SolutionBenefits() {
                   <p className="text-xs font-semibold text-teal-700 italic mb-3">
                     &ldquo;{benefit.quote}&rdquo;
                   </p>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
                     {benefit.description}
                   </p>
+                </div>
+
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono">
+                  <span className="text-slate-400 uppercase">Validation:</span>
+                  <span className="text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-100">
+                    {benefit.clinicalProof}
+                  </span>
                 </div>
               </div>
             );

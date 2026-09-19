@@ -17,6 +17,7 @@ import {
   Sparkles,
   BarChart2,
   TrendingDown,
+  Lock,
 } from "lucide-react";
 
 interface RoleSolution {
@@ -339,7 +340,7 @@ export function RoleSolutionsTabs() {
                 onClick={() => setActiveTab(r.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border ${
                   isSelected
-                    ? "bg-slate-950 text-white border-slate-950 shadow-sm ring-2 ring-slate-950/20"
+                    ? "bg-teal-700 text-white border-teal-700 shadow-sm ring-2 ring-teal-600/20"
                     : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-950"
                 }`}
               >
@@ -403,7 +404,7 @@ export function RoleSolutionsTabs() {
               {/* CTA Link */}
               <div className="pt-2">
                 <Link href={currentRole.portalRoute}>
-                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-xs transition-colors">
+                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs transition-colors">
                     <span>{currentRole.portalCta}</span>
                     <ArrowRight className="h-3.5 w-3.5" />
                   </button>

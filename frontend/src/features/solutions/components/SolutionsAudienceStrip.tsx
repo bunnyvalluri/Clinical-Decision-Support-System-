@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   User,
@@ -10,6 +10,9 @@ import {
   Database,
   ArrowRight,
   Sparkles,
+  CheckCircle2,
+  Activity,
+  ShieldCheck,
 } from "lucide-react";
 
 interface AudienceCard {
@@ -19,6 +22,7 @@ interface AudienceCard {
   description: string;
   badge: string;
   metric: string;
+  telemetryTag: string;
   icon: React.ElementType;
   accentColor: string;
   accentBorder: string;
@@ -34,6 +38,7 @@ const AUDIENCE_CARDS: AudienceCard[] = [
       "Understand your personal vital trajectories and receive clear, non-alarmist health guidance without confusing medical jargon.",
     badge: "Personal Health",
     metric: "Plain Language Insights",
+    telemetryTag: "Patient-Friendly Vitals",
     icon: User,
     accentColor: "bg-rose-50 text-rose-600 border-rose-200",
     accentBorder: "border-t-rose-500",
@@ -47,8 +52,9 @@ const AUDIENCE_CARDS: AudienceCard[] = [
       "Access validated risk predictions, longitudinal trend analysis, and TreeSHAP explainability to elevate diagnostic confidence.",
     badge: "Diagnostics & Care",
     metric: "TreeSHAP Attributions",
+    telemetryTag: "qSOFA & Sepsis Lead",
     icon: Stethoscope,
-    accentColor: "bg-teal-50 text-teal-600 border-teal-200",
+    accentColor: "bg-teal-50 text-teal-700 border-teal-200",
     accentBorder: "border-t-teal-600",
     linkHref: "#role-solutions",
   },
@@ -60,8 +66,9 @@ const AUDIENCE_CARDS: AudienceCard[] = [
       "Rapid acuity scoring, continuous vital trend tracking, early sepsis warnings, and intelligent threshold alarms to eliminate alert fatigue.",
     badge: "Continuous Triage",
     metric: "42% Less Alarm Fatigue",
+    telemetryTag: "NEWS2 Floor Acuity",
     icon: HeartHandshake,
-    accentColor: "bg-sky-50 text-sky-600 border-sky-200",
+    accentColor: "bg-sky-50 text-sky-700 border-sky-200",
     accentBorder: "border-t-sky-500",
     linkHref: "#role-solutions",
   },
@@ -73,8 +80,9 @@ const AUDIENCE_CARDS: AudienceCard[] = [
       "Optimize bed allocation, reduce 30-day preventable readmissions, and achieve enterprise-scale clinical workflow efficiency.",
     badge: "Enterprise Scale",
     metric: "32% Fewer Readmissions",
+    telemetryTag: "Throughput Optimization",
     icon: Building2,
-    accentColor: "bg-indigo-50 text-indigo-600 border-indigo-200",
+    accentColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
     accentBorder: "border-t-indigo-600",
     linkHref: "#role-solutions",
   },
@@ -86,14 +94,17 @@ const AUDIENCE_CARDS: AudienceCard[] = [
       "Continuous model drift auditing with PSI tests, FHIR v4.0.1 interoperability, and immutable 21 CFR Part 11 cryptographic logging.",
     badge: "MLOps & Security",
     metric: "21 CFR Part 11 Trails",
+    telemetryTag: "PSI Drift < 0.10",
     icon: Database,
-    accentColor: "bg-amber-50 text-amber-600 border-amber-200",
+    accentColor: "bg-amber-50 text-amber-700 border-amber-200",
     accentBorder: "border-t-amber-500",
     linkHref: "#role-solutions",
   },
 ];
 
 export function SolutionsAudienceStrip() {
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+
   return (
     <section className="py-14 sm:py-18 bg-slate-50/70 border-b border-slate-200/80">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -113,9 +124,12 @@ export function SolutionsAudienceStrip() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
           {AUDIENCE_CARDS.map((card) => {
             const Icon = card.icon;
+            const isHovered = hoveredCard === card.id;
             return (
               <div
                 key={card.id}
+                onMouseEnter={() => setHoveredCard(card.id)}
+                onMouseLeave={() => setHoveredCard(null)}
                 className={`group relative rounded-2xl bg-white border border-slate-200 p-5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-1 transition-all flex flex-col justify-between border-t-4 ${card.accentBorder}`}
               >
                 <div>
@@ -141,17 +155,23 @@ export function SolutionsAudienceStrip() {
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-semibold text-slate-500">
-                    {card.metric}
-                  </span>
-                  <a
-                    href={card.linkHref}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:text-teal-900 group-hover:translate-x-0.5 transition-transform"
-                  >
-                    <span>Explore</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </a>
+                <div className="space-y-3 pt-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-slate-500 bg-slate-50 px-2 py-1 rounded border border-slate-200/70">
+                    <span className="text-slate-600">{card.telemetryTag}</span>
+                    <span className="text-teal-700 font-bold">{card.metric.split(" ")[0]}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono text-slate-500">
+                      {card.metric}
+                    </span>
+                    <a
+                      href={card.linkHref}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-teal-700 hover:text-teal-900 group-hover:translate-x-0.5 transition-transform"
+                    >
+                      <span>Explore</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </a>
+                  </div>
                 </div>
               </div>
             );

@@ -255,12 +255,7 @@ export default function LandingPage() {
       <PublicNavbar />
 
       {/* 2. Hero Section: Clinical Decision Support Platform */}
-      <section className="relative overflow-hidden pt-8 pb-16 sm:pt-14 sm:pb-20 lg:pt-20 lg:pb-24 border-b border-slate-200/80">
-        {/* Ambient Gradient Mesh Background Glows */}
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-gradient-to-tr from-teal-400/15 via-cyan-400/10 to-indigo-400/10 rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-[20%] left-[-5%] w-[450px] h-[450px] bg-teal-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-[30%] right-[-5%] w-[450px] h-[450px] bg-sky-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
-
+      <section className="relative overflow-hidden pt-8 pb-16 sm:pt-14 sm:pb-20 lg:pt-20 lg:pb-24 border-b border-slate-200/80 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.08),rgba(2,132,199,0.04),transparent)]">
         {/* Subtle decorative clinical grid background */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_30%,#000_70%,transparent_100%)] pointer-events-none opacity-40 -z-10" />
 
@@ -274,7 +269,7 @@ export default function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-600" />
                 </span>
-                <span className="font-mono text-[11px] text-teal-900 font-bold uppercase tracking-wider">
+                <span className="font-mono text-[11px] text-teal-800 font-bold uppercase tracking-wider">
                   FDA SaMD Class II Aligned
                 </span>
                 <span className="text-slate-300">•</span>
@@ -286,7 +281,7 @@ export default function LandingPage() {
               {/* Authoritative Main Headline */}
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08]">
                 Real-Time Clinical{" "}
-                <span className="bg-gradient-to-r from-teal-600 via-emerald-600 to-cyan-600 bg-clip-text text-transparent block sm:inline">
+                <span className="text-teal-600 block sm:inline">
                   Decision Support System
                 </span>
               </h1>
@@ -298,12 +293,27 @@ export default function LandingPage() {
                 and deterministic clinical safety overrides.
               </p>
 
+              {/* Clinical Governance Invariant Notice */}
+              <div className="p-3.5 rounded-2xl bg-white border border-slate-200/90 flex items-start gap-3 max-w-xl shadow-2xs">
+                <ShieldCheck className="h-5 w-5 text-teal-600 shrink-0 mt-0.5" />
+                <div className="space-y-0.5">
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    <strong className="font-bold text-slate-900">Clinical Responsibility Standard:</strong> Assistive intelligence only. Final diagnoses, medication adjustments, and discharge plans require licensed clinician sign-off.
+                  </p>
+                  <div className="flex items-center gap-3 text-[10px] text-slate-500 font-mono pt-1">
+                    <span>● 21 CFR Part 11 Aligned</span>
+                    <span>● Zero PHI Export</span>
+                    <span>● Non-Autonomous</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1">
                 <Link href="/dashboard" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full sm:w-auto text-sm font-bold gap-2 shadow-lg shadow-teal-600/20 hover:shadow-xl hover:shadow-teal-600/30 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white border-0 transition-all hover:-translate-y-0.5 h-12 px-7 rounded-xl"
+                    className="w-full sm:w-auto text-sm font-bold gap-2 bg-teal-600 hover:bg-teal-700 text-white shadow-sm border-0 transition-all h-12 px-7 rounded-xl"
                   >
                     <HeartPulse className="h-4 w-4" />
                     <span>Launch Live Portal</span>
@@ -314,7 +324,7 @@ export default function LandingPage() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="w-full sm:w-auto text-sm font-semibold gap-2 bg-white/90 backdrop-blur-md border-slate-300/90 hover:bg-slate-50 text-slate-800 shadow-xs hover:-translate-y-0.5 transition-all h-12 px-6 rounded-xl"
+                    className="w-full sm:w-auto text-sm font-semibold gap-2 bg-white border-slate-300 text-slate-800 hover:bg-slate-50 shadow-2xs transition-all h-12 px-6 rounded-xl"
                   >
                     <Sliders className="h-4 w-4 text-teal-600" />
                     <span>Explore Bedside Simulator</span>
@@ -335,7 +345,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("DOCTOR")}
-                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-md hover:shadow-teal-500/5 hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-teal-400 hover:shadow-xs hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
@@ -352,7 +362,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("NURSE")}
-                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-md hover:shadow-sky-500/5 hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-sky-400 hover:shadow-xs hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
@@ -369,7 +379,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("ANALYST")}
-                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-md hover:shadow-amber-500/5 hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-amber-400 hover:shadow-xs hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
@@ -386,7 +396,7 @@ export default function LandingPage() {
                   <button
                     type="button"
                     onClick={() => handleQuickDemo("ADMIN")}
-                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-md hover:shadow-purple-500/5 hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
+                    className="group p-3 rounded-xl bg-white border border-slate-200 hover:border-purple-400 hover:shadow-xs hover:-translate-y-0.5 transition-all text-left flex flex-col justify-between cursor-pointer"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded border border-purple-200">
@@ -405,11 +415,8 @@ export default function LandingPage() {
             {/* Right Column: Clear Clinical Medical Frame */}
             <div className="lg:col-span-5 relative flex justify-center items-center mt-6 lg:mt-0">
               <div className="relative w-full max-w-sm sm:max-w-md">
-                {/* Radiant ambient glow behind console frame */}
-                <div className="absolute -inset-3 bg-gradient-to-tr from-teal-500/20 via-sky-500/20 to-purple-500/20 rounded-3xl blur-2xl opacity-70 pointer-events-none" />
-
                 {/* Main Clinical Frame */}
-                <div className="relative overflow-hidden rounded-3xl border border-white/60 bg-white/95 backdrop-blur-xl p-3.5 shadow-2xl space-y-3.5">
+                <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-3.5 shadow-xl space-y-3.5">
                   {/* Hospital Telemetry Top Status Header */}
                   <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-between text-[11px] font-mono border border-slate-200/90">
                     <div className="flex items-center gap-2">
@@ -430,7 +437,7 @@ export default function LandingPage() {
                       className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
                     />
 
-                    {/* Non-obstructive mini telemetry HUD badge */}
+                    {/* Non-obstructive mini telemetry HUD badge - Pure Light */}
                     <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 flex items-center gap-2 shadow-md">
                       <Activity className="h-3.5 w-3.5 text-teal-600 animate-pulse" />
                       <span className="text-[11px] font-mono text-teal-800 font-bold">114 BPM • 98% SpO2</span>
@@ -440,7 +447,7 @@ export default function LandingPage() {
                   {/* Attending Physician Profile Banner */}
                   <div className="p-3 rounded-xl bg-white text-slate-900 flex items-center justify-between border border-slate-200 shadow-xs">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-teal-600 to-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                      <div className="h-9 w-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
                         VA
                       </div>
                       <div className="min-w-0 text-left">
@@ -502,7 +509,7 @@ export default function LandingPage() {
               <p className="text-sm font-bold text-slate-950 truncate">Random Forest</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-[11px] text-teal-700 font-mono font-bold">Calibrated Brier</span>
-                <span className="text-[10px] text-slate-400 font-mono truncate">0.0027</span>
+                <span className="text-[10px] text-slate-500 font-mono truncate">0.0027</span>
               </div>
             </div>
 
@@ -526,7 +533,7 @@ export default function LandingPage() {
               <p className="text-sm font-bold text-slate-950">0 Missed Events</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-[11px] text-teal-700 font-mono font-bold">100% Recall</span>
-                <span className="text-[10px] text-slate-400 font-mono">Acute Cohort</span>
+                <span className="text-[10px] text-slate-500 font-mono">Acute Cohort</span>
               </div>
             </div>
 
@@ -538,7 +545,7 @@ export default function LandingPage() {
               <p className="text-sm font-bold text-slate-950">ASGI Real-Time</p>
               <div className="flex items-center gap-1.5 mt-1">
                 <span className="text-[11px] text-sky-700 font-mono font-bold">Sub-Second Push</span>
-                <span className="text-[10px] text-slate-400 font-mono">WebSockets</span>
+                <span className="text-[10px] text-slate-500 font-mono">WebSockets</span>
               </div>
             </div>
           </div>
@@ -554,8 +561,7 @@ export default function LandingPage() {
               <span>LIVE CLINICAL SIMULATOR</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-              Live Patient Risk &amp;{" "}
-              <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">TreeSHAP</span> Explainer
+              Live Patient Risk &amp; <span className="text-teal-600">TreeSHAP</span> Explainer
             </h2>
             <p className="text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
               Adjust patient vitals in real time to observe dynamic ML risk stratification,
@@ -650,7 +656,7 @@ export default function LandingPage() {
                         onClick={() => setVitals({ ...vitals, chestPain: item.val })}
                         className={`text-xs py-2.5 rounded-xl font-medium transition-all text-center cursor-pointer border ${
                           vitals.chestPain === item.val
-                            ? "bg-slate-950 text-white font-bold border-slate-950 shadow-sm"
+                            ? "bg-teal-700 text-white font-bold border-teal-700 shadow-sm"
                             : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
                         }`}
                       >
@@ -693,7 +699,7 @@ export default function LandingPage() {
                       <span className="text-xs text-slate-500 block font-medium">Calibrated Risk Probability</span>
                       <div className="flex items-baseline gap-2 mt-1">
                         <span className="text-5xl font-black text-slate-950 font-mono tracking-tight">{simulationResult.probability}%</span>
-                        <span className="text-xs text-slate-400 font-mono">Platt Sigmoid</span>
+                        <span className="text-xs text-slate-500 font-mono">Platt Sigmoid</span>
                       </div>
                     </div>
                     <span className={`text-xs font-mono font-bold px-3.5 py-1.5 rounded-xl border self-start ${simulationResult.tierBadgeClass}`}>
@@ -704,7 +710,7 @@ export default function LandingPage() {
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/50">
                       <div className={`h-full transition-all duration-300 rounded-full bg-gradient-to-r ${simulationResult.tierColor}`} style={{ width: `${simulationResult.probability}%` }} />
                     </div>
-                    <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                       <span>Low</span><span>Med</span><span>High</span><span>Crit</span>
                     </div>
                   </div>
@@ -769,8 +775,7 @@ export default function LandingPage() {
               <span>HIGH-ACUITY CLINICAL CAPABILITIES</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-              Clinical Intelligence for{" "}
-              <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Every Role</span>
+              Clinical Intelligence for <span className="text-teal-600">Every Role</span>
             </h2>
             <p className="text-base text-slate-600 leading-relaxed font-normal">
               Designed to alleviate diagnostic latency, eliminate alert fatigue, and deliver transparent
@@ -806,9 +811,9 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center">
-            <Link href="/dashboard">
-              <Button className="gap-2 bg-slate-950 hover:bg-slate-800 text-white text-sm font-bold px-8 h-12 rounded-xl shadow-xs transition-colors">
-                <span>Explore Platform</span>
+            <Link href="/features">
+              <Button className="gap-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold px-8 h-12 rounded-xl shadow-xs transition-colors">
+                <span>Explore All Capabilities</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -825,7 +830,7 @@ export default function LandingPage() {
               <span>CARE PATHWAY INTEGRATION</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-              Where <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">technology</span> supports better care.
+              Where <span className="text-teal-600">technology</span> supports better care.
             </h2>
           </div>
 
@@ -868,8 +873,7 @@ export default function LandingPage() {
               <span>ACTIVE CLOUD INFRASTRUCTURE</span>
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-              End-to-End Solutions for{" "}
-              <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Real-World</span> Clinical Challenges
+              End-to-End Solutions for <span className="text-teal-600">Real-World</span> Clinical Challenges
             </h2>
             <p className="text-base text-slate-600 leading-relaxed font-normal">
               A purpose-built cloud stack handling everything from real-time telemetry to async PDF generation.
@@ -911,7 +915,7 @@ export default function LandingPage() {
 
           <div className="text-center">
             <Link href="/solutions">
-              <Button className="gap-2 bg-slate-950 hover:bg-slate-800 text-white text-sm font-bold px-8 h-12 rounded-xl shadow-xs transition-colors">
+              <Button className="gap-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold px-8 h-12 rounded-xl shadow-xs transition-colors">
                 <span>View Full Architecture</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -930,9 +934,7 @@ export default function LandingPage() {
                 <span>SECURITY &amp; PATIENT PRIVACY</span>
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-                Be the Clinical{" "}
-                <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Champion</span>{" "}
-                with HIPAA Compliance
+                Be the Clinical <span className="text-teal-600">Champion</span> with HIPAA Compliance
               </h2>
               <p className="text-base text-slate-600 leading-relaxed font-normal">
                 Hospital environments demand uncompromising standards. The CDSS enforces medical record masking, audit logging, and strict role-based permissions at every layer.
@@ -1001,9 +1003,7 @@ export default function LandingPage() {
                 <span>MEDICAL EVIDENCE</span>
               </div>
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-                Grounded in{" "}
-                <span className="bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">Evidence-Based</span>{" "}
-                Medicine
+                Grounded in <span className="text-teal-600">Evidence-Based</span> Medicine
               </h2>
               <p className="text-base text-slate-600 leading-relaxed font-normal">
                 All AI recommendations and clinical rule overrides are anchored in peer-reviewed consensus literature from leading international medical bodies.
@@ -1024,7 +1024,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-3 flex-wrap pt-2">
                 <a href="#faq">
-                  <Button className="bg-slate-950 hover:bg-slate-800 text-white rounded-xl px-7 h-12 font-bold text-sm gap-2 shadow-xs">
+                  <Button className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-7 h-12 font-bold text-sm gap-2 shadow-xs">
                     <span>Read Evidence</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>
