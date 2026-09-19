@@ -136,27 +136,25 @@ export function SolutionsHero() {
               </svg>
             </div>
 
-            <div className="relative w-full max-w-sm sm:max-w-md">
+            <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
               {/* Doctor Main Image Frame */}
-              <div className="relative aspect-[4/5] w-full rounded-3xl overflow-hidden border border-slate-200/90 bg-gradient-to-b from-teal-50/50 via-white to-sky-50/50 shadow-xl p-2 group">
+              <div className="relative aspect-square w-full rounded-3xl overflow-hidden border border-slate-200/90 bg-gradient-to-b from-teal-50/50 via-white to-sky-50/50 shadow-xl p-2 group">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden bg-slate-100">
                   <Image
                     src="/doctor-hero.jpg"
                     alt="Healthcare clinician using HealthNova AI tablet at bedside"
                     fill
-                    sizes="(max-width: 768px) 100vw, 420px"
-                    className="object-cover object-top group-hover:scale-102 transition-transform duration-500"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 512px"
+                    className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
                     priority
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/25 via-transparent to-transparent pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent pointer-events-none" />
 
-                  {/* Bottom Image Tag */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950/70 backdrop-blur-md text-white border border-white/10 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-[10px] font-medium">
-                      <Activity className="h-3 w-3 text-teal-400 animate-pulse" />
-                      <span>Continuous Telemetry Ingestion</span>
-                    </div>
-                    <span className="text-[9px] font-mono text-teal-300 font-bold">LIVE</span>
+                  {/* Bottom Image Tag - Compact Left Pill avoiding the tablet on the right */}
+                  <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-10 flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-950/80 backdrop-blur-md text-white border border-white/15 shadow-sm">
+                    <Activity className="h-3.5 w-3.5 text-teal-400 animate-pulse shrink-0" />
+                    <span className="text-[10px] sm:text-[11px] font-medium tracking-tight">Continuous Telemetry Ingestion</span>
+                    <span className="text-[9px] font-mono text-teal-300 font-bold bg-teal-950/60 px-1.5 py-0.5 rounded border border-teal-500/30">LIVE</span>
                   </div>
                 </div>
               </div>
@@ -173,7 +171,7 @@ export function SolutionsHero() {
               </div>
 
               {/* Floating Badge 2: Top Right - Empowered Providers */}
-              <div className="absolute top-14 -right-3 sm:-right-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              <div className="absolute top-8 -right-3 sm:-right-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
                   <Users className="h-4 w-4" />
                 </div>
@@ -183,8 +181,8 @@ export function SolutionsHero() {
                 </div>
               </div>
 
-              {/* Floating Badge 3: Bottom Left - Healthier Communities */}
-              <div className="absolute bottom-20 -left-3 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              {/* Floating Badge 3: Mid Left - Healthier Communities (positioned above doctor's pointing hand) */}
+              <div className="absolute top-1/2 -translate-y-1/2 -left-3 sm:-left-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0 border border-rose-100">
                   <Heart className="h-4 w-4" />
                 </div>
@@ -195,7 +193,7 @@ export function SolutionsHero() {
               </div>
 
               {/* Floating Badge 4: Bottom Right - Safer Care */}
-              <div className="absolute -bottom-3 -right-3 sm:-right-6 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
+              <div className="absolute -bottom-4 -right-2 sm:-right-4 rounded-2xl bg-white/95 border border-slate-200/90 px-3.5 py-2.5 shadow-md flex items-center gap-3 z-20 backdrop-blur-sm hover:scale-102 transition-transform">
                 <div className="h-8 w-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0 border border-teal-100">
                   <ShieldCheck className="h-4 w-4" />
                 </div>

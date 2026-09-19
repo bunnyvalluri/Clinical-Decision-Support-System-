@@ -132,7 +132,7 @@ test("Public Navigation & Footer: Unified links and institutional metadata", () 
     ? fs.readFileSync(navConfigPath, "utf-8")
     : fs.readFileSync(navPath, "utf-8");
 
-  const expectedNavLinks = ["Home", "About", "Features", "Solutions", "Blog", "Contact"];
+  const expectedNavLinks = ["Home", "About", "Features", "Solutions", "Contact"];
   for (const link of expectedNavLinks) {
     assert.match(
       navContent,

@@ -15,7 +15,6 @@ export const PUBLIC_NAV_LINKS: NavLinkItem[] = [
   { name: "About", href: "/about", description: "Mission, Architecture & Clinical Governance" },
   { name: "Features", href: "/features", description: "AI/ML Capabilities & Healthcare Intelligence" },
   { name: "Solutions", href: "/solutions", description: "Integrated Care Pathways & Workflows" },
-  { name: "Blog", href: "/blog", description: "Clinical Intelligence, AI & Research Updates" },
   { name: "Contact", href: "/contact", description: "Dr. Vadla Abhinay, MD Profile & Clinical Inquiries" },
 ];
 

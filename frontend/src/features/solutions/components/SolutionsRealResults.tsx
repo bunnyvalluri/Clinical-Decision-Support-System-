@@ -36,11 +36,11 @@ export function SolutionsRealResults() {
             </p>
 
             <div className="pt-2">
-              <Link href="/blog">
+              <Link href="/features">
                 <Button
                   className="bg-slate-950 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl shadow-xs gap-2 text-xs sm:text-sm"
                 >
-                  <span>Read Case Studies</span>
+                  <span>Explore Clinical Evidence</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
