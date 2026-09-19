@@ -5,12 +5,14 @@ import React, { useEffect, useRef } from "react";
 interface RealtimeEcgWaveformProps {
   heartRate?: number;
   stDepression?: number;
+  showBadge?: boolean;
   className?: string;
 }
 
 export function RealtimeEcgWaveform({
   heartRate = 72,
   stDepression = 0,
+  showBadge = false,
   className = "",
 }: RealtimeEcgWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -46,11 +48,10 @@ export function RealtimeEcgWaveform({
       const amplitudeScale = (height * 0.42);
 
       // Advance sweep speed based on heartRate (beats per minute)
-      // Standard 60fps: 1 beat = 60 / heartRate seconds = (60 / heartRate) * 60 frames = 3600 / heartRate frames
       const framesPerBeat = Math.max(15, (3600 / Math.max(40, heartRate)));
       const phaseDelta = 1 / framesPerBeat;
 
-      // Calculate number of pixels to advance per frame (approx 2 to 4 px)
+      // Calculate number of pixels to advance per frame
       const pxPerFrame = Math.max(1.8 * dpr, (width / (framesPerBeat * 2.2)));
 
       for (let p = 0; p < Math.ceil(pxPerFrame); p++) {
@@ -78,8 +79,7 @@ export function RealtimeEcgWaveform({
         } else if (cyclePhase >= 0.31 && cyclePhase < 0.35) {
           // S Wave recovery to ST segment
           const sPos = (cyclePhase - 0.31) / 0.04;
-          // Target point is the ST segment baseline which includes stDepression
-          const stOffset = (stDepression / 5.0) * 0.22; // ST depression sags below baseline
+          const stOffset = (stDepression / 5.0) * 0.22;
           yOffset = 0.4 * (1 - sPos) + stOffset * sPos;
         } else if (cyclePhase >= 0.35 && cyclePhase < 0.48) {
           // ST Segment (flat or depressed)
@@ -180,15 +180,17 @@ export function RealtimeEcgWaveform({
 
   return (
     <div
-      className={`relative w-full h-11 bg-teal-50/70 rounded-xl border border-teal-200/80 p-0.5 overflow-hidden shadow-2xs ${className}`}
+      className={`relative w-full h-11 sm:h-12 bg-teal-50/70 rounded-xl border border-teal-200/80 p-0.5 overflow-hidden shadow-2xs ${className}`}
     >
       <canvas ref={canvasRef} className="w-full h-full block" />
-      {/* Live Badge Overlay */}
-      <div className="absolute top-1.5 right-2 flex items-center gap-1.5 pointer-events-none text-[9px] font-mono font-bold text-teal-800 bg-white/90 px-1.5 py-0.5 rounded border border-teal-200 shadow-2xs">
-        <span className="h-1.5 w-1.5 rounded-full bg-teal-600 animate-ping" />
-        <span>LIVE {heartRate} BPM</span>
-      </div>
+      {showBadge && (
+        <div className="absolute top-1.5 right-2 flex items-center gap-1.5 pointer-events-none text-[8px] sm:text-[9px] font-mono font-bold text-teal-800 bg-white/90 px-1.5 py-0.5 rounded border border-teal-200 shadow-2xs">
+          <span className="h-1.5 w-1.5 rounded-full bg-teal-600 animate-ping" />
+          <span>LIVE {heartRate} BPM</span>
+        </div>
+      )}
     </div>
   );
 }
 export default RealtimeEcgWaveform;
+

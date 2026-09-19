@@ -608,7 +608,7 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
           </div>
 
           {/* Presets Segmented Bar */}
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar justify-center flex-wrap p-1.5 bg-slate-100/90 rounded-2xl max-w-3xl mx-auto border border-slate-200">
+          <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-center gap-1.5 sm:gap-2 p-1.5 bg-slate-100/90 rounded-2xl max-w-3xl mx-auto border border-slate-200">
             {PRESETS.map((preset, idx) => {
               const active = activePresetIndex === idx;
               return (
@@ -619,15 +619,15 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                     setActivePresetIndex(idx);
                     setVitals(preset.vitals);
                   }}
-                  className={`inline-flex items-center gap-2.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                  className={`inline-flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     active
                       ? "bg-white text-slate-900 shadow-sm border border-slate-200"
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent"
                   }`}
                 >
-                  <span>{preset.name}</span>
+                  <span className="truncate">{preset.name}</span>
                   <span
-                    className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${preset.badgeColor}`}
+                    className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-md border shrink-0 ${preset.badgeColor}`}
                   >
                     {preset.badge}
                   </span>
@@ -637,14 +637,14 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
           </div>
 
           {/* Simulator Panel */}
-          <div className="rounded-3xl border border-slate-200/90 bg-slate-50/70 p-6 sm:p-8 lg:p-10 shadow-sm">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-slate-50/70 p-3 sm:p-6 lg:p-8 shadow-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-8 items-start">
               {/* Left: Sliders */}
-              <div className="space-y-4 text-left">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <HeartPulse className="h-5 w-5 text-teal-600" />
-                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+              <div className="space-y-3 sm:space-y-4 text-left">
+                <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <HeartPulse className="h-4.5 w-4.5 text-teal-600 shrink-0" />
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-950 uppercase tracking-wide truncate">
                       Physiological Parameters
                     </h3>
                   </div>
@@ -654,15 +654,15 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                       setActivePresetIndex(0);
                       setVitals(PRESETS[0].vitals);
                     }}
-                    className="inline-flex items-center gap-1 text-xs font-mono font-semibold text-slate-500 hover:text-teal-700 bg-white border border-slate-200 px-2.5 py-1 rounded-full cursor-pointer transition-colors"
+                    className="inline-flex items-center gap-1 text-[11px] font-mono font-semibold text-slate-600 hover:text-teal-700 bg-white border border-slate-200 px-2.5 py-1 rounded-full cursor-pointer transition-colors shrink-0"
                   >
                     <RotateCcw className="h-3 w-3" />
-                    <span>Reset Vitals</span>
+                    <span>Reset</span>
                   </button>
                 </div>
 
                 {isBiologicalViolation && (
-                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2.5">
+                  <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-center gap-2.5">
                     <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
                     <span>
                       <strong>Biological Contradiction:</strong> Systolic ({vitals.systolicBp}) must exceed
@@ -715,7 +715,7 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                 ].map((s, i) => (
                   <div
                     key={i}
-                    className="space-y-2 bg-white p-4.5 rounded-2xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-colors"
+                    className="space-y-1.5 bg-white p-3 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-colors"
                   >
                     <div className="flex justify-between items-center text-xs">
                       <span className="font-semibold text-slate-800">{s.label}</span>
@@ -740,11 +740,11 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                   </div>
                 ))}
 
-                <div className="space-y-2 bg-white p-4.5 rounded-2xl border border-slate-200/90 shadow-2xs">
+                <div className="space-y-2 bg-white p-3 sm:p-4 rounded-xl border border-slate-200/90 shadow-2xs">
                   <span className="text-xs font-semibold text-slate-800 block">
                     Chest Pain Classification
                   </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
                     {[
                       { label: "Typical", val: 0 },
                       { label: "Atypical", val: 1 },
@@ -755,7 +755,7 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                         key={item.val}
                         type="button"
                         onClick={() => setVitals({ ...vitals, chestPain: item.val })}
-                        className={`text-xs py-2.5 rounded-xl font-medium transition-all text-center cursor-pointer border ${
+                        className={`text-xs py-2 sm:py-2.5 rounded-xl font-medium transition-all text-center cursor-pointer border ${
                           vitals.chestPain === item.val
                             ? "bg-teal-700 text-white font-bold border-teal-700 shadow-sm"
                             : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100"
@@ -769,28 +769,28 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
               </div>
 
               {/* Right: Output */}
-              <div className="space-y-4 text-left">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-                  <div className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-teal-600" />
-                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
-                      Real-Time Inference &amp; TreeSHAP
+              <div className="space-y-3 sm:space-y-4 text-left">
+                <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Brain className="h-4.5 w-4.5 text-teal-600 shrink-0" />
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-950 uppercase tracking-wide truncate">
+                      Real-Time Inference
                     </h3>
                   </div>
-                  <span className="flex items-center gap-1.5 text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                  <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-mono text-emerald-700 font-bold bg-emerald-50 px-2 sm:px-2.5 py-0.5 rounded-full border border-emerald-200 shrink-0">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping" />
                     Live Calibrated
                   </span>
                 </div>
 
                 {/* Risk Output Card */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-5">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-teal-700 pb-3 border-b border-slate-100">
+                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-sm space-y-3.5 sm:space-y-4">
+                  <div className="flex items-center justify-between text-[11px] font-mono text-teal-700 pb-2 border-b border-slate-100">
                     <span className="flex items-center gap-1.5 font-bold">
                       <Activity className="h-3.5 w-3.5 animate-pulse" />
                       LEAD II &bull; {vitals.heartRate} BPM
                     </span>
-                    <span className="text-slate-500">
+                    <span className="text-slate-500 font-medium">
                       ST: {vitals.stDepression > 0 ? `-${vitals.stDepression.toFixed(1)}mm` : "ISO"}
                     </span>
                   </div>
@@ -798,28 +798,32 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                   <RealtimeEcgWaveform
                     heartRate={vitals.heartRate}
                     stDepression={vitals.stDepression}
-                    className="w-full h-12"
+                    className="w-full h-11 sm:h-12"
                   />
 
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div>
-                      <span className="text-xs text-slate-500 block font-medium">
+                  {/* Header Row: Metric label + Risk Tier badge */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
                         Calibrated Risk Probability
                       </span>
-                      <div className="flex items-baseline gap-2 mt-1">
-                        <span className="text-5xl font-black text-slate-950 font-mono tracking-tight">
-                          {simulationResult.probability}%
-                        </span>
-                        <span className="text-xs text-slate-500 font-mono">Platt Sigmoid</span>
-                      </div>
+                      <span
+                        className={`text-[10px] sm:text-xs font-mono font-bold px-2.5 py-1 rounded-lg border shrink-0 ${simulationResult.tierBadgeClass}`}
+                      >
+                        {simulationResult.tier} RISK
+                      </span>
                     </div>
-                    <span
-                      className={`text-xs font-mono font-bold px-3.5 py-1.5 rounded-xl border self-start ${simulationResult.tierBadgeClass}`}
-                    >
-                      {simulationResult.tier} RISK
-                    </span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 font-mono tracking-tight">
+                        {simulationResult.probability}%
+                      </span>
+                      <span className="text-[10px] sm:text-xs text-slate-500 font-mono">
+                        Platt Sigmoid
+                      </span>
+                    </div>
                   </div>
 
+                  {/* Progress Bar & Breakdown */}
                   <div className="space-y-1.5">
                     <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/50">
                       <div
@@ -827,28 +831,42 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                         style={{ width: `${simulationResult.probability}%` }}
                       />
                     </div>
-                    <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                      <span>Low ({simulationResult.probabilities.low}%)</span>
-                      <span>Med ({simulationResult.probabilities.med}%)</span>
-                      <span>High ({simulationResult.probabilities.high}%)</span>
-                      <span>Crit ({simulationResult.probabilities.crit}%)</span>
+                    <div className="grid grid-cols-4 gap-1 text-center font-mono pt-0.5">
+                      <div className="bg-slate-50 py-1 px-0.5 rounded-lg border border-slate-200/70">
+                        <span className="block text-[8px] sm:text-[9px] text-slate-400 uppercase leading-none">Low</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 mt-0.5 block leading-tight">{simulationResult.probabilities.low}%</span>
+                      </div>
+                      <div className="bg-slate-50 py-1 px-0.5 rounded-lg border border-slate-200/70">
+                        <span className="block text-[8px] sm:text-[9px] text-slate-400 uppercase leading-none">Med</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 mt-0.5 block leading-tight">{simulationResult.probabilities.med}%</span>
+                      </div>
+                      <div className="bg-slate-50 py-1 px-0.5 rounded-lg border border-slate-200/70">
+                        <span className="block text-[8px] sm:text-[9px] text-slate-400 uppercase leading-none">High</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 mt-0.5 block leading-tight">{simulationResult.probabilities.high}%</span>
+                      </div>
+                      <div className="bg-slate-50 py-1 px-0.5 rounded-lg border border-slate-200/70">
+                        <span className="block text-[8px] sm:text-[9px] text-slate-400 uppercase leading-none">Crit</span>
+                        <span className="text-[10px] sm:text-[11px] font-bold text-slate-700 mt-0.5 block leading-tight">{simulationResult.probabilities.crit}%</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl bg-amber-50/80 border border-amber-200 text-xs flex items-start gap-3">
+                  {/* Clinical Directive */}
+                  <div className="p-3 sm:p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs flex items-start gap-2.5">
                     <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
-                    <div>
+                    <div className="min-w-0">
                       <span className="font-bold text-slate-900 block mb-0.5">Clinical Directive:</span>
-                      <span className="text-slate-700 leading-relaxed">
+                      <span className="text-slate-700 leading-relaxed text-[11px] sm:text-xs">
                         {simulationResult.recommendation}
                       </span>
                     </div>
                   </div>
 
+                  {/* Abstention Flag */}
                   {simulationResult.isUncertain && (
-                    <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 text-xs text-purple-800 flex items-center gap-2 font-mono">
-                      <AlertCircle className="h-4 w-4 text-purple-600 shrink-0" />
-                      <span>
+                    <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-[11px] sm:text-xs text-purple-800 flex items-start sm:items-center gap-2 font-mono">
+                      <AlertCircle className="h-4 w-4 text-purple-600 shrink-0 mt-0.5 sm:mt-0" />
+                      <span className="leading-snug">
                         <strong>Abstention:</strong> Prediction requires additional review (H:{" "}
                         {simulationResult.entropy}).
                       </span>
@@ -856,11 +874,11 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                   )}
 
                   {/* Copy Handover Button */}
-                  <div className="pt-1 flex items-center justify-between">
+                  <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <button
                       type="button"
                       onClick={copyHandoverNotes}
-                      className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-teal-700 hover:text-teal-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-xl cursor-pointer transition-colors"
+                      className="inline-flex items-center justify-center gap-2 text-xs font-mono font-bold text-teal-700 hover:text-teal-900 bg-teal-50/80 hover:bg-teal-100/80 border border-teal-200/90 px-3.5 py-2.5 rounded-xl cursor-pointer transition-colors w-full sm:w-auto shadow-2xs"
                     >
                       {copiedHandover ? (
                         <>
@@ -874,25 +892,32 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                         </>
                       )}
                     </button>
-                    <span className="text-[10px] text-slate-400 font-mono">Attending Gate: 100% Enforced</span>
+                    <div className="flex items-center justify-center sm:justify-end gap-1.5 text-[10px] text-slate-500 font-mono">
+                      <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      <span>Attending Gate: 100% Enforced</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* SHAP Attributions */}
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-3.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold text-slate-950">TreeSHAP Factor Attributions</span>
-                    <span className="text-xs font-mono text-slate-500">Baseline E[f(x)] = 0.350</span>
+                <div className="rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-5 shadow-xs space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-1">
+                    <span className="text-xs sm:text-sm font-bold text-slate-950">
+                      TreeSHAP Factor Attributions
+                    </span>
+                    <span className="text-[10px] sm:text-xs font-mono text-slate-500">
+                      Baseline E[f(x)] = 0.350
+                    </span>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-2.5">
                     {simulationResult.shapDrivers.map((driver, index) => (
-                      <div key={index} className="space-y-1.5">
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="font-semibold text-slate-800">{driver.factor}</span>
-                          <div className="flex items-center gap-2 font-mono">
-                            <span className="text-slate-500">{driver.value}</span>
+                      <div key={index} className="space-y-1">
+                        <div className="flex justify-between items-center text-xs gap-1">
+                          <span className="font-semibold text-slate-800 truncate text-[11px] sm:text-xs">{driver.factor}</span>
+                          <div className="flex items-center gap-1.5 font-mono shrink-0">
+                            <span className="text-slate-500 text-[10px] sm:text-[11px]">{driver.value}</span>
                             <span
-                              className={`font-bold ${
+                              className={`font-bold text-[10px] sm:text-[11px] ${
                                 driver.isPositive ? "text-rose-600" : "text-emerald-600"
                               }`}
                             >
@@ -912,7 +937,7 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                       </div>
                     ))}
                   </div>
-                  <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 leading-relaxed pt-0.5">
                     Red = positive risk contributor; Green = protective clinical marker.
                   </p>
                 </div>
