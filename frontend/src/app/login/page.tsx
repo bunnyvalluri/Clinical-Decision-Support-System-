@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import Image from "next/image";
@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { RealtimeEcgWaveform } from "@/components/clinical/RealtimeEcgWaveform";
 import { useAuthStore, getRoleHomeRoute, type RoleType } from "@/features/auth/authStore";
 
 const DEMO_ROLES = [
@@ -261,19 +262,14 @@ export default function LoginPage() {
               </span>
             </div>
 
-            {/* High-Fidelity ECG Waveform */}
-            <div className="relative h-14 w-full overflow-hidden rounded-xl bg-slate-950 px-3 flex items-center shadow-inner">
-              <svg className="h-10 w-full" viewBox="0 0 320 40" preserveAspectRatio="none">
-                <path
-                  d="M0,20 L30,20 L35,18 L40,22 L45,20 L50,20 L55,10 L60,32 L65,4 L70,26 L75,20 L85,20 L95,17 L105,20 L130,20 L135,18 L140,22 L145,20 L150,20 L155,10 L160,32 L165,4 L170,26 L175,20 L185,20 L195,17 L205,20 L230,20 L235,18 L240,22 L245,20 L250,20 L255,10 L260,32 L265,4 L270,26 L275,20 L285,20 L295,17 L305,20 L320,20"
-                  fill="none"
-                  stroke="#10b981"
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <div className="absolute right-3 top-2 flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 font-bold bg-slate-900/90 px-2 py-0.5 rounded-md border border-emerald-500/30 backdrop-blur-xs">
+            {/* High-Fidelity Real-Time Moving ECG Telemetry Stream */}
+            <div className="relative h-14 w-full overflow-hidden rounded-xl bg-slate-950 flex items-center shadow-inner border border-slate-800/80">
+              <RealtimeEcgWaveform
+                heartRate={72}
+                theme="dark"
+                className="!h-full !w-full !border-0 !rounded-none !bg-transparent !p-0"
+              />
+              <div className="absolute right-3 top-2.5 z-10 flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 font-bold bg-slate-900/90 px-2 py-0.5 rounded-md border border-emerald-500/30 backdrop-blur-xs shadow-xs pointer-events-none">
                 <HeartPulse className="h-3 w-3 animate-pulse text-rose-400" />
                 <span>72 BPM · 99% SpO2 · 120/80</span>
               </div>

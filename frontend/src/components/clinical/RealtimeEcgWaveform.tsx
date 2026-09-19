@@ -6,6 +6,8 @@ interface RealtimeEcgWaveformProps {
   heartRate?: number;
   stDepression?: number;
   showBadge?: boolean;
+  theme?: "light" | "dark";
+  color?: string;
   className?: string;
 }
 
@@ -13,9 +15,12 @@ export function RealtimeEcgWaveform({
   heartRate = 72,
   stDepression = 0,
   showBadge = false,
+  theme = "light",
+  color,
   className = "",
 }: RealtimeEcgWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -108,9 +113,9 @@ export function RealtimeEcgWaveform({
       // Draw background
       ctx.clearRect(0, 0, width, height);
 
-      // Subtle millimeter telemetry grid
+      // Millimeter telemetry grid
       ctx.lineWidth = 1 * dpr;
-      ctx.strokeStyle = "rgba(13, 148, 136, 0.08)";
+      ctx.strokeStyle = isDark ? "rgba(16, 185, 129, 0.08)" : "rgba(13, 148, 136, 0.08)";
       const gridSpacing = 16 * dpr;
       ctx.beginPath();
       for (let x = 0; x < width; x += gridSpacing) {
@@ -127,7 +132,7 @@ export function RealtimeEcgWaveform({
       ctx.lineWidth = 2.2 * dpr;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.strokeStyle = "#0d9488"; // Medical clinical teal
+      ctx.strokeStyle = color || (isDark ? "#10b981" : "#0d9488"); // Neon emerald or clinical teal
 
       ctx.beginPath();
       let started = false;
@@ -158,13 +163,13 @@ export function RealtimeEcgWaveform({
       // Glow halo
       ctx.beginPath();
       ctx.arc(cursorX, cursorY, 6 * dpr, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(13, 148, 136, 0.25)";
+      ctx.fillStyle = isDark ? "rgba(16, 185, 129, 0.45)" : "rgba(13, 148, 136, 0.25)";
       ctx.fill();
 
       // Sharp center core dot
       ctx.beginPath();
       ctx.arc(cursorX, cursorY, 2.8 * dpr, 0, Math.PI * 2);
-      ctx.fillStyle = "#0f766e";
+      ctx.fillStyle = isDark ? "#34d399" : "#0f766e";
       ctx.fill();
 
       animationFrameId = requestAnimationFrame(render);
@@ -176,16 +181,30 @@ export function RealtimeEcgWaveform({
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", handleResize);
     };
-  }, [heartRate, stDepression]);
+  }, [heartRate, stDepression, isDark, color]);
+
+  const defaultContainerStyles = isDark
+    ? "bg-slate-950 border-slate-800/80"
+    : "bg-teal-50/70 border-teal-200/80";
 
   return (
     <div
-      className={`relative w-full h-11 sm:h-12 bg-teal-50/70 rounded-xl border border-teal-200/80 p-0.5 overflow-hidden shadow-2xs ${className}`}
+      className={`relative w-full h-11 sm:h-12 rounded-xl border p-0.5 overflow-hidden shadow-2xs ${defaultContainerStyles} ${className}`}
     >
       <canvas ref={canvasRef} className="w-full h-full block" />
       {showBadge && (
-        <div className="absolute top-1.5 right-2 flex items-center gap-1.5 pointer-events-none text-[8px] sm:text-[9px] font-mono font-bold text-teal-800 bg-white/90 px-1.5 py-0.5 rounded border border-teal-200 shadow-2xs">
-          <span className="h-1.5 w-1.5 rounded-full bg-teal-600 animate-ping" />
+        <div
+          className={`absolute top-1.5 right-2 flex items-center gap-1.5 pointer-events-none text-[8px] sm:text-[9px] font-mono font-bold px-1.5 py-0.5 rounded border shadow-2xs ${
+            isDark
+              ? "text-emerald-400 bg-slate-900/90 border-emerald-500/30"
+              : "text-teal-800 bg-white/90 border-teal-200"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full animate-ping ${
+              isDark ? "bg-emerald-400" : "bg-teal-600"
+            }`}
+          />
           <span>LIVE {heartRate} BPM</span>
         </div>
       )}
