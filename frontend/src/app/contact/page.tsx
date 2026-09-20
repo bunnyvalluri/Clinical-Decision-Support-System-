@@ -711,8 +711,8 @@ export default function ContactDoctorPage() {
               <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                 Attending Rotations
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3">
-                Dr. Vadla Abhinay&apos;s Weekly Clinical Matrix
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3 transition-all duration-300">
+                {activeDoctor.name}&apos;s Weekly Clinical Matrix
               </h2>
               <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 Live timetable of ICU ward rounds, diagnostic electrophysiology lab blocks, and outpatient consultation hours.
@@ -970,9 +970,9 @@ export default function ContactDoctorPage() {
                   </span>
                   <h2
                     id="consultation-heading"
-                    className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3"
+                    className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3 transition-all duration-300"
                   >
-                    Reach Dr. Vadla Abhinay&apos;s Clinic
+                    Reach {activeDoctor.name}&apos;s Clinic
                   </h2>
                   <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                     Submit a clinical case review request, outpatient appointment inquiry, or institutional consultation.
