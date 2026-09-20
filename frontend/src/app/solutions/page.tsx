@@ -129,7 +129,7 @@ const solutionsJsonLd = {
 
 export default function SolutionsPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-teal-500/20 selection:text-teal-900 font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-teal-500/20 selection:text-teal-900 font-sans antialiased overflow-x-clip">
       {/* Schema.org Structured Data */}
       <Script
         id="solutions-schema-ld"

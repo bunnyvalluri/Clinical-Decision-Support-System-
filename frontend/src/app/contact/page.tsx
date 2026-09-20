@@ -410,7 +410,7 @@ export default function ContactDoctorPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fafbfc] text-slate-900 selection:bg-teal-500/20 selection:text-teal-900 font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-[#fafbfc] text-slate-900 selection:bg-teal-500/20 selection:text-teal-900 font-sans antialiased overflow-x-clip">
       {/* 1. Universal Institutional Navbar */}
       <PublicNavbar />
 

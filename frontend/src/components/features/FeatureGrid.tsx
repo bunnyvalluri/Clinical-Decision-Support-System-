@@ -18,7 +18,7 @@ import {
 export function FeatureGrid() {
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [expandedFeatureId, setExpandedFeatureId] = useState<number | null>(null);
+  const [expandedFeatureId, setExpandedFeatureId] = useState<string | null>(null);
 
   const categories = [
     { id: "ALL", label: "All Capabilities" },
