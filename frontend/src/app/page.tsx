@@ -232,7 +232,7 @@ const HERO_CLINICIANS = [
     initials: "KP",
     role: "MD",
     title: "Director of Critical Care & Diagnostics • Attending",
-    image: "/doctor-hero-prashanth.jpg?v=2",
+    image: "/doctor-hero-prashanth.jpg",
     alt: "Attending Physician Dr. Prashanth reviewing hemodynamic telemetry on tablet",
     node: "NODE 05 • CRITICAL CARE UNIT",
     enc: "ENC-88294",

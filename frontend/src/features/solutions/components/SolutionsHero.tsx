@@ -84,7 +84,7 @@ const SOLUTIONS_HERO_PHOTOS = [
     alt: "Attending Physician Dr. Vedha Sree using HealthNova AI tablet at bedside",
   },
   {
-    image: "/doctor-hero-prashanth.jpg?v=2",
+    image: "/doctor-hero-prashanth.jpg",
     alt: "Attending Physician Dr. Prashanth using HealthNova AI tablet at bedside",
   },
   {

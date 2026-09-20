@@ -283,7 +283,7 @@ const CONTACT_DOCTORS = [
     role: "Director of Critical Care Medicine & Diagnostic Systems",
     title: "Attending Physician & Diagnostics Lead",
     license: "License: CA-MD-98424 • NPI: 1092834713",
-    image: "/doctor-hero-prashanth.jpg?v=2",
+    image: "/doctor-hero-prashanth.jpg",
     alt: "Dr. Prashanth, MD - Director of Critical Care Medicine and Attending Physician",
     dutyStatus: "On Duty • CCU & ICU Ward",
     telemetry: "Continuous Ingestion Active",
