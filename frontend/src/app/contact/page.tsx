@@ -541,10 +541,30 @@ export default function ContactDoctorPage() {
               <div className="lg:col-span-5 flex flex-col items-center">
                 <div className="relative w-full max-w-md">
                   {/* Doctor Switcher Bar */}
-                  <div className="mb-3 flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                    <div className="flex items-center gap-1.5 flex-1">
+                  <div className="mb-3 flex flex-col gap-1.5 p-2 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div className="flex items-center justify-between px-1 pb-1 border-b border-slate-100">
+                      <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <User className="h-3 w-3 text-teal-600" />
+                        Attending Team ({CONTACT_DOCTORS.length})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsAutoRotate(!isAutoRotate)}
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded-md border transition-colors cursor-pointer flex items-center gap-1 ${
+                          isAutoRotate
+                            ? "bg-teal-50 border-teal-200 text-teal-800 font-bold"
+                            : "bg-slate-100 border-slate-200 text-slate-500 font-medium"
+                        }`}
+                        title={isAutoRotate ? "Auto-switching every 2s (click to pause)" : "Paused (click to auto-rotate)"}
+                      >
+                        <span className={`h-1.5 w-1.5 rounded-full ${isAutoRotate ? "bg-teal-500 animate-pulse" : "bg-slate-400"}`} />
+                        {isAutoRotate ? "Auto 2s" : "Paused"}
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-5 gap-1 pt-0.5">
                       {CONTACT_DOCTORS.map((doc, idx) => {
                         const isSelected = idx === activeDoctorIdx;
+                        const shortName = doc.name.replace("Dr. ", "").replace("Vadla ", "").replace("Valluri ", "").split(" ")[0];
                         return (
                           <button
                             key={doc.id}
@@ -553,30 +573,17 @@ export default function ContactDoctorPage() {
                               setActiveDoctorIdx(idx);
                               setIsAutoRotate(false);
                             }}
-                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                            className={`flex items-center justify-center py-1.5 px-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                               isSelected
                                 ? "bg-teal-700 text-white shadow-xs"
                                 : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"
                             }`}
                           >
-                            <User className="h-3 w-3" />
-                            <span className="truncate">{doc.name.replace("Dr. ", "")}</span>
+                            <span className="truncate">{shortName}</span>
                           </button>
                         );
                       })}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsAutoRotate(!isAutoRotate)}
-                      className={`text-[10px] font-mono px-2 py-1 rounded-lg border transition-colors cursor-pointer ${
-                        isAutoRotate
-                          ? "bg-teal-50 border-teal-200 text-teal-800 font-bold"
-                          : "bg-slate-100 border-slate-200 text-slate-500 font-medium"
-                      }`}
-                      title={isAutoRotate ? "Auto-switching every 2s (click to pause)" : "Paused (click to auto-rotate)"}
-                    >
-                      {isAutoRotate ? "Auto 2s" : "Paused"}
-                    </button>
                   </div>
 
                   {/* Outer Frame with Clean Medical Shadow */}
