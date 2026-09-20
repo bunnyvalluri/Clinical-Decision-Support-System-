@@ -1073,20 +1073,22 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
                 className="max-w-4xl mx-auto rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 p-4 sm:p-7 lg:p-9 shadow-xs text-left space-y-4 sm:space-y-6"
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-xs shrink-0">
+                  <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-xs shrink-0 mt-0.5 sm:mt-0">
                       <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base sm:text-xl font-black text-slate-950 truncate">{role.title}</h3>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <h3 className="text-base sm:text-xl font-black text-slate-950 leading-tight">
+                          {role.title}
+                        </h3>
                         <span
                           className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded border shrink-0 ${role.badgeColor}`}
                         >
                           {role.badge}
                         </span>
                       </div>
-                      <p className="text-[11px] sm:text-xs text-slate-500 font-mono mt-0.5 truncate">
+                      <p className="text-[10px] sm:text-xs text-slate-500 font-mono mt-1 sm:mt-0.5 leading-tight break-words">
                         Role: {role.code} • SLA: {role.sla}
                       </p>
                     </div>

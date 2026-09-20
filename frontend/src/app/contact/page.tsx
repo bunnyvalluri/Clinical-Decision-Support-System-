@@ -571,24 +571,24 @@ export default function ContactDoctorPage() {
                   </div>
 
                   {/* Verification & License Pill Below Image */}
-                  <div className="mt-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all duration-300">
-                    <div className="flex items-center gap-3">
-                      <div className="h-11 w-11 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-bold text-sm shrink-0 transition-all duration-300 shadow-2xs">
+                  <div className="mt-4 p-3 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-2.5 transition-all duration-300">
+                    <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+                      <div className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl sm:rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-bold text-xs sm:text-sm shrink-0 transition-all duration-300 shadow-2xs">
                         {activeDoctor.initials}
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-sm font-bold text-slate-950 transition-all duration-300">
+                          <span className="text-xs sm:text-sm font-bold text-slate-950 transition-all duration-300 leading-tight">
                             {activeDoctor.name}
                           </span>
-                          <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0" />
+                          <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-teal-600 shrink-0" />
                         </div>
-                        <span className="text-[11px] text-slate-500 font-mono transition-all duration-300 block">
+                        <span className="text-[10px] sm:text-[11px] text-slate-500 font-mono transition-all duration-300 block leading-tight break-words mt-0.5">
                           {activeDoctor.license}
                         </span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0 shadow-2xs">
+                    <span className="text-[9px] sm:text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border border-emerald-200 shrink-0 shadow-2xs">
                       Verified M.D.
                     </span>
                   </div>
@@ -611,9 +611,9 @@ export default function ContactDoctorPage() {
               {/* Doctor Details & Biography (7 cols) */}
               <div className="lg:col-span-7 space-y-6 text-left">
                 <div className="space-y-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold font-mono shadow-2xs">
+                  <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-[11px] sm:text-xs font-semibold font-mono shadow-2xs max-w-full">
                     <Stethoscope className="h-3.5 w-3.5 text-teal-600 shrink-0" />
-                    <span>{activeDoctor.title}</span>
+                    <span className="break-words leading-tight">{activeDoctor.title}</span>
                   </div>
 
                   <h1
@@ -640,8 +640,8 @@ export default function ContactDoctorPage() {
                       <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Education</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.degree}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.education}</div>
+                    <div className="text-xs font-bold text-slate-950 leading-tight break-words">{activeDoctor.degree}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 leading-tight break-words">{activeDoctor.education}</div>
                   </div>
 
                   <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
@@ -649,8 +649,8 @@ export default function ContactDoctorPage() {
                       <HeartPulse className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Experience</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.experience}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.experienceDetail}</div>
+                    <div className="text-xs font-bold text-slate-950 leading-tight break-words">{activeDoctor.experience}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 leading-tight break-words">{activeDoctor.experienceDetail}</div>
                   </div>
 
                   <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
@@ -658,8 +658,8 @@ export default function ContactDoctorPage() {
                       <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Governance</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.governance}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.governanceDetail}</div>
+                    <div className="text-xs font-bold text-slate-950 leading-tight break-words">{activeDoctor.governance}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 leading-tight break-words">{activeDoctor.governanceDetail}</div>
                   </div>
 
                   <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
@@ -667,8 +667,8 @@ export default function ContactDoctorPage() {
                       <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Research</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.research}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.researchDetail}</div>
+                    <div className="text-xs font-bold text-slate-950 leading-tight break-words">{activeDoctor.research}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 leading-tight break-words">{activeDoctor.researchDetail}</div>
                   </div>
                 </div>
 
