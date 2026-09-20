@@ -16,8 +16,6 @@
 
 <p align="center">
   <em>Predict • Prevent • Support</em>
-  &nbsp;|&nbsp;
-  <strong>Project Code: BPY-CSE-2666</strong>
 </p>
 
 <p align="center">
@@ -42,7 +40,7 @@ Cardiovascular diseases (CVDs) remain the leading cause of mortality worldwide, 
 
 Traditional clinical scoring tools (e.g., Framingham, TIMI) often rely on coarse linear cutoffs, lack real-time reactivity during active patient hospitalization, and fail to provide transparent reasoning.
 
-**HealthNova AI** is an enterprise-grade, real-time clinical decision-support ecosystem engineered to bridge this gap (Academic Project BPY-CSE-2666):
+**HealthNova AI** is an enterprise-grade, real-time clinical decision-support ecosystem engineered to bridge this gap:
 - **Intelligent Stratification:** Leverages supervised machine learning (Random Forest, AdaBoost, SVM) to classify patient deterioration risks into 4 calibrated tiers: `LOW`, `MEDIUM`, `HIGH`, and `CRITICAL`.
 - **Explainable AI (XAI):** Uses TreeSHAP to attribute exact positive and protective risk drivers for every single inference, providing transparent clinical reasoning to attending clinicians.
 - **Zero-Reload Telemetry:** Delivers sub-second vital alerts and risk transitions directly to clinician dashboards via WebSockets powered by Django Channels and Redis.
@@ -220,7 +218,7 @@ sequenceDiagram
 ## 🧠 Machine Learning & Explainable AI (XAI)
 
 ### 1. Academic Research Foundation & Multi-Model Benchmarking
-Aligned with the foundational research paper *"Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques"* (Project Code: **BPY-CSE-2666**), HealthNova AI integrates a three-model supervised learning suite evaluated under 5-fold stratified cross-validation with **strict patient-level isolation** (zero data leakage).
+Aligned with foundational research in patient risk prediction (*"Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques"*), HealthNova AI integrates a three-model supervised learning suite evaluated under 5-fold stratified cross-validation with **strict patient-level isolation** (zero data leakage).
 
 > ⚠️ **Mandatory Invariant — Zero Metric Fabrication**:
 > While the exploratory reference research paper reported a preliminary 99% accuracy for Random Forest on initial partitioned data, production clinical deployment requires honest, reproducible cross-validation on unaugmented clinical cohorts without synthetic inflation.
@@ -635,7 +633,6 @@ For in-depth architectural specifications and subsystem runbooks, consult the `d
 
 ## 👥 Contributing & Attribution
 
-- **Project Identifier:** `BPY-CSE-2666`
 - **Application Title:** Patient Risk Level Prediction Using Machine Learning for Intelligent Clinical Decision Support
 - **Repository:** [`bunnyvalluri/Clinical-Decision-Support-System-`](https://github.com/bunnyvalluri/Clinical-Decision-Support-System-)
 - **Live Production:** [clinical-decision-support-system-2026.vercel.app](https://clinical-decision-support-system-2026.vercel.app)

@@ -1,6 +1,6 @@
 # HealthNova AI CDSS — Bruno API Quality Platform
 
-Welcome to the **Bruno API Quality and Contract Testing Suite** for the HealthNova AI Clinical Decision Support System (BPY-CSE-2666).
+Welcome to the **Bruno API Quality and Contract Testing Suite** for the HealthNova AI Clinical Decision Support System.
 
 ## Directory Structure
 

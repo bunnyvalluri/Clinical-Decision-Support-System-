@@ -147,8 +147,8 @@ test("Public Navigation & Footer: Unified links and institutional metadata", () 
 
   assert.match(
     footerContent,
-    /BRAND_CONFIG\.academic\.projectCode|BPY-CSE-2666/,
-    "PublicFooter must include project attribution BPY-CSE-2666"
+    /BRAND_CONFIG\.brandName/,
+    "PublicFooter must include brand attribution"
   );
   assert.match(
     footerContent,
