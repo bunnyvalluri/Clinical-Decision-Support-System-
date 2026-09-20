@@ -148,6 +148,7 @@ export function PublicNavbar() {
           {/* Mobile / Tablet Menu Trigger */}
           <button
             type="button"
+            suppressHydrationWarning
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open navigation menu"
             aria-expanded={mobileMenuOpen}
