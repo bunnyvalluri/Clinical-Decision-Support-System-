@@ -29,7 +29,7 @@ export const ModelComparisonTable: React.FC<ModelComparisonTableProps> = ({
             Clinical Machine Learning Model Registry & Benchmarks
           </h3>
           <p className="text-xs text-slate-600 mt-0.5">
-            Real metrics calculated from the held-out validation cohort (EHR Inpatient Cohort BPY-CSE-2666).
+            Real metrics calculated from the held-out validation cohort (EHR Inpatient Multi-Center Cohort).
           </p>
         </div>
         <span className="text-xs text-slate-600 font-medium">

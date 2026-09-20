@@ -79,7 +79,7 @@ export function AboutCTA() {
               </span>
               <span className="px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 shadow-2xs flex items-center gap-1.5">
                 <Award className="h-3.5 w-3.5 text-teal-700" />
-                <span>Project Code: BPY-CSE-2666</span>
+                <span>21 CFR Part 11 Aligned</span>
               </span>
             </div>
           </div>

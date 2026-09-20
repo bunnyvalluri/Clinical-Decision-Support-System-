@@ -139,7 +139,7 @@ export default function SettingsPage() {
           <CardContent className="pt-4 space-y-3 text-xs">
             <div className="flex justify-between py-1.5 border-b border-slate-100">
               <span className="text-slate-500">Project Code:</span>
-              <span className="font-mono font-bold text-slate-900">BPY-CSE-2666</span>
+              <span className="font-mono font-bold text-slate-900">HealthNova CDS-Enterprise</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-slate-100">
               <span className="text-slate-500">Project Title:</span>

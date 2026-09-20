@@ -127,7 +127,7 @@ export default function MLGovernancePage() {
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                   EthicalML Framework
                 </span>
-                <span className="text-xs text-slate-400">• BPY-CSE-2666</span>
+                <span className="text-xs text-slate-400">• 21 CFR Part 11</span>
               </div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mt-0.5">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />

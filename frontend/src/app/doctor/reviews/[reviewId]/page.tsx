@@ -122,7 +122,7 @@ export default function DoctorReviewActionDetailPage() {
               Physician Attestation & Override Controls
             </CardTitle>
             <CardDescription className="text-xs text-slate-500">
-              Mandatory clinical sign-off requirement under CDSS governance standard BPY-CSE-2666.
+              Mandatory clinical sign-off requirement under CDSS clinical governance standard.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-5 space-y-4">

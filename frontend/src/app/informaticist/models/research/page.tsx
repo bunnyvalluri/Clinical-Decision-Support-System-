@@ -157,7 +157,7 @@ export default function InformaticistResearchDashboardPage() {
               </h1>
             </div>
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 text-xs py-1">
-              Academic Standard: BPY-CSE-2666
+              Academic Standard: CDS-Validation-2026
             </Badge>
           </div>
           <p className="text-xs text-slate-600 leading-relaxed max-w-4xl">

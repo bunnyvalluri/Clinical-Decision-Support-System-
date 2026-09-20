@@ -208,7 +208,7 @@ export function PublicNavbar() {
           <div className="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-mono font-semibold">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span className="truncate">SYSTEMS OPERATIONAL • BPY-CSE-2666</span>
+              <span className="truncate">SYSTEMS OPERATIONAL • VERIFIED</span>
             </div>
             <span className="text-[10px] bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full shrink-0 font-bold">
               LIVE

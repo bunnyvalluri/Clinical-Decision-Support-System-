@@ -11,7 +11,7 @@ interface BrandFooterProps {
  * BrandFooter
  *
  * Professional healthcare footer displaying dynamic year, brand copyright,
- * academic project attribution (BPY-CSE-2666), and clinical safety disclaimer.
+ * enterprise branding, compliance badges, and clinical safety disclaimer.
  */
 export function BrandFooter({ className = "", condensed = false }: BrandFooterProps) {
   const currentYear = new Date().getFullYear();
@@ -42,10 +42,6 @@ export function BrandFooter({ className = "", condensed = false }: BrandFooterPr
             <HeartPulse className="h-4 w-4 text-teal-600" />
             <span>&copy; {currentYear} {BRAND_CONFIG.brandName}</span>
           </div>
-          <span className="text-slate-300">|</span>
-          <span className="font-mono text-[11px] text-slate-600">
-            Project Code: {BRAND_CONFIG.academic.projectCode}
-          </span>
           <span className="text-slate-300 hidden sm:inline">|</span>
           <div className="flex items-center gap-1 text-[11px] text-slate-600">
             <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />

@@ -159,7 +159,7 @@ export function PublicFooter() {
           <div className="flex items-center gap-2">
             <HeartPulse className="h-3.5 w-3.5 text-teal-600 shrink-0" />
             <span>
-              &copy; {currentYear} {BRAND_CONFIG.brandName}. All rights reserved. | Academic Project: {BRAND_CONFIG.academic.projectCode}
+              &copy; {currentYear} {BRAND_CONFIG.brandName}. All rights reserved.
             </span>
           </div>
           <div className="flex items-center gap-1 text-center sm:text-right text-[11px] text-slate-500">

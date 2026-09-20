@@ -122,7 +122,7 @@ export default function SecurityOverviewPage() {
               Controlled Security & Vulnerability Management
             </h1>
             <p className="text-sm text-slate-500 mt-1 max-w-2xl">
-              Internal DevSecOps security testing layer for BPY-CSE-2666. Default-deny allowlist policy,
+              Internal DevSecOps security testing layer for HealthNova CDSS. Default-deny allowlist policy,
               7-question validation gate, synthetic test datasets, and strict isolation from clinical request paths.
             </p>
           </div>

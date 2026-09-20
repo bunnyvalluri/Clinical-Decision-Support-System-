@@ -65,7 +65,7 @@ export const BRAND_CONFIG = {
       "Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques",
     secondaryTitle:
       "Patient Risk Level Prediction Using Machine Learning for Intelligent Clinical Decision Support",
-    projectCode: "BPY-CSE-2666",
+    projectCode: "",
   },
 
   /** Institutional contact channels */

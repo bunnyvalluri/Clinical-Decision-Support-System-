@@ -109,7 +109,7 @@ export default function AdminMLSecurityPage() {
                 <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
                   IT Infrastructure & Security
                 </span>
-                <span className="text-xs text-slate-400">• BPY-CSE-2666</span>
+                <span className="text-xs text-slate-400">• SOC 2 Type II</span>
               </div>
               <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2 mt-0.5">
                 <Shield className="w-5 h-5 text-rose-600" />

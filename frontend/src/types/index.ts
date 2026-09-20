@@ -1,5 +1,5 @@
 /**
- * Global TypeScript type definitions for BPY-CSE-2666.
+ * Global TypeScript type definitions for HealthNova Clinical Decision Support System.
  *
  * These types mirror the Django serializer output exactly, ensuring
  * type safety across the entire frontend codebase.

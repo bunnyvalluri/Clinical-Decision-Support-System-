@@ -637,7 +637,7 @@ export default function LoginPage() {
         {/* Footer */}
         <div className="pt-6 text-center text-[11px] text-slate-400 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>HealthNova AI Enterprise v1.0.0</span>
-          <span>Project BPY-CSE-2666 • Assistive Software as a Medical Device</span>
+          <span>Assistive Software as a Medical Device (SaMD) • HIPAA Compliant</span>
         </div>
       </div>
     </div>
