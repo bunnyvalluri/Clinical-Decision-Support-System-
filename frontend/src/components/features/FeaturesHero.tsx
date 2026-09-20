@@ -393,20 +393,25 @@ export function FeaturesHero() {
                 </div>
 
                 {/* Cohort Pill Tabs */}
-                <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl">
+                <div className="grid grid-cols-3 gap-1 sm:gap-1.5 p-1 bg-slate-100 rounded-xl">
                   {MOCK_PATIENTS.map((p, idx) => (
                     <button
                       key={p.id}
                       type="button"
                       onClick={() => setSelectedPatientIdx(idx)}
-                      className={`py-1.5 px-2 rounded-lg font-mono text-[10px] font-bold transition-all cursor-pointer truncate ${
+                      className={`py-1.5 px-1 sm:px-2 rounded-lg text-[10px] sm:text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 text-center ${
                         selectedPatientIdx === idx
-                          ? "bg-white text-slate-950 shadow-xs border border-slate-200"
-                          : "text-slate-600 hover:text-slate-900"
+                          ? "bg-white text-slate-950 shadow-xs border border-slate-200 ring-1 ring-slate-200/50"
+                          : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
                       }`}
+                      title={p.name}
                     >
-                      {p.riskTier === "HIGH RISK" ? "⚠️ " : p.riskTier === "ELEVATED" ? "⚡ " : "✓ "}
-                      {p.name.split(",")[0]}
+                      <span className="shrink-0 text-xs">
+                        {p.riskTier === "HIGH RISK" ? "⚠️" : p.riskTier === "ELEVATED" ? "⚡" : "✓"}
+                      </span>
+                      <span className="leading-tight break-normal whitespace-normal sm:whitespace-nowrap font-medium">
+                        {p.name.split(",")[0]}
+                      </span>
                     </button>
                   ))}
                 </div>

@@ -183,8 +183,8 @@ export function SolutionsHero() {
                         : "bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
-                    <p className="font-bold text-slate-900 text-xs truncate">{item.ward.split("•")[0]}</p>
-                    <p className="text-[10px] text-slate-500 truncate">{item.metricValue.split("(")[0]}</p>
+                    <p className="font-bold text-slate-950 text-xs leading-tight">{item.ward.split("•")[0].trim()}</p>
+                    <p className="text-[10px] text-slate-500 leading-tight mt-0.5">{item.metricValue.split("(")[0].trim()}</p>
                   </button>
                 ))}
               </div>
@@ -347,8 +347,8 @@ export function SolutionsHero() {
                     <BarChart2 className="h-3.5 w-3.5" />
                   </div>
                   <div className="text-left min-w-0">
-                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Better Decisions</p>
-                    <p className="text-[9px] font-medium text-slate-500 truncate">Evidence-informed</p>
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">{`Better Decisions`}</p>
+                    <p className="text-[9px] font-medium text-slate-500">{`Evidence-informed`}</p>
                   </div>
                 </div>
 
@@ -357,8 +357,8 @@ export function SolutionsHero() {
                     <Users className="h-3.5 w-3.5" />
                   </div>
                   <div className="text-left min-w-0">
-                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Empowered Providers</p>
-                    <p className="text-[9px] font-medium text-slate-500 truncate">Reduced burden</p>
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">{`Empowered Providers`}</p>
+                    <p className="text-[9px] font-medium text-slate-500">{`Reduced burden`}</p>
                   </div>
                 </div>
 
@@ -367,8 +367,8 @@ export function SolutionsHero() {
                     <Heart className="h-3.5 w-3.5" />
                   </div>
                   <div className="text-left min-w-0">
-                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Healthier Communities</p>
-                    <p className="text-[9px] font-medium text-slate-500 truncate">Early risk awareness</p>
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">{`Healthier Communities`}</p>
+                    <p className="text-[9px] font-medium text-slate-500">{`Early risk awareness`}</p>
                   </div>
                 </div>
 
@@ -377,8 +377,8 @@ export function SolutionsHero() {
                     <ShieldCheck className="h-3.5 w-3.5" />
                   </div>
                   <div className="text-left min-w-0">
-                    <p className="text-[11px] font-bold text-slate-900 leading-tight truncate">Safer Care</p>
-                    <p className="text-[9px] font-medium text-slate-500 truncate">Continuous audit</p>
+                    <p className="text-[11px] font-bold text-slate-900 leading-tight">{`Safer Care`}</p>
+                    <p className="text-[9px] font-medium text-slate-500">{`Continuous audit`}</p>
                   </div>
                 </div>
               </div>

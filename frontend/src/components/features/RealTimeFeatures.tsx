@@ -73,15 +73,15 @@ export function RealTimeFeatures() {
   }, []);
 
   return (
-    <section id="realtime" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+    <section id="realtime" className="py-10 sm:py-16 lg:py-20 bg-slate-50/50 border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>REAL-TIME INFRASTRUCTURE</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             Sub-20ms Real-Time{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Clinical Intelligence
@@ -94,15 +94,15 @@ export function RealTimeFeatures() {
         </div>
 
         {/* Real-time Architecture Showcase */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-start">
           {/* Left 7 cols: Real-Time Event Types */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {REAL_TIME_EVENTS.map((item, idx) => {
               const isPulsing = idx === pulseTick % REAL_TIME_EVENTS.length;
               return (
                 <div
                   key={item.event}
-                  className={`rounded-3xl bg-white border p-5 space-y-2 transition-all duration-300 shadow-2xs group ${
+                  className={`rounded-2xl sm:rounded-3xl bg-white border p-4 sm:p-5 space-y-2 transition-all duration-300 shadow-2xs group ${
                     isPulsing
                       ? "border-teal-500 ring-2 ring-teal-500/20 shadow-md"
                       : "border-slate-200/90 hover:border-teal-400 hover:shadow-md"
@@ -128,7 +128,7 @@ export function RealTimeFeatures() {
           </div>
 
           {/* Right 5 cols: Live Infrastructure Status Card (Pure Light Clinical Theme) */}
-          <div className="lg:col-span-5 rounded-3xl bg-white border border-slate-300 p-6 sm:p-7 flex flex-col justify-between shadow-xl space-y-5">
+          <div className="lg:col-span-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-4 sm:p-6 lg:p-7 flex flex-col justify-between shadow-xl space-y-5">
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3.5 border-b border-slate-200">
                 <div className="flex items-center gap-2">

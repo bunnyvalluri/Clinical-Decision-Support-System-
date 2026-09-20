@@ -45,15 +45,15 @@ export function AIIntelligenceSection() {
   ];
 
   return (
-    <section id="ai-intelligence" className="py-20 sm:py-28 bg-white border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+    <section id="ai-intelligence" className="py-10 sm:py-16 lg:py-20 bg-white border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>AI INFRASTRUCTURE &amp; EXPLAINABILITY</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             AI-Powered{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Clinical Intelligence
@@ -110,7 +110,7 @@ export function AIIntelligenceSection() {
               return (
                 <div
                   key={cap.title}
-                  className="rounded-3xl bg-slate-50/70 border border-slate-200/90 p-5 flex flex-col items-center text-center justify-between shadow-2xs hover:bg-white hover:border-teal-400 hover:shadow-md hover:-translate-y-1 transition-all duration-200 group cursor-default"
+                  className="rounded-2xl sm:rounded-3xl bg-slate-50/70 border border-slate-200/90 p-3.5 sm:p-5 flex flex-col items-center text-center justify-between shadow-2xs hover:bg-white hover:border-teal-400 hover:shadow-md hover:-translate-y-1 transition-all duration-200 group cursor-default"
                 >
                   <div className="h-11 w-11 rounded-2xl bg-white border border-slate-200 text-teal-700 flex items-center justify-center mb-3 shadow-2xs group-hover:scale-105 transition-transform duration-200">
                     <IconComponent className="h-5 w-5" />
@@ -135,7 +135,7 @@ export function AIIntelligenceSection() {
             {MODEL_STACK.map((mod) => (
               <div
                 key={mod.name}
-                className="rounded-3xl bg-slate-50/70 border border-slate-200 p-6 space-y-4 hover:bg-white hover:border-teal-400 hover:shadow-md transition-all"
+                className="rounded-2xl sm:rounded-3xl bg-slate-50/70 border border-slate-200 p-4 sm:p-6 space-y-3 sm:space-y-4 hover:bg-white hover:border-teal-400 hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-md bg-teal-100 text-teal-900 border border-teal-200">
@@ -164,7 +164,7 @@ export function AIIntelligenceSection() {
 
         {/* Tab 3: TreeSHAP Explainability View */}
         {activeTab === "explainability" && (
-          <div className="rounded-3xl bg-slate-50/70 border border-slate-200 p-6 sm:p-8 space-y-6 animate-in fade-in duration-200">
+          <div className="rounded-2xl sm:rounded-3xl bg-slate-50/70 border border-slate-200 p-4 sm:p-6 lg:p-8 space-y-6 animate-in fade-in duration-200">
             <div className="max-w-2xl space-y-2">
               <h3 className="text-lg font-bold text-slate-950">Additive Pathophysiological Attribution</h3>
               <p className="text-xs text-slate-600 leading-relaxed">
@@ -173,15 +173,15 @@ export function AIIntelligenceSection() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
                 <span className="text-[10px] font-mono font-bold text-rose-700 uppercase">Risk Drivers (+)</span>
                 <p className="text-xs text-slate-700">Serum Lactate &gt; 3.5, MAP &lt; 65 mmHg, and elevated ST-segment depression increase trajectory risk score.</p>
               </div>
-              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
                 <span className="text-[10px] font-mono font-bold text-emerald-700 uppercase">Protective Markers (-)</span>
                 <p className="text-xs text-slate-700">Preserved left ventricular ejection fraction (&gt; 55%) and nominal urine output counteract acute risk tiers.</p>
               </div>
-              <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-1.5">
                 <span className="text-[10px] font-mono font-bold text-teal-700 uppercase">Epistemic Uncertainty</span>
                 <p className="text-xs text-slate-700">Shannon entropy bounds flag cases with insufficient physiological data for mandatory manual chart review.</p>
               </div>
@@ -190,7 +190,7 @@ export function AIIntelligenceSection() {
         )}
 
         {/* Mandatory Clinical Governance & Human-in-the-Loop Callout */}
-        <div className="rounded-3xl bg-slate-50 border border-slate-300 p-6 sm:p-8 lg:p-10 max-w-4xl mx-auto shadow-sm space-y-6">
+        <div className="rounded-2xl sm:rounded-3xl bg-slate-50 border border-slate-300 p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto shadow-sm space-y-6">
           <div className="flex items-center gap-3.5 pb-4 border-b border-slate-200">
             <div className="h-12 w-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center shrink-0 shadow-md shadow-teal-800/20">
               <ShieldCheck className="h-6 w-6" />

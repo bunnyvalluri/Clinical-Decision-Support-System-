@@ -47,15 +47,15 @@ export function FeatureGrid() {
   }, [selectedCategory, searchQuery]);
 
   return (
-    <section id="powerful-features" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-10">
+    <section id="powerful-features" className="py-10 sm:py-16 lg:py-20 bg-slate-50/50 border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>ENTERPRISE CAPABILITIES MATRIX</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             Comprehensive Tools for{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Clinical Excellence
@@ -138,7 +138,7 @@ export function FeatureGrid() {
                 <div
                   key={feat.id}
                   tabIndex={0}
-                  className="group rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-7 shadow-xs hover:border-teal-400 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                  className="group rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 p-4 sm:p-6 lg:p-7 shadow-xs hover:border-teal-400 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
                 >
                   <div className="space-y-4">
                     {/* Card Header */}

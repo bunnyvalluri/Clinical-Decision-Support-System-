@@ -75,15 +75,15 @@ const SECURITY_PILLARS: SecurityPillar[] = [
 
 export function SecurityFeatures() {
   return (
-    <section id="security" className="py-20 sm:py-28 bg-white border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+    <section id="security" className="py-10 sm:py-16 lg:py-20 bg-white border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>HEALTHCARE DATA PROTECTION &amp; COMPLIANCE</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             Security &amp; Governance{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               by Design
@@ -112,14 +112,14 @@ export function SecurityFeatures() {
         </div>
 
         {/* 6 Security Pillars Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {SECURITY_PILLARS.map((p) => {
             const IconComponent = p.icon;
             return (
               <div
                 key={p.title}
                 tabIndex={0}
-                className="group rounded-3xl bg-slate-50/70 border border-slate-200/90 p-6 sm:p-7 shadow-2xs hover:bg-white hover:border-teal-400 hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+                className="group rounded-2xl sm:rounded-3xl bg-slate-50/70 border border-slate-200/90 p-4 sm:p-6 lg:p-7 shadow-2xs hover:bg-white hover:border-teal-400 hover:shadow-md hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">

@@ -22,15 +22,15 @@ export function RoleFeatures() {
   const ActiveIcon = activeCard.icon;
 
   return (
-    <section id="role-features" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+    <section id="role-features" className="py-10 sm:py-16 lg:py-20 bg-slate-50/50 border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>ROLE-SCOPED WORKSPACES</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             Built for Every{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Healthcare Role
@@ -43,7 +43,7 @@ export function RoleFeatures() {
         </div>
 
         {/* Live Active Role Workspace Stage */}
-        <div className="rounded-3xl bg-white border border-slate-300 p-6 sm:p-8 shadow-md relative overflow-hidden space-y-5">
+        <div className="rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-4 sm:p-6 lg:p-8 shadow-md relative overflow-hidden space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-2xl bg-teal-700 text-white flex items-center justify-center shadow-sm shrink-0">
@@ -105,7 +105,7 @@ export function RoleFeatures() {
                 key={card.role}
                 tabIndex={0}
                 onClick={() => setActiveRoleIdx(idx)}
-                className={`rounded-3xl border p-6 sm:p-7 flex flex-col justify-between transition-all duration-200 cursor-pointer ${
+                className={`rounded-2xl sm:rounded-3xl border p-4 sm:p-6 lg:p-7 flex flex-col justify-between transition-all duration-200 cursor-pointer ${
                   isSelected
                     ? "bg-white border-teal-600 shadow-lg ring-2 ring-teal-500/20"
                     : "bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 shadow-2xs"

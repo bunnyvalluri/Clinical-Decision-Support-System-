@@ -76,15 +76,15 @@ export function MLWorkflow() {
   const StepIcon = activeStep.icon;
 
   return (
-    <section id="ml-workflow" className="py-20 sm:py-28 bg-white border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+    <section id="ml-workflow" className="py-10 sm:py-16 lg:py-20 bg-white border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 lg:space-y-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>ALGORITHMIC INTEGRITY &amp; LIFECYCLE</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             The Machine Learning{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Inference Pipeline
@@ -97,8 +97,8 @@ export function MLWorkflow() {
         </div>
 
         {/* 5-Step Interactive Stepper Bar */}
-        <div className="rounded-3xl bg-slate-50 border border-slate-200 p-3 sm:p-4 shadow-sm">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <div className="rounded-2xl sm:rounded-3xl bg-slate-50 border border-slate-200 p-2.5 sm:p-4 shadow-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             {ML_STEPS.map((step, idx) => {
               const IconComp = step.icon;
               const isActive = activeStepIdx === idx;
@@ -130,7 +130,7 @@ export function MLWorkflow() {
         </div>
 
         {/* Active Step Deep-Dive Inspector */}
-        <div className="rounded-3xl bg-slate-50/70 border border-slate-300 p-6 sm:p-8 space-y-4">
+        <div className="rounded-2xl sm:rounded-3xl bg-slate-50/70 border border-slate-300 p-4 sm:p-6 lg:p-8 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 shadow-sm">
@@ -161,7 +161,7 @@ export function MLWorkflow() {
         </div>
 
         {/* Machine Learning Model Ensembles Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {[
             {
               name: "CatBoost Classifier",
@@ -194,7 +194,7 @@ export function MLWorkflow() {
           ].map((m) => (
             <div
               key={m.name}
-              className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 shadow-2xs space-y-3 hover:bg-white hover:border-teal-400 hover:shadow-md transition-all duration-200 group"
+              className="p-4 sm:p-5 lg:p-6 rounded-2xl sm:rounded-3xl bg-slate-50/70 border border-slate-200 shadow-2xs space-y-3 hover:bg-white hover:border-teal-400 hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex items-center justify-between">
                 <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${m.badgeBg}`}>
@@ -209,7 +209,7 @@ export function MLWorkflow() {
         </div>
 
         {/* Prominent Risk Prediction Safety Disclaimer Banner (Mandatory Clinical Invariant) */}
-        <div className="rounded-3xl bg-amber-50/90 border border-amber-300 p-5 sm:p-6 max-w-3xl mx-auto flex items-start sm:items-center gap-4 shadow-2xs">
+        <div className="rounded-2xl sm:rounded-3xl bg-amber-50/90 border border-amber-300 p-4 sm:p-5 lg:p-6 max-w-3xl mx-auto flex items-start sm:items-center gap-4 shadow-2xs">
           <div className="h-10 w-10 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 flex items-center justify-center shrink-0 shadow-2xs">
             <AlertCircle className="h-5 w-5" />
           </div>

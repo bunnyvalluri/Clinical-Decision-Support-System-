@@ -98,11 +98,11 @@ export function FeatureHighlightCards() {
   const activeRole = ROLE_PREVIEWS[selectedRolePreview];
 
   return (
-    <section className="py-16 sm:py-24 bg-white border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+    <section className="py-10 sm:py-16 lg:py-20 bg-white border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-10">
           {/* Card 1: Interactive Clinical Intelligence & Risk Intercept */}
-          <div className="relative rounded-3xl bg-white border border-slate-300 p-7 sm:p-9 flex flex-col justify-between shadow-md hover:shadow-xl hover:border-teal-400 transition-all duration-300 overflow-hidden group">
+          <div className="relative rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-4 sm:p-7 lg:p-9 flex flex-col justify-between shadow-xs hover:shadow-xl hover:border-teal-400 transition-all duration-300 overflow-hidden group">
             {/* Top Teal Accent Bar */}
             <div
               aria-hidden="true"
@@ -219,7 +219,7 @@ export function FeatureHighlightCards() {
           </div>
 
           {/* Card 2: Multi-Role Care Portals & Workspaces */}
-          <div className="relative rounded-3xl bg-white border border-slate-300 p-7 sm:p-9 flex flex-col justify-between shadow-md hover:shadow-xl hover:border-teal-400 transition-all duration-300 overflow-hidden group">
+          <div className="relative rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-4 sm:p-7 lg:p-9 flex flex-col justify-between shadow-xs hover:shadow-xl hover:border-teal-400 transition-all duration-300 overflow-hidden group">
             {/* Top Teal Accent Bar */}
             <div
               aria-hidden="true"

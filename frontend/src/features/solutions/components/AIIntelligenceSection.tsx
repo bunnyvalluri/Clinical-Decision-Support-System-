@@ -189,7 +189,7 @@ export function AIIntelligenceSection() {
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 text-left">
             <div className="p-3 bg-white rounded-xl border border-slate-200/80">
               <span className="text-[10px] font-mono text-slate-500 uppercase block">Active Architecture</span>
-              <span className="text-xs font-bold text-slate-900 block truncate">{activeM.name}</span>
+              <span className="text-xs font-bold text-slate-900 block leading-tight break-words">{activeM.name}</span>
             </div>
             <div className="p-3 bg-white rounded-xl border border-slate-200/80">
               <span className="text-[10px] font-mono text-slate-500 uppercase block">ROC-AUC Score</span>

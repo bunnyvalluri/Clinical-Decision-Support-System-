@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 
 export function FeaturesCTA() {
   return (
-    <section className="py-20 sm:py-28 bg-gradient-to-b from-white to-slate-50/80 border-t border-slate-200">
+    <section className="py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-white to-slate-50/80 border-t border-slate-200">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-white border border-slate-300 p-8 sm:p-14 lg:p-16 text-center shadow-xl relative overflow-hidden space-y-6">
+        <div className="rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-5 sm:p-10 lg:p-14 text-center shadow-xl relative overflow-hidden space-y-6">
           {/* Subtle ambient lighting */}
           <div
             aria-hidden="true"
@@ -26,7 +26,7 @@ export function FeaturesCTA() {
               <span>POINT-OF-CARE TRANSFORMATION</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
               See Intelligent Clinical Decision Support{" "}
               <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
                 in Action
