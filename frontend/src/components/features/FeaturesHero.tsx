@@ -189,19 +189,19 @@ export function FeaturesHero() {
 
             {/* Main Headline */}
             <div className="space-y-2">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08]">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-tight sm:leading-[1.08]">
                 Comprehensive{" "}
                 <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
                   Clinical Intelligence
                 </span>
               </h1>
-              <p className="text-lg sm:text-xl font-medium text-slate-700 tracking-tight">
+              <p className="text-base sm:text-xl font-medium text-slate-700 tracking-tight">
                 Engineered for Acute Bedside Triage &amp; Early Deterioration Intercept
               </p>
             </div>
 
             {/* Supporting Description */}
-            <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed max-w-2xl font-normal">
               HealthNova AI integrates calibrated multi-model machine learning, sub-20ms WebSocket telemetry,
               and deterministic clinical scoring rules (qSOFA, NEWS2). Designed from the ICU up, our suite
               enables physicians and nurses to detect acute decompensation hours in advance while preserving
@@ -209,16 +209,16 @@ export function FeaturesHero() {
             </p>
 
             {/* Reassurance Disclaimer Badge */}
-            <div className="p-4 sm:p-4.5 rounded-2xl bg-white border border-teal-200 shadow-sm flex items-start gap-3.5 max-w-xl">
-              <div className="h-10 w-10 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-teal-700/20">
-                <ShieldCheck className="h-5 w-5" />
+            <div className="p-3.5 sm:p-4.5 rounded-2xl bg-white border border-teal-200 shadow-xs flex items-start gap-3 sm:gap-3.5 max-w-xl">
+              <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm shadow-teal-700/20">
+                <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <strong className="text-xs font-bold text-slate-950 uppercase tracking-wider">
                     Clinician-in-the-Loop Standard
                   </strong>
-                  <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  <span className="text-[9px] sm:text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                     NON-AUTONOMOUS
                   </span>
                 </div>
@@ -232,20 +232,20 @@ export function FeaturesHero() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-              <a href="#powerful-features">
+              <a href="#powerful-features" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-teal-700 hover:bg-teal-800 text-white font-bold px-7 shadow-md shadow-teal-900/10 gap-2 text-sm h-12 rounded-xl transition-all hover:-translate-y-0.5 cursor-pointer"
+                  className="w-full sm:w-auto bg-teal-700 hover:bg-teal-800 text-white font-bold px-7 shadow-md shadow-teal-900/10 gap-2 text-xs sm:text-sm h-11 sm:h-12 rounded-xl transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
                   <span>Explore Capabilities Matrix</span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </a>
-              <a href="#ai-intelligence">
+              <a href="#ai-intelligence" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-300 text-slate-700 hover:text-slate-950 font-semibold px-6 text-sm h-12 gap-2 rounded-xl shadow-2xs transition-all hover:-translate-y-0.5 cursor-pointer"
+                  className="w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-300 text-slate-700 hover:text-slate-950 font-semibold px-6 text-xs sm:text-sm h-11 sm:h-12 gap-2 rounded-xl shadow-2xs transition-all hover:-translate-y-0.5 cursor-pointer"
                 >
                   <Layers className="h-4 w-4 text-teal-700" />
                   <span>Clinical Intelligence Architecture</span>
@@ -254,24 +254,24 @@ export function FeaturesHero() {
             </div>
 
             {/* Proof Metrics Ribbon */}
-            <div className="pt-5 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="pt-5 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               {proofMetrics.map((item) => {
                 const Icon = item.icon;
                 return (
                   <div
                     key={item.label}
-                    className="p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all"
+                    className="p-2.5 sm:p-3.5 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all"
                   >
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <Icon className="h-3.5 w-3.5 shrink-0" />
-                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider truncate">
+                      <Icon className="h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0" />
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider truncate">
                         {item.label}
                       </span>
                     </div>
-                    <div className="text-base sm:text-lg font-black text-slate-950 font-mono tracking-tight">
+                    <div className="text-sm sm:text-base lg:text-lg font-black text-slate-950 font-mono tracking-tight truncate">
                       {item.value}
                     </div>
-                    <div className="text-[10px] text-slate-500 font-medium truncate mt-0.5">
+                    <div className="text-[9px] sm:text-[10px] text-slate-500 font-medium truncate mt-0.5">
                       {item.sub}
                     </div>
                   </div>

@@ -128,7 +128,7 @@ export function SolutionsHero() {
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.14] sm:leading-[1.12]">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-tight sm:leading-[1.12]">
               Smarter Solutions{" "}
               <span className="text-teal-600 block sm:inline">
                 for a Healthier Tomorrow
@@ -136,19 +136,19 @@ export function SolutionsHero() {
             </h1>
 
             {/* Supporting Description */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
+            <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed max-w-2xl font-normal">
               Comprehensive, evidence-based AI capabilities engineered to elevate clinical workflows, safeguard patient telemetry, accelerate medical decisions, and empower healthcare professionals across inpatient, outpatient, and critical care environments.
             </p>
 
             {/* Reassurance Governance Disclaimer */}
-            <div className="p-4 rounded-2xl bg-white/95 border border-slate-200/90 flex items-start gap-3.5 max-w-xl shadow-xs">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-white/95 border border-slate-200/90 flex items-start gap-3 sm:gap-3.5 max-w-xl shadow-xs">
               <ShieldCheck className="h-5 w-5 text-teal-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <p className="text-xs text-slate-600 leading-relaxed">
                   <strong className="font-bold text-slate-900">Clinical Decision Support Invariant:</strong>{" "}
                   HealthNova AI assists clinical teams with validated risk models and explainable telemetry. Licensed healthcare professionals retain complete diagnostic and prescription authority.
                 </p>
-                <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500 font-mono pt-1">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] text-slate-500 font-mono pt-1">
                   <span className="flex items-center gap-1 font-semibold text-teal-700">
                     <CheckCircle2 className="h-3 w-3" /> 21 CFR Part 11 Compliant
                   </span>
@@ -171,7 +171,7 @@ export function SolutionsHero() {
                   FHIR v4.0.1 Connected
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {HERO_SCENARIOS.map((item, idx) => (
                   <button
                     key={item.ward}
@@ -183,7 +183,7 @@ export function SolutionsHero() {
                         : "bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
                     }`}
                   >
-                    <p className="font-bold text-slate-900 text-[11px] truncate">{item.ward.split("•")[0]}</p>
+                    <p className="font-bold text-slate-900 text-xs truncate">{item.ward.split("•")[0]}</p>
                     <p className="text-[10px] text-slate-500 truncate">{item.metricValue.split("(")[0]}</p>
                   </button>
                 ))}

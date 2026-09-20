@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 
 export function AboutCTA() {
   return (
-    <section className="py-20 sm:py-28 bg-gradient-to-b from-white to-slate-50/80 border-t border-slate-200">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl bg-white border border-slate-300 p-8 sm:p-14 lg:p-16 text-center shadow-xl relative overflow-hidden space-y-6">
+    <section className="py-12 sm:py-20 lg:py-28 bg-gradient-to-b from-white to-slate-50/80 border-t border-slate-200">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+        <div className="rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-6 sm:p-12 lg:p-16 text-center shadow-xs sm:shadow-xl relative overflow-hidden space-y-4 sm:space-y-6">
           {/* Ambient subtle glow */}
           <div
             aria-hidden="true"
@@ -20,20 +20,20 @@ export function AboutCTA() {
             className="pointer-events-none absolute -bottom-24 left-1/4 h-80 w-80 rounded-full bg-sky-400/10 blur-3xl"
           />
 
-          <div className="max-w-3xl mx-auto space-y-5 relative z-10">
+          <div className="max-w-3xl mx-auto space-y-4 sm:space-y-5 relative z-10">
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
               <Sparkles className="h-3.5 w-3.5 text-teal-700" />
               <span>INSTITUTIONAL CLINICAL DEPLOYMENT</span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950 leading-tight">
               Building Smarter, Safer{" "}
               <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
                 Clinical Intelligence Together
               </span>
             </h2>
 
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
               Empower your hospital network, clinical rapid response teams, and medical informaticists
               with anticipatory deterioration detection, explainable TreeSHAP attributions, and
               zero-compromise patient safety.

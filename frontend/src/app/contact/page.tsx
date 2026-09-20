@@ -634,61 +634,61 @@ export default function ContactDoctorPage() {
                 </div>
 
                 {/* Key Credentials Strip */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-1">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <Award className="h-4 w-4" />
-                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Education</span>
+                      <Award className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Education</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">{activeDoctor.degree}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.education}</div>
+                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.degree}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.education}</div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <HeartPulse className="h-4 w-4" />
-                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Experience</span>
+                      <HeartPulse className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Experience</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">{activeDoctor.experience}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.experienceDetail}</div>
+                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.experience}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.experienceDetail}</div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <ShieldCheck className="h-4 w-4" />
-                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Governance</span>
+                      <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Governance</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">{activeDoctor.governance}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.governanceDetail}</div>
+                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.governance}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.governanceDetail}</div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
+                  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <BookOpen className="h-4 w-4" />
-                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Research</span>
+                      <BookOpen className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold text-slate-500 uppercase">Research</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">{activeDoctor.research}</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.researchDetail}</div>
+                    <div className="text-xs font-bold text-slate-950 truncate">{activeDoctor.research}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5 truncate">{activeDoctor.researchDetail}</div>
                   </div>
                 </div>
 
                 {/* Action CTAs */}
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
-                  <a href="#consultation-form">
+                  <a href="#consultation-form" className="w-full sm:w-auto">
                     <Button
                       size="lg"
-                      className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold px-7 shadow-sm text-sm h-12 rounded-xl transition-all border-0 gap-2 cursor-pointer"
+                      className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold px-7 shadow-sm text-xs sm:text-sm h-11 sm:h-12 rounded-xl transition-all border-0 gap-2 cursor-pointer"
                     >
                       <Calendar className="h-4 w-4" />
                       <span>Request Clinical Consultation</span>
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </a>
-                  <a href="#attending-schedule">
+                  <a href="#attending-schedule" className="w-full sm:w-auto">
                     <Button
                       variant="outline"
                       size="lg"
-                      className="w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-300 text-slate-700 hover:text-slate-950 font-semibold px-6 text-sm h-12 rounded-xl shadow-2xs gap-2 transition-all cursor-pointer"
+                      className="w-full sm:w-auto bg-white hover:bg-slate-50 border-slate-300 text-slate-700 hover:text-slate-950 font-semibold px-6 text-xs sm:text-sm h-11 sm:h-12 rounded-xl shadow-2xs gap-2 transition-all cursor-pointer"
                     >
                       <Clock className="h-4 w-4 text-teal-600" />
                       <span>View Attending Schedule</span>
@@ -704,36 +704,36 @@ export default function ContactDoctorPage() {
         <section
           id="attending-schedule"
           aria-label="Clinical Schedule"
-          className="py-14 sm:py-20 bg-white border-b border-slate-200/90"
+          className="py-10 sm:py-16 lg:py-20 bg-white border-b border-slate-200/90"
         >
-          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-10">
+          <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mx-auto text-center mb-8 sm:mb-10">
               <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                 Attending Rotations
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3 transition-all duration-300">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-950 tracking-tight mt-3 transition-all duration-300">
                 {activeDoctor.name}&apos;s Weekly Clinical Matrix
               </h2>
-              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
                 Live timetable of ICU ward rounds, diagnostic electrophysiology lab blocks, and outpatient consultation hours.
               </p>
             </div>
 
             {/* Day Selector Tabs */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+            <div className="grid grid-cols-5 gap-1 sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-2 mb-6 sm:mb-8">
               {CLINICAL_SCHEDULE.map((item) => (
                 <button
                   key={item.code}
                   type="button"
                   onClick={() => setSelectedDay(item.day)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                  className={`px-1.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border text-center ${
                     selectedDay === item.day
                       ? "bg-teal-700 text-white border-teal-700 shadow-xs ring-2 ring-teal-600/20"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                   }`}
                 >
-                  <span className="font-mono mr-1.5">{item.code}</span>
-                  <span>{item.day}</span>
+                  <span className="font-mono sm:mr-1.5 block sm:inline">{item.code}</span>
+                  <span className="hidden sm:inline">{item.day}</span>
                 </button>
               ))}
             </div>
@@ -742,7 +742,7 @@ export default function ContactDoctorPage() {
             {CLINICAL_SCHEDULE.filter((d) => d.day === selectedDay).map((schedule) => (
               <div
                 key={schedule.day}
-                className="max-w-4xl mx-auto rounded-3xl bg-slate-50/80 border border-slate-200 p-6 sm:p-8 shadow-sm"
+                className="max-w-4xl mx-auto rounded-2xl sm:rounded-3xl bg-slate-50/80 border border-slate-200 p-4 sm:p-6 lg:p-8 shadow-xs"
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-6 border-b border-slate-200 gap-3">
                   <div>
@@ -1072,13 +1072,13 @@ export default function ContactDoctorPage() {
 
               {/* Form Right Side: Multi-Tab Interactive Inquiry Submission */}
               <div className="lg:col-span-7 text-left">
-                <div className="rounded-3xl bg-slate-50/80 border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div className="rounded-2xl sm:rounded-3xl bg-slate-50/80 border border-slate-200 p-4 sm:p-6 lg:p-8 shadow-xs">
                   {/* Category Tabs */}
-                  <div className="flex flex-wrap gap-1.5 p-1.5 rounded-2xl bg-slate-200/70 mb-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 rounded-2xl bg-slate-200/70 mb-6">
                     <button
                       type="button"
                       onClick={() => handleTabChange("referral")}
-                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                         activeTab === "referral"
                           ? "bg-white text-slate-950 shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
@@ -1089,10 +1089,10 @@ export default function ContactDoctorPage() {
                     <button
                       type="button"
                       onClick={() => handleTabChange("consultation")}
-                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                         activeTab === "consultation"
                           ? "bg-white text-slate-950 shadow-xs"
-                          : "text-slate-600 hover:text-slate-900"
+                          : "text-slate-600 hover:text-slate-950"
                       }`}
                     >
                       Patient Consult
@@ -1100,10 +1100,10 @@ export default function ContactDoctorPage() {
                     <button
                       type="button"
                       onClick={() => handleTabChange("enterprise")}
-                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                         activeTab === "enterprise"
                           ? "bg-white text-slate-950 shadow-xs"
-                          : "text-slate-600 hover:text-slate-900"
+                          : "text-slate-600 hover:text-slate-950"
                       }`}
                     >
                       Hospital Pilot
@@ -1111,10 +1111,10 @@ export default function ContactDoctorPage() {
                     <button
                       type="button"
                       onClick={() => handleTabChange("research")}
-                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                         activeTab === "research"
                           ? "bg-white text-slate-950 shadow-xs"
-                          : "text-slate-600 hover:text-slate-900"
+                          : "text-slate-600 hover:text-slate-950"
                       }`}
                     >
                       Academic AI

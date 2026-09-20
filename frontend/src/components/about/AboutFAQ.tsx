@@ -112,21 +112,21 @@ export function AboutFAQ() {
   });
 
   return (
-    <section id="faq" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-12">
+    <section id="faq" className="py-12 sm:py-20 lg:py-28 bg-slate-50/50 border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-4xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
         {/* Section Header */}
         <div className="text-center space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>TRANSPARENCY &amp; CLINICAL INFORMATICS</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             Frequently Asked{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Questions
             </span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+          <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
             Authoritative answers on regulatory compliance, machine learning calibration,
             EHR interoperability, and clinical governance.
           </p>

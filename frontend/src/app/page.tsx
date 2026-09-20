@@ -427,18 +427,18 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
         <div className="container relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* Left Column: Hero Copy & Actions */}
-            <div className="lg:col-span-7 text-left space-y-6">
+            <div className="lg:col-span-7 text-left space-y-5 sm:space-y-6">
               {/* Institutional Regulatory Compliance Ribbon */}
-              <div className="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-slate-200/90 text-slate-700 shadow-sm">
+              <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-2xl sm:rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md border border-slate-200/90 text-slate-700 shadow-2xs">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-600" />
                 </span>
-                <span className="font-mono text-[11px] text-teal-800 font-bold uppercase tracking-wider">
+                <span className="font-mono text-[10px] sm:text-[11px] text-teal-800 font-bold uppercase tracking-wider">
                   FDA SaMD Class II Aligned
                 </span>
                 <span className="text-slate-300">•</span>
-                <span className="text-slate-700 text-xs font-medium">Sub-20ms Telemetry</span>
+                <span className="text-slate-700 text-[11px] sm:text-xs font-medium">Sub-20ms Telemetry</span>
                 <span className="text-slate-300 hidden sm:inline">•</span>
                 <span className="text-teal-700 font-mono text-xs font-semibold hidden sm:inline">
                   TreeSHAP Explainable
@@ -446,31 +446,31 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               </div>
 
               {/* Authoritative Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-[1.08]">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-slate-950 leading-tight sm:leading-[1.12]">
                 Real-Time Clinical{" "}
                 <span className="text-teal-600 block sm:inline">Decision Support System</span>
               </h1>
 
               {/* Subtitle / Value Proposition */}
-              <p className="text-base sm:text-lg text-slate-600 max-w-2xl leading-relaxed font-normal">
+              <p className="text-sm sm:text-base lg:text-lg text-slate-600 max-w-2xl leading-relaxed font-normal">
                 Empowering hospital cardiologists, emergency triage nurses, and ICU teams with
                 Platt-calibrated multi-class ML risk predictions, transparent TreeSHAP factor
                 attributions, and deterministic clinical safety overrides.
               </p>
 
               {/* Clinical Governance Invariant Notice */}
-              <div className="p-4 rounded-2xl bg-white border border-slate-200/90 flex items-start gap-3.5 max-w-xl shadow-2xs">
-                <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <ShieldCheck className="h-5 w-5" />
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white border border-slate-200/90 flex items-start gap-3 sm:gap-3.5 max-w-xl shadow-2xs">
+                <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-0.5 min-w-0">
                   <p className="text-xs text-slate-600 leading-relaxed">
                     <strong className="font-bold text-slate-900">Clinical Responsibility Standard:</strong>{" "}
                     Assistive intelligence only. All clinical prescriptions, diagnoses, and medical decisions
                     require licensed human clinician evaluation and sign-off.
                   </p>
-                  <div className="flex items-center gap-3 text-[10px] text-slate-500 font-mono pt-1">
-                    <span>● 21 CFR Part 11 Aligned</span>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-[10px] text-slate-500 font-mono pt-1">
+                    <span>● 21 CFR Part 11</span>
                     <span>● Zero PHI Export</span>
                     <span>● Non-Autonomous</span>
                   </div>
@@ -606,54 +606,54 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
           </div>
 
           {/* Institutional KPI Metric Ribbon */}
-          <div className="pt-8 sm:pt-12 grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto text-left">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-500 truncate">Champion Model</span>
+          <div className="pt-6 sm:pt-10 grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 max-w-6xl mx-auto text-left">
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
+              <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Champion Model</span>
                 <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               </div>
-              <p className="text-sm font-bold text-slate-950 truncate">Random Forest</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-950 truncate">Random Forest</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[11px] text-teal-700 font-mono font-bold">Calibrated Brier</span>
-                <span className="text-[10px] text-slate-500 font-mono truncate">0.0027</span>
+                <span className="text-[10px] sm:text-[11px] text-teal-700 font-mono font-bold truncate">Calibrated Brier</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-500 font-mono truncate">0.0027</span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-500 truncate">Inference Latency</span>
-                <Zap className="h-4 w-4 text-amber-500 shrink-0" />
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
+              <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Inference Latency</span>
+                <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-500 shrink-0" />
               </div>
-              <p className="text-sm font-bold text-slate-950">0.136 ms</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-950 truncate">0.136 ms</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[11px] text-slate-600 font-mono font-semibold">Scikit-Learn</span>
-                <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                <span className="text-[10px] sm:text-[11px] text-slate-600 font-mono font-semibold truncate">Scikit-Learn</span>
+                <span className="text-[9px] sm:text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.2 sm:py-0.5 rounded border border-emerald-200 shrink-0">
                   Sub-ms
                 </span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-500 truncate">Acute Safety</span>
-                <ShieldCheck className="h-4 w-4 text-teal-600 shrink-0" />
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
+              <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Acute Safety</span>
+                <ShieldCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-teal-600 shrink-0" />
               </div>
-              <p className="text-sm font-bold text-slate-950">0 Missed Events</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-950 truncate">0 Missed Events</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[11px] text-teal-700 font-mono font-bold">100% Recall</span>
-                <span className="text-[10px] text-slate-500 font-mono">Acute Cohort</span>
+                <span className="text-[10px] sm:text-[11px] text-teal-700 font-mono font-bold truncate">100% Recall</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-500 font-mono truncate">Acute</span>
               </div>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-semibold text-slate-500 truncate">Live Telemetry</span>
-                <Radio className="h-4 w-4 text-sky-600 animate-pulse shrink-0" />
+            <div className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white p-3 sm:p-4.5 shadow-xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all">
+              <div className="flex items-center justify-between mb-1 sm:mb-1.5">
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-500 truncate">Live Telemetry</span>
+                <Radio className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-sky-600 animate-pulse shrink-0" />
               </div>
-              <p className="text-sm font-bold text-slate-950">ASGI Real-Time</p>
+              <p className="text-xs sm:text-sm font-bold text-slate-950 truncate">ASGI Real-Time</p>
               <div className="flex items-center gap-1.5 mt-1">
-                <span className="text-[11px] text-sky-700 font-mono font-bold">Sub-Second Push</span>
-                <span className="text-[10px] text-slate-500 font-mono">WebSockets</span>
+                <span className="text-[10px] sm:text-[11px] text-sky-700 font-mono font-bold truncate">Push</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-500 font-mono truncate">WebSockets</span>
               </div>
             </div>
           </div>
@@ -661,24 +661,24 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 3. Live Bedside Risk Simulator & TreeSHAP Explainer */}
-      <section id="simulator" className="py-20 sm:py-28 bg-white border-b border-slate-200/80 relative">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-3xl mx-auto space-y-4">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/90 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+      <section id="simulator" className="py-12 sm:py-20 lg:py-28 bg-white border-b border-slate-200/80 relative">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
+          <div className="text-center max-w-3xl mx-auto space-y-3 sm:space-y-4">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/90 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5 text-teal-600" />
               <span>LIVE CLINICAL SIMULATOR</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
               Live Patient Risk &amp; <span className="text-teal-600">TreeSHAP</span> Explainer
             </h2>
-            <p className="text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed max-w-2xl mx-auto font-normal">
               Adjust patient vitals in real time to observe dynamic ML risk stratification,
               uncertainty entropy bounds, and localized TreeSHAP feature attributions.
             </p>
           </div>
 
           {/* Presets Segmented Bar */}
-          <div className="grid grid-cols-2 sm:flex sm:items-center sm:justify-center gap-1.5 sm:gap-2 p-1.5 bg-slate-100/90 rounded-2xl max-w-3xl mx-auto border border-slate-200">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2 p-1.5 bg-slate-100/90 rounded-2xl max-w-3xl mx-auto border border-slate-200">
             {PRESETS.map((preset, idx) => {
               const active = activePresetIndex === idx;
               return (
@@ -691,7 +691,7 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
                   }}
                   className={`inline-flex items-center justify-between sm:justify-center gap-1.5 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     active
-                      ? "bg-white text-slate-900 shadow-sm border border-slate-200"
+                      ? "bg-white text-slate-900 shadow-xs border border-slate-200 font-bold"
                       : "text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent"
                   }`}
                 >
@@ -707,7 +707,7 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
           </div>
 
           {/* Simulator Panel */}
-          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-slate-50/70 p-3 sm:p-6 lg:p-8 shadow-sm">
+          <div className="rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-slate-50/70 p-3 sm:p-5 lg:p-8 shadow-xs">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-8 items-start">
               {/* Left: Sliders */}
               <div className="space-y-3 sm:space-y-4 text-left">
@@ -1018,24 +1018,24 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 4. Clinical Intelligence for Every Role (Interactive Workstation Switcher) */}
-      <section id="features" className="py-20 sm:py-28 bg-slate-50/70 border-b border-slate-200/80">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="features" className="py-12 sm:py-20 lg:py-28 bg-slate-50/70 border-b border-slate-200/80">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5 text-teal-600" />
               <span>ROLE-ENGINEERED WORKSPACES</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
               Clinical Intelligence for <span className="text-teal-600">Every Role</span>
             </h2>
-            <p className="text-base text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
               Tailored interfaces purpose-built for the distinct clinical responsibilities of doctors,
               nurses, informaticists, and healthcare leadership.
             </p>
           </div>
 
           {/* Role Navigation Selector Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-4xl mx-auto">
             {CLINICAL_ROLES_DATA.map((role, idx) => {
               const active = activeRoleIndex === idx;
               const Icon = role.icon;
@@ -1044,16 +1044,16 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
                   key={role.id}
                   type="button"
                   onClick={() => setActiveRoleIndex(idx)}
-                  className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                  className={`inline-flex items-center justify-center sm:justify-start gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer border ${
                     active
-                      ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                      ? "bg-slate-900 text-white border-slate-900 shadow-xs"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${active ? "text-teal-400" : "text-teal-600"}`} />
-                  <span>{role.title}</span>
+                  <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${active ? "text-teal-400" : "text-teal-600"} shrink-0`} />
+                  <span className="truncate">{role.title}</span>
                   <span
-                    className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                    className={`text-[8px] sm:text-[9px] font-mono font-bold px-1 sm:px-1.5 py-0.2 sm:py-0.5 rounded shrink-0 hidden xs:inline ${
                       active ? "bg-slate-800 text-slate-300" : "bg-slate-100 text-slate-600"
                     }`}
                   >
@@ -1070,32 +1070,32 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
             return (
               <div
                 key={role.id}
-                className="max-w-4xl mx-auto rounded-3xl bg-white border border-slate-200/90 p-7 sm:p-9 shadow-md text-left space-y-6"
+                className="max-w-4xl mx-auto rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 p-4 sm:p-7 lg:p-9 shadow-xs text-left space-y-4 sm:space-y-6"
               >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 sm:pb-4 border-b border-slate-100 gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-xs">
-                      <Icon className="h-6 w-6" />
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-xs shrink-0">
+                      <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-xl font-black text-slate-950">{role.title}</h3>
+                        <h3 className="text-base sm:text-xl font-black text-slate-950 truncate">{role.title}</h3>
                         <span
-                          className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${role.badgeColor}`}
+                          className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded border shrink-0 ${role.badgeColor}`}
                         >
                           {role.badge}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 font-mono mt-0.5">
-                        Clinical Role Spec: {role.code} • Governance: {role.sla}
+                      <p className="text-[11px] sm:text-xs text-slate-500 font-mono mt-0.5 truncate">
+                        Role: {role.code} • SLA: {role.sla}
                       </p>
                     </div>
                   </div>
 
-                  <Link href="/dashboard">
+                  <Link href="/dashboard" className="w-full sm:w-auto">
                     <Button
                       size="sm"
-                      className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs h-9 px-4 rounded-xl cursor-pointer"
+                      className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs h-9 px-4 rounded-xl cursor-pointer"
                     >
                       <span>Open Workspace</span>
                       <ArrowRight className="h-3.5 w-3.5 ml-1" />
@@ -1103,13 +1103,13 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
                   </Link>
                 </div>
 
-                <p className="text-sm text-slate-700 leading-relaxed font-normal">{role.tagline}</p>
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-normal">{role.tagline}</p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3.5">
                   {role.primaryTools.map((tool, i) => (
                     <div
                       key={i}
-                      className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2.5 text-xs text-slate-800"
+                      className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-start gap-2.5 text-xs text-slate-800"
                     >
                       <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
                       <span className="font-semibold">{tool}</span>
@@ -1117,11 +1117,11 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
                   ))}
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2 font-mono">
+                <div className="pt-3 sm:pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 gap-2 font-mono">
                   <span>
                     Performance Benchmark: <strong className="text-slate-900">{role.metric}</strong> ({role.metricLabel})
                   </span>
-                  <span className="text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  <span className="text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200 self-start sm:self-auto">
                     Human-in-the-Loop Enforced
                   </span>
                 </div>
@@ -1131,7 +1131,7 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
 
           <div className="text-center pt-2">
             <Link href="/features">
-              <Button className="gap-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold px-8 h-12 rounded-xl shadow-xs transition-colors cursor-pointer">
+              <Button className="w-full sm:w-auto gap-2 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold px-6 sm:px-8 h-11 sm:h-12 rounded-xl shadow-xs transition-colors cursor-pointer">
                 <span>Explore All 12 Clinical Capabilities</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -1141,19 +1141,19 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 5. Where Technology Supports Better Care (Clinical Workflow Pipeline) */}
-      <section id="workflow" className="py-20 sm:py-28 bg-white border-b border-slate-200/80">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="workflow" className="py-12 sm:py-20 lg:py-28 bg-white border-b border-slate-200/80">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5 text-teal-600" />
               <span>CARE PATHWAY INTEGRATION</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
               Where <span className="text-teal-600">technology</span> supports better care.
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 text-left">
             {[
               {
                 step: "01",
@@ -1192,19 +1192,19 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               return (
                 <div
                   key={idx}
-                  className="flex items-start gap-5 p-7 rounded-3xl border border-slate-200/90 bg-white shadow-xs hover:shadow-lg hover:border-teal-300 hover:-translate-y-0.5 transition-all relative overflow-hidden"
+                  className="flex items-start gap-3.5 sm:gap-5 p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-xs hover:shadow-lg hover:border-teal-300 hover:-translate-y-0.5 transition-all relative overflow-hidden"
                 >
-                  <span className="absolute top-4 right-5 text-4xl font-black font-mono text-slate-100/90 select-none">
+                  <span className="absolute top-3 sm:top-4 right-4 sm:right-5 text-2xl sm:text-3xl lg:text-4xl font-black font-mono text-slate-100/90 select-none">
                     {item.step}
                   </span>
                   <div
-                    className={`h-13 w-13 rounded-2xl border ${item.bg} flex items-center justify-center shrink-0 shadow-xs`}
+                    className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl border ${item.bg} flex items-center justify-center shrink-0 shadow-2xs`}
                   >
-                    <Icon className={`h-6 w-6 ${item.ic}`} />
+                    <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${item.ic}`} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-slate-950 text-base mb-1.5">{item.title}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                    <h3 className="font-bold text-slate-950 text-sm sm:text-base mb-1">{item.title}</h3>
+                    <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               );
@@ -1214,22 +1214,22 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 6. End-to-End Solutions */}
-      <section id="architecture" className="py-20 sm:py-28 bg-slate-50/70 border-b border-slate-200/80">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="architecture" className="py-12 sm:py-20 lg:py-28 bg-slate-50/70 border-b border-slate-200/80">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5 text-teal-600" />
               <span>ACTIVE CLOUD INFRASTRUCTURE</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
               End-to-End Solutions for <span className="text-teal-600">Real-World</span> Clinical Challenges
             </h2>
-            <p className="text-base text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
               A purpose-built cloud stack handling everything from real-time telemetry to async PDF generation.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 text-left">
             {[
               {
                 badge: "PostgreSQL 16",
@@ -1269,28 +1269,28 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               return (
                 <div
                   key={idx}
-                  className="relative overflow-hidden rounded-3xl bg-white border border-slate-200 p-7 space-y-5 shadow-xs hover:shadow-lg hover:border-teal-400 hover:-translate-y-1 transition-all flex flex-col justify-between"
+                  className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white border border-slate-200 p-4 sm:p-6 lg:p-7 space-y-4 shadow-xs hover:shadow-lg hover:border-teal-400 hover:-translate-y-1 transition-all flex flex-col justify-between"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center justify-between mb-3">
                       <span
-                        className={`text-[10px] font-mono font-bold uppercase tracking-widest ${item.bbg} ${item.bc} px-3 py-1 rounded-full border ${item.border}`}
+                        className={`text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-widest ${item.bbg} ${item.bc} px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full border ${item.border}`}
                       >
                         {item.badge}
                       </span>
-                      <span className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-slate-500">
+                      <span className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-mono font-bold text-slate-500">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                         Active
                       </span>
                     </div>
                     <div
-                      className={`h-12 w-12 rounded-2xl border ${item.ibg} flex items-center justify-center mb-4 shadow-2xs`}
+                      className={`h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl border ${item.ibg} flex items-center justify-center mb-3 sm:mb-4 shadow-2xs`}
                     >
-                      <Icon className={`h-6 w-6 ${item.ic}`} />
+                      <Icon className={`h-5 w-5 sm:h-6 sm:w-6 ${item.ic}`} />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-slate-950 mb-2">{item.title}</h3>
-                      <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                      <h3 className="text-base sm:text-lg font-bold text-slate-950 mb-1 sm:mb-2">{item.title}</h3>
+                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 </div>
@@ -1300,7 +1300,7 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
 
           <div className="text-center">
             <Link href="/solutions">
-              <Button className="gap-2 bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold px-8 h-12 rounded-xl shadow-xs transition-colors cursor-pointer">
+              <Button className="w-full sm:w-auto gap-2 bg-teal-600 hover:bg-teal-700 text-white text-xs sm:text-sm font-bold px-6 sm:px-8 h-11 sm:h-12 rounded-xl shadow-xs transition-colors cursor-pointer">
                 <span>View Full Architecture</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
@@ -1310,47 +1310,47 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 7. HIPAA & RBAC */}
-      <section id="security" className="py-20 sm:py-28 bg-white border-b border-slate-200/80">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 items-center">
-            <div className="space-y-6 text-left">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+      <section id="security" className="py-12 sm:py-20 lg:py-28 bg-white border-b border-slate-200/80">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
+            <div className="space-y-4 sm:space-y-6 text-left">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
                 <Sparkles className="h-3.5 w-3.5 text-teal-600" />
                 <span>SECURITY &amp; PATIENT PRIVACY</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
                 Be the Clinical <span className="text-teal-600">Champion</span> with HIPAA Compliance
               </h2>
-              <p className="text-base text-slate-600 leading-relaxed font-normal">
+              <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
                 Hospital environments demand uncompromising standards. HealthNova AI enforces medical
                 record masking, audit logging, and strict role-based permissions at every layer.
               </p>
-              <div className="space-y-3.5 pt-1">
+              <div className="space-y-2.5 sm:space-y-3.5 pt-1">
                 {[
                   "Encrypted MRN with masked display across all telemetry feeds",
                   "Mandatory physician override justifications permanently bound to decision logs",
                   "Automatic JWT session expiration with silent refresh and instant local storage purging",
                   "All data in transit via TLS 1.3; at rest via AES-256 in Neon PostgreSQL",
                 ].map((point, i) => (
-                  <div key={i} className="flex items-start gap-3 text-left">
+                  <div key={i} className="flex items-start gap-2.5 sm:gap-3 text-left">
                     <div className="h-5 w-5 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0 mt-0.5">
                       <Check className="h-3.5 w-3.5 text-teal-700" />
                     </div>
-                    <span className="text-sm text-slate-700 leading-relaxed">{point}</span>
+                    <span className="text-xs sm:text-sm text-slate-700 leading-relaxed">{point}</span>
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-3 flex-wrap pt-2">
-                <Link href="/register">
-                  <Button className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-7 h-12 font-bold text-sm gap-2 shadow-sm cursor-pointer">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                <Link href="/register" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-7 h-11 sm:h-12 font-bold text-xs sm:text-sm gap-2 shadow-xs cursor-pointer">
                     <span>Get Started</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Link href="/login">
+                <Link href="/login" className="w-full sm:w-auto">
                   <Button
                     variant="outline"
-                    className="rounded-xl px-7 h-12 font-semibold text-sm border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    className="w-full sm:w-auto rounded-xl px-7 h-11 sm:h-12 font-semibold text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
                     Sign In
                   </Button>
@@ -1358,12 +1358,12 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               </div>
             </div>
 
-            <div className="rounded-3xl border border-slate-200 bg-slate-50/90 p-7 sm:p-9 space-y-4 shadow-sm text-left">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-200">
-                <span className="text-sm font-bold text-slate-950 uppercase tracking-wide">
+            <div className="rounded-2xl sm:rounded-3xl border border-slate-200 bg-slate-50/90 p-4 sm:p-7 lg:p-9 space-y-3 sm:space-y-4 shadow-xs text-left">
+              <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-slate-200">
+                <span className="text-xs sm:text-sm font-bold text-slate-950 uppercase tracking-wide">
                   Role-Based Access Control
                 </span>
-                <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                <span className="text-[10px] sm:text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full">
                   Enforced
                 </span>
               </div>
@@ -1395,15 +1395,15 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between py-3.5 border-b border-slate-200/80 last:border-0"
+                  className="flex items-center justify-between py-2.5 sm:py-3.5 border-b border-slate-200/80 last:border-0"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${item.color}`}>
+                  <div className="flex items-center gap-2.5 sm:gap-3">
+                    <span className={`text-[9px] sm:text-[10px] font-mono font-bold px-1.5 sm:px-2 py-0.5 rounded-md border ${item.color}`}>
                       {item.badge}
                     </span>
-                    <span className="text-sm font-bold text-slate-900">{item.role}</span>
+                    <span className="text-xs sm:text-sm font-bold text-slate-900">{item.role}</span>
                   </div>
-                  <span className="text-xs text-slate-500 font-mono hidden sm:block">{item.access}</span>
+                  <span className="text-[11px] sm:text-xs text-slate-500 font-mono hidden sm:block">{item.access}</span>
                 </div>
               ))}
             </div>
@@ -1412,46 +1412,46 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 8. Evidence-Based Medicine */}
-      <section className="py-20 sm:py-28 bg-slate-50/70 border-b border-slate-200/80">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 items-center">
-            <div className="space-y-6 text-left">
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+      <section className="py-12 sm:py-20 lg:py-28 bg-slate-50/70 border-b border-slate-200/80">
+        <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
+            <div className="space-y-4 sm:space-y-6 text-left">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
                 <Sparkles className="h-3.5 w-3.5 text-teal-600" />
                 <span>MEDICAL EVIDENCE</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
                 Grounded in <span className="text-teal-600">Evidence-Based</span> Medicine
               </h2>
-              <p className="text-base text-slate-600 leading-relaxed font-normal">
+              <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
                 All AI recommendations and clinical rule overrides are anchored in peer-reviewed consensus
                 literature from leading international medical bodies.
               </p>
-              <div className="space-y-3.5 pt-1">
+              <div className="space-y-2.5 sm:space-y-3.5 pt-1">
                 {[
                   "Surviving Sepsis Campaign 2021 — SCCM/ESICM international guidelines",
                   "KDIGO Clinical Practice for AKI — Level 1A Evidence creatinine criteria",
                   "AHA/ACC 2017 Hypertension — Class I recommendations for hypertensive crisis",
                 ].map((point, i) => (
-                  <div key={i} className="flex items-start gap-3 text-left">
+                  <div key={i} className="flex items-start gap-2.5 sm:gap-3 text-left">
                     <div className="h-5 w-5 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0 mt-0.5">
                       <Check className="h-3.5 w-3.5 text-teal-700" />
                     </div>
-                    <span className="text-sm text-slate-700 leading-relaxed">{point}</span>
+                    <span className="text-xs sm:text-sm text-slate-700 leading-relaxed">{point}</span>
                   </div>
                 ))}
               </div>
-              <div className="flex items-center gap-3 flex-wrap pt-2">
-                <a href="#faq">
-                  <Button className="bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-7 h-12 font-bold text-sm gap-2 shadow-xs cursor-pointer">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+                <a href="#faq" className="w-full sm:w-auto">
+                  <Button className="w-full sm:w-auto bg-teal-600 hover:bg-teal-700 text-white rounded-xl px-7 h-11 sm:h-12 font-bold text-xs sm:text-sm gap-2 shadow-xs cursor-pointer">
                     <span>Read Evidence</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </a>
-                <a href="#simulator">
+                <a href="#simulator" className="w-full sm:w-auto">
                   <Button
                     variant="outline"
-                    className="rounded-xl px-7 h-12 font-semibold text-sm border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                    className="w-full sm:w-auto rounded-xl px-7 h-11 sm:h-12 font-semibold text-xs sm:text-sm border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
                   >
                     Try Simulator
                   </Button>
@@ -1459,7 +1459,7 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               </div>
             </div>
 
-            <div className="space-y-4 text-left">
+            <div className="space-y-3 sm:space-y-4 text-left">
               {[
                 {
                   code: "SSC-2021-SEPSIS",
@@ -1485,15 +1485,15 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
               ].map((card, i) => (
                 <div
                   key={i}
-                  className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2.5 hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all"
+                  className="p-4 sm:p-5 lg:p-6 rounded-xl sm:rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2 hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all"
                 >
                   <div className="flex items-center justify-between">
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${card.cc}`}>
+                    <span className={`text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${card.cc}`}>
                       {card.code}
                     </span>
-                    <span className="text-[11px] text-slate-500 font-mono">{card.strength}</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-500 font-mono">{card.strength}</span>
                   </div>
-                  <h4 className="font-bold text-base text-slate-950">{card.title}</h4>
+                  <h4 className="font-bold text-sm sm:text-base text-slate-950">{card.title}</h4>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{card.desc}</p>
                 </div>
               ))}
@@ -1503,21 +1503,21 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
       </section>
 
       {/* 9. FAQ */}
-      <section id="faq" className="py-20 sm:py-28 bg-white border-b border-slate-200/80">
-        <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 space-y-12">
+      <section id="faq" className="py-12 sm:py-20 lg:py-28 bg-white border-b border-slate-200/80">
+        <div className="container mx-auto max-w-3xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-12">
           <div className="text-center space-y-3">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 border border-teal-200/80 text-teal-800 text-xs font-mono font-bold uppercase tracking-wider">
               <Sparkles className="h-3.5 w-3.5 text-teal-600" />
               <span>FREQUENTLY ASKED QUESTIONS</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950">
               Frequently Asked Questions
             </h2>
-            <p className="text-base text-slate-600 leading-relaxed font-normal">
+            <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
               Key considerations on clinical safety, ML calibration, and regulatory boundaries.
             </p>
           </div>
-          <div className="space-y-3.5 text-left">
+          <div className="space-y-3 sm:space-y-3.5 text-left">
             {[
               {
                 q: "How does the system ensure licensed physicians retain final diagnostic authority?",
@@ -1542,16 +1542,16 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all hover:border-teal-300 shadow-2xs"
+                className="rounded-xl sm:rounded-2xl border border-slate-200 bg-white overflow-hidden transition-all hover:border-teal-300 shadow-2xs"
               >
                 <button
                   type="button"
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full px-6 py-4.5 text-left flex items-center justify-between font-bold text-slate-950 hover:text-teal-700 transition-colors cursor-pointer gap-4 text-sm sm:text-base"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4.5 text-left flex items-center justify-between font-bold text-slate-950 hover:text-teal-700 transition-colors cursor-pointer gap-3 sm:gap-4 text-xs sm:text-base"
                 >
-                  <span>{item.q}</span>
+                  <span className="leading-snug">{item.q}</span>
                   <span
-                    className={`h-7 w-7 rounded-full border flex items-center justify-center shrink-0 transition-all text-base leading-none font-light ${
+                    className={`h-6 w-6 sm:h-7 sm:w-7 rounded-full border flex items-center justify-center shrink-0 transition-all text-sm sm:text-base leading-none font-light ${
                       openFaq === idx
                         ? "rotate-45 border-teal-400 bg-teal-50 text-teal-700"
                         : "border-slate-200 bg-slate-100 text-slate-500"
@@ -1561,7 +1561,7 @@ Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINI
                   </span>
                 </button>
                 {openFaq === idx && (
-                  <div className="px-6 pb-6 pt-1 text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
+                  <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/50">
                     {item.a}
                   </div>
                 )}

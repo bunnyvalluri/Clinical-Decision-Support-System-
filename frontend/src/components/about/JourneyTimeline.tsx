@@ -96,30 +96,30 @@ export function JourneyTimeline() {
   const activeMilestone = MILESTONES[activeStepIdx];
 
   return (
-    <section id="journey" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+    <section id="journey" className="py-12 sm:py-20 lg:py-28 bg-slate-50/50 border-b border-slate-200 relative">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 space-y-8 sm:space-y-16">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
             <span>CLINICAL EVIDENCE ROADMAP</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black tracking-tight text-slate-950 leading-tight">
             From Cohort Evidence to{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
               Bedside Impact
             </span>
           </h2>
-          <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+          <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-normal">
             How rigorous clinical research, multi-center cohort validation, and machine learning
             engineering evolved into an enterprise-grade hospital decision support ecosystem.
           </p>
         </div>
 
         {/* Interactive Milestone Stepper (Desktop Horizontal / Mobile Vertical) */}
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {/* Milestone Step Buttons */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
             {MILESTONES.map((m, idx) => {
               const isSelected = activeStepIdx === idx;
               return (
@@ -127,13 +127,13 @@ export function JourneyTimeline() {
                   key={m.step}
                   type="button"
                   onClick={() => setActiveStepIdx(idx)}
-                  className={`p-3.5 rounded-2xl border text-left transition-all duration-200 cursor-pointer ${
+                  className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border text-left transition-all duration-200 cursor-pointer ${
                     isSelected
                       ? "bg-white text-slate-950 border-teal-600 shadow-md ring-2 ring-teal-500/20"
                       : "bg-white hover:bg-slate-50 text-slate-900 border-slate-200 hover:border-slate-300 shadow-2xs"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-1.5 sm:mb-2">
                     <span
                       className={`text-xs font-mono font-black ${
                         isSelected ? "text-teal-800" : "text-teal-700"
@@ -151,14 +151,14 @@ export function JourneyTimeline() {
                   <h4 className="text-xs font-bold tracking-tight text-slate-950 line-clamp-1">
                     {m.title}
                   </h4>
-                  <span className="text-[10px] text-slate-500 block mt-0.5 font-mono">{m.period}</span>
+                  <span className="text-[9px] sm:text-[10px] text-slate-500 block mt-0.5 font-mono">{m.period}</span>
                 </button>
               );
             })}
           </div>
 
           {/* Active Milestone Deep Inspection Card */}
-          <div className="rounded-3xl bg-white border border-slate-300 p-6 sm:p-8 lg:p-10 shadow-sm space-y-6">
+          <div className="rounded-2xl sm:rounded-3xl bg-white border border-slate-300 p-4 sm:p-6 lg:p-10 shadow-xs space-y-4 sm:space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
