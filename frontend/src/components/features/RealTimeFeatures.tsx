@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Radio,
   Activity,
@@ -12,6 +12,8 @@ import {
   Sparkles,
   Wifi,
   ShieldCheck,
+  Database,
+  Layers,
 } from "lucide-react";
 
 interface RealTimeEvent {
@@ -61,9 +63,18 @@ const REAL_TIME_EVENTS: RealTimeEvent[] = [
 ];
 
 export function RealTimeFeatures() {
+  const [pulseTick, setPulseTick] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPulseTick((prev) => (prev + 1) % 100);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <section id="realtime" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
@@ -86,27 +97,34 @@ export function RealTimeFeatures() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left 7 cols: Real-Time Event Types */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {REAL_TIME_EVENTS.map((item) => (
-              <div
-                key={item.event}
-                className="rounded-2xl bg-white border border-slate-200/90 p-5 space-y-2 hover:border-teal-400 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 shadow-2xs group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-950 group-hover:text-teal-800 transition-colors">
-                    {item.event}
-                  </span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
-                    {item.latency}
-                  </span>
+            {REAL_TIME_EVENTS.map((item, idx) => {
+              const isPulsing = idx === pulseTick % REAL_TIME_EVENTS.length;
+              return (
+                <div
+                  key={item.event}
+                  className={`rounded-3xl bg-white border p-5 space-y-2 transition-all duration-300 shadow-2xs group ${
+                    isPulsing
+                      ? "border-teal-500 ring-2 ring-teal-500/20 shadow-md"
+                      : "border-slate-200/90 hover:border-teal-400 hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-950 group-hover:text-teal-800 transition-colors">
+                      {item.event}
+                    </span>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      {item.latency}
+                    </span>
+                  </div>
+                  <p className="text-[11px] font-mono text-teal-700 font-semibold">
+                    {item.source}
+                  </p>
+                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    {item.description}
+                  </p>
                 </div>
-                <p className="text-[11px] font-mono text-teal-700 font-semibold">
-                  {item.source}
-                </p>
-                <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                  {item.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Right 5 cols: Live Infrastructure Status Card (Pure Light Clinical Theme) */}
@@ -126,21 +144,21 @@ export function RealTimeFeatures() {
               </div>
 
               <div className="space-y-2 text-xs font-mono">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
                   <span className="text-slate-600 font-medium">ASGI Protocol:</span>
                   <span className="font-bold text-slate-900">Django Channels 4.1</span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
                   <span className="text-slate-600 font-medium">Channel Layer:</span>
                   <span className="font-bold text-slate-900">Redis In-Memory Pub/Sub</span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
                   <span className="text-slate-600 font-medium">Transport Security:</span>
                   <span className="font-bold text-slate-900">WSS / TLS 1.3 Strict</span>
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-                  <span className="text-slate-600 font-medium">PostgreSQL Persistence:</span>
-                  <span className="font-bold text-teal-800">Neon High-Assurance</span>
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                  <span className="text-slate-600 font-medium">PostgreSQL Store:</span>
+                  <span className="font-bold text-teal-800">Neon Authoritative Store</span>
                 </div>
               </div>
 

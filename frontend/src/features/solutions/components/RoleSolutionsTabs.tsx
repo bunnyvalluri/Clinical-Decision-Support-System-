@@ -326,7 +326,7 @@ export function RoleSolutionsTabs() {
         </div>
 
         {/* Tab Navigation Buttons */}
-        <div className="flex items-center justify-start sm:justify-center overflow-x-auto pb-4 mb-8 no-scrollbar gap-2">
+        <div className="flex items-center justify-start sm:justify-center overflow-x-auto pb-4 mb-8 no-scrollbar gap-2.5">
           {ROLES_DATA.map((r) => {
             const Icon = r.icon;
             const isSelected = r.id === activeTab;
@@ -338,13 +338,15 @@ export function RoleSolutionsTabs() {
                 aria-controls={`panel-${r.id}`}
                 id={`tab-${r.id}`}
                 onClick={() => setActiveTab(r.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border ${
+                className={`flex items-center gap-2.5 px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border shadow-xs ${
                   isSelected
-                    ? "bg-teal-700 text-white border-teal-700 shadow-sm ring-2 ring-teal-600/20"
-                    : "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-950"
+                    ? "bg-teal-700 text-white border-teal-700 shadow-teal-700/20 ring-4 ring-teal-600/15 scale-[1.02]"
+                    : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-950 hover:border-slate-300"
                 }`}
               >
-                <Icon className="h-4 w-4 shrink-0" />
+                <div className={`p-1 rounded-lg ${isSelected ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"}`}>
+                  <Icon className="h-4 w-4 shrink-0" />
+                </div>
                 <span>{r.role}</span>
               </button>
             );
@@ -356,40 +358,44 @@ export function RoleSolutionsTabs() {
           id={`panel-${currentRole.id}`}
           role="tabpanel"
           aria-labelledby={`tab-${currentRole.id}`}
-          className="rounded-3xl bg-slate-50/70 border border-slate-200 p-6 sm:p-8 lg:p-10 shadow-xs"
+          className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 lg:p-10 shadow-sm relative overflow-hidden"
         >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-teal-50/60 to-transparent rounded-bl-full pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 relative z-10">
             {/* Left Column: Role Details & Capabilities */}
             <div className="lg:col-span-7 space-y-6 text-left">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shrink-0">
-                  <CurrentIcon className="h-6 w-6" />
+              <div className="flex items-center gap-3.5">
+                <div className="h-14 w-14 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-700 shrink-0 shadow-xs">
+                  <CurrentIcon className="h-7 w-7" />
                 </div>
                 <div>
-                  <span className="text-[11px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200">
+                  <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 inline-block shadow-2xs">
                     {currentRole.badge}
                   </span>
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-950 mt-1">
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-950 mt-1 tracking-tight">
                     {currentRole.headline}
                   </h3>
                 </div>
               </div>
 
-              <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                 {currentRole.description}
               </p>
 
               {/* 6 Capabilities Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
                 {currentRole.capabilities.map((cap, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:border-teal-300 transition-colors"
+                    className="p-4 rounded-2xl bg-slate-50/70 border border-slate-200/80 shadow-2xs hover:border-teal-300 hover:bg-white transition-all group"
                   >
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
+                    <div className="flex items-start gap-3">
+                      <div className="h-6 w-6 rounded-lg bg-teal-100/70 text-teal-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:scale-105 transition-transform">
+                        <CheckCircle2 className="h-4 w-4" />
+                      </div>
                       <div>
-                        <h4 className="text-xs font-bold text-slate-900 mb-1">
+                        <h4 className="text-xs font-bold text-slate-950 mb-1 group-hover:text-teal-700 transition-colors">
                           {cap.title}
                         </h4>
                         <p className="text-[11px] text-slate-500 leading-relaxed">
@@ -402,66 +408,66 @@ export function RoleSolutionsTabs() {
               </div>
 
               {/* CTA Link */}
-              <div className="pt-2">
+              <div className="pt-3">
                 <Link href={currentRole.portalRoute}>
-                  <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs transition-colors">
+                  <button className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all">
                     <span>{currentRole.portalCta}</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    <ArrowRight className="h-4 w-4" />
                   </button>
                 </Link>
               </div>
             </div>
 
             {/* Right Column: Interactive Workflow Visualizer & Live Mock Telemetry */}
-            <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-white border border-slate-200 p-6 shadow-xs text-left">
+            <div className="lg:col-span-5 flex flex-col justify-between rounded-2xl bg-slate-50/80 border border-slate-200 p-6 shadow-xs text-left">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                <div className="flex items-center justify-between border-b border-slate-200/80 pb-4 mb-4">
                   <div className="flex items-center gap-2">
                     <Activity className="h-4 w-4 text-teal-600 animate-pulse" />
-                    <span className="text-xs font-mono font-bold text-slate-800">
+                    <span className="text-xs font-mono font-bold text-slate-900 tracking-wider">
                       LIVE WORKFLOW PATHWAY
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 shadow-2xs">
                     Active Governance
                   </span>
                 </div>
 
                 {/* Simulated Telemetry Banner */}
-                <div className="mb-5 p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between">
+                <div className="mb-5 p-4 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] font-mono text-slate-500 block uppercase">
+                    <span className="text-[10px] font-mono text-slate-500 block uppercase tracking-wider">
                       {currentRole.mockTelemetry.label}
                     </span>
-                    <span className="text-sm font-mono font-black text-slate-900">
+                    <span className="text-base font-mono font-black text-slate-950">
                       {currentRole.mockTelemetry.value}
                     </span>
-                    <span className="text-[10px] text-slate-400 block pt-0.5">
+                    <span className="text-[10px] text-slate-500 block pt-0.5">
                       {currentRole.mockTelemetry.sublabel}
                     </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-teal-100 text-teal-800">
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-800 border border-teal-200">
                       {currentRole.mockTelemetry.status}
                     </span>
-                    <span className="text-[9px] font-mono text-slate-400 block pt-1">
+                    <span className="text-[9px] font-mono text-slate-500 block pt-1">
                       {currentRole.mockTelemetry.detailBadge}
                     </span>
                   </div>
                 </div>
 
-                <h4 className="text-xs font-bold text-slate-900 mb-3 uppercase tracking-wider text-teal-800">
+                <h4 className="text-xs font-mono font-bold text-teal-800 mb-3 uppercase tracking-wider">
                   {currentRole.sampleWorkflowTitle}
                 </h4>
 
-                {/* Numbered Steps */}
-                <div className="space-y-3.5">
+                {/* Numbered Steps with visual connection line */}
+                <div className="space-y-3 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-teal-200/60">
                   {currentRole.sampleWorkflowSteps.map((step, sIdx) => (
-                    <div key={sIdx} className="flex items-start gap-3 text-xs">
-                      <div className="h-6 w-6 rounded-full bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-mono font-bold text-[11px] shrink-0 mt-0.5">
+                    <div key={sIdx} className="flex items-start gap-3 text-xs relative z-10">
+                      <div className="h-6 w-6 rounded-full bg-white border-2 border-teal-600 text-teal-700 flex items-center justify-center font-mono font-bold text-[10px] shrink-0 mt-0.5 shadow-2xs">
                         {sIdx + 1}
                       </div>
-                      <p className="text-slate-600 leading-relaxed pt-0.5">
+                      <p className="text-slate-700 leading-relaxed pt-0.5 font-medium">
                         {step}
                       </p>
                     </div>
@@ -470,10 +476,10 @@ export function RoleSolutionsTabs() {
               </div>
 
               {/* Clinical Oversight Callout */}
-              <div className="mt-6 p-3.5 rounded-xl bg-teal-50/60 border border-teal-200/80 flex items-start gap-2.5 text-xs text-slate-600">
+              <div className="mt-6 p-4 rounded-xl bg-teal-50/80 border border-teal-200 flex items-start gap-3 text-xs text-slate-700 shadow-2xs">
                 <ShieldCheck className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] leading-snug">
-                  <strong className="font-bold text-slate-900">Role Boundary Assurance:</strong> All actions adhere to strict RBAC boundaries. Final clinical decisions require authenticated clinician sign-off.
+                  <strong className="font-bold text-slate-950">Role Boundary Assurance:</strong> All actions adhere to strict RBAC boundaries. Final clinical decisions require authenticated clinician sign-off.
                 </p>
               </div>
             </div>

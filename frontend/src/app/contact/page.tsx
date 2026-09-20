@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -34,9 +34,14 @@ import {
   Check,
   Search,
   Filter,
+  User,
+  Zap,
+  Layers,
+  PhoneCall,
 } from "lucide-react";
 import { PublicNavbar, PublicFooter } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { RealtimeEcgWaveform } from "@/components/clinical/RealtimeEcgWaveform";
 
 interface DepartmentRouting {
   name: string;
@@ -44,6 +49,7 @@ interface DepartmentRouting {
   lead: string;
   phone: string;
   sla: string;
+  capacity: "Normal Census" | "High Census" | "Immediate Capacity";
   type: "critical" | "diagnostic" | "informatics";
   desc: string;
   icon: React.ElementType;
@@ -56,6 +62,7 @@ const HOSPITAL_DEPARTMENTS: DepartmentRouting[] = [
     lead: "Dr. Vadla Abhinay, MD (Attending Lead)",
     phone: "ext. 402",
     sla: "< 15 min Ward Response",
+    capacity: "Normal Census",
     type: "critical",
     desc: "Inpatient STEMI/NSTEMI stabilization, bedside invasive telemetry, and continuous hemodynamic monitoring.",
     icon: HeartPulse,
@@ -66,6 +73,7 @@ const HOSPITAL_DEPARTMENTS: DepartmentRouting[] = [
     lead: "Cardiac Pacing & Arrhythmia Core",
     phone: "ext. 418",
     sla: "12-Lead Holter Active",
+    capacity: "Immediate Capacity",
     type: "diagnostic",
     desc: "Complex arrhythmia mapping, QTc dispersion surveillance, catheter ablation triage, and pacemaker interrogation.",
     icon: Activity,
@@ -76,6 +84,7 @@ const HOSPITAL_DEPARTMENTS: DepartmentRouting[] = [
     lead: "Rapid Response Medical Staff",
     phone: "ext. 911 (STAT)",
     sla: "24/7 Continuous Surveillance",
+    capacity: "High Census",
     type: "critical",
     desc: "Automated qSOFA and NEWS2 score synthesis with early 6-hour sepsis trajectory prediction and bundle authorization.",
     icon: ShieldCheck,
@@ -86,6 +95,7 @@ const HOSPITAL_DEPARTMENTS: DepartmentRouting[] = [
     lead: "Model Registry & TreeSHAP Hub",
     phone: "ext. 550",
     sla: "FHIR v4.0.1 Live Synced",
+    capacity: "Immediate Capacity",
     type: "informatics",
     desc: "Model registry verification, feature attribution auditing, TreeSHAP validation, and HL7 FHIR v4 interface pipelines.",
     icon: Radio,
@@ -96,6 +106,7 @@ const HOSPITAL_DEPARTMENTS: DepartmentRouting[] = [
     lead: "Echocardiography & Doppler Core",
     phone: "ext. 425",
     sla: "Same-Day Report Turnaround",
+    capacity: "Normal Census",
     type: "diagnostic",
     desc: "Transesophageal and transthoracic echocardiography, arterial Doppler flow, and myocardial strain imaging.",
     icon: Stethoscope,
@@ -106,6 +117,7 @@ const HOSPITAL_DEPARTMENTS: DepartmentRouting[] = [
     lead: "Surgical Case Coordination",
     phone: "ext. 460",
     sla: "Priority Pre-Op Clearance",
+    capacity: "Normal Census",
     type: "critical",
     desc: "Pre-operative hemodynamic risk clearance, CABG/valve surgical scheduling, and post-bypass recovery pathways.",
     icon: Building2,
@@ -167,28 +179,96 @@ const CLINICAL_SCHEDULE = [
 
 const CLINICAL_FAQS = [
   {
+    category: "consult",
     q: "What is the typical turnaround time for physician-to-physician case consults?",
     a: "Routine outpatient consult requests are reviewed within 24 to 48 hours. Priority ward and diagnostic telemetry reviews are triaged within 12 hours. For acute inpatient hospital cases, the on-duty CCU fellow and Dr. Vadla Abhinay's team respond via hospital pager in under 15 minutes.",
   },
   {
-    q: "How does Dr. Vadla Abhinay utilize AI and TreeSHAP in patient care?",
-    a: "Dr. Abhinay uses HealthNova AI's calibrated machine learning as a real-time clinical decision support radar. AI models surface early deterioration signals and TreeSHAP feature attributions, identifying specific biomarkers driving patient risk. However, all diagnostic evaluations, prescription orders, and clinical protocols require human attending physician evaluation and sign-off.",
+    category: "ai",
+    q: "How do attending cardiologists utilize AI and TreeSHAP in patient care?",
+    a: "Attending clinicians use HealthNova AI's calibrated machine learning as a real-time clinical decision support radar. AI models surface early deterioration signals and TreeSHAP feature attributions, identifying specific biomarkers driving patient risk. However, all diagnostic evaluations, prescription orders, and clinical protocols require human attending physician evaluation and sign-off.",
   },
   {
+    category: "security",
     q: "How is patient data and PHI protected during consultation submissions?",
     a: "All transmissions on this portal utilize end-to-end TLS 1.3 encryption compliant with HIPAA § 164.312. Context minimization ensures no unredacted patient PHI is stored in agent memory or public cloud vector indices. Records sync directly to the hospital's authoritative PostgreSQL store.",
   },
   {
+    category: "integration",
     q: "Can hospital networks submit batch HL7 FHIR or 12-lead Holter telemetry files?",
     a: "Yes. HealthNova AI natively interfaces with HL7 FHIR v4.0.1 and DICOM standard endpoints. Hospital IT departments and referring clinics can arrange direct automated ingestion pipelines through our Clinical AI & Informatics Bureau (ext. 550).",
   },
   {
-    q: "Does Dr. Vadla Abhinay provide second opinions for structural heart disease?",
+    category: "consult",
+    q: "Are second opinions provided for complex structural heart disease?",
     a: "Yes. Inpatient and outpatient second opinions for complex arrhythmia, valvular heart disease, post-myocardial infarction recovery, and sepsis-induced myocardial dysfunction are conducted on Tuesday and Thursday clinical sessions.",
   },
 ];
 
+const CONTACT_DOCTORS = [
+  {
+    id: "abhinay",
+    name: "Dr. Vadla Abhinay",
+    suffix: "MD",
+    initials: "VA",
+    role: "Chief of Cardiology & ICU Telemetry Director",
+    title: "Attending Cardiologist & Clinical Lead",
+    license: "License: CA-MD-98421 • NPI: 1092834710",
+    image: "/doctor-hero.jpg",
+    alt: "Dr. Vadla Abhinay, MD - Chief of Cardiology and Attending Physician",
+    dutyStatus: "On Duty • Acute CCU Ward",
+    telemetry: "12-Lead Holter Active",
+    education: "Johns Hopkins Medicine",
+    degree: "M.D. Cardiology",
+    experience: "18+ Yrs Clinical",
+    experienceDetail: "Acute CCU & Telemetry",
+    governance: "Human Sign-Off",
+    governanceDetail: "100% Attending Gate",
+    research: "TreeSHAP AI",
+    researchDetail: "JAMA & Lancet Digital",
+    bio: "Dr. Vadla Abhinay is a board-certified cardiologist leading the Clinical Decision Support initiative at HealthNova AI. With extensive experience across acute coronary care units, cardiovascular telemetry, and bedside decision intelligence, Dr. Abhinay oversees patient risk stratification, multi-lead Holter diagnostics, and human-in-the-loop validation protocols.",
+    email: "dr.abhinay.vadla@hospital.org",
+  },
+  {
+    id: "rahul",
+    name: "Dr. Valluri Rahul",
+    suffix: "MD",
+    initials: "VR",
+    role: "Director of Cardiovascular Informatics & Telemetry",
+    title: "Attending Cardiologist & Clinical Co-Lead",
+    license: "License: CA-MD-98422 • NPI: 1092834711",
+    image: "/doctor-hero-rahul.jpg",
+    alt: "Dr. Valluri Rahul, MD - Director of Cardiovascular Informatics and Attending Physician",
+    dutyStatus: "On Duty • Telemetry Core",
+    telemetry: "Continuous Ingestion Active",
+    education: "Stanford Medical Center",
+    degree: "M.D., MS Informatics",
+    experience: "15+ Yrs Clinical",
+    experienceDetail: "ICU Telemetry & AI",
+    governance: "Human Sign-Off",
+    governanceDetail: "100% Attending Gate",
+    research: "Clinical NLP & CDS",
+    researchDetail: "NEJM AI & Nature Digital",
+    bio: "Dr. Valluri Rahul is a board-certified cardiologist and clinical informaticist pioneering algorithmic safety and real-time hemodynamic telemetry at HealthNova AI. Dr. Rahul leads multi-center validation of early deterioration scoring, FHIR data pipelines, and bedside explainable intelligence for ICU and CCU multidisciplinary care teams.",
+    email: "dr.rahul.valluri@hospital.org",
+  },
+];
+
 export default function ContactDoctorPage() {
+  const [activeDoctorIdx, setActiveDoctorIdx] = useState<number>(0);
+  const [isAutoRotate, setIsAutoRotate] = useState<boolean>(true);
+
+  // 2-second automatic photo & profile rotation (can be paused or clicked)
+  useEffect(() => {
+    if (!isAutoRotate) return;
+    const timer = setInterval(() => {
+      setActiveDoctorIdx((prev) => (prev + 1) % CONTACT_DOCTORS.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, [isAutoRotate]);
+
+  const activeDoctor = CONTACT_DOCTORS[activeDoctorIdx];
+
   const [activeTab, setActiveTab] = useState<
     "referral" | "consultation" | "enterprise" | "research"
   >("referral");
@@ -200,7 +280,7 @@ export default function ContactDoctorPage() {
     organization: "",
     mrn: "",
     inquiryType: "physician-referral",
-    urgency: "routine",
+    urgency: "priority",
     department: "WARD-CCU-04",
     message: "",
   });
@@ -209,10 +289,14 @@ export default function ContactDoctorPage() {
   const [selectedDeptFilter, setSelectedDeptFilter] = useState<
     "all" | "critical" | "diagnostic" | "informatics"
   >("all");
+  const [deptSearchQuery, setDeptSearchQuery] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [copiedToken, setCopiedToken] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [faqSearchQuery, setFaqSearchQuery] = useState("");
   const [receiptToken, setReceiptToken] = useState("");
 
   const handleTabChange = (
@@ -260,6 +344,20 @@ export default function ContactDoctorPage() {
     }
   };
 
+  const handleScheduleSelect = (day: string) => {
+    setSelectedDay(day);
+    setFormData((prev) => ({
+      ...prev,
+      message: prev.message
+        ? prev.message
+        : `Requesting consultation slot aligned with ${day} clinical schedule.`,
+    }));
+    const formElement = document.getElementById("consultation-form");
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -269,21 +367,47 @@ export default function ContactDoctorPage() {
     setTimeout(() => {
       setIsSubmitting(false);
       setIsSuccess(true);
-    }, 650);
+    }, 600);
   };
 
   const copyReceipt = () => {
     navigator.clipboard.writeText(
-      `HealthNova Clinical Consultation Token: ${receiptToken}\nPhysician: Dr. Vadla Abhinay, MD\nDepartment: ${formData.department}\nTimestamp: ${new Date().toISOString()}\nStatus: Encrypted & Dispatched`
+      `HealthNova Clinical Consultation Token: ${receiptToken}\nPhysician: ${activeDoctor.name}, MD\nDepartment: ${formData.department}\nTimestamp: ${new Date().toISOString()}\nStatus: Encrypted & Dispatched`
     );
     setCopiedToken(true);
     setTimeout(() => setCopiedToken(false), 2500);
   };
 
-  const filteredDepts =
-    selectedDeptFilter === "all"
-      ? HOSPITAL_DEPARTMENTS
-      : HOSPITAL_DEPARTMENTS.filter((d) => d.type === selectedDeptFilter);
+  const copyClinicPhone = () => {
+    navigator.clipboard.writeText("+18004325884");
+    setCopiedPhone(true);
+    setTimeout(() => setCopiedPhone(false), 2000);
+  };
+
+  const copyClinicEmail = () => {
+    navigator.clipboard.writeText(activeDoctor.email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  const filteredDepts = HOSPITAL_DEPARTMENTS.filter((d) => {
+    const matchesCategory =
+      selectedDeptFilter === "all" || d.type === selectedDeptFilter;
+    const matchesSearch =
+      deptSearchQuery.trim() === "" ||
+      d.name.toLowerCase().includes(deptSearchQuery.toLowerCase()) ||
+      d.code.toLowerCase().includes(deptSearchQuery.toLowerCase()) ||
+      d.desc.toLowerCase().includes(deptSearchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const filteredFaqs = CLINICAL_FAQS.filter((f) => {
+    return (
+      faqSearchQuery.trim() === "" ||
+      f.q.toLowerCase().includes(faqSearchQuery.toLowerCase()) ||
+      f.a.toLowerCase().includes(faqSearchQuery.toLowerCase())
+    );
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-[#fafbfc] text-slate-900 selection:bg-teal-500/20 selection:text-teal-900 font-sans antialiased overflow-x-hidden">
@@ -292,22 +416,31 @@ export default function ContactDoctorPage() {
 
       <main id="main-content" className="flex-1">
         {/* Hospital Telemetry Status Strip */}
-        <div className="w-full bg-slate-100 border-b border-slate-200 py-1.5 px-4 text-[11px] font-mono text-slate-600">
-          <div className="container mx-auto max-w-7xl flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+        <div className="w-full bg-slate-50 border-b border-slate-200/90 py-2 px-4 text-[11px] font-mono text-slate-600">
+          <div className="container mx-auto max-w-7xl flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="font-bold text-slate-900">Hospital Ward Status:</span>
-              <span>Acute CCU &amp; Telemetry Stream Synchronized</span>
+              <span className="font-bold text-slate-950">Ward Status:</span>
+              <span className="text-slate-700">Acute CCU &amp; Telemetry Stream Synchronized</span>
             </div>
-            <div className="flex items-center gap-4 text-[10px]">
-              <span className="hidden sm:inline">Attending Lead: Dr. Vadla Abhinay, MD</span>
-              <span className="hidden md:inline text-slate-400">|</span>
-              <span className="text-teal-800 font-bold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
-                Paging: ext. 402
+            <div className="flex items-center gap-3 text-[10px]">
+              <span className="hidden sm:inline font-medium text-slate-700">
+                Attending Leads: <strong className="text-slate-950">Dr. Vadla Abhinay, MD</strong> &bull; <strong className="text-slate-950">Dr. Valluri Rahul, MD</strong>
               </span>
+              <span className="hidden md:inline text-slate-300">|</span>
+              <button
+                type="button"
+                onClick={copyClinicPhone}
+                className="text-teal-800 hover:text-teal-950 font-bold bg-teal-50 hover:bg-teal-100 px-2 py-0.5 rounded border border-teal-200 transition-colors inline-flex items-center gap-1 cursor-pointer"
+                title="Click to copy phone number"
+              >
+                <Phone className="h-3 w-3 text-teal-600" />
+                <span>Paging: ext. 402</span>
+                {copiedPhone && <Check className="h-2.5 w-2.5 text-emerald-600 ml-0.5" />}
+              </button>
               <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
                 HIPAA § 164.312 Verified
               </span>
@@ -338,60 +471,137 @@ export default function ContactDoctorPage() {
               {/* Doctor Image & Clinical Status HUD (5 cols) */}
               <div className="lg:col-span-5 flex flex-col items-center">
                 <div className="relative w-full max-w-md">
+                  {/* Doctor Switcher Bar */}
+                  <div className="mb-3 flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                    <div className="flex items-center gap-1.5 flex-1">
+                      {CONTACT_DOCTORS.map((doc, idx) => {
+                        const isSelected = idx === activeDoctorIdx;
+                        return (
+                          <button
+                            key={doc.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveDoctorIdx(idx);
+                              setIsAutoRotate(false);
+                            }}
+                            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-teal-700 text-white shadow-xs"
+                                : "text-slate-600 hover:text-slate-950 hover:bg-slate-100"
+                            }`}
+                          >
+                            <User className="h-3 w-3" />
+                            <span className="truncate">{doc.name.replace("Dr. ", "")}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAutoRotate(!isAutoRotate)}
+                      className={`text-[10px] font-mono px-2 py-1 rounded-lg border transition-colors cursor-pointer ${
+                        isAutoRotate
+                          ? "bg-teal-50 border-teal-200 text-teal-800 font-bold"
+                          : "bg-slate-100 border-slate-200 text-slate-500 font-medium"
+                      }`}
+                      title={isAutoRotate ? "Auto-switching every 2s (click to pause)" : "Paused (click to auto-rotate)"}
+                    >
+                      {isAutoRotate ? "Auto 2s" : "Paused"}
+                    </button>
+                  </div>
+
                   {/* Outer Frame with Clean Medical Shadow */}
-                  <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-slate-100 border border-slate-200 shadow-xl group p-2 bg-white">
+                  <div className="relative aspect-square w-full rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-xl group p-2">
                     <div className="relative w-full h-full rounded-2xl overflow-hidden bg-slate-100">
-                      <Image
-                        src="/doctor-hero.jpg"
-                        alt="Dr. Vadla Abhinay, MD - Chief of Cardiology and Attending Physician"
-                        width={600}
-                        height={600}
-                        priority
-                        className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
-                      />
+                      {CONTACT_DOCTORS.map((doc, idx) => {
+                        const isActive = idx === activeDoctorIdx;
+                        return (
+                          <div
+                            key={doc.image}
+                            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                              isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                            }`}
+                          >
+                            <Image
+                              src={doc.image}
+                              alt={doc.alt}
+                              width={600}
+                              height={600}
+                              priority={idx === 0}
+                              className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
+                            />
+                          </div>
+                        );
+                      })}
 
                       {/* On-Duty Status Badge */}
-                      <div className="absolute top-3.5 left-3.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 shadow-sm flex items-center gap-2">
+                      <div className="absolute top-3.5 left-3.5 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-slate-200 shadow-sm flex items-center gap-2 z-20">
                         <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-xs font-mono font-bold text-slate-900">On Duty • Clinical Unit</span>
+                        <span className="text-xs font-mono font-bold text-slate-900">
+                          {activeDoctor.dutyStatus}
+                        </span>
                       </div>
 
                       {/* Vitals Telemetry Badge */}
-                      <div className="absolute bottom-3.5 right-3.5 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-sm flex items-center gap-2">
+                      <div className="absolute bottom-3.5 right-3.5 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 shadow-sm flex items-center gap-2 z-20">
                         <Activity className="h-4 w-4 text-teal-600 animate-pulse" />
-                        <span className="text-xs font-mono text-teal-900 font-bold">12-Lead Holter Active</span>
+                        <span className="text-xs font-mono text-teal-900 font-bold">
+                          {activeDoctor.telemetry}
+                        </span>
+                      </div>
+
+                      {/* Carousel slide indicators - Pure Light Glass */}
+                      <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-slate-200 shadow-sm z-20">
+                        {CONTACT_DOCTORS.map((_, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setActiveDoctorIdx(idx);
+                              setIsAutoRotate(false);
+                            }}
+                            className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                              idx === activeDoctorIdx ? "w-4 bg-teal-600" : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                            }`}
+                            aria-label={`Switch to doctor ${idx + 1}`}
+                          />
+                        ))}
                       </div>
                     </div>
                   </div>
 
                   {/* Verification & License Pill Below Image */}
-                  <div className="mt-4 p-3.5 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-bold text-xs shrink-0">
-                        VA
+                  <div className="mt-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs flex items-center justify-between transition-all duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="h-11 w-11 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center font-bold text-sm shrink-0 transition-all duration-300 shadow-2xs">
+                        {activeDoctor.initials}
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-slate-950">Board Certified Cardiologist</span>
-                          <CheckCircle2 className="h-3.5 w-3.5 text-teal-600" />
+                          <span className="text-sm font-bold text-slate-950 transition-all duration-300">
+                            {activeDoctor.name}
+                          </span>
+                          <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0" />
                         </div>
-                        <span className="text-[11px] text-slate-500 font-mono">License: CA-MD-98421 • NPI: 1092834710</span>
+                        <span className="text-[11px] text-slate-500 font-mono transition-all duration-300 block">
+                          {activeDoctor.license}
+                        </span>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0">
+                    <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 shrink-0 shadow-2xs">
                       Verified M.D.
                     </span>
                   </div>
 
                   {/* Sub-specialty Tags Strip */}
                   <div className="mt-3 flex flex-wrap gap-1.5 justify-center">
-                    <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[10px] font-mono bg-white text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs font-medium">
                       Acute Coronary Syndrome
                     </span>
-                    <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[10px] font-mono bg-white text-teal-800 px-2.5 py-0.5 rounded-full border border-teal-200 shadow-2xs font-semibold">
                       TreeSHAP Explainability
                     </span>
-                    <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[10px] font-mono bg-white text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200 shadow-2xs font-medium">
                       ICU Sepsis Shock
                     </span>
                   </div>
@@ -401,67 +611,64 @@ export default function ContactDoctorPage() {
               {/* Doctor Details & Biography (7 cols) */}
               <div className="lg:col-span-7 space-y-6 text-left">
                 <div className="space-y-3">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold font-mono">
-                    <Stethoscope className="h-3.5 w-3.5 text-teal-600" />
-                    <span>Attending Physician &amp; Clinical Lead</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-semibold font-mono shadow-2xs">
+                    <Stethoscope className="h-3.5 w-3.5 text-teal-600 shrink-0" />
+                    <span>{activeDoctor.title}</span>
                   </div>
 
                   <h1
                     id="doctor-profile-title"
-                    className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-tight"
+                    className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-950 tracking-tight leading-tight transition-all duration-300"
                   >
-                    Dr. Vadla Abhinay, <span className="text-teal-600">MD</span>
+                    {activeDoctor.name},{" "}
+                    <span className="text-teal-600">{activeDoctor.suffix}</span>
                   </h1>
 
                   <p className="text-lg sm:text-xl font-bold text-slate-800">
-                    Chief of Cardiology &amp; ICU Telemetry Director
+                    {activeDoctor.role}
                   </p>
 
                   <p className="text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl font-normal">
-                    Dr. Vadla Abhinay is a board-certified cardiologist leading the Clinical Decision Support
-                    initiative at HealthNova AI. With extensive experience across acute coronary care units,
-                    cardiovascular telemetry, and bedside decision intelligence, Dr. Abhinay oversees patient
-                    risk stratification, multi-lead Holter diagnostics, and human-in-the-loop validation
-                    protocols.
+                    {activeDoctor.bio}
                   </p>
                 </div>
 
                 {/* Key Credentials Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <Award className="h-3.5 w-3.5" />
+                      <Award className="h-4 w-4" />
                       <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Education</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">M.D. Cardiology</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">Johns Hopkins Medicine</div>
+                    <div className="text-xs font-bold text-slate-950">{activeDoctor.degree}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.education}</div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <HeartPulse className="h-3.5 w-3.5" />
+                      <HeartPulse className="h-4 w-4" />
                       <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Experience</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">18+ Yrs Clinical</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">Acute CCU &amp; Telemetry</div>
+                    <div className="text-xs font-bold text-slate-950">{activeDoctor.experience}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.experienceDetail}</div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <ShieldCheck className="h-3.5 w-3.5" />
+                      <ShieldCheck className="h-4 w-4" />
                       <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Governance</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">Human Sign-Off</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">100% Attending Gate</div>
+                    <div className="text-xs font-bold text-slate-950">{activeDoctor.governance}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.governanceDetail}</div>
                   </div>
 
-                  <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 transition-colors">
+                  <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-teal-300 hover:shadow-xs transition-all">
                     <div className="flex items-center gap-1.5 text-teal-700 mb-1">
-                      <BookOpen className="h-3.5 w-3.5" />
+                      <BookOpen className="h-4 w-4" />
                       <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">Research</span>
                     </div>
-                    <div className="text-xs font-bold text-slate-950">TreeSHAP AI</div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">JAMA &amp; Lancet Digital</div>
+                    <div className="text-xs font-bold text-slate-950">{activeDoctor.research}</div>
+                    <div className="text-[10px] text-slate-500 mt-0.5">{activeDoctor.researchDetail}</div>
                   </div>
                 </div>
 
@@ -497,17 +704,17 @@ export default function ContactDoctorPage() {
         <section
           id="attending-schedule"
           aria-label="Clinical Schedule"
-          className="py-14 sm:py-18 bg-white border-b border-slate-200"
+          className="py-14 sm:py-20 bg-white border-b border-slate-200/90"
         >
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center mb-10">
-              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full">
+              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                 Attending Rotations
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3">
                 Dr. Vadla Abhinay&apos;s Weekly Clinical Matrix
               </h2>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 Live timetable of ICU ward rounds, diagnostic electrophysiology lab blocks, and outpatient consultation hours.
               </p>
             </div>
@@ -519,9 +726,9 @@ export default function ContactDoctorPage() {
                   key={item.code}
                   type="button"
                   onClick={() => setSelectedDay(item.day)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
                     selectedDay === item.day
-                      ? "bg-teal-600 text-white border-teal-700 shadow-sm"
+                      ? "bg-teal-700 text-white border-teal-700 shadow-xs ring-2 ring-teal-600/20"
                       : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
                   }`}
                 >
@@ -539,30 +746,30 @@ export default function ContactDoctorPage() {
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-6 border-b border-slate-200 gap-3">
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <h3 className="text-lg sm:text-xl font-black text-slate-950">{schedule.day} Clinical Schedule</h3>
-                      <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                      <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200 shadow-2xs">
                         {schedule.status}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1.5">
+                    <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5 text-teal-600" />
                       <span>{schedule.location}</span>
                     </p>
                   </div>
-                  <a href="#consultation-form">
-                    <Button
-                      size="sm"
-                      className="bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs h-9 px-4 rounded-xl cursor-pointer"
-                    >
-                      Book on {schedule.day}
-                    </Button>
-                  </a>
+                  <button
+                    type="button"
+                    onClick={() => handleScheduleSelect(schedule.day)}
+                    className="inline-flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs h-9 px-4 rounded-xl cursor-pointer shadow-xs transition-colors"
+                  >
+                    <span>Book on {schedule.day}</span>
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Morning Block */}
-                  <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                  <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-teal-300 transition-colors">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[10px] font-mono font-bold uppercase text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
                         Morning Shift • Inpatient
@@ -580,7 +787,7 @@ export default function ContactDoctorPage() {
                   </div>
 
                   {/* Afternoon Block */}
-                  <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                  <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-blue-300 transition-colors">
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-[10px] font-mono font-bold uppercase text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
                         Afternoon Shift • Diagnostic / Clinic
@@ -599,8 +806,8 @@ export default function ContactDoctorPage() {
                 </div>
 
                 <div className="mt-6 pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
-                  <span className="flex items-center gap-1">
-                    <ShieldCheck className="h-3.5 w-3.5 text-teal-600" />
+                  <span className="flex items-center gap-1.5">
+                    <ShieldCheck className="h-4 w-4 text-teal-600" />
                     <span>Next Open Outpatient Consultation Window: Tomorrow, 02:00 PM EST</span>
                   </span>
                   <span className="font-mono text-[11px] text-teal-800 font-bold">
@@ -612,26 +819,27 @@ export default function ContactDoctorPage() {
           </div>
         </section>
 
-        {/* 4. Clinical Focus & Diagnostic Domains */}
-        <section aria-label="Clinical Specializations" className="py-14 sm:py-18 bg-slate-50/60 border-b border-slate-200">
+        {/* 4. Clinical Focus & Diagnostic Domains with Live Interactive Telemetry Micro-Cards */}
+        <section aria-label="Clinical Specializations" className="py-14 sm:py-20 bg-slate-50/70 border-b border-slate-200">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-12">
-              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full">
+              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                 Clinical Expertise
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3">
                 Core Clinical Domains &amp; Diagnostic Focus
               </h2>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 Delivering evidence-based cardiovascular care supported by calibrated machine learning insights.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+              {/* Domain 1: Holter & ECG Telemetry */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-11 w-11 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
+                    <div className="h-11 w-11 rounded-2xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-2xs">
                       <Activity className="h-5 w-5" />
                     </div>
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200">
@@ -643,17 +851,34 @@ export default function ContactDoctorPage() {
                     Continuous multi-lead cardiac surveillance, QTc dispersion analysis, ST-segment elevation tracking,
                     and sub-20ms bedside arrhythmia classification.
                   </p>
+
+                  {/* Micro Visualizer */}
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 mb-4">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1.5">
+                      <span>Live Rhythm Lead II</span>
+                      <span className="text-teal-700 font-bold">74 BPM • Regular</span>
+                    </div>
+                    <div className="h-10 w-full bg-white rounded-lg border border-slate-200/80 relative overflow-hidden">
+                      <RealtimeEcgWaveform
+                        heartRate={74}
+                        theme="light"
+                        color="#0d9488"
+                        className="w-full h-full"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-[10px] font-mono text-teal-800 font-semibold">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-teal-800 font-semibold">
                   <span>Standard: AHA/ACC ECG Guidelines</span>
-                  <span className="bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">Continuous</span>
+                  <span className="bg-teal-50 px-2 py-0.5 rounded border border-teal-200">Continuous</span>
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+              {/* Domain 2: Acute Sepsis & Hemodynamic Risk */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-emerald-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-11 w-11 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center">
+                    <div className="h-11 w-11 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shadow-2xs">
                       <ShieldCheck className="h-5 w-5" />
                     </div>
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200">
@@ -665,17 +890,34 @@ export default function ContactDoctorPage() {
                     Deterministic qSOFA and NEWS2 scoring integration with machine learning trajectories for early shock
                     prevention and bundle authorization.
                   </p>
+
+                  {/* Micro Visualizer */}
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 mb-4">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1.5">
+                      <span>NEWS2 Floor Index</span>
+                      <span className="text-emerald-700 font-bold">Tier 1 • Monitored</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
+                      <div className="bg-emerald-500 h-2 rounded-full w-1/4 transition-all duration-500" />
+                    </div>
+                    <div className="flex justify-between text-[9px] font-mono text-slate-400 mt-1">
+                      <span>Low Risk (0-4)</span>
+                      <span>Mod (5-6)</span>
+                      <span>Critical (7+)</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-[10px] font-mono text-emerald-800 font-semibold">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-emerald-800 font-semibold">
                   <span>Standard: Surviving Sepsis 2021</span>
-                  <span className="bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">+4.2h Lead</span>
+                  <span className="bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">+4.2h Lead</span>
                 </div>
               </div>
 
-              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-teal-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between">
+              {/* Domain 3: Explainable AI TreeSHAP */}
+              <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-2xs hover:shadow-md hover:border-sky-300 hover:-translate-y-0.5 transition-all flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="h-11 w-11 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center">
+                    <div className="h-11 w-11 rounded-2xl bg-sky-50 border border-sky-200 text-sky-700 flex items-center justify-center shadow-2xs">
                       <Sparkles className="h-5 w-5" />
                     </div>
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-50 text-slate-700 border border-slate-200">
@@ -687,10 +929,25 @@ export default function ContactDoctorPage() {
                     Transparent clinical feature attribution, ensuring every AI risk score highlights the exact patient
                     biomarkers driving deterioration signals.
                   </p>
+
+                  {/* Micro Visualizer */}
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/90 mb-4 space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                      <span>HRV Variance</span>
+                      <span className="text-sky-800 font-bold">+0.06 &uarr;</span>
+                    </div>
+                    <div className="w-full bg-slate-200 rounded-full h-1.5">
+                      <div className="bg-sky-500 h-1.5 rounded-full w-3/4" />
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-500">
+                      <span>MAP Stability</span>
+                      <span className="text-slate-600 font-medium">0.00 &bull;</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-[10px] font-mono text-sky-800 font-semibold">
+                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-sky-800 font-semibold">
                   <span>Standard: Zero Black-Box Opacity</span>
-                  <span className="bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">100% Transparent</span>
+                  <span className="bg-sky-50 px-2 py-0.5 rounded border border-sky-200">100% Transparent</span>
                 </div>
               </div>
             </div>
@@ -701,14 +958,14 @@ export default function ContactDoctorPage() {
         <section
           id="consultation-form"
           aria-labelledby="consultation-heading"
-          className="py-14 sm:py-18 bg-white border-b border-slate-200"
+          className="py-14 sm:py-20 bg-white border-b border-slate-200"
         >
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
               {/* Form Left Side: Direct Contact Details & Emergency Escalation */}
               <div id="department-info" className="lg:col-span-5 space-y-6 text-left">
                 <div>
-                  <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full">
+                  <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                     Direct Contact Channels
                   </span>
                   <h2
@@ -736,9 +993,9 @@ export default function ContactDoctorPage() {
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start gap-3.5">
-                    <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
+                <div className="space-y-3.5">
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start gap-3.5 hover:bg-white hover:border-teal-300 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <MapPin className="h-5 w-5" />
                     </div>
                     <div>
@@ -750,8 +1007,8 @@ export default function ContactDoctorPage() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start gap-3.5">
-                    <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center shrink-0">
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start gap-3.5 hover:bg-white hover:border-blue-300 transition-all">
+                    <div className="h-10 w-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center shrink-0 shadow-2xs">
                       <Clock className="h-5 w-5" />
                     </div>
                     <div>
@@ -763,47 +1020,65 @@ export default function ContactDoctorPage() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start gap-3.5">
-                    <div className="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0">
-                      <Mail className="h-5 w-5" />
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start justify-between gap-3.5 hover:bg-white hover:border-emerald-300 transition-all">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0 shadow-2xs">
+                        <Mail className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-950">Encrypted Clinical Inbox</h4>
+                        <p className="text-xs text-slate-700 mt-0.5 font-mono font-medium">
+                          {activeDoctor.email}
+                        </p>
+                        <span className="text-[10px] text-teal-700 font-semibold block mt-0.5">
+                          HL7 FHIR v4 Secure Gateway Connected
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-950">Encrypted Clinical Inbox</h4>
-                      <p className="text-xs text-slate-600 mt-0.5 font-mono">
-                        dr.abhinay.vadla@hospital.org
-                      </p>
-                      <span className="text-[10px] text-teal-700 font-semibold block mt-0.5">
-                        HL7 FHIR v4 Secure Gateway Connected
-                      </span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={copyClinicEmail}
+                      className="text-[10px] font-mono font-bold text-teal-700 hover:text-teal-900 border border-teal-200 bg-teal-50 px-2 py-1 rounded-lg shrink-0 cursor-pointer"
+                    >
+                      {copiedEmail ? "Copied" : "Copy"}
+                    </button>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start gap-3.5">
-                    <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center shrink-0">
-                      <Phone className="h-5 w-5" />
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs flex items-start justify-between gap-3.5 hover:bg-white hover:border-purple-300 transition-all">
+                    <div className="flex items-start gap-3.5">
+                      <div className="h-10 w-10 rounded-xl bg-purple-50 border border-purple-200 text-purple-700 flex items-center justify-center shrink-0 shadow-2xs">
+                        <Phone className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-950">Direct Clinic Telephone</h4>
+                        <p className="text-xs text-slate-700 mt-0.5 font-mono font-medium">
+                          +1 (800) 432-5884 ext. 402
+                        </p>
+                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                          Direct extension to attending clinical desk.
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-950">Direct Clinic Telephone</h4>
-                      <p className="text-xs text-slate-600 mt-0.5 font-mono">
-                        +1 (800) 432-5884 ext. 402
-                      </p>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
-                        Direct extension to Dr. Vadla Abhinay&apos;s clinical coordinator.
-                      </span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={copyClinicPhone}
+                      className="text-[10px] font-mono font-bold text-teal-700 hover:text-teal-900 border border-teal-200 bg-teal-50 px-2 py-1 rounded-lg shrink-0 cursor-pointer"
+                    >
+                      {copiedPhone ? "Copied" : "Copy"}
+                    </button>
                   </div>
                 </div>
               </div>
 
               {/* Form Right Side: Multi-Tab Interactive Inquiry Submission */}
               <div className="lg:col-span-7 text-left">
-                <div className="rounded-3xl bg-slate-50/70 border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div className="rounded-3xl bg-slate-50/80 border border-slate-200 p-6 sm:p-8 shadow-sm">
                   {/* Category Tabs */}
-                  <div className="flex flex-wrap gap-1.5 p-1 rounded-2xl bg-slate-200/80 mb-6">
+                  <div className="flex flex-wrap gap-1.5 p-1.5 rounded-2xl bg-slate-200/70 mb-6">
                     <button
                       type="button"
                       onClick={() => handleTabChange("referral")}
-                      className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         activeTab === "referral"
                           ? "bg-white text-slate-950 shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
@@ -814,7 +1089,7 @@ export default function ContactDoctorPage() {
                     <button
                       type="button"
                       onClick={() => handleTabChange("consultation")}
-                      className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         activeTab === "consultation"
                           ? "bg-white text-slate-950 shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
@@ -825,7 +1100,7 @@ export default function ContactDoctorPage() {
                     <button
                       type="button"
                       onClick={() => handleTabChange("enterprise")}
-                      className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         activeTab === "enterprise"
                           ? "bg-white text-slate-950 shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
@@ -836,7 +1111,7 @@ export default function ContactDoctorPage() {
                     <button
                       type="button"
                       onClick={() => handleTabChange("research")}
-                      className={`flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      className={`flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         activeTab === "research"
                           ? "bg-white text-slate-950 shadow-xs"
                           : "text-slate-600 hover:text-slate-900"
@@ -847,8 +1122,8 @@ export default function ContactDoctorPage() {
                   </div>
 
                   <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-200">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-9 w-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shadow-2xs">
                         <Send className="h-4 w-4" />
                       </div>
                       <div>
@@ -859,11 +1134,11 @@ export default function ContactDoctorPage() {
                           {activeTab === "research" && "Clinical AI Research & TreeSHAP Study"}
                         </h3>
                         <p className="text-[11px] text-slate-500">
-                          Encrypted transmission to Dr. Vadla Abhinay&apos;s clinical coordinator desk
+                          Encrypted transmission to {activeDoctor.name}&apos;s clinical coordinator desk
                         </p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200">
+                    <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded-full border border-teal-200 shadow-2xs">
                       SECURE EHR
                     </span>
                   </div>
@@ -877,7 +1152,7 @@ export default function ContactDoctorPage() {
                       <div>
                         <h4 className="text-xl font-bold text-slate-950">Clinical Consultation Request Dispatched</h4>
                         <p className="text-xs text-slate-600 max-w-md mx-auto leading-relaxed mt-1">
-                          Your case notes have been encrypted and queued directly at Dr. Vadla Abhinay&apos;s triage desk.
+                          Your case notes have been encrypted and queued directly at {activeDoctor.name}&apos;s triage desk.
                           A confirmation notice has been sent to <span className="font-semibold text-slate-900">{formData.email}</span>.
                         </p>
                       </div>
@@ -897,7 +1172,7 @@ export default function ContactDoctorPage() {
                           </div>
                           <div>
                             <span className="text-slate-400 block text-[9px] uppercase">Attending Lead</span>
-                            <span className="font-bold text-slate-900">Dr. Vadla Abhinay, MD</span>
+                            <span className="font-bold text-slate-900">{activeDoctor.name}, MD</span>
                           </div>
                           <div>
                             <span className="text-slate-400 block text-[9px] uppercase">Department Code</span>
@@ -944,13 +1219,13 @@ export default function ContactDoctorPage() {
                               organization: "",
                               mrn: "",
                               inquiryType: "physician-referral",
-                              urgency: "routine",
+                              urgency: "priority",
                               department: "WARD-CCU-04",
                               message: "",
                             });
                           }}
                           variant="outline"
-                          className="border-slate-300 text-xs font-bold h-10 px-5 cursor-pointer"
+                          className="border-slate-300 text-xs font-bold h-10 px-5 cursor-pointer hover:bg-white"
                         >
                           Submit Another Inquiry
                         </Button>
@@ -970,7 +1245,7 @@ export default function ContactDoctorPage() {
                             placeholder="e.g. Dr. Robert Chen, MD / Eleanor Vance"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 shadow-2xs"
                           />
                         </div>
 
@@ -985,7 +1260,7 @@ export default function ContactDoctorPage() {
                             placeholder="clinician@hospital.org"
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1001,7 +1276,7 @@ export default function ContactDoctorPage() {
                             placeholder="+1 (555) 000-0000"
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 shadow-2xs"
                           />
                         </div>
 
@@ -1015,7 +1290,7 @@ export default function ContactDoctorPage() {
                             placeholder="Memorial Hospital / Clinic"
                             value={formData.organization}
                             onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 shadow-2xs"
                           />
                         </div>
 
@@ -1029,7 +1304,7 @@ export default function ContactDoctorPage() {
                             placeholder="MRN-882910"
                             value={formData.mrn}
                             onChange={(e) => setFormData({ ...formData, mrn: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 font-mono"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 font-mono shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1043,7 +1318,7 @@ export default function ContactDoctorPage() {
                             id="department"
                             value={formData.department}
                             onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs"
                           >
                             <option value="WARD-CCU-04">WARD-CCU-04: Acute Coronary Care Unit</option>
                             <option value="LAB-EP-02">LAB-EP-02: Electrophysiology &amp; Holter Lab</option>
@@ -1062,11 +1337,11 @@ export default function ContactDoctorPage() {
                             id="urgency"
                             value={formData.urgency}
                             onChange={(e) => setFormData({ ...formData, urgency: e.target.value })}
-                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all shadow-2xs"
                           >
-                            <option value="routine">Routine Case Review (Within 48h SLA)</option>
-                            <option value="priority">Priority Telemetry Evaluation (Within 12h SLA)</option>
-                            <option value="urgent">Urgent Ward Consultation (Same Day / &lt;4h SLA)</option>
+                            <option value="priority">Priority Telemetry Evaluation (&lt; 12h SLA)</option>
+                            <option value="urgent">Urgent Ward Consultation (&lt; 4h STAT)</option>
+                            <option value="routine">Routine Case Review (&lt; 48h SLA)</option>
                           </select>
                         </div>
                       </div>
@@ -1082,7 +1357,7 @@ export default function ContactDoctorPage() {
                           placeholder="Summarize pertinent clinical findings, telemetry observations, rhythm strip characteristics, or consultation goals..."
                           value={formData.message}
                           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 resize-y"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all placeholder:text-slate-400 resize-y shadow-2xs"
                         />
                       </div>
 
@@ -1095,14 +1370,14 @@ export default function ContactDoctorPage() {
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold h-11 rounded-xl shadow-xs border-0 text-xs gap-2 transition-all cursor-pointer"
+                        className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold h-12 rounded-xl shadow-sm border-0 text-xs gap-2 transition-all cursor-pointer"
                       >
                         {isSubmitting ? (
-                          <span>Encrypting &amp; Dispatching to Dr. Abhinay...</span>
+                          <span>Encrypting &amp; Dispatching to {activeDoctor.name}...</span>
                         ) : (
                           <>
-                            <Send className="h-3.5 w-3.5" />
-                            <span>Transmit Consultation Request to Dr. Vadla Abhinay, MD</span>
+                            <Send className="h-4 w-4" />
+                            <span>Transmit Consultation Request to {activeDoctor.name}, MD</span>
                           </>
                         )}
                       </Button>
@@ -1114,67 +1389,88 @@ export default function ContactDoctorPage() {
           </div>
         </section>
 
-        {/* 6. Hospital Department Directory with Category Filters */}
-        <section aria-label="Hospital Department Routing" className="py-14 sm:py-18 bg-white border-b border-slate-200">
+        {/* 6. Hospital Department Directory with Category Filters & Search */}
+        <section aria-label="Hospital Department Routing" className="py-14 sm:py-20 bg-white border-b border-slate-200">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl mx-auto text-center mb-8">
-              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full">
+              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                 Hospital System Directory
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3">
                 Coordinated Departmental Care Units
               </h2>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 Direct extension numbers and on-duty escalation channels for specialized clinical care units.
               </p>
             </div>
 
-            {/* Department Filter Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-              <button
-                type="button"
-                onClick={() => setSelectedDeptFilter("all")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                  selectedDeptFilter === "all"
-                    ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                All Units ({HOSPITAL_DEPARTMENTS.length})
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedDeptFilter("critical")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                  selectedDeptFilter === "critical"
-                    ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                Critical Care &amp; CCU
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedDeptFilter("diagnostic")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                  selectedDeptFilter === "diagnostic"
-                    ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                Diagnostic Suites
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedDeptFilter("informatics")}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
-                  selectedDeptFilter === "informatics"
-                    ? "bg-slate-900 text-white border-slate-900 shadow-2xs"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                AI &amp; Informatics
-              </button>
+            {/* Department Search & Category Filter Pills */}
+            <div className="max-w-xl mx-auto mb-8 space-y-3">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search care unit by name or code (e.g., CCU, Sepsis, Electrophysiology)..."
+                  value={deptSearchQuery}
+                  onChange={(e) => setDeptSearchQuery(e.target.value)}
+                  className="w-full pl-4 pr-10 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-2xs"
+                />
+                {deptSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setDeptSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedDeptFilter("all")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    selectedDeptFilter === "all"
+                      ? "bg-teal-700 text-white border-teal-700 shadow-xs"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  All Units ({HOSPITAL_DEPARTMENTS.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDeptFilter("critical")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    selectedDeptFilter === "critical"
+                      ? "bg-teal-700 text-white border-teal-700 shadow-xs"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  Critical Care &amp; CCU
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDeptFilter("diagnostic")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    selectedDeptFilter === "diagnostic"
+                      ? "bg-teal-700 text-white border-teal-700 shadow-xs"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  Diagnostic Suites
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDeptFilter("informatics")}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                    selectedDeptFilter === "informatics"
+                      ? "bg-teal-700 text-white border-teal-700 shadow-xs"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  AI &amp; Informatics
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 text-left">
@@ -1183,23 +1479,28 @@ export default function ContactDoctorPage() {
                 return (
                   <div
                     key={dept.code}
-                    className="p-5 rounded-2xl bg-slate-50 border border-slate-200 shadow-2xs hover:shadow-md hover:border-teal-300 transition-all flex flex-col justify-between"
+                    className="p-5 rounded-2xl bg-slate-50/70 border border-slate-200 shadow-2xs hover:shadow-md hover:border-teal-300 hover:bg-white transition-all flex flex-col justify-between group"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center group-hover:scale-105 transition-transform shadow-2xs">
                           <Icon className="h-5 w-5" />
                         </div>
-                        <span className="text-[10px] font-mono font-bold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
-                          {dept.code}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200">
+                            {dept.capacity}
+                          </span>
+                          <span className="text-[10px] font-mono font-bold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                            {dept.code}
+                          </span>
+                        </div>
                       </div>
-                      <h4 className="text-sm font-bold text-slate-950 leading-snug">{dept.name}</h4>
+                      <h4 className="text-sm font-bold text-slate-950 leading-snug group-hover:text-teal-700 transition-colors">{dept.name}</h4>
                       <p className="text-[11px] text-teal-800 font-semibold mt-0.5">{dept.lead}</p>
                       <p className="text-xs text-slate-600 mt-2 leading-relaxed">{dept.desc}</p>
                     </div>
 
-                    <div className="pt-3 mt-4 border-t border-slate-200 flex items-center justify-between">
+                    <div className="pt-3 mt-4 border-t border-slate-200/80 flex items-center justify-between">
                       <div>
                         <span className="text-xs font-mono font-bold text-slate-900">{dept.phone}</span>
                         <span className="text-[10px] text-slate-500 block">{dept.sla}</span>
@@ -1207,9 +1508,9 @@ export default function ContactDoctorPage() {
                       <button
                         type="button"
                         onClick={() => handleDepartmentRoute(dept.code, dept.name)}
-                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 inline-flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs"
+                        className="text-[11px] font-bold text-teal-700 hover:text-teal-900 inline-flex items-center gap-1 cursor-pointer bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs hover:border-teal-300 transition-all"
                       >
-                        <span>Select</span>
+                        <span>Select Unit</span>
                         <ArrowRight className="h-3 w-3" />
                       </button>
                     </div>
@@ -1221,30 +1522,41 @@ export default function ContactDoctorPage() {
         </section>
 
         {/* 7. Clinical Referral & Telemetry FAQ Accordion */}
-        <section aria-label="Clinical Consultation FAQ" className="py-14 sm:py-18 bg-slate-50/60 border-b border-slate-200">
+        <section aria-label="Clinical Consultation FAQ" className="py-14 sm:py-20 bg-slate-50/70 border-b border-slate-200">
           <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10">
-              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full">
+              <span className="text-xs font-mono font-bold text-teal-800 uppercase tracking-wider bg-teal-50 border border-teal-200 px-3 py-1 rounded-full shadow-2xs">
                 Referral Inquiries
               </span>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-950 tracking-tight mt-3">
                 Frequently Asked Clinical Questions
               </h2>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
                 Key guidance on telemetry data transmission, turnaround SLAs, and attending physician oversight.
               </p>
+
+              {/* FAQ Search */}
+              <div className="max-w-md mx-auto mt-6">
+                <input
+                  type="text"
+                  placeholder="Search questions (e.g., TreeSHAP, FHIR, SLAs)..."
+                  value={faqSearchQuery}
+                  onChange={(e) => setFaqSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 shadow-2xs"
+                />
+              </div>
             </div>
 
             <div className="space-y-3 text-left">
-              {CLINICAL_FAQS.map((faq, index) => (
+              {filteredFaqs.map((faq, index) => (
                 <div
                   key={faq.q}
-                  className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-2xs transition-colors"
+                  className="rounded-2xl bg-white border border-slate-200 overflow-hidden shadow-2xs transition-colors hover:border-slate-300"
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                    className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-50/70 transition-colors"
+                    className="w-full p-4 sm:p-5 flex items-center justify-between text-left cursor-pointer hover:bg-slate-50/60 transition-colors"
                   >
                     <span className="text-sm font-bold text-slate-950 pr-4">{faq.q}</span>
                     <span className="h-7 w-7 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
@@ -1256,7 +1568,7 @@ export default function ContactDoctorPage() {
                     </span>
                   </button>
                   {openFaqIndex === index && (
-                    <div className="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/40">
+                    <div className="px-4 sm:px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/30">
                       {faq.a}
                     </div>
                   )}

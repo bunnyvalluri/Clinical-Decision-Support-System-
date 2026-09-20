@@ -13,6 +13,9 @@ import {
   Sparkles,
   ArrowRight,
   TrendingUp,
+  Database,
+  Layers,
+  ChevronRight,
 } from "lucide-react";
 
 interface MLStep {
@@ -20,6 +23,7 @@ interface MLStep {
   name: string;
   actor: "ML ENGINE" | "CLINICIAN" | "SYSTEM";
   detail: string;
+  technical: string;
   icon: React.ComponentType<{ className?: string }>;
 }
 
@@ -29,6 +33,7 @@ const ML_STEPS: MLStep[] = [
     name: "Patient Ingestion",
     actor: "SYSTEM",
     detail: "High-frequency vitals, ECG ST depression, blood pressure, lab assays continuous ingestion via FHIR v4.0.1.",
+    technical: "HL7 FHIR v4.0.1 Observation streams parsed through Pydantic schemas into Celery Redis ingestion buffer under 20ms.",
     icon: FileSpreadsheet,
   },
   {
@@ -36,6 +41,7 @@ const ML_STEPS: MLStep[] = [
     name: "Data Validation",
     actor: "SYSTEM",
     detail: "Biological plausibility checks & Mahalanobis out-of-distribution guard filtering sensor motion artifacts.",
+    technical: "Systolic > Diastolic verification, heart rate bound checks [30-240 bpm], and missingness imputation via KNN.",
     icon: CheckCheck,
   },
   {
@@ -43,6 +49,7 @@ const ML_STEPS: MLStep[] = [
     name: "Feature Pipeline",
     actor: "ML ENGINE",
     detail: "StandardScaler normalization, dynamic imputation, and temporal ratio extraction pipelines.",
+    technical: "Shock Index (HR/SBP), Modified Shock Index (HR/MAP), and temporal moving delta windows across 60-minute buffers.",
     icon: Sliders,
   },
   {
@@ -50,6 +57,7 @@ const ML_STEPS: MLStep[] = [
     name: "Model Ensemble",
     actor: "ML ENGINE",
     detail: "CatBoost & Random Forest champion ensembles with Platt probability calibration wrapper.",
+    technical: "Dual gradient boosted decision trees voting with isotonic probability calibration, producing empirical Brier scores < 0.08.",
     icon: Cpu,
   },
   {
@@ -57,115 +65,116 @@ const ML_STEPS: MLStep[] = [
     name: "Risk Stratification",
     actor: "ML ENGINE",
     detail: "Calibrated probability output partitioned into clinical triage risk tiers with Shannon entropy bounds.",
+    technical: "Tier assignment (Low <20%, Elevated 20-60%, High >60%) joined with TreeSHAP additive biomarker attributions.",
     icon: Activity,
-  },
-  {
-    step: "06",
-    name: "TreeSHAP Breakdown",
-    actor: "ML ENGINE",
-    detail: "Exact additive Shapley value decomposition calculating local pathophysiological biomarker attributions.",
-    icon: Sliders,
-  },
-  {
-    step: "07",
-    name: "Clinical Review",
-    actor: "CLINICIAN",
-    detail: "Attending physician reviews prediction and evidence at bedside with documented sign-off or override.",
-    icon: Stethoscope,
-  },
-  {
-    step: "08",
-    name: "Immutable Audit",
-    actor: "SYSTEM",
-    detail: "Cryptographic audit trail committed permanently to Neon PostgreSQL authoritative store.",
-    icon: ShieldCheck,
   },
 ];
 
 export function MLWorkflow() {
-  const [activeStepIdx, setActiveStepIdx] = useState(0);
+  const [activeStepIdx, setActiveStepIdx] = useState(3);
+  const activeStep = ML_STEPS[activeStepIdx];
+  const StepIcon = activeStep.icon;
 
   return (
     <section id="ml-workflow" className="py-20 sm:py-28 bg-white border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-teal-700" />
-            <span>MACHINE LEARNING PIPELINE</span>
+            <span>ALGORITHMIC INTEGRITY &amp; LIFECYCLE</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950 leading-tight">
-            Machine Learning for{" "}
+            The Machine Learning{" "}
             <span className="bg-gradient-to-r from-teal-700 via-emerald-600 to-cyan-700 bg-clip-text text-transparent">
-              Clinical Risk Intelligence
+              Inference Pipeline
             </span>
           </h2>
           <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-            From biological plausibility screening to TreeSHAP feature attributions and mandatory
-            physician review, every prediction is transparent, calibrated, and auditable.
+            From raw physiological telemetry to calibrated risk predictions, every step follows strict
+            mathematical verification and clinician-in-the-loop validation gates.
           </p>
         </div>
 
-        {/* 8-Step Pipeline Stepper */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {ML_STEPS.map((s, idx) => {
-            const IconComponent = s.icon;
-            const isClinician = s.actor === "CLINICIAN";
-            const isSelected = activeStepIdx === idx;
-
-            return (
-              <div
-                key={s.step}
-                onClick={() => setActiveStepIdx(idx)}
-                className={`rounded-2xl border p-5 bg-white shadow-2xs flex flex-col justify-between transition-all duration-200 hover:-translate-y-1 hover:shadow-md cursor-pointer ${
-                  isSelected
-                    ? "border-teal-600 ring-2 ring-teal-500/20 shadow-sm"
-                    : isClinician
-                    ? "border-teal-300 bg-teal-50/20"
-                    : "border-slate-200/90 hover:border-slate-300"
-                }`}
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between font-mono">
-                    <span className="text-xs font-black text-slate-400">
-                      STEP {s.step}
+        {/* 5-Step Interactive Stepper Bar */}
+        <div className="rounded-3xl bg-slate-50 border border-slate-200 p-3 sm:p-4 shadow-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            {ML_STEPS.map((step, idx) => {
+              const IconComp = step.icon;
+              const isActive = activeStepIdx === idx;
+              return (
+                <button
+                  key={step.step}
+                  type="button"
+                  onClick={() => setActiveStepIdx(idx)}
+                  className={`p-3.5 rounded-2xl text-left transition-all cursor-pointer flex flex-col justify-between ${
+                    isActive
+                      ? "bg-white border border-teal-600 shadow-md ring-2 ring-teal-500/20"
+                      : "bg-white/60 hover:bg-white border border-slate-200 hover:border-slate-300 shadow-2xs"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-[10px] font-mono font-black ${isActive ? "text-teal-700" : "text-slate-500"}`}>
+                      PHASE {step.step}
                     </span>
-                    <span
-                      className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
-                        isClinician
-                          ? "bg-teal-700 text-white shadow-2xs"
-                          : "bg-slate-100 text-slate-700 border border-slate-200"
-                      }`}
-                    >
-                      {s.actor}
-                    </span>
+                    <IconComp className={`h-4 w-4 ${isActive ? "text-teal-700" : "text-slate-400"}`} />
                   </div>
-
-                  <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200/80 flex items-center justify-center text-teal-700 shadow-2xs">
-                    <IconComponent className="h-5 w-5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-950 truncate">{step.name}</h4>
+                    <span className="text-[9px] font-mono text-slate-500 uppercase">{step.actor}</span>
                   </div>
-
-                  <h3 className="text-sm font-bold text-slate-950 tracking-tight">
-                    {s.name}
-                  </h3>
-
-                  <p className="text-xs text-slate-600 leading-relaxed font-normal">
-                    {s.detail}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Supported Model Architectures Card */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto">
+        {/* Active Step Deep-Dive Inspector */}
+        <div className="rounded-3xl bg-slate-50/70 border border-slate-300 p-6 sm:p-8 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-teal-700 text-white flex items-center justify-center shrink-0 shadow-sm">
+                <StepIcon className="h-5 w-5" />
+              </div>
+              <div>
+                <span className="text-[10px] font-mono font-bold text-teal-700 uppercase">
+                  ACTIVE PHASE INSPECTION • STEP {activeStep.step}
+                </span>
+                <h3 className="text-lg font-bold text-slate-950">{activeStep.name}</h3>
+              </div>
+            </div>
+            <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-white text-slate-800 border border-slate-200 shadow-2xs">
+              Actor: {activeStep.actor}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+            <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1.5">
+              <span className="font-bold text-slate-900 block font-mono text-[11px] uppercase">Clinical Function</span>
+              <p className="text-slate-600 leading-relaxed">{activeStep.detail}</p>
+            </div>
+            <div className="p-4 rounded-2xl bg-white border border-slate-200 space-y-1.5">
+              <span className="font-bold text-teal-800 block font-mono text-[11px] uppercase">Technical Execution</span>
+              <p className="text-slate-700 leading-relaxed font-mono">{activeStep.technical}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Machine Learning Model Ensembles Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {[
             {
+              name: "CatBoost Classifier",
+              role: "Ensemble Champion",
+              desc: "Optimized gradient-boosted decision trees on heterogeneous patient vitals with Platt probability scaling.",
+              metric: "Champion (AUC 0.94)",
+              badgeBg: "bg-teal-50 text-teal-800 border-teal-200",
+            },
+            {
               name: "Random Forest Classifier",
-              role: "Champion Ensemble",
-              desc: "100-tree ensemble with Platt sigmoid calibration wrapper; optimal sensitivity on acute cardiac and sepsis cohorts.",
-              metric: "Active Champion (AUC 0.94)",
+              role: "Secondary Ensemble",
+              desc: "High-entropy bootstrap aggregated trees mitigating outlier variance and missing bedside telemetry points.",
+              metric: "Ensemble (AUC 0.92)",
               badgeBg: "bg-emerald-50 text-emerald-800 border-emerald-200",
             },
             {
@@ -176,7 +185,7 @@ export function MLWorkflow() {
               badgeBg: "bg-blue-50 text-blue-800 border-blue-200",
             },
             {
-              name: "AdaBoost & CatBoost Classifier",
+              name: "AdaBoost & Boosting Trees",
               role: "Adaptive Boosting",
               desc: "Sequential weak learners iteratively weighting borderline physiological outliers and clinical edge cases.",
               metric: "Adaptive Boost (AUC 0.93)",
@@ -185,7 +194,7 @@ export function MLWorkflow() {
           ].map((m) => (
             <div
               key={m.name}
-              className="p-6 rounded-2xl bg-slate-50/70 border border-slate-200 shadow-2xs space-y-3 hover:bg-white hover:border-teal-400 hover:shadow-md transition-all duration-200 group"
+              className="p-6 rounded-3xl bg-slate-50/70 border border-slate-200 shadow-2xs space-y-3 hover:bg-white hover:border-teal-400 hover:shadow-md transition-all duration-200 group"
             >
               <div className="flex items-center justify-between">
                 <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${m.badgeBg}`}>

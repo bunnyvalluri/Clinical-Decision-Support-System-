@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Users,
   Layout,
@@ -13,6 +13,7 @@ import {
   ArrowRight,
   Sparkles,
   ShieldCheck,
+  Zap,
 } from "lucide-react";
 
 interface FlowNode {
@@ -20,25 +21,28 @@ interface FlowNode {
   name: string;
   sub: string;
   detail: string;
+  protocol: string;
   icon: React.ComponentType<{ className?: string }>;
   isFinal?: boolean;
 }
 
 const FLOW_NODES: FlowNode[] = [
-  { step: "01", name: "Care Team & Vitals", sub: "Bedside Telemetry", detail: "ICU sensors & manual vitals stream via FHIR", icon: Users },
-  { step: "02", name: "Next.js 16 Client", sub: "Secure Web App", detail: "Accessible interface with Apple HIG touch targets", icon: Layout },
-  { step: "03", name: "Django REST & ASGI", sub: "Security & Channels", detail: "Granular 5-role RBAC & WebSocket router", icon: Server },
-  { step: "04", name: "Neon PostgreSQL", sub: "Authoritative Store", detail: "ACID transactions & immutable audit trails", icon: Database },
-  { step: "05", name: "ML Inference Pipeline", sub: "Ensemble Scoring", detail: "StandardScaler normalization & CatBoost inference", icon: Cpu },
-  { step: "06", name: "Deterministic Gate", sub: "Clinical Scoring", detail: "qSOFA, NEWS2 & shock index verification", icon: Activity },
-  { step: "07", name: "TreeSHAP Explainer", sub: "Feature Weights", detail: "Exact additive Shapley pathophysiological drivers", icon: Sliders },
-  { step: "08", name: "Physician Sign-Off", sub: "Human-in-the-Loop", detail: "Attending clinician order authorization", icon: Stethoscope, isFinal: true },
+  { step: "01", name: "Care Team & Vitals", sub: "Bedside Telemetry", detail: "ICU sensors & manual vitals stream continuous readings.", protocol: "HL7 FHIR v4.0.1", icon: Users },
+  { step: "02", name: "Next.js 16 Client", sub: "Secure Web App", detail: "Accessible interface with Apple HIG touch targets.", protocol: "TypeScript / React", icon: Layout },
+  { step: "03", name: "Django REST & ASGI", sub: "Security & Channels", detail: "Granular 5-role RBAC & WebSocket router.", protocol: "TLS 1.3 / WSS", icon: Server },
+  { step: "04", name: "Neon PostgreSQL", sub: "Authoritative Store", detail: "ACID transactions & immutable audit trails.", protocol: "PostgreSQL 16", icon: Database },
+  { step: "05", name: "ML Inference Pipeline", sub: "Ensemble Scoring", detail: "StandardScaler normalization & CatBoost inference.", protocol: "Platt Calibrated", icon: Cpu },
+  { step: "06", name: "Deterministic Gate", sub: "Clinical Scoring", detail: "qSOFA, NEWS2 & shock index verification.", protocol: "Deterministic Rules", icon: Activity },
+  { step: "07", name: "TreeSHAP Explainer", sub: "Feature Weights", detail: "Exact additive Shapley pathophysiological drivers.", protocol: "Shapley Values", icon: Sliders },
+  { step: "08", name: "Physician Sign-Off", sub: "Human-in-the-Loop", detail: "Attending clinician order authorization.", protocol: "SHA-256 Sign-Off", icon: Stethoscope, isFinal: true },
 ];
 
 export function DataFlowVisual() {
+  const [selectedNodeIdx, setSelectedNodeIdx] = useState<number | null>(null);
+
   return (
     <section id="architecture" className="py-20 sm:py-28 bg-slate-50/50 border-b border-slate-200 relative">
-      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-mono font-bold tracking-wider uppercase shadow-2xs">
@@ -61,14 +65,18 @@ export function DataFlowVisual() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 relative">
           {FLOW_NODES.map((node, idx) => {
             const IconComponent = node.icon;
-            const isLast = idx === FLOW_NODES.length - 1;
+            const isSelected = selectedNodeIdx === idx;
 
             return (
               <div
                 key={node.step}
-                className={`relative rounded-3xl border p-5 sm:p-6 flex flex-col justify-between shadow-2xs hover:-translate-y-1 hover:shadow-md transition-all duration-200 group ${
+                tabIndex={0}
+                onClick={() => setSelectedNodeIdx(isSelected ? null : idx)}
+                className={`relative rounded-3xl border p-5 sm:p-6 flex flex-col justify-between shadow-2xs hover:-translate-y-1 hover:shadow-md transition-all duration-200 cursor-pointer group ${
                   node.isFinal
                     ? "bg-white border-teal-500 ring-2 ring-teal-500/20 shadow-sm"
+                    : isSelected
+                    ? "bg-white border-teal-600 shadow-md ring-2 ring-teal-500/20"
                     : "bg-white border-slate-200/90 hover:border-teal-400"
                 }`}
               >
@@ -78,10 +86,10 @@ export function DataFlowVisual() {
                       STEP {node.step}
                     </span>
                     <div
-                      className={`h-10 w-10 rounded-xl border flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform duration-200 ${
+                      className={`h-10 w-10 rounded-2xl border flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform duration-200 ${
                         node.isFinal
                           ? "bg-teal-700 border-teal-800 text-white shadow-xs"
-                          : "bg-teal-50 border-teal-200 text-teal-700"
+                          : "bg-teal-50 border border-teal-200 text-teal-700"
                       }`}
                     >
                       <IconComponent className="h-5 w-5" />
@@ -100,6 +108,12 @@ export function DataFlowVisual() {
                   <p className="text-xs text-slate-600 leading-relaxed font-normal">
                     {node.detail}
                   </p>
+
+                  <div className="pt-1">
+                    <span className="text-[9px] font-mono font-bold text-slate-600 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded">
+                      Protocol: {node.protocol}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono">

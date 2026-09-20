@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -190,7 +190,44 @@ const CLINICAL_ROLES_DATA = [
   },
 ];
 
+const HERO_CLINICIANS = [
+  {
+    name: "Dr. Vadla Abhinay",
+    initials: "VA",
+    role: "MD",
+    title: "Chief of Cardiology • Attending",
+    image: "/doctor-hero.jpg",
+    alt: "Attending Cardiologist Dr. Vadla Abhinay reviewing patient risk assessment on tablet",
+    node: "NODE 04 • ICU TELEMETRY",
+    enc: "ENC-88291",
+    vitalsBadge: "114 BPM • 98% SpO2",
+    registry: "SHA-256 Verified",
+  },
+  {
+    name: "Dr. Valluri Rahul",
+    initials: "VR",
+    role: "MD",
+    title: "Chief of Cardiology • Attending",
+    image: "/doctor-hero-rahul.jpg",
+    alt: "Attending Cardiologist Dr. Valluri Rahul reviewing cardiac telemetry on tablet",
+    node: "NODE 02 • CCU TELEMETRY",
+    enc: "ENC-88292",
+    vitalsBadge: "114 BPM • 98% SpO2",
+    registry: "SHA-256 Verified",
+  },
+];
+
 export default function LandingPage() {
+  // Rotating Hero Clinician Photo Carousel (cycles every 2 seconds)
+  const [activeClinicianIndex, setActiveClinicianIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveClinicianIndex((prev) => (prev + 1) % HERO_CLINICIANS.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Interactive Live Bedside Simulator State
   const [vitals, setVitals] = useState(PRESETS[1].vitals);
   const [activePresetIndex, setActivePresetIndex] = useState<number>(1);
@@ -346,7 +383,7 @@ Status: ${simulationResult.tier} Risk (${simulationResult.probability}% Platt-Ca
 Vitals: BP ${vitals.systolicBp}/${vitals.diastolicBp} mmHg | HR ${vitals.heartRate} bpm | ST-Dep ${vitals.stDepression}mm | Chol ${vitals.cholesterol} mg/dL
 Clinical Directive: ${simulationResult.recommendation}
 Uncertainty: Entropy ${simulationResult.entropy} | Margin ${simulationResult.margin}
-Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
+Attending Physician: ${HERO_CLINICIANS[activeClinicianIndex].name}, ${HERO_CLINICIANS[activeClinicianIndex].role} (Sign-Off Mandated)`;
     navigator.clipboard.writeText(text);
     setCopiedHandover(true);
     setTimeout(() => setCopiedHandover(false), 2500);
@@ -375,8 +412,8 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
             <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
               Zero PHI Memory
             </span>
-            <span className="hidden md:inline text-slate-500 font-bold">
-              Attending: Dr. Vadla Abhinay, MD
+            <span className="hidden md:inline text-slate-500 font-bold transition-all duration-300">
+              Attending: {HERO_CLINICIANS[activeClinicianIndex].name}, {HERO_CLINICIANS[activeClinicianIndex].role}
             </span>
           </div>
         </div>
@@ -471,51 +508,84 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                 {/* Main Clinical Frame */}
                 <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-3.5 shadow-xl space-y-3.5">
                   {/* Hospital Telemetry Top Status Header */}
-                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-between text-[11px] font-mono border border-slate-200/90">
+                  <div className="px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-between text-[11px] font-mono border border-slate-200/90 transition-all duration-500">
                     <div className="flex items-center gap-2">
                       <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                      <span className="text-slate-900 font-bold">NODE 04 • ICU TELEMETRY</span>
+                      <span className="text-slate-900 font-bold tracking-tight">
+                        {HERO_CLINICIANS[activeClinicianIndex].node}
+                      </span>
                     </div>
-                    <span className="text-teal-700 font-bold bg-teal-50 border border-teal-200/60 px-2 py-0.5 rounded">
-                      ENC-88291
+                    <span className="text-teal-700 font-bold bg-teal-50 border border-teal-200/60 px-2 py-0.5 rounded transition-all duration-300">
+                      {HERO_CLINICIANS[activeClinicianIndex].enc}
                     </span>
                   </div>
 
-                  {/* Doctor Image Frame */}
+                  {/* Doctor Image Frame with 2-Second Rotating Photos */}
                   <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-slate-100 border border-slate-200 shadow-inner group">
-                    <Image
-                      src="/doctor-hero.jpg"
-                      alt="Attending Cardiologist Dr. Vadla Abhinay reviewing patient risk assessment on tablet"
-                      width={600}
-                      height={600}
-                      priority
-                      className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
-                    />
+                    {HERO_CLINICIANS.map((clinician, idx) => {
+                      const isActive = idx === activeClinicianIndex;
+                      return (
+                        <div
+                          key={clinician.name}
+                          className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                            isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                          }`}
+                        >
+                          <Image
+                            src={clinician.image}
+                            alt={clinician.alt}
+                            width={600}
+                            height={600}
+                            priority={idx === 0}
+                            className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-500"
+                          />
+                        </div>
+                      );
+                    })}
 
                     {/* Non-obstructive mini telemetry HUD badge - Pure Light */}
-                    <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 flex items-center gap-2 shadow-md">
+                    <div className="absolute bottom-3 right-3 px-3 py-1.5 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200 text-slate-800 flex items-center gap-2 shadow-md z-20">
                       <Activity className="h-3.5 w-3.5 text-teal-600 animate-pulse" />
                       <span className="text-[11px] font-mono text-teal-800 font-bold">
-                        114 BPM • 98% SpO2
+                        {HERO_CLINICIANS[activeClinicianIndex].vitalsBadge}
                       </span>
+                    </div>
+
+                    {/* Carousel slide indicators - Pure Light Glass */}
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-slate-200 shadow-sm z-20">
+                      {HERO_CLINICIANS.map((_, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setActiveClinicianIndex(idx)}
+                          className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                            idx === activeClinicianIndex
+                              ? "w-4 bg-teal-600"
+                              : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                          }`}
+                          aria-label={`Switch to photo ${idx + 1}`}
+                        />
+                      ))}
                     </div>
                   </div>
 
                   {/* Attending Physician Profile Banner */}
-                  <div className="p-3 rounded-xl bg-white text-slate-900 flex items-center justify-between border border-slate-200 shadow-xs">
+                  <div className="p-3 rounded-xl bg-white text-slate-900 flex items-center justify-between border border-slate-200 shadow-xs transition-all duration-300">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="h-9 w-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
-                        VA
+                      <div className="h-9 w-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs transition-all duration-300">
+                        {HERO_CLINICIANS[activeClinicianIndex].initials}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-xs text-slate-950 truncate">Dr. Vadla Abhinay</span>
+                          <span className="font-bold text-xs text-slate-950 truncate transition-all duration-300">
+                            {HERO_CLINICIANS[activeClinicianIndex].name}
+                          </span>
                           <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-1 py-0.2 rounded border border-teal-200">
-                            MD
+                            {HERO_CLINICIANS[activeClinicianIndex].role}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-500 block truncate">
-                          Chief of Cardiology • Attending
+                        <span className="text-[10px] text-slate-500 block truncate transition-all duration-300">
+                          {HERO_CLINICIANS[activeClinicianIndex].title}
                         </span>
                       </div>
                     </div>
@@ -525,7 +595,7 @@ Attending Physician: Dr. Vadla Abhinay, MD (Sign-Off Mandated)`;
                           REGISTRY
                         </span>
                         <span className="text-xs font-bold text-emerald-700 font-mono truncate block mt-0.5">
-                          SHA-256 Verified
+                          {HERO_CLINICIANS[activeClinicianIndex].registry}
                         </span>
                       </div>
                     </div>

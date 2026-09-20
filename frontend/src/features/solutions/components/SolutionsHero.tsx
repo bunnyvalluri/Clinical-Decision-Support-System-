@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -70,9 +70,28 @@ const HERO_SCENARIOS: HeroTelemetryState[] = [
   },
 ];
 
+const SOLUTIONS_HERO_PHOTOS = [
+  {
+    image: "/doctor-hero.jpg",
+    alt: "Attending Cardiologist Dr. Vadla Abhinay using HealthNova AI tablet at bedside",
+  },
+  {
+    image: "/doctor-hero-rahul.jpg",
+    alt: "Attending Cardiologist Dr. Valluri Rahul using HealthNova AI tablet at bedside",
+  },
+];
+
 export function SolutionsHero() {
   const [activeScenarioIdx, setActiveScenarioIdx] = useState<number>(0);
+  const [activePhotoIdx, setActivePhotoIdx] = useState<number>(0);
   const activeScenario = HERO_SCENARIOS[activeScenarioIdx];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActivePhotoIdx((prev) => (prev + 1) % SOLUTIONS_HERO_PHOTOS.length);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <section className="relative overflow-hidden pt-4 pb-14 sm:pt-8 sm:pb-20 lg:pt-10 lg:pb-24 bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,148,136,0.08),rgba(2,132,199,0.04),transparent)] border-b border-slate-200/80">
@@ -230,21 +249,48 @@ export function SolutionsHero() {
               {/* Doctor Main Image Frame: Unobstructed and 100% completely visible on mobile & desktop */}
               <div className="relative aspect-square w-full rounded-3xl overflow-hidden border border-slate-200/90 bg-gradient-to-b from-teal-50/50 via-white to-sky-50/50 shadow-xl p-2 group">
                 <div className="relative w-full h-full rounded-2xl overflow-hidden bg-slate-100">
-                  <Image
-                    src="/doctor-hero.jpg"
-                    alt="Healthcare clinician using HealthNova AI tablet at bedside"
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 512px"
-                    className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/15 via-transparent to-transparent pointer-events-none" />
+                  {SOLUTIONS_HERO_PHOTOS.map((photo, idx) => {
+                    const isActive = idx === activePhotoIdx;
+                    return (
+                      <div
+                        key={photo.image}
+                        className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                          isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                        }`}
+                      >
+                        <Image
+                          src={photo.image}
+                          alt={photo.alt}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 512px"
+                          className="object-cover object-center group-hover:scale-102 transition-transform duration-500"
+                          priority={idx === 0}
+                        />
+                      </div>
+                    );
+                  })}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/15 via-transparent to-transparent pointer-events-none z-10" />
 
                   {/* Bottom Image Tag - Crisp Pure Light Glass Pill */}
-                  <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 z-10 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 border border-slate-200/90 shadow-sm">
+                  <div className="absolute bottom-2.5 left-2.5 sm:bottom-4 sm:left-4 z-20 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/95 backdrop-blur-md text-slate-900 border border-slate-200/90 shadow-sm">
                     <Activity className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-teal-600 animate-pulse shrink-0" />
                     <span className="text-[9px] sm:text-[11px] font-semibold tracking-tight">Continuous Telemetry Ingestion</span>
                     <span className="text-[8px] sm:text-[9px] font-mono text-teal-800 font-bold bg-teal-100/90 px-1.5 py-0.5 rounded border border-teal-300">LIVE</span>
+                  </div>
+
+                  {/* Carousel slide indicators - Pure Light Glass */}
+                  <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-slate-200 shadow-sm z-20">
+                    {SOLUTIONS_HERO_PHOTOS.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActivePhotoIdx(idx)}
+                        className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                          idx === activePhotoIdx ? "w-4 bg-teal-600" : "w-1.5 bg-slate-300 hover:bg-slate-400"
+                        }`}
+                        aria-label={`Switch to photo ${idx + 1}`}
+                      />
+                    ))}
                   </div>
                 </div>
               </div>
