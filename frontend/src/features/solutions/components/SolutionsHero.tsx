@@ -79,6 +79,18 @@ const SOLUTIONS_HERO_PHOTOS = [
     image: "/doctor-hero-rahul.jpg",
     alt: "Attending Cardiologist Dr. Valluri Rahul using HealthNova AI tablet at bedside",
   },
+  {
+    image: "/doctor-hero-vedha.jpg",
+    alt: "Attending Physician Dr. Vedha Sree using HealthNova AI tablet at bedside",
+  },
+  {
+    image: "/doctor-hero-prashanth.jpg?v=2",
+    alt: "Attending Physician Dr. Prashanth using HealthNova AI tablet at bedside",
+  },
+  {
+    image: "/doctor-hero-pranay.jpg",
+    alt: "Attending Physician Dr. Pranay using HealthNova AI tablet at bedside",
+  },
 ];
 
 export function SolutionsHero() {
