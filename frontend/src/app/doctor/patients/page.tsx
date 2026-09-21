@@ -20,7 +20,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DoctorLayout } from "@/components/layout/DoctorLayout";
+
 import apiClient from "@/services/apiClient";
 
 // ─────────────────────────────────────────────────────────────
@@ -184,8 +184,7 @@ export default function DoctorPatientsPage() {
   // Render
   // ─────────────────────────────────────────────────────────────
   return (
-    <DoctorLayout>
-      <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 space-y-5 max-w-7xl mx-auto">
 
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4
@@ -471,7 +470,6 @@ export default function DoctorPatientsPage() {
             </div>
           </>
         )}
-      </div>
-    </DoctorLayout>
+    </div>
   );
 }
