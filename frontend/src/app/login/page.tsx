@@ -668,7 +668,7 @@ export default function LoginPage() {
                   className="w-full text-xs font-semibold border-slate-200 hover:bg-slate-50 gap-2 h-9 cursor-pointer"
                 >
                   <Building2 className="h-4 w-4 text-slate-600" />
-                  <span>Single Sign-On (Epic EHR / SMART on FHIR)</span>
+                  <span>Sign In</span>
                 </Button>
               </form>
 
