@@ -64,18 +64,18 @@ test("2. Exact Dialog Content: Header, Message, and Button labels match specific
   );
 });
 
-test("3. Visual Design & Theme Invariants: Isolated dark charcoal, peach/pink OK button, ZERO dark: variant classes", () => {
+test("3. Visual Design & Theme Invariants: Clean white container, peach/pink OK button, ZERO dark: variant classes", () => {
   const compPath = path.join(rootDir, "src", "components", "auth", "LogoutConfirmationDialog.tsx");
   const content = fs.readFileSync(compPath, "utf-8");
 
-  // Dark charcoal container
+  // Clean white container
   assert.ok(
-    content.includes("#202124") || content.includes("#242424"),
-    "Must use dark charcoal container background"
+    content.includes("bg-white"),
+    "Must use clean white container background"
   );
   assert.ok(
-    content.includes("#3c4043"),
-    "Must use subtle border (#3c4043)"
+    content.includes("border-slate-200") || content.includes("border-slate-100"),
+    "Must use subtle slate border"
   );
 
   // Peach/pink/rose confirmation style for OK button
