@@ -21,6 +21,20 @@ def set_deterministic_seed():
 
 
 @pytest.fixture(autouse=True)
+def in_memory_channel_layer(settings):
+    """Use fast in-memory channel layer for test suite."""
+    from channels.layers import channel_layers
+    settings.CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
+    channel_layers.backends.clear()
+    yield
+    channel_layers.backends.clear()
+
+
+@pytest.fixture(autouse=True)
 def mock_external_services(monkeypatch):
     """Ensure tests run hermetically without external network dependencies."""
     # Ensure offline mode for Kaggle client so it always uses deterministic curated benchmarks

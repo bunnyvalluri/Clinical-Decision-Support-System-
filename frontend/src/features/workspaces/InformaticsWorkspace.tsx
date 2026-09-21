@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   Activity,
   AlertCircle,
@@ -27,6 +28,7 @@ import {
   TrendingDown,
   TrendingUp,
   Zap,
+  BookOpen,
 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +36,8 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuthStore } from "@/features/auth/authStore";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
+import { ClinicalKnowledgeBrowser } from "@/components/clinical/ClinicalKnowledgeBrowser";
+import { AISafetyStatusCard } from "@/components/clinical/AISafetyStatusCard";
 
 interface ModelBenchmark {
   name: string;
@@ -161,7 +165,7 @@ export function InformaticsWorkspace() {
   const [benchmarks] = React.useState<ModelBenchmark[]>(BENCHMARKS);
   const [dataQuality] = React.useState<DataQualityMetric[]>(DATA_QUALITY);
   const [driftMetrics] = React.useState<DriftMetric[]>(DRIFT_METRICS);
-  const [activeTab, setActiveTab] = React.useState<"BENCHMARKS" | "DATA_QUALITY" | "DRIFT" | "AI_EVAL">("BENCHMARKS");
+  const [activeTab, setActiveTab] = React.useState<"BENCHMARKS" | "DATA_QUALITY" | "DRIFT" | "AI_EVAL" | "KNOWLEDGE_GOVERNANCE">("BENCHMARKS");
   const [timeRange, setTimeRange] = React.useState<"1H" | "24H" | "7D" | "30D">("24H");
   const [curveMode, setCurveMode] = React.useState<"ROC" | "PR" | "CALIBRATION">("ROC");
   const [isRefreshing, setIsRefreshing] = React.useState(false);
@@ -238,6 +242,17 @@ export function InformaticsWorkspace() {
             <Download className="h-3.5 w-3.5 mr-1.5" />
             Export SaMD Dossier
           </Button>
+
+          <Link href="/informaticist/interoperability">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs h-8 bg-teal-50 border-teal-300 text-teal-800 hover:bg-teal-100 shadow-2xs font-semibold"
+            >
+              <Layers className="h-3.5 w-3.5 mr-1.5 text-teal-600" />
+              FHIR Hub
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -605,6 +620,17 @@ export function InformaticsWorkspace() {
           <Bot className="h-4 w-4" />
           AI &amp; LLM Safety Evaluation
         </button>
+        <button
+          onClick={() => setActiveTab("KNOWLEDGE_GOVERNANCE")}
+          className={`px-4 py-3 text-xs font-semibold border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap ${
+            activeTab === "KNOWLEDGE_GOVERNANCE"
+              ? "border-amber-600 text-amber-700"
+              : "border-transparent text-slate-600 hover:text-slate-900"
+          }`}
+        >
+          <BookOpen className="h-4 w-4" />
+          Clinical Guidelines &amp; AI Safety Governance
+        </button>
       </div>
 
       {/* TAB 1: Model Benchmarks */}
@@ -908,6 +934,14 @@ export function InformaticsWorkspace() {
               </div>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* TAB 5: Clinical Guidelines & AI Safety Governance */}
+      {activeTab === "KNOWLEDGE_GOVERNANCE" && (
+        <div className="space-y-6">
+          <AISafetyStatusCard />
+          <ClinicalKnowledgeBrowser />
         </div>
       )}
     </div>

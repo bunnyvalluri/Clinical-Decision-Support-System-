@@ -87,6 +87,7 @@ LOCAL_APPS = [
     "apps.web_intelligence.apps.WebIntelligenceConfig",
     "apps.engineering_loops.apps.EngineeringLoopsConfig",
     "apps.blog.apps.BlogConfig",
+    "apps.interoperability.apps.InteroperabilityConfig",
     "integrations.jules.apps.JulesConfig",
 ]
 

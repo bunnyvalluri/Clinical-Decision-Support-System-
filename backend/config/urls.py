@@ -8,6 +8,18 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from apps.ai_orchestrator.ollama_views import OllamaHealthView
+from apps.clinical.direct_urls import (
+    alerts_router,
+    evidence_router,
+    guideline_router,
+    guideline_version_router,
+    knowledge_router,
+    prediction_reviews_patterns,
+    review_router,
+    rules_router,
+    safety_router,
+    timeline_router,
+)
 
 admin.site.site_header = "HealthNova AI Administration"
 admin.site.site_title = "HealthNova AI"
@@ -19,6 +31,28 @@ urlpatterns = [
     path("api/ai/providers/ollama/health/", OllamaHealthView.as_view(), name="ollama-health-direct-slash"),
     # Admin interface
     path("admin/", admin.site.urls),
+
+    # Prompt 64 — Clinical Knowledge, Guidelines, Rules, Evidence, Timeline, Safety, Reviews
+    path("api/clinical-knowledge/", include(knowledge_router.urls)),
+    path("api/v1/clinical-knowledge/", include(knowledge_router.urls)),
+    path("api/guidelines/", include(guideline_router.urls)),
+    path("api/v1/guidelines/", include(guideline_router.urls)),
+    path("api/guideline-versions/", include(guideline_version_router.urls)),
+    path("api/v1/guideline-versions/", include(guideline_version_router.urls)),
+    path("api/clinical-rules/", include(rules_router.urls)),
+    path("api/v1/clinical-rules/", include(rules_router.urls)),
+    path("api/evidence/", include(evidence_router.urls)),
+    path("api/v1/evidence/", include(evidence_router.urls)),
+    path("api/patient-timeline/", include(timeline_router.urls)),
+    path("api/v1/patient-timeline/", include(timeline_router.urls)),
+    path("api/clinical-alerts/", include(alerts_router.urls)),
+    path("api/v1/clinical-alerts/", include(alerts_router.urls)),
+    path("api/prediction-reviews/", include((prediction_reviews_patterns, "prediction_reviews"))),
+    path("api/v1/prediction-reviews/", include((prediction_reviews_patterns, "v1_prediction_reviews"))),
+    path("api/ai/safety/", include(safety_router.urls)),
+    path("api/v1/ai/safety/", include(safety_router.urls)),
+    path("api/ai/review/", include(review_router.urls)),
+    path("api/v1/ai/review/", include(review_router.urls)),
 
     # API v1 — all application REST endpoints
     path("api/v1/", include("apps.core.urls", namespace="core")),
@@ -53,6 +87,8 @@ urlpatterns = [
     path("api/admin/automation/jules/", include("integrations.jules.urls", namespace="jules_admin_compat")),
     path("api/v1/informaticist/datasets/", include("apps.model_registry.kaggle_urls")),
     path("api/informaticist/datasets/", include("apps.model_registry.kaggle_urls")),
+    path("api/v1/interoperability/", include("apps.interoperability.api.urls", namespace="interoperability")),
+    path("fhir/r4/", include("apps.interoperability.api.fhir_urls")),
 ]
 
 

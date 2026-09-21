@@ -290,7 +290,7 @@ class PatientConsumer(BaseConsumer):
         payload = event.get("payload", event)
         await self.send_json_message(
             {
-                "event": "PATIENT_UPDATE",
+                "event": event.get("event", "PATIENT_UPDATE"),
                 "type": "patient_update",
                 "payload": payload,
             }

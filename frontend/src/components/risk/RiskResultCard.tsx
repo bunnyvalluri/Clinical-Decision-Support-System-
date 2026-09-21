@@ -6,13 +6,14 @@ import { DataQualityIndicator } from "./DataQualityIndicator";
 import { UncertaintyIndicator } from "./UncertaintyIndicator";
 import { ClinicalAlert } from "./ClinicalAlert";
 import { ClinicalReviewPanel } from "./ClinicalReviewPanel";
-import { AlertCircle, Clock, Cpu, FileText, ShieldAlert, Sparkles, User } from "lucide-react";
+import { AlertCircle, Clock, Cpu, FileText, MessageSquarePlus, ShieldAlert, Sparkles, User } from "lucide-react";
 import { RiskLevel, RiskPrediction } from "@/services/risk/riskApi";
 
 export interface RiskResultCardProps {
   prediction: RiskPrediction;
   patientName?: string;
   onRecordReview?: (predictionId: string, override: RiskLevel, rationale: string) => Promise<void>;
+  onProvideFeedback?: (predictionId: string) => void;
   disabledReview?: boolean;
 }
 
@@ -20,6 +21,7 @@ export const RiskResultCard: React.FC<RiskResultCardProps> = ({
   prediction,
   patientName,
   onRecordReview,
+  onProvideFeedback,
   disabledReview = false,
 }) => {
   const cdss = prediction.cdss_guidance;
@@ -139,6 +141,26 @@ export const RiskResultCard: React.FC<RiskResultCardProps> = ({
             onRecordReview={onRecordReview}
             disabled={disabledReview}
           />
+        )}
+
+        {/* Clinician Feedback Trigger */}
+        {onProvideFeedback && (
+          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="text-xs">
+              <span className="font-semibold text-slate-800">Prediction Feedback & Audit</span>
+              <p className="text-[11px] text-slate-500">
+                Help model monitoring by submitting qualitative clinical utility ratings or flags.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onProvideFeedback(prediction.id || prediction.prediction_id || "")}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-100 transition-colors shadow-xs"
+            >
+              <MessageSquarePlus className="w-3.5 h-3.5 text-sky-700" />
+              Provide Clinical Feedback
+            </button>
+          </div>
         )}
 
         {/* Mandatory Clinical Safety Disclaimer */}

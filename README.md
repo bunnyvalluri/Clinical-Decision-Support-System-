@@ -57,9 +57,11 @@ Traditional clinical scoring tools (e.g., Framingham, TIMI) often rely on coarse
 | **Real-Time Telemetry** | Daphne ASGI + Django Channels + Redis Pub/Sub | Instant zero-reload alerts to hospital wards when patient vitals deteriorate |
 | **Physician Override** | Structured override API with documented clinical rationales and timestamping | Preserves physician agency with tamper-evident audit records |
 | **Asynchronous PDF Reports** | Celery task queue + ReportLab rendering pipeline | Generates formatted, audit-ready clinical discharge and risk summaries |
-| **Granular RBAC** | Role-based token access (`ADMIN`, `DOCTOR`, `NURSE`, `ANALYST`, `PATIENT`) | Strict principle of least privilege safeguarding sensitive patient PHI |
+| **Patient Risk Timeline** | Phase 3 Controlled Taxonomy & multi-source event aggregation | Unified longitudinal trajectory with role-scoped privacy boundaries |
+| **Prediction Comparison Engine** | Current vs. Previous feature deltas, % changes, and TreeSHAP shifts | Instant clinical divergence audit and automatic escalation alert triggers |
+| **Clinician Feedback Loop** | Structured feedback (`PredictionFeedback`) without autonomous retraining | Empirically validates ML utility while preserving human clinical sovereignty |
 | **Cloud-Native Database** | Neon Serverless PostgreSQL with connection pooling & branching | Enterprise durability, instant schema test branches, and low-latency queries |
-| **Modern Clinical UI** | Next.js 16 App Router, React 19, TypeScript, and Tailwind CSS | Accessible white-only clinical design system with color-coded risk tokens |
+| **Modern Clinical UI** | Next.js 16 App Router, React 19, TypeScript, and Tailwind CSS | Accessible pure white/light clinical design system with color-coded risk tokens |
 
 ---
 
@@ -259,6 +261,23 @@ Dedicated interactive research workspace for Chief Medical Informaticists and ML
 - Population-level covariate drift tracking (PSI and Kolmogorov-Smirnov statistical tests).
 - Automated Clinical Data Quality audits (impossible vital ranges, conflicting vitals, missing critical indicators).
 
+### 6. Longitudinal Patient Risk Timeline (`/doctor/patients/[id]/timeline`)
+Unified, chronological clinical event stream consolidating 8 domain event sources:
+- **Phase 3 Controlled Taxonomy:** Distinguishes encounters, vitals recordings, ML inferences, clinical alerts, nurse triage acuity (ESI 1-5), doctor overrides, data quality flags, and FHIR interoperability records.
+- **Strict Role-Scoped Visibility:** Sanitizes technical XAI parameters and internal audit logs (`INFORMATICIST_ADMIN` / `CLINICAL_STAFF`) when viewed by patients (`PUBLIC_PATIENT`), preventing panic while offering maximum clinical transparency to physicians.
+- **Cryptographic Provenance:** Every event records model IDs, training dataset hashes, feature snapshot schemas, and actor identities.
+
+### 7. Current vs. Previous Prediction Comparison (`/doctor/patients/[id]/predictions`)
+Dynamic clinical differential engine comparing consecutive inferences:
+- **Biomarker Deltas & Clinical Significance:** Identifies quantitative vital shifts (e.g., SBP +48 mmHg, +40%), evaluating whether each delta exceeds predetermined physiological thresholds.
+- **TreeSHAP Importance Divergence:** Highlights which biomarkers drove the risk tier transition and tracks their directional attribution shift.
+- **Automated Escalation Alerts:** Automatically triggers `ClinicalAlert` and `Escalation` records with WebSocket push notifications whenever a patient's risk escalates to `HIGH` or `CRITICAL`.
+
+### 8. Human-in-the-Loop Clinician Feedback Loop (`/doctor/reviews/[id]`)
+Post-market surveillance mechanism allowing attending physicians and nurses to review predictions:
+- **Controlled Feedback Taxonomy:** Classifies feedback into `PREDICTION_ACCEPTED`, `FALSE_POSITIVE`, `FALSE_NEGATIVE`, `EARLY_WARNING_CONFIRMED`, `CLINICALLY_PLAUSIBLE_ACTION_DEFERRED`, and `DIAGNOSTIC_DRIFT_SUSPECTED`.
+- **Policy Invariant:** Feedback entries link to audit records (`PredictionOutcomeLink`) without triggering autonomous retraining, guaranteeing human informaticist sign-off and model validation gates.
+
 ---
 
 ## 📂 Repository Structure
@@ -316,6 +335,13 @@ Dedicated interactive research workspace for Chief Medical Informaticists and ML
 │   ├── 03-system-architecture.md   # Architectural boundaries and flow diagrams
 │   ├── 04-technology-stack.md       # Version matrix and technology rationales
 │   ├── api.md                       # Complete REST & WebSocket API specification
+│   ├── patient-risk-timeline.md     # Phase 3 Timeline taxonomy & aggregation design
+│   ├── prediction-comparison.md     # Feature deltas, % changes & SHAP divergence
+│   ├── prediction-review-workflow.md# Human-in-the-loop review & override workflow
+│   ├── prediction-feedback.md       # Clinician post-market surveillance feedback loop
+│   ├── clinical-risk-escalation.md  # Multi-tier acute escalation & alert protocols
+│   ├── prediction-lineage.md        # Cryptographic model/dataset provenance tracking
+│   ├── patient-timeline-architecture.md # Full-stack timeline data flow & UI specs
 │   ├── database/                    # ER diagrams, schemas, and indexing strategies
 │   └── deployment_guide.md          # Production deployment & infrastructure runbook
 │
@@ -362,6 +388,9 @@ docker compose up --build -d
 |---|---|---|
 | **Clinical Web App** | [http://localhost:3000](http://localhost:3000) | Next.js Clinician Portal & Telemetry Dashboard |
 | **Backend REST API** | [http://localhost:8000/api/v1/](http://localhost:8000/api/v1/) | Browsable Django REST Framework API |
+| **FHIR R4 Metadata** | [http://localhost:8000/fhir/r4/metadata](http://localhost:8000/fhir/r4/metadata) | HL7 FHIR Release 4 CapabilityStatement |
+| **FHIR Interoperability API** | [http://localhost:8000/api/v1/interoperability/](http://localhost:8000/api/v1/interoperability/) | Endpoints, Sync Jobs, Mappings & Review Queue |
+| **Informaticist FHIR Hub** | [http://localhost:3000/informaticist/interoperability](http://localhost:3000/informaticist/interoperability) | Clinical Data Exchange & Reconciliation Portal |
 | **API Health Probe** | [http://localhost:8000/api/v1/health/](http://localhost:8000/api/v1/health/) | JSON health & dependency readiness probe |
 | **Django Admin** | [http://localhost:8000/admin/](http://localhost:8000/admin/) | System Administration & Database Browser |
 | **Nginx Reverse Proxy**| [http://localhost](http://localhost) | Unified ingress proxy (Port 80) |

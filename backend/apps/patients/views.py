@@ -182,11 +182,93 @@ class PatientViewSet(AuditLogMixin, viewsets.ModelViewSet):
         """
         GET /api/v1/patients/{id}/timeline/
         Aggregated chronological clinical timeline (admissions, vitals, predictions, reviews, triage, alerts).
+        Supports query params:
+        - event_type (default ALL)
+        - date_from, date_to (ISO datetime strings)
+        - source
+        - severity
+        - page, page_size (or limit, offset)
         """
         patient = self.get_object()
         from services.timeline_service import PatientTimelineService
-        timeline_events = PatientTimelineService.get_timeline_for_patient(patient.id)
-        return Response({"success": True, "patient_id": str(patient.id), "events": timeline_events, "count": len(timeline_events)})
+
+        # Extract parameters
+        event_type = request.query_params.get("event_type")
+        date_from = request.query_params.get("date_from")
+        date_to = request.query_params.get("date_to")
+        source = request.query_params.get("source")
+        severity = request.query_params.get("severity")
+
+        try:
+            page_size = int(request.query_params.get("page_size", request.query_params.get("max_events", 50)))
+        except (ValueError, TypeError):
+            page_size = 50
+
+        try:
+            page_num = int(request.query_params.get("page", 1))
+        except (ValueError, TypeError):
+            page_num = 1
+
+        offset = (page_num - 1) * page_size
+        user_role = getattr(request.user, "role", "DOCTOR")
+
+        timeline_events = PatientTimelineService.get_timeline_for_patient(
+            patient_id=patient.id,
+            user_role=user_role,
+            event_type=event_type,
+            date_from=date_from,
+            date_to=date_to,
+            source=source,
+            severity=severity,
+            offset=offset,
+            limit=page_size,
+        )
+
+        return Response({
+            "success": True,
+            "patient_id": str(patient.id),
+            "patient_mrn": patient.mrn,
+            "events": timeline_events,
+            "count": len(timeline_events),
+            "page": page_num,
+            "page_size": page_size,
+        })
+
+    @action(detail=True, methods=["get"], url_path="predictions/comparison")
+    def prediction_comparison(self, request: Request, pk=None) -> Response:
+        """
+        GET /api/v1/patients/{id}/predictions/comparison/
+        Compares the patient's current authoritative prediction against their prior valid baseline.
+        """
+        patient = self.get_object()
+        from services.prediction_comparison_service import (
+            PredictionComparisonService,
+            get_current_patient_prediction,
+            get_previous_patient_prediction,
+        )
+
+        current_pred = get_current_patient_prediction(patient.id)
+        if not current_pred:
+            return Response({
+                "success": True,
+                "has_prediction": False,
+                "patient_id": str(patient.id),
+                "message": "No valid predictions available for comparison.",
+                "data": None,
+            }, status=status.HTTP_200_OK)
+
+        previous_pred = get_previous_patient_prediction(patient.id, current_pred.id)
+        comparison_data = PredictionComparisonService.compare_patient_predictions(
+            current_pred=current_pred,
+            previous_pred=previous_pred,
+        )
+
+        return Response({
+            "success": True,
+            "has_prediction": True,
+            "patient_id": str(patient.id),
+            "data": comparison_data,
+        }, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["get"], url_path="predictions")
     def predictions(self, request: Request, pk=None) -> Response:
@@ -218,4 +300,5 @@ class PatientViewSet(AuditLogMixin, viewsets.ModelViewSet):
         Convenience alias returning patient vitals history.
         """
         return self.clinical_records(request, pk=pk)
+
 

@@ -282,6 +282,7 @@ class ClinicalRuleSerializer(serializers.ModelSerializer):
         model = ClinicalRule
         fields = [
             "id",
+            "rule_id",
             "rule_name",
             "description",
             "condition_expression",
@@ -291,8 +292,234 @@ class ClinicalRuleSerializer(serializers.ModelSerializer):
             "effective_from",
             "effective_to",
             "approval_status",
+            "verified_source",
             "created_at",
             "updated_at",
+        ]
+
+
+class EvidenceSourceSerializer(serializers.ModelSerializer):
+    """Serializer for clinical evidence sources."""
+
+    class Meta:
+        from apps.clinical.models import EvidenceSource
+        model = EvidenceSource
+        fields = [
+            "id",
+            "name",
+            "organization",
+            "source_url",
+            "publisher",
+            "publication_date",
+            "retrieved_date",
+            "trust_level",
+            "jurisdiction",
+            "specialty",
+            "is_verified",
+            "verification_status",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class EvidenceReferenceSerializer(serializers.ModelSerializer):
+    """Serializer for specific clinical references and citations."""
+
+    source_name = serializers.CharField(source="source.name", read_only=True)
+    verification_status = serializers.CharField(source="source.verification_status", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import EvidenceReference
+        model = EvidenceReference
+        fields = [
+            "id",
+            "source",
+            "source_name",
+            "verification_status",
+            "citation_text",
+            "doi_or_url",
+            "evidence_level",
+            "recommendation_grade",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class ClinicalKnowledgeVersionSerializer(serializers.ModelSerializer):
+    """Serializer for immutable clinical knowledge versions."""
+
+    reviewer_name = serializers.CharField(source="reviewer.get_full_name", read_only=True)
+    approved_by_name = serializers.CharField(source="approved_by.get_full_name", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import ClinicalKnowledgeVersion
+        model = ClinicalKnowledgeVersion
+        fields = [
+            "id",
+            "document",
+            "version",
+            "previous_version",
+            "status",
+            "content_snapshot",
+            "changed_fields",
+            "change_reason",
+            "reviewer",
+            "reviewer_name",
+            "approved_by",
+            "approved_by_name",
+            "approval_event",
+            "effective_date",
+            "review_date",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class ClinicalKnowledgeDocumentSerializer(serializers.ModelSerializer):
+    """Serializer for authoritative clinical knowledge documents and guidelines."""
+
+    evidence_source_details = EvidenceSourceSerializer(source="evidence_source", read_only=True)
+    created_by_name = serializers.CharField(source="created_by.get_full_name", read_only=True)
+    reviewer_name = serializers.CharField(source="reviewer.get_full_name", read_only=True)
+    is_stale = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        from apps.clinical.models import ClinicalKnowledgeDocument
+        model = ClinicalKnowledgeDocument
+        fields = [
+            "id",
+            "document_id",
+            "title",
+            "document_type",
+            "organization",
+            "jurisdiction",
+            "specialty",
+            "summary",
+            "content",
+            "status",
+            "current_version",
+            "is_active",
+            "created_by",
+            "created_by_name",
+            "reviewer",
+            "reviewer_name",
+            "effective_date",
+            "review_date",
+            "is_stale",
+            "evidence_source",
+            "evidence_source_details",
+            "provenance",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class ClinicalRuleVersionSerializer(serializers.ModelSerializer):
+    """Serializer for clinical rule version history."""
+
+    changed_by_name = serializers.CharField(source="changed_by.get_full_name", read_only=True)
+    approved_by_name = serializers.CharField(source="approved_by.get_full_name", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import ClinicalRuleVersion
+        model = ClinicalRuleVersion
+        fields = [
+            "id",
+            "rule",
+            "version",
+            "previous_version",
+            "condition_expression",
+            "severity",
+            "action_type",
+            "change_reason",
+            "changed_by",
+            "changed_by_name",
+            "approved_by",
+            "approved_by_name",
+            "effective_from",
+            "effective_to",
+            "created_at",
+        ]
+
+
+class ClinicalAlertSerializer(serializers.ModelSerializer):
+    """Serializer for clinical alerts."""
+
+    patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
+    acknowledged_by_name = serializers.CharField(source="acknowledged_by.get_full_name", read_only=True)
+    resolved_by_name = serializers.CharField(source="resolved_by.get_full_name", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import ClinicalAlert
+        model = ClinicalAlert
+        fields = [
+            "id",
+            "patient",
+            "patient_mrn",
+            "alert_type",
+            "severity",
+            "source",
+            "message",
+            "details",
+            "is_acknowledged",
+            "acknowledged_by",
+            "acknowledged_by_name",
+            "acknowledged_at",
+            "is_resolved",
+            "resolved_by",
+            "resolved_by_name",
+            "resolved_at",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class PatientTimelineEventSerializer(serializers.ModelSerializer):
+    """Serializer for patient timeline events."""
+
+    patient_mrn = serializers.CharField(source="patient.mrn", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import PatientTimelineEvent
+        model = PatientTimelineEvent
+        fields = [
+            "id",
+            "patient",
+            "patient_mrn",
+            "event_type",
+            "title",
+            "description",
+            "timestamp",
+            "actor",
+            "source",
+            "severity",
+            "provenance",
+            "metadata",
+            "correlation_id",
+            "created_at",
+        ]
+
+
+class AISafetyEventSerializer(serializers.ModelSerializer):
+    """Serializer for AI safety gate events."""
+
+    user_email = serializers.EmailField(source="user.email", read_only=True)
+
+    class Meta:
+        from apps.clinical.models import AISafetyEvent
+        model = AISafetyEvent
+        fields = [
+            "id",
+            "correlation_id",
+            "event_type",
+            "severity",
+            "user",
+            "user_email",
+            "user_role",
+            "patient",
+            "details",
+            "action_taken",
+            "timestamp",
         ]
 
 

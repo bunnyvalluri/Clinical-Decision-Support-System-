@@ -459,3 +459,134 @@ class WebResearchCompletedEvent:
             "timestamp": self.timestamp,
         }
 
+
+@dataclass(frozen=True)
+class PredictionReviewedEvent:
+    prediction_id: str
+    patient_id: str
+    doctor_name: str
+    decision: str
+    status: str
+    rationale: str = ""
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "PREDICTION_REVIEWED",
+            "type": "prediction_reviewed",
+            "prediction_id": str(self.prediction_id),
+            "patient_id": str(self.patient_id),
+            "doctor_name": self.doctor_name,
+            "decision": self.decision,
+            "status": self.status,
+            "rationale": self.rationale,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class PredictionOverriddenEvent:
+    prediction_id: str
+    patient_id: str
+    doctor_name: str
+    original_risk: str
+    override_risk: str
+    rationale: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "PREDICTION_OVERRIDDEN",
+            "type": "prediction_overridden",
+            "prediction_id": str(self.prediction_id),
+            "patient_id": str(self.patient_id),
+            "doctor_name": self.doctor_name,
+            "original_risk": self.original_risk,
+            "override_risk": self.override_risk,
+            "rationale": self.rationale,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class RiskChangedEvent:
+    patient_id: str
+    patient_mrn: str
+    previous_risk: str
+    current_risk: str
+    transition_direction: str  # "ESCALATION" | "DE_ESCALATION" | "STABLE"
+    model_version: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "RISK_CHANGED",
+            "type": "risk_changed",
+            "patient_id": str(self.patient_id),
+            "patient_mrn": self.patient_mrn,
+            "previous_risk": self.previous_risk,
+            "current_risk": self.current_risk,
+            "transition_direction": self.transition_direction,
+            "model_version": self.model_version,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass(frozen=True)
+class PatientTimelineUpdatedEvent:
+    patient_id: str
+    event_id: str
+    event_type: str
+    title: str
+    severity: str
+    timestamp: str = ""
+
+    def __post_init__(self) -> None:
+        if not self.timestamp:
+            object.__setattr__(self, "timestamp", _utc_now_iso())
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "event": "PATIENT_TIMELINE_UPDATED",
+            "type": "patient_timeline_updated",
+            "patient_id": str(self.patient_id),
+            "event_id": str(self.event_id),
+            "event_type": self.event_type,
+            "title": self.title,
+            "severity": self.severity,
+            "timestamp": self.timestamp,
+        }
+
+
+def broadcast_patient_event(patient_id: str, event_type: str, payload: dict[str, Any]) -> None:
+    """Broadcast an authorized event to the patient channel group via channel layer."""
+    import logging
+    try:
+        from channels.layers import get_channel_layer
+        from asgiref.sync import async_to_sync
+        channel_layer = get_channel_layer()
+        if channel_layer:
+            async_to_sync(channel_layer.group_send)(
+                f"patient_{patient_id}",
+                {
+                    "type": "patient_update",
+                    "event": event_type,
+                    "payload": payload,
+                },
+            )
+    except Exception as exc:
+        logging.getLogger(__name__).warning("Could not broadcast patient event %s: %s", event_type, exc)
+
+

@@ -74,6 +74,10 @@ class DeterministicRuleAlert:
     severity: str  # NORMAL, MONITOR, URGENT_EVALUATION, CRITICAL_EMERGENCY
     trigger_criteria: str
     recommended_action: str
+    rule_id: str = ""
+    rule_version: str = "1.0.0"
+    evidence_source: str = ""
+    explanation: str = ""
     evaluated_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 

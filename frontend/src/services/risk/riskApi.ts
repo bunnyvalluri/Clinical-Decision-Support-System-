@@ -290,4 +290,124 @@ export const riskApi = {
     const res = await apiClient.get("/risk/drift/");
     return res.data;
   },
+
+  /**
+   * Compare a specific prediction against its antecedent baseline.
+   */
+  async getPredictionComparison(predictionId: string): Promise<PredictionComparisonResult> {
+    const res = await apiClient.get<{ success: boolean; data: PredictionComparisonResult }>(
+      `/predictions/${predictionId}/comparison/`
+    );
+    return res.data.data;
+  },
+
+  /**
+   * Compare patient's current active prediction against their prior valid baseline.
+   */
+  async getPatientPredictionComparison(patientId: string): Promise<PredictionComparisonResult | null> {
+    const res = await apiClient.get<{
+      success: boolean;
+      has_prediction: boolean;
+      data: PredictionComparisonResult | null;
+    }>(`/patients/${patientId}/predictions/comparison/`);
+    return res.data.data;
+  },
+
+  /**
+   * Submit structured clinician feedback for a prediction.
+   */
+  async submitPredictionFeedback(
+    predictionId: string,
+    payload: { feedback_category: string; comments: string }
+  ): Promise<any> {
+    const res = await apiClient.post(`/predictions/${predictionId}/feedback/`, payload);
+    return res.data;
+  },
+
+  /**
+   * List structured clinician feedback for a prediction.
+   */
+  async listPredictionFeedback(predictionId: string): Promise<any[]> {
+    const res = await apiClient.get(`/predictions/${predictionId}/feedback/`);
+    return res.data?.data || [];
+  },
 };
+
+export interface FeatureDifference {
+  feature: string;
+  display_name: string;
+  unit: string;
+  previous_value: string | number | null;
+  current_value: string | number | null;
+  delta: number | null;
+  percentage_change: number | null;
+  direction: "INCREASED" | "DECREASED" | "UNCHANGED" | "ADDED" | "REMOVED" | "CHANGED";
+  is_numeric: boolean;
+  is_significant: boolean;
+}
+
+export interface PredictionComparisonResult {
+  is_initial_prediction: boolean;
+  patient_id: string;
+  patient_mrn: string;
+  risk_changed: boolean;
+  transition_direction: "ESCALATION" | "DE_ESCALATION" | "STABLE" | "INITIAL";
+  risk_transition: string;
+  time_between_predictions_seconds: number;
+  time_between_formatted: string;
+  current_prediction: {
+    id: string;
+    timestamp: string;
+    risk_level: RiskLevel;
+    probability: number;
+    confidence_score?: number | null;
+    model_name: string;
+    model_version: string;
+    feature_schema_version: string;
+    dataset_version: string;
+    is_abstaining: boolean;
+    uncertainty_score?: number | null;
+    ood_status: string;
+    clinician_override?: RiskLevel | null;
+    override_reason?: string;
+    review_status: string;
+    review_decision?: string | null;
+  };
+  previous_prediction?: {
+    id: string;
+    timestamp: string;
+    risk_level: RiskLevel;
+    probability: number;
+    confidence_score?: number | null;
+    model_name: string;
+    model_version: string;
+    feature_schema_version: string;
+    dataset_version: string;
+    is_abstaining: boolean;
+    uncertainty_score?: number | null;
+    ood_status: string;
+    clinician_override?: RiskLevel | null;
+    override_reason?: string;
+    review_status: string;
+    review_decision?: string | null;
+  } | null;
+  model_version_changed: boolean;
+  feature_changes: FeatureDifference[];
+  feature_changes_count: number;
+  shap_divergence: {
+    available: boolean;
+    method?: string;
+    shifted_factors: Array<{
+      feature: string;
+      display_name: string;
+      previous_shap: number;
+      current_shap: number;
+      shap_shift: number;
+      increased_contribution: boolean;
+    }>;
+    disclaimer?: string;
+  };
+  alerts_generated: any[];
+  evaluation_timestamp: string;
+}
+

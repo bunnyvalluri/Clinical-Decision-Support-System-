@@ -6,11 +6,23 @@ import { DoctorLayout } from "@/components/layout/DoctorLayout";
 import { RiskAssessmentForm } from "@/components/risk/RiskAssessmentForm";
 import { RiskResultCard } from "@/components/risk/RiskResultCard";
 import { RiskTimeline } from "@/components/risk/RiskTimeline";
+import { PredictionComparisonCard } from "@/components/clinical/PredictionComparisonCard";
+import { PredictionFeedbackModal } from "@/components/clinical/PredictionFeedbackModal";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, ArrowLeft, PlusCircle, History, RefreshCw, AlertCircle } from "lucide-react";
+import {
+  Activity,
+  ArrowLeft,
+  PlusCircle,
+  History,
+  RefreshCw,
+  AlertCircle,
+  GitCompare,
+  Clock,
+} from "lucide-react";
 import {
   PatientRiskSummary,
+  PredictionComparisonResult,
   RiskLevel,
   RiskPrediction,
   riskApi,
@@ -23,8 +35,15 @@ export default function DoctorPatientPredictionsPage() {
   const [activeTab, setActiveTab] = React.useState<string>("assess");
   const [riskSummary, setRiskSummary] = React.useState<PatientRiskSummary | null>(null);
   const [selectedPrediction, setSelectedPrediction] = React.useState<RiskPrediction | null>(null);
+  const [comparison, setComparison] = React.useState<PredictionComparisonResult | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isComparisonLoading, setIsComparisonLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [comparisonError, setComparisonError] = React.useState<string | null>(null);
+
+  // Feedback modal state
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState<boolean>(false);
+  const [feedbackPredictionId, setFeedbackPredictionId] = React.useState<string | null>(null);
 
   const loadData = React.useCallback(async () => {
     if (!patientId) return;
@@ -48,15 +67,41 @@ export default function DoctorPatientPredictionsPage() {
     }
   }, [patientId]);
 
+  const loadComparison = React.useCallback(async () => {
+    if (!patientId) return;
+    setIsComparisonLoading(true);
+    setComparisonError(null);
+    try {
+      const comp = await riskApi.getPatientPredictionComparison(patientId);
+      setComparison(comp);
+    } catch (err: any) {
+      console.error("Failed to load prediction comparison:", err);
+      setComparisonError(
+        err?.response?.data?.error?.message ||
+          err?.message ||
+          "Could not compute prediction comparison."
+      );
+    } finally {
+      setIsComparisonLoading(false);
+    }
+  }, [patientId]);
+
   React.useEffect(() => {
     loadData();
   }, [loadData]);
+
+  React.useEffect(() => {
+    if (activeTab === "comparison") {
+      loadComparison();
+    }
+  }, [activeTab, loadComparison]);
 
   // Handle new prediction completed
   const handlePredictionComplete = (newPrediction: RiskPrediction) => {
     setSelectedPrediction(newPrediction);
     setActiveTab("result");
     loadData(); // refresh trajectory
+    loadComparison(); // refresh comparison deltas
   };
 
   // Handle physician clinical review / override
@@ -67,6 +112,13 @@ export default function DoctorPatientPredictionsPage() {
     });
     setSelectedPrediction(updated);
     loadData();
+    loadComparison();
+  };
+
+  // Handle clinician feedback trigger
+  const handleOpenFeedback = (predId: string) => {
+    setFeedbackPredictionId(predId);
+    setIsFeedbackModalOpen(true);
   };
 
   // Select item from timeline
@@ -77,6 +129,13 @@ export default function DoctorPatientPredictionsPage() {
       setActiveTab("result");
     } catch (err) {
       console.error("Failed to load prediction detail:", err);
+    }
+  };
+
+  const handleRefreshAll = () => {
+    loadData();
+    if (activeTab === "comparison") {
+      loadComparison();
     }
   };
 
@@ -102,11 +161,11 @@ export default function DoctorPatientPredictionsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={loadData}
-            disabled={isLoading}
+            onClick={handleRefreshAll}
+            disabled={isLoading || isComparisonLoading}
             className="h-8 text-xs gap-1.5 border-slate-300"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading || isComparisonLoading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
         </div>
@@ -119,7 +178,7 @@ export default function DoctorPatientPredictionsPage() {
             </h1>
             <p className="text-xs text-slate-600 mt-1">
               Patient MRN: <strong className="text-slate-900 font-mono">{riskSummary?.patient_mrn || patientId}</strong> —
-              Authoritative Source: <strong className="text-slate-800">Neon PostgreSQL</strong>
+              Authoritative Store: <strong className="text-slate-800">Neon PostgreSQL</strong>
             </p>
           </div>
         </div>
@@ -140,7 +199,11 @@ export default function DoctorPatientPredictionsPage() {
             </TabsTrigger>
             <TabsTrigger value="result" className="text-xs gap-1.5 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs">
               <Activity className="w-3.5 h-3.5" />
-              Risk Assessment & CDSS Result
+              Assessment & CDSS Result
+            </TabsTrigger>
+            <TabsTrigger value="comparison" className="text-xs gap-1.5 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs">
+              <GitCompare className="w-3.5 h-3.5" />
+              Prediction Comparison & Deltas
             </TabsTrigger>
             <TabsTrigger value="trajectory" className="text-xs gap-1.5 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs">
               <History className="w-3.5 h-3.5" />
@@ -164,13 +227,14 @@ export default function DoctorPatientPredictionsPage() {
                 prediction={selectedPrediction}
                 patientName={`Patient MRN: ${riskSummary?.patient_mrn || patientId}`}
                 onRecordReview={handleRecordReview}
+                onProvideFeedback={handleOpenFeedback}
               />
             ) : (
               <div className="p-8 text-center rounded-xl border border-slate-200 bg-white space-y-3">
                 <Activity className="w-8 h-8 text-slate-300 mx-auto" />
                 <h3 className="text-sm font-semibold text-slate-800">No Risk Assessment Selected</h3>
                 <p className="text-xs text-slate-500 max-w-md mx-auto">
-                  Execute a new clinical assessment or select a historical prediction from the timeline to inspect full TreeSHAP explainability and CDSS guidance.
+                  Execute a new clinical assessment or select a historical prediction from the trajectory to inspect full TreeSHAP explainability and CDSS guidance.
                 </p>
                 <Button
                   size="sm"
@@ -183,7 +247,61 @@ export default function DoctorPatientPredictionsPage() {
             )}
           </TabsContent>
 
-          {/* TAB 3: Longitudinal Risk Trajectory */}
+          {/* TAB 3: Current vs Previous Prediction Comparison */}
+          <TabsContent value="comparison" className="space-y-4">
+            {isComparisonLoading ? (
+              <div className="p-12 text-center rounded-xl border border-slate-200 bg-white space-y-3">
+                <RefreshCw className="w-8 h-8 text-sky-600 animate-spin mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-800">Computing Longitudinal Deltas</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Calculating physiological feature differences, risk transitions, and TreeSHAP attribution divergence across historical inferences...
+                </p>
+              </div>
+            ) : comparisonError ? (
+              <div className="p-6 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 space-y-2">
+                <div className="flex items-center gap-2 font-semibold">
+                  <AlertCircle className="w-4 h-4 text-rose-600" />
+                  <span>Unable to Load Comparison</span>
+                </div>
+                <p>{comparisonError}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadComparison}
+                  className="text-xs border-rose-300 hover:bg-rose-100"
+                >
+                  Retry Comparison
+                </Button>
+              </div>
+            ) : comparison ? (
+              <PredictionComparisonCard
+                comparison={comparison}
+                onReviewClick={(predId) => {
+                  handleSelectFromTimeline(predId);
+                  setActiveTab("result");
+                }}
+                onFeedbackClick={handleOpenFeedback}
+                onRefresh={loadComparison}
+              />
+            ) : (
+              <div className="p-8 text-center rounded-xl border border-slate-200 bg-white space-y-3">
+                <GitCompare className="w-8 h-8 text-slate-300 mx-auto" />
+                <h3 className="text-sm font-semibold text-slate-800">No Comparison Data Available</h3>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  At least two historical risk assessments are required to calculate physiological deltas and feature divergence.
+                </p>
+                <Button
+                  size="sm"
+                  onClick={() => setActiveTab("assess")}
+                  className="text-xs bg-sky-700 hover:bg-sky-800 text-white"
+                >
+                  Create Assessment
+                </Button>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* TAB 4: Longitudinal Risk Trajectory */}
           <TabsContent value="trajectory" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-1">
@@ -199,6 +317,7 @@ export default function DoctorPatientPredictionsPage() {
                     prediction={selectedPrediction}
                     patientName={`Patient MRN: ${riskSummary?.patient_mrn || patientId}`}
                     onRecordReview={handleRecordReview}
+                    onProvideFeedback={handleOpenFeedback}
                   />
                 ) : (
                   <div className="p-8 text-center rounded-xl border border-slate-200 bg-white text-xs text-slate-500">
@@ -210,6 +329,20 @@ export default function DoctorPatientPredictionsPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Clinical Prediction Feedback Modal */}
+      {selectedPrediction && (
+        <PredictionFeedbackModal
+          isOpen={isFeedbackModalOpen}
+          onClose={() => setIsFeedbackModalOpen(false)}
+          predictionId={feedbackPredictionId || selectedPrediction.id || selectedPrediction.prediction_id || ""}
+          patientName={`Patient MRN: ${riskSummary?.patient_mrn || patientId}`}
+          onFeedbackSubmitted={() => {
+            loadData();
+            loadComparison();
+          }}
+        />
+      )}
     </DoctorLayout>
   );
 }

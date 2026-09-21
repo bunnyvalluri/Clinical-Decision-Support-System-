@@ -301,3 +301,107 @@ class PredictionViewSet(viewsets.ModelViewSet):
             )
 
         return Response(result, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="comparison",
+        permission_classes=[permissions.IsAuthenticated, HasPredictionAccess],
+    )
+    def comparison(self, request: Request, pk=None) -> Response:
+        """
+        GET /api/v1/predictions/{id}/comparison/
+        Produce side-by-side comparison between this prediction and its prior baseline.
+        """
+        try:
+            current_pred = self.get_queryset().select_related(
+                "patient", "model_version", "clinical_record", "overridden_by", "explanation"
+            ).get(id=pk)
+        except Exception:
+            return Response(
+                {"success": False, "error": {"code": "prediction_not_found", "message": "Prediction not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        from services.prediction_comparison_service import (
+            PredictionComparisonService,
+            get_previous_patient_prediction,
+        )
+
+        previous_pred = get_previous_patient_prediction(
+            patient_id=current_pred.patient_id,
+            current_prediction_id=current_pred.id,
+        )
+
+        comparison_data = PredictionComparisonService.compare_patient_predictions(
+            current_pred=current_pred,
+            previous_pred=previous_pred,
+        )
+
+        has_comp = (not comparison_data.get("is_initial_prediction", False)) and (comparison_data.get("previous_prediction") is not None)
+        return Response({
+            "success": True,
+            "has_comparison": has_comp,
+            "data": comparison_data,
+        }, status=status.HTTP_200_OK)
+
+    @action(
+        detail=True,
+        methods=["get", "post"],
+        url_path="feedback",
+        permission_classes=[permissions.IsAuthenticated, HasPredictionAccess],
+    )
+    def feedback(self, request: Request, pk=None) -> Response:
+        """
+        GET  /api/v1/predictions/{id}/feedback/ -> List clinician feedback for this prediction.
+        POST /api/v1/predictions/{id}/feedback/ -> Submit new feedback by authorized clinician.
+        """
+        try:
+            prediction = self.get_queryset().select_related("patient").get(id=pk)
+        except Exception:
+            return Response(
+                {"success": False, "error": {"code": "prediction_not_found", "message": "Prediction not found."}},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        from apps.predictions.models import PredictionFeedback
+        from apps.predictions.serializers import PredictionFeedbackSerializer
+
+        if request.method == "GET":
+            feedbacks = PredictionFeedback.objects.filter(prediction=prediction).select_related("user").order_by("-created_at")
+            serializer = PredictionFeedbackSerializer(feedbacks, many=True)
+            return Response({"success": True, "count": len(serializer.data), "data": serializer.data}, status=status.HTTP_200_OK)
+
+        # POST: Patients cannot submit clinical feedback; only clinicians, staff, and admins can
+        if getattr(request.user, "is_patient", request.user.role == UserRole.PATIENT):
+            return Response(
+                {"success": False, "error": "Only authorized clinicians and staff can submit prediction feedback."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = PredictionFeedbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        feedback_obj = serializer.save(
+            prediction=prediction,
+            patient=prediction.patient,
+            user=request.user,
+            user_role=getattr(request.user, "role", "DOCTOR"),
+        )
+
+        # Audit feedback creation
+        from apps.core.models import AuditLog
+        AuditLog.objects.create(
+            user=request.user,
+            action=AuditLog.Action.CREATE,
+            resource_type="PredictionFeedback",
+            resource_id=str(feedback_obj.id),
+            description=f"Clinician {request.user.email} submitted {feedback_obj.feedback_category} feedback for prediction {prediction.id}.",
+            metadata={
+                "prediction_id": str(prediction.id),
+                "patient_id": str(prediction.patient_id),
+                "category": feedback_obj.feedback_category,
+            },
+        )
+
+        return Response({"success": True, "data": PredictionFeedbackSerializer(feedback_obj).data}, status=status.HTTP_201_CREATED)
+

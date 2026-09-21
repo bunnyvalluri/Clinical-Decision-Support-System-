@@ -1,0 +1,21 @@
+meta {
+  name: FHIR-METADATA-001
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/fhir/r4/metadata
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/fhir+json
+}
+
+assert {
+  res.status: eq 200
+  res.body.resourceType: eq CapabilityStatement
+  res.body.fhirVersion: eq 4.0.1
+}

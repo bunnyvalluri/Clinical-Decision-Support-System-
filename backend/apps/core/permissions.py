@@ -79,6 +79,9 @@ class IsInformaticist(BasePermission):
         )
 
 
+IsMedicalInformaticist = IsInformaticist
+
+
 class IsPatient(BasePermission):
     """Grant access to PATIENT role."""
 
@@ -105,6 +108,9 @@ class IsClinicianOrStaff(BasePermission):
             or request.user.is_clinician
             or request.user.is_staff_member
         )
+
+
+IsDoctorOrNurse = IsClinicianOrStaff
 
 
 class IsAdminOrClinician(BasePermission):

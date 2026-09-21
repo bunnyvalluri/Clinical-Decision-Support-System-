@@ -19,8 +19,12 @@ class ReviewStatus(models.TextChoices):
     PENDING_REVIEW = "PENDING_REVIEW", "Pending Review"
     UNDER_REVIEW = "UNDER_REVIEW", "Under Review"
     REVIEWED = "REVIEWED", "Reviewed / Concurred"
+    ACCEPTED = "ACCEPTED", "Accepted"
     ACCEPTED_FOR_CONSIDERATION = "ACCEPTED_FOR_CONSIDERATION", "Accepted for Consideration"
+    OVERRIDDEN = "OVERRIDDEN", "Overridden"
     REJECTED = "REJECTED", "Rejected"
+    DISMISSED = "DISMISSED", "Dismissed"
+    REQUIRES_MORE_DATA = "REQUIRES_MORE_DATA", "Requires More Data"
     REQUIRES_MORE_INFORMATION = "REQUIRES_MORE_INFORMATION", "Requires More Information"
     ESCALATED = "ESCALATED", "Escalated"
     SUPERSEDED = "SUPERSEDED", "Superseded"
@@ -220,6 +224,9 @@ class ReviewDecision(models.TextChoices):
     OVERRIDE = "OVERRIDE", "Override AI Prediction"
     MONITOR = "MONITOR", "Serial Observation Required"
     TRANSFER = "TRANSFER", "ICU / Specialist Transfer"
+    REQUEST_MORE_DATA = "REQUEST_MORE_DATA", "Request Additional Clinical Data"
+    ESCALATE = "ESCALATE", "Escalate to Attending / Specialist"
+    DISMISS = "DISMISS", "Dismiss Alert / Recommendation"
 
 
 class ClinicalReview(BaseModel):
@@ -257,12 +264,36 @@ class ClinicalReview(BaseModel):
         blank=True,
         help_text="Mandatory clinical rationale explaining physician decision or override.",
     )
+    structured_reason = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="Standardized clinical override justification category.",
+    )
     override_risk_level = models.CharField(
         max_length=20,
         choices=RiskLevel.choices,
         null=True,
         blank=True,
         help_text="Target clinical risk tier if physician overrides.",
+    )
+    model_version_str = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Captured model version at review time.",
+    )
+    rule_version_str = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Captured clinical rule version at review time.",
+    )
+    guideline_version_str = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Captured guideline version at review time.",
     )
     reviewed_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
@@ -274,6 +305,10 @@ class ClinicalReview(BaseModel):
 
     def __str__(self) -> str:
         return f"Review for {self.prediction.id} by {self.doctor} [{self.status}]"
+
+
+# Semantic alias for Prompt 64 compliance
+PredictionReview = ClinicalReview
 
 
 class RiskThresholdPolicy(BaseModel):
@@ -344,5 +379,128 @@ class RiskThresholdPolicy(BaseModel):
         if p < float(self.high_threshold):
             return RiskLevel.HIGH
         return RiskLevel.CRITICAL
+
+
+class FeedbackCategory(models.TextChoices):
+    PREDICTION_ACCEPTED = "PREDICTION_ACCEPTED", "Prediction Accepted & Clinically Useful"
+    NOT_CLINICALLY_USEFUL = "NOT_CLINICALLY_USEFUL", "Prediction Not Clinically Useful"
+    INCORRECT_PREDICTION = "INCORRECT_PREDICTION", "Incorrect Risk Assessment"
+    INSUFFICIENT_DATA = "INSUFFICIENT_DATA", "Insufficient Clinical Data for Assessment"
+    CONFLICTING_INFORMATION = "CONFLICTING_INFORMATION", "Conflicting Clinical Evidence"
+    NEEDS_REVIEW = "NEEDS_REVIEW", "Requires Specialist/Attending Review"
+    OTHER = "OTHER", "Other Clinical Feedback"
+
+
+class PredictionFeedback(BaseModel):
+    """
+    Clinician structured feedback record on ML risk prediction utility and validity.
+    Feeds into continuous monitoring, calibration audits, and offline dataset curation.
+    Mandatory invariant: Never triggers automatic online retraining or direct deployment.
+    """
+    prediction = models.ForeignKey(
+        Prediction,
+        on_delete=models.CASCADE,
+        related_name="feedback_entries",
+        help_text="Prediction evaluated by clinician.",
+    )
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.CASCADE,
+        related_name="prediction_feedback_entries",
+    )
+    user = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="submitted_prediction_feedback",
+    )
+    user_role = models.CharField(max_length=50, default="DOCTOR", db_index=True)
+    feedback_category = models.CharField(
+        max_length=50,
+        choices=FeedbackCategory.choices,
+        default=FeedbackCategory.PREDICTION_ACCEPTED,
+        db_index=True,
+    )
+    comments = models.TextField(blank=True, help_text="Clinician contextual comments or concerns.")
+    is_reviewed_by_informaticist = models.BooleanField(default=False, db_index=True)
+    reviewed_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audited_prediction_feedback",
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "prediction_feedback"
+        verbose_name = "Prediction Feedback"
+        verbose_name_plural = "Prediction Feedback Entries"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["feedback_category", "created_at"]),
+            models.Index(fields=["patient", "created_at"]),
+        ]
+
+    def __str__(self) -> str:
+        return f"Feedback [{self.feedback_category}] on Pred {self.prediction_id} by {self.user}"
+
+
+class OutcomeType(models.TextChoices):
+    ICU_ADMISSION = "ICU_ADMISSION", "ICU Admission"
+    CARDIAC_ARREST = "CARDIAC_ARREST", "Cardiac Arrest / Code Blue"
+    SEPSIS_CONFIRMED = "SEPSIS_CONFIRMED", "Confirmed Sepsis Diagnosis"
+    ACUTE_KIDNEY_INJURY = "ACUTE_KIDNEY_INJURY", "Acute Kidney Injury (KDIGO)"
+    DISCHARGED_STABLE = "DISCHARGED_STABLE", "Discharged Home Stable"
+    TRANSFERRED = "TRANSFERRED", "Transferred to Higher Acuity Ward"
+    MORTALITY = "MORTALITY", "Inpatient Mortality"
+    READMISSION_30D = "READMISSION_30D", "30-Day Readmission"
+    OTHER = "OTHER", "Other Clinical Outcome"
+
+
+class PredictionOutcomeLink(BaseModel):
+    """
+    Documented clinical outcome linked to an antecedent risk prediction.
+    Enables empirical validation, calibration tracking, and sensitivity auditing.
+    """
+    prediction = models.ForeignKey(
+        Prediction,
+        on_delete=models.CASCADE,
+        related_name="outcome_links",
+    )
+    patient = models.ForeignKey(
+        "patients.Patient",
+        on_delete=models.CASCADE,
+        related_name="prediction_outcome_links",
+    )
+    clinical_record = models.ForeignKey(
+        "clinical.ClinicalRecord",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="prediction_outcome_links",
+    )
+    outcome_type = models.CharField(
+        max_length=50,
+        choices=OutcomeType.choices,
+        db_index=True,
+    )
+    description = models.TextField(blank=True)
+    documented_at = models.DateTimeField(default=timezone.now, db_index=True)
+    documented_by = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="documented_prediction_outcomes",
+    )
+
+    class Meta:
+        db_table = "prediction_outcome_links"
+        verbose_name = "Prediction Outcome Link"
+        verbose_name_plural = "Prediction Outcome Links"
+        ordering = ["-documented_at"]
+
 
 

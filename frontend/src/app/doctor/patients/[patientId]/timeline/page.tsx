@@ -3,55 +3,13 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { DoctorLayout } from "@/components/layout/DoctorLayout";
-import { ClinicalTimeline } from "@/components/clinical/ClinicalTimeline";
+import { PatientTimelineViewer } from "@/components/clinical/PatientTimelineViewer";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Clock, RefreshCw, User } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 export default function DoctorPatientTimelinePage() {
   const { patientId } = useParams<{ patientId: string }>();
   const router = useRouter();
-  const [timelineEvents, setTimelineEvents] = React.useState<any[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    async function loadTimeline() {
-      setIsLoading(true);
-      try {
-        const res = await fetch(`/api/v1/patients/${patientId}/timeline/`);
-        if (res.ok) {
-          const json = await res.json();
-          if (json.events && json.events.length > 0) {
-            setTimelineEvents(
-              json.events.map((e: any) => ({
-                id: e.event_id,
-                title: e.title,
-                timestamp: new Date(e.timestamp).toLocaleString(),
-                description: e.description,
-                eventType: e.event_type,
-                actor: e.actor,
-                severity: e.severity === "CRITICAL" ? "critical" : e.severity === "WARNING" ? "warning" : "normal",
-              }))
-            );
-          } else {
-            setTimelineEvents([]);
-          }
-        } else {
-          setTimelineEvents([]);
-        }
-      } catch (err) {
-        console.error("Failed to load timeline:", err);
-        setTimelineEvents([]);
-      } finally {
-
-        setIsLoading(false);
-      }
-    }
-
-    if (patientId) {
-      loadTimeline();
-    }
-  }, [patientId]);
 
   return (
     <DoctorLayout>
@@ -62,52 +20,18 @@ export default function DoctorPatientTimelinePage() {
             variant="ghost"
             size="sm"
             onClick={() => router.push(`/doctor/patients/${patientId}`)}
-            className="gap-1 text-xs"
+            className="gap-1 text-xs text-slate-700 hover:text-slate-900"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to Patient
+            Back to Patient Chart
           </Button>
           <span className="text-slate-300">/</span>
-          <span className="text-xs text-slate-500 font-medium">Clinical Timeline</span>
+          <span className="text-xs text-slate-500 font-medium">Longitudinal Clinical Timeline</span>
         </div>
 
-        <Card className="border border-slate-200 bg-white shadow-xs">
-          <CardHeader className="p-5 border-b border-slate-100 bg-slate-50/50">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-blue-600" />
-                  <CardTitle className="text-lg font-bold text-slate-900">
-                    Patient Clinical Timeline & Encounter Journey
-                  </CardTitle>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Chronological trail of admissions, vital encounters, risk inferences, and doctor sign-offs for MRN: {patientId}.
-                </CardDescription>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.location.reload()}
-                className="gap-1.5 text-xs"
-              >
-                <RefreshCw className="h-3.5 w-3.5 text-slate-500" />
-                Refresh
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-6">
-            {isLoading ? (
-              <div className="p-12 text-center text-xs text-slate-500">Loading chronological timeline...</div>
-            ) : timelineEvents.length === 0 ? (
-              <div className="p-12 text-center text-sm font-medium text-slate-500">
-                No clinical events available.
-              </div>
-            ) : (
-              <ClinicalTimeline events={timelineEvents} />
-            )}
-          </CardContent>
-        </Card>
+        {patientId && (
+          <PatientTimelineViewer patientId={patientId} mrn={patientId} />
+        )}
       </div>
     </DoctorLayout>
   );

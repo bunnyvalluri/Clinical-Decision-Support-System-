@@ -73,6 +73,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
         if score >= 2:
             return DeterministicRuleAlert(
                 rule_name="qSOFA Sepsis Risk Flag",
+                rule_id="RULE-QSOFA-01",
+                rule_version="1.0.0",
+                evidence_source="Singer M, et al. Sepsis-3 International Consensus. JAMA 2016.",
+                explanation="Quick SOFA score of 2 or more indicates significantly elevated in-hospital mortality from suspected infection.",
                 severity="CRITICAL_EMERGENCY",
                 trigger_criteria=f"qSOFA score {score}/3: {', '.join(criteria_met)}",
                 recommended_action=(
@@ -83,6 +87,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
         elif score == 1:
             return DeterministicRuleAlert(
                 rule_name="qSOFA Borderline Flag",
+                rule_id="RULE-QSOFA-02",
+                rule_version="1.0.0",
+                evidence_source="Singer M, et al. Sepsis-3 International Consensus. JAMA 2016.",
+                explanation="qSOFA score of 1 indicates borderline risk requiring closer vital sign monitoring.",
                 severity="MONITOR",
                 trigger_criteria=f"qSOFA score 1/3: {', '.join(criteria_met)}",
                 recommended_action="Increase monitoring frequency. Re-evaluate vitals in 1 hour.",
@@ -170,6 +178,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
         if score >= 7:
             return DeterministicRuleAlert(
                 rule_name="NEWS2 High Acute Deterioration Flag",
+                rule_id="RULE-NEWS2-01",
+                rule_version="2.0.0",
+                evidence_source="Royal College of Physicians. National Early Warning Score (NEWS) 2. 2017.",
+                explanation="NEWS2 score >= 7 represents high-grade clinical risk mandating urgent clinical team review.",
                 severity="CRITICAL_EMERGENCY",
                 trigger_criteria=f"Aggregate NEWS2 score {score} (High Risk): {'; '.join(factors)}",
                 recommended_action=(
@@ -180,6 +192,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
         elif score >= 5:
             return DeterministicRuleAlert(
                 rule_name="NEWS2 Medium Clinical Deterioration Flag",
+                rule_id="RULE-NEWS2-02",
+                rule_version="2.0.0",
+                evidence_source="Royal College of Physicians. National Early Warning Score (NEWS) 2. 2017.",
+                explanation="NEWS2 score 5-6 indicates medium risk of clinical deterioration.",
                 severity="URGENT_EVALUATION",
                 trigger_criteria=f"Aggregate NEWS2 score {score} (Medium Risk): {'; '.join(factors)}",
                 recommended_action=(
@@ -189,6 +205,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
         elif score >= 3:
             return DeterministicRuleAlert(
                 rule_name="NEWS2 Low Clinical Risk Flag",
+                rule_id="RULE-NEWS2-03",
+                rule_version="2.0.0",
+                evidence_source="Royal College of Physicians. National Early Warning Score (NEWS) 2. 2017.",
+                explanation="NEWS2 score 3-4 indicates low risk requiring routine nursing observation.",
                 severity="MONITOR",
                 trigger_criteria=f"Aggregate NEWS2 score {score} (Low Risk): {'; '.join(factors)}",
                 recommended_action="Inform registered nurse; standard vital monitoring protocol.",
@@ -211,6 +231,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Severe Hyperkalemia Safety Alert",
+                        rule_id="RULE-CRIT-K-HIGH",
+                        rule_version="1.0.0",
+                        evidence_source="AHA Guidelines on Cardiopulmonary Resuscitation and ECC: Electrolyte Emergencies.",
+                        explanation="Serum potassium >= 6.2 mmol/L carries immediate danger of lethal ventricular arrhythmias and asystole.",
                         severity="CRITICAL_EMERGENCY",
                         trigger_criteria=f"Potassium {k} mmol/L (>= 6.2 mmol/L)",
                         recommended_action=(
@@ -223,6 +247,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Severe Hypokalemia Safety Alert",
+                        rule_id="RULE-CRIT-K-LOW",
+                        rule_version="1.0.0",
+                        evidence_source="AHA Guidelines on Electrolyte Emergencies.",
+                        explanation="Serum potassium <= 2.8 mmol/L impairs cardiac repolarization and risks torsades de pointes.",
                         severity="URGENT_EVALUATION",
                         trigger_criteria=f"Potassium {k} mmol/L (<= 2.8 mmol/L)",
                         recommended_action="Initiate urgent potassium replacement under cardiac monitoring.",
@@ -237,6 +265,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Severe Lactic Acidosis Alert",
+                        rule_id="RULE-CRIT-LAC-HIGH",
+                        rule_version="1.0.0",
+                        evidence_source="Surviving Sepsis Campaign International Guidelines 2021.",
+                        explanation="Serum lactate >= 4.0 mmol/L indicates severe tissue hypoperfusion / anaerobic metabolism in sepsis.",
                         severity="CRITICAL_EMERGENCY",
                         trigger_criteria=f"Serum Lactate {lac} mmol/L (>= 4.0 mmol/L)",
                         recommended_action=(
@@ -249,6 +281,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Elevated Lactate Alert",
+                        rule_id="RULE-CRIT-LAC-MED",
+                        rule_version="1.0.0",
+                        evidence_source="Surviving Sepsis Campaign International Guidelines 2021.",
+                        explanation="Serum lactate 2.0-3.9 mmol/L suggests early tissue hypoperfusion.",
                         severity="MONITOR",
                         trigger_criteria=f"Serum Lactate {lac} mmol/L (>= 2.0 mmol/L)",
                         recommended_action="Repeat serum lactate in 2-4 hours; assess intravascular volume.",
@@ -263,6 +299,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Hypertensive Crisis Threshold Flag",
+                        rule_id="RULE-CRIT-BP-HYPERTENSIVE",
+                        rule_version="1.0.0",
+                        evidence_source="ACC/AHA 2017 Guideline for High Blood Pressure in Adults.",
+                        explanation="BP >= 180/120 mmHg indicates hypertensive crisis with risk of acute target organ damage.",
                         severity="CRITICAL_EMERGENCY",
                         trigger_criteria=f"BP {sbp}/{dbp} mmHg (>= 180/120 mmHg)",
                         recommended_action=(
@@ -280,6 +320,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Severe Hypoglycemia Alarm",
+                        rule_id="RULE-CRIT-GLU-LOW",
+                        rule_version="1.0.0",
+                        evidence_source="ADA Standards of Medical Care in Diabetes 2024.",
+                        explanation="Blood glucose < 50 mg/dL causes neuroglycopenia, seizure, and coma risk.",
                         severity="CRITICAL_EMERGENCY",
                         trigger_criteria=f"Glucose {glu} mg/dL (< 50 mg/dL)",
                         recommended_action="Emergency administration of IV dextrose 50% or glucagon. Recheck in 15m.",
@@ -289,6 +333,10 @@ class ClinicalRulesEngine(BaseService, IClinicalRuleEngine):
                 alerts.append(
                     DeterministicRuleAlert(
                         rule_name="Severe Hyperglycemia Threshold Flag",
+                        rule_id="RULE-CRIT-GLU-HIGH",
+                        rule_version="1.0.0",
+                        evidence_source="ADA Standards of Medical Care in Diabetes 2024.",
+                        explanation="Blood glucose >= 450 mg/dL suggests impending DKA or HHS.",
                         severity="URGENT_EVALUATION",
                         trigger_criteria=f"Glucose {glu} mg/dL (>= 450 mg/dL)",
                         recommended_action="Evaluate for diabetic ketoacidosis (DKA) or hyperosmolar hyperglycemic state (HHS).",

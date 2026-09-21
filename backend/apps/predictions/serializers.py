@@ -198,3 +198,90 @@ class ClinicalOverrideSerializer(serializers.Serializer):
         max_length=2000,
         help_text="Clinical justification for override.",
     )
+
+
+class PredictionFeedbackSerializer(serializers.ModelSerializer):
+    """Serializer for clinician feedback on prediction utility and clinical alignment."""
+
+    user_name = serializers.CharField(source="user.get_full_name", read_only=True)
+    user_email = serializers.CharField(source="user.email", read_only=True)
+
+    class Meta:
+        from apps.predictions.models import PredictionFeedback
+        model = PredictionFeedback
+        fields = [
+            "id",
+            "prediction",
+            "patient",
+            "user",
+            "user_name",
+            "user_email",
+            "user_role",
+            "feedback_category",
+            "comments",
+            "is_reviewed_by_informaticist",
+            "reviewed_by",
+            "reviewed_at",
+            "created_at",
+        ]
+        read_only_fields = ["id", "prediction", "patient", "user", "user_name", "user_email", "user_role", "created_at"]
+
+
+class PredictionOutcomeLinkSerializer(serializers.ModelSerializer):
+    """Serializer for linking predictions to subsequent documented patient outcomes."""
+
+    documented_by_name = serializers.CharField(source="documented_by.get_full_name", read_only=True)
+
+    class Meta:
+        from apps.predictions.models import PredictionOutcomeLink
+        model = PredictionOutcomeLink
+        fields = [
+            "id",
+            "prediction",
+            "patient",
+            "clinical_record",
+            "outcome_type",
+            "description",
+            "documented_at",
+            "documented_by",
+            "documented_by_name",
+            "created_at",
+        ]
+        read_only_fields = ["id", "documented_by", "documented_by_name", "created_at"]
+
+
+class FeatureDifferenceSerializer(serializers.Serializer):
+    """Serializes comparative feature differences between current and previous predictions."""
+
+    feature = serializers.CharField()
+    display_name = serializers.CharField()
+    unit = serializers.CharField(allow_blank=True)
+    previous_value = serializers.CharField(allow_null=True)
+    current_value = serializers.CharField(allow_null=True)
+    delta = serializers.FloatField(allow_null=True)
+    percentage_change = serializers.FloatField(allow_null=True)
+    direction = serializers.CharField()
+    is_numeric = serializers.BooleanField()
+    is_significant = serializers.BooleanField()
+
+
+class PredictionComparisonSerializer(serializers.Serializer):
+    """Full detail comparison between current and previous prediction."""
+
+    is_initial_prediction = serializers.BooleanField()
+    patient_id = serializers.CharField()
+    patient_mrn = serializers.CharField()
+    risk_changed = serializers.BooleanField()
+    transition_direction = serializers.CharField()
+    risk_transition = serializers.CharField()
+    time_between_predictions_seconds = serializers.IntegerField()
+    time_between_formatted = serializers.CharField()
+    current_prediction = serializers.DictField()
+    previous_prediction = serializers.DictField(allow_null=True)
+    model_version_changed = serializers.BooleanField()
+    feature_changes = FeatureDifferenceSerializer(many=True)
+    feature_changes_count = serializers.IntegerField()
+    shap_divergence = serializers.DictField()
+    alerts_generated = serializers.ListField(child=serializers.DictField())
+    evaluation_timestamp = serializers.DateTimeField()
+

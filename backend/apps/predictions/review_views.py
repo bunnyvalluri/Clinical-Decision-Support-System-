@@ -10,12 +10,15 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from apps.clinical.models import Escalation, EscalationStatus
+import logging
+from apps.clinical.models import Escalation, EscalationStatus, PatientTimelineEvent
 from apps.core.models import AuditLog
 from apps.core.permissions import CanReviewPrediction, IsClinicianOrStaff, IsDoctor
 from apps.notifications.models import Notification
 from apps.patients.models import Patient
 from apps.predictions.models import ClinicalReview, Prediction, ReviewDecision, ReviewStatus, RiskLevel
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
@@ -182,6 +185,71 @@ def record_clinical_review_view(request: Request, pk: str) -> Response:
             "override_risk": override_risk_level,
         },
     )
+
+    # Write authoritative timeline event
+    try:
+        is_override = (decision_val == ReviewDecision.OVERRIDE)
+        timeline_event_type = (
+            PatientTimelineEvent.EventType.PREDICTION_OVERRIDE
+            if is_override
+            else PatientTimelineEvent.EventType.PREDICTION_REVIEW
+        )
+        event_title = (
+            f"Prediction Overridden to {override_risk_level or 'NEW TIER'}"
+            if is_override
+            else f"Prediction Reviewed: {decision_val}"
+        )
+        PatientTimelineEvent.objects.create(
+            patient=prediction.patient,
+            event_type=timeline_event_type,
+            title=event_title,
+            description=rationale or f"Physician {request.user.email} signed off with decision {decision_val}.",
+            actor=request.user.email,
+            source="PHYSICIAN_PORTAL",
+            severity=PatientTimelineEvent.Severity.WARNING if is_override else PatientTimelineEvent.Severity.NORMAL,
+            correlation_id=str(prediction.id),
+            authorization_scope="CLINICIAN_ONLY",
+            provenance={
+                "review_id": str(review.id),
+                "decision": decision_val,
+                "clinician_id": str(request.user.id),
+                "prediction_id": str(prediction.id),
+            },
+        )
+    except Exception as e:
+        logger.warning(f"Could not record timeline event for review: {e}")
+
+    # Realtime notification broadcast to patient channel
+    try:
+        from channels_app.events import (
+            broadcast_patient_event,
+            PredictionReviewedEvent,
+            PredictionOverriddenEvent,
+        )
+        if decision_val == ReviewDecision.OVERRIDE:
+            broadcast_patient_event(
+                str(prediction.patient_id),
+                PredictionOverriddenEvent(
+                    patient_id=str(prediction.patient_id),
+                    prediction_id=str(prediction.id),
+                    overridden_by=request.user.email,
+                    override_risk_level=override_risk_level or "OVERRIDDEN",
+                    reason=rationale,
+                ),
+            )
+        else:
+            broadcast_patient_event(
+                str(prediction.patient_id),
+                PredictionReviewedEvent(
+                    patient_id=str(prediction.patient_id),
+                    prediction_id=str(prediction.id),
+                    reviewed_by=request.user.email,
+                    decision=decision_val,
+                    status=review_status_val,
+                ),
+            )
+    except Exception as e:
+        logger.warning(f"Could not broadcast channels event for review: {e}")
 
     return Response({
         "success": True,
