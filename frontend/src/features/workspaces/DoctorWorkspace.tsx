@@ -172,24 +172,37 @@ export function DoctorWorkspace() {
   const fetchData = React.useCallback(async () => {
     setLoading(true);
     setError(null);
+
+    // 8-second hard timeout so the page never hangs forever
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8_000);
+
     try {
-      // 1. Fetch summary metrics
-      const summaryRes = await apiClient.get("/predictions/doctor-summary/").catch(() => null);
-      if (summaryRes?.data?.data) {
-        setSummaryData(summaryRes.data.data);
+      // 1. Fetch summary metrics (fire-and-forget, non-blocking)
+      const summaryRes = await apiClient
+        .get("/predictions/doctor-summary/", { signal: controller.signal })
+        .catch(() => null);
+      if (summaryRes?.data?.data) setSummaryData(summaryRes.data.data);
+
+      // 2. Fetch predictions list — try two endpoints
+      let predsRes = await apiClient
+        .get("/predictions/", { signal: controller.signal })
+        .catch(() => null);
+      if (!predsRes?.data) {
+        predsRes = await apiClient
+          .get("/predictions/records/", { signal: controller.signal })
+          .catch(() => null);
       }
 
-      // 2. Fetch predictions list
-      const predsRes = await apiClient.get("/v1/predictions/").catch(async () => {
-        return await apiClient.get("/predictions/records/");
-      });
+      const rawList: any[] =
+        predsRes?.data?.results ||
+        predsRes?.data?.data ||
+        (Array.isArray(predsRes?.data) ? predsRes.data : []);
 
-      const rawList: any[] = predsRes?.data?.results || predsRes?.data?.data || predsRes?.data || [];
       const mappedCases: PatientCase[] = rawList.map((item: any) => {
         const prob = typeof item.probability === "number" ? item.probability : parseFloat(item.probability || "0");
         const risk = (item.risk_level || item.prediction_result || "LOW").toUpperCase() as PatientCase["riskLevel"];
 
-        // Map shap drivers if explanation exists
         const rawDrivers = item.explanation?.top_risk_factors || [];
         const shapDrivers = rawDrivers.map((d: any) => ({
           feature: d.feature || d.name || "Vital/Lab",
@@ -236,20 +249,23 @@ export function DoctorWorkspace() {
       });
 
       setCases(mappedCases);
-      if (mappedCases.length > 0 && !selectedCase) {
-        setSelectedCase(mappedCases[0]);
-      }
+      if (mappedCases.length > 0 && !selectedCase) setSelectedCase(mappedCases[0]);
+      setIsLive(true);
+      setError(null);
     } catch (err: any) {
-      console.error("Failed to load doctor workspace data:", err);
-      setError("Unable to load clinical records from the database. Please ensure the backend is connected.");
+      if (err?.name !== "CanceledError" && err?.name !== "AbortError") {
+        console.error("Failed to load doctor workspace data:", err);
+        setError("Backend unavailable. Showing last known data.");
+      }
       setIsLive(false);
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
       setLastUpdated(new Date());
-      setIsLive(true);
       setPollCount((n) => n + 1);
     }
   }, [selectedCase]);
+
 
   // ── Real-time polling: refresh every 30 seconds ──────────────────────────
   React.useEffect(() => {
@@ -581,11 +597,22 @@ export function DoctorWorkspace() {
               </div>
             )}
 
-            {/* Loading State */}
+            {/* Loading State — skeleton rows, max 8s */}
             {loading && !error && (
-              <div className="p-12 text-center space-y-3">
-                <RefreshCw className="h-7 w-7 text-emerald-600 animate-spin mx-auto" />
-                <p className="text-xs text-slate-500">Querying authoritative Neon PostgreSQL database...</p>
+              <div className="divide-y divide-slate-50">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="px-5 py-4 flex items-center gap-4 animate-pulse">
+                    <div className="h-8 w-8 rounded-full bg-slate-200 shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-3 bg-slate-200 rounded w-36" />
+                      <div className="h-2 bg-slate-100 rounded w-24" />
+                    </div>
+                    <div className="h-5 w-14 bg-slate-200 rounded-full" />
+                    <div className="h-5 w-20 bg-slate-100 rounded-full" />
+                    <div className="h-5 w-16 bg-slate-100 rounded-full" />
+                    <div className="h-7 w-20 bg-slate-100 rounded" />
+                  </div>
+                ))}
               </div>
             )}
 
