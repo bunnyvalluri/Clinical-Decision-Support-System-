@@ -26,11 +26,20 @@ import {
   Zap,
   Building2,
   Globe2,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { RealtimeEcgWaveform } from "@/components/clinical/RealtimeEcgWaveform";
 import { useAuthStore, getRoleHomeRoute, type RoleType } from "@/features/auth/authStore";
 
@@ -97,6 +106,37 @@ const DEMO_ROLES = [
   },
 ];
 
+const SSO_PROVIDERS = [
+  {
+    id: "epic",
+    name: "Epic Systems",
+    badge: "Hyperspace • MyChart",
+    description: "SMART on FHIR v2.0 • OAuth 2.0 / OIDC",
+    clientContext: "Client ID: epic-cdss-88210",
+  },
+  {
+    id: "cerner",
+    name: "Oracle Cerner",
+    badge: "Millennium EHR",
+    description: "HL7 FHIR R4 Endpoint • SMART Backend",
+    clientContext: "Client ID: cerner-cdss-3391",
+  },
+  {
+    id: "smart",
+    name: "SMART Health IT",
+    badge: "FHIR R4 Sandbox",
+    description: "Open Clinical Sandbox • Synthetic EHR",
+    clientContext: "Client: r4.smarthealthit.org",
+  },
+  {
+    id: "nhs",
+    name: "NHS Digital",
+    badge: "CIS2 Authentication",
+    description: "Care Identity Service • National Spine",
+    clientContext: "Client: nhs-cdss-0199",
+  },
+];
+
 export default function LoginPage() {
   const router = useRouter();
   const { loginWithCredentials, loginAsRole } = useAuthStore();
@@ -109,6 +149,22 @@ export default function LoginPage() {
   const [error, setError] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [copiedRole, setCopiedRole] = React.useState<string | null>(null);
+  const [isSsoDialogOpen, setIsSsoDialogOpen] = React.useState(false);
+  const [selectedSsoProvider, setSelectedSsoProvider] = React.useState("epic");
+  const [selectedSsoRole, setSelectedSsoRole] = React.useState<RoleType>("DOCTOR");
+  const [isSsoAuthenticating, setIsSsoAuthenticating] = React.useState(false);
+
+  const handleSsoLaunch = async () => {
+    setIsSsoAuthenticating(true);
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      loginAsRole(selectedSsoRole);
+      setIsSsoDialogOpen(false);
+      router.push(getRoleHomeRoute(selectedSsoRole));
+    } finally {
+      setIsSsoAuthenticating(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -608,8 +664,8 @@ export default function LoginPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => handleQuickDemo("DOCTOR")}
-                  className="w-full text-xs font-semibold border-slate-200 hover:bg-slate-50 gap-2 h-9"
+                  onClick={() => setIsSsoDialogOpen(true)}
+                  className="w-full text-xs font-semibold border-slate-200 hover:bg-slate-50 gap-2 h-9 cursor-pointer"
                 >
                   <Building2 className="h-4 w-4 text-slate-600" />
                   <span>Single Sign-On (Epic EHR / SMART on FHIR)</span>
@@ -640,6 +696,154 @@ export default function LoginPage() {
           <span>Assistive Software as a Medical Device (SaMD) • HIPAA Compliant</span>
         </div>
       </div>
+
+      {/* Institutional SSO & SMART on FHIR Modal */}
+      <Dialog open={isSsoDialogOpen} onOpenChange={setIsSsoDialogOpen}>
+        <DialogContent className="max-w-2xl bg-white border border-slate-200 p-6 sm:p-7 text-slate-900 shadow-2xl rounded-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="space-y-2 border-b border-slate-100 pb-4 text-left">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-teal-50 border border-teal-200 text-teal-700 flex items-center justify-center shrink-0">
+                <Building2 className="h-5 w-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                  Institutional Single Sign-On (SSO)
+                </DialogTitle>
+                <DialogDescription className="text-xs text-slate-500 mt-0.5">
+                  Connect via Epic Hyperspace, Cerner, or SMART on FHIR Federated Identity Provider
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-5 py-2">
+            {/* Step 1: Select EHR Identity Provider */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  1. Select Identity Provider (EHR System)
+                </label>
+                <span className="text-[10px] font-mono text-teal-700 bg-teal-50 px-2 py-0.5 rounded border border-teal-200">
+                  SMART v2.0 / HL7 FHIR R4
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {SSO_PROVIDERS.map((provider) => {
+                  const isSelected = selectedSsoProvider === provider.id;
+                  return (
+                    <button
+                      key={provider.id}
+                      type="button"
+                      onClick={() => setSelectedSsoProvider(provider.id)}
+                      className={`text-left p-3 rounded-xl border transition-all cursor-pointer ${
+                        isSelected
+                          ? "border-teal-600 bg-teal-50/50 shadow-sm ring-1 ring-teal-600"
+                          : "border-slate-200 bg-slate-50/60 hover:bg-slate-50 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-xs text-slate-900">{provider.name}</span>
+                        <span className="text-[10px] font-medium text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                          {provider.badge}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-slate-500 mt-1 leading-tight">{provider.description}</p>
+                      <div className="text-[10px] font-mono text-slate-400 mt-1.5">{provider.clientContext}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Step 2: Select Clinical Role */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  2. Select Clinical Role & Practitioner Account
+                </label>
+                <span className="text-[10px] font-mono text-slate-500">
+                  5 Authorized Clinical Scopes
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {DEMO_ROLES.map((roleItem) => {
+                  const isSelected = selectedSsoRole === roleItem.role;
+                  const Icon = roleItem.icon;
+                  return (
+                    <button
+                      key={roleItem.role}
+                      type="button"
+                      onClick={() => setSelectedSsoRole(roleItem.role)}
+                      className={`text-left p-3 rounded-xl border transition-all cursor-pointer flex items-start gap-3 ${
+                        isSelected
+                          ? "border-teal-600 bg-teal-50/50 shadow-sm ring-1 ring-teal-600"
+                          : "border-slate-200 bg-slate-50/60 hover:bg-slate-50 hover:border-slate-300"
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg border ${roleItem.badgeColor} shrink-0`}>
+                        <Icon className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="font-bold text-xs text-slate-900 truncate">{roleItem.title}</span>
+                          <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${roleItem.badgeColor}`}>
+                            {roleItem.initials}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">{roleItem.department}</p>
+                        <p className="text-[10px] text-slate-400 truncate mt-1">{roleItem.scope}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Simulated Launch Context Pill */}
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-teal-600 shrink-0" />
+                <span className="text-[11px] text-slate-700">
+                  Authorized Scope: <strong className="text-slate-900">launch/patient patient/*.read user/*.read openid fhirUser</strong>
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400 hidden sm:inline">
+                OAuth 2.0 PKCE
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter className="border-t border-slate-100 pt-4 flex items-center justify-between sm:justify-between gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsSsoDialogOpen(false)}
+              disabled={isSsoAuthenticating}
+              className="text-xs font-semibold border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSsoLaunch}
+              disabled={isSsoAuthenticating}
+              className="text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white gap-2 cursor-pointer shadow-sm"
+            >
+              {isSsoAuthenticating ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />
+                  <span>Connecting to EHR & Exchanging Token...</span>
+                </>
+              ) : (
+                <>
+                  <span>Launch EHR Session ({selectedSsoRole})</span>
+                  <ArrowRight className="h-3.5 w-3.5 text-white" />
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
