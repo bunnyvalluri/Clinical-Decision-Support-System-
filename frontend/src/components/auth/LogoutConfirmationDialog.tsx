@@ -45,13 +45,14 @@ export function LogoutConfirmationDialog({
 
   const isOpen = propOpen !== undefined ? propOpen : isLogoutDialogOpen;
   const isLoggingOut = propLoading !== undefined ? propLoading : logoutStatus === "LOGGING_OUT";
+  const okButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const cancelButtonRef = React.useRef<HTMLButtonElement | null>(null);
 
-  // Auto-focus the Cancel button when dialog opens to prevent accidental confirmation
+  // Auto-focus the OK button when dialog opens so Enter immediately confirms logout
   React.useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
-        cancelButtonRef.current?.focus();
+        okButtonRef.current?.focus();
       }, 50);
       return () => clearTimeout(timer);
     }
@@ -79,6 +80,26 @@ export function LogoutConfirmationDialog({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (isLoggingOut) return;
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation();
+      if (document.activeElement === cancelButtonRef.current) {
+        handleCancel();
+      } else {
+        handleConfirm();
+      }
+    } else if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      cancelButtonRef.current?.focus();
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      okButtonRef.current?.focus();
+    }
+  };
+
   return (
     <AlertDialogPrimitive.Root open={isOpen} onOpenChange={(open) => !open && handleCancel()}>
       <AlertDialogPrimitive.Portal>
@@ -91,6 +112,7 @@ export function LogoutConfirmationDialog({
         <AlertDialogPrimitive.Content
           aria-labelledby="logout-dialog-header"
           aria-describedby="logout-dialog-message"
+          onKeyDown={handleKeyDown}
           onEscapeKeyDown={(e) => {
             if (isLoggingOut) {
               e.preventDefault();
@@ -149,6 +171,7 @@ export function LogoutConfirmationDialog({
 
             {/* OK Button: Light peach/pink/red confirmation style */}
             <button
+              ref={okButtonRef}
               type="button"
               disabled={isLoggingOut}
               onClick={handleConfirm}
