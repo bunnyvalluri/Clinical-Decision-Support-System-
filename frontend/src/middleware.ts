@@ -108,14 +108,15 @@ export function middleware(request: NextRequest) {
   const namespace = getNamespaceFromPath(pathname);
   if (namespace) {
     const allowedRoles = ROLE_NAMESPACE_MAP[namespace] || [];
-    const defaultRole = allowedRoles[0];
 
-    // Seamlessly activate the target portal role cookie so direct navigation to any portal works instantly
-    if (!roleCookie || !allowedRoles.includes(roleCookie.toUpperCase())) {
-      const response = NextResponse.next();
-      response.cookies.set("clinical_role", defaultRole, { path: "/", sameSite: "strict" });
-      response.cookies.set("user_role", defaultRole, { path: "/", sameSite: "strict" });
-      return response;
+    // If unauthenticated (no role cookie) -> redirect to /login
+    if (!roleCookie) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    // If authenticated but accessing another role's namespace -> redirect to own authorized dashboard
+    if (!allowedRoles.includes(roleCookie.toUpperCase())) {
+      return NextResponse.redirect(new URL(getRoleDashboard(roleCookie), request.url));
     }
   }
 

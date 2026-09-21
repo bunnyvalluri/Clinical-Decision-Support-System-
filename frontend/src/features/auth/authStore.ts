@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { create } from "zustand";
 import apiClient, { tokenStorage } from "@/services/apiClient";
@@ -16,13 +16,21 @@ export interface UserProfile {
   license_number?: string;
 }
 
+export type LogoutStatus = "IDLE" | "OPEN" | "CONFIRMING" | "LOGGING_OUT" | "SUCCESS" | "ERROR";
+
 interface AuthState {
   user: UserProfile | null;
   accessToken: string | null;
   refreshToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isLogoutDialogOpen: boolean;
+  logoutStatus: LogoutStatus;
+  logoutError: string | null;
   setAuth: (user: UserProfile, tokens: { access: string; refresh: string }) => void;
+  openLogoutDialog: () => void;
+  closeLogoutDialog: () => void;
+  confirmLogout: () => Promise<void>;
   logout: () => void;
   loginWithCredentials: (email: string, password: string) => Promise<UserProfile>;
   loginAsRole: (role: RoleType, customProfile?: Partial<UserProfile>) => void;
@@ -139,37 +147,20 @@ function getInitialAuthState(): {
     }
     const match = document.cookie.match(/(?:^|;\s*)clinical_role=([^;]+)/);
     const roleCookie = match ? (decodeURIComponent(match[1]).toUpperCase() as RoleType) : null;
-    if (roleCookie && EVALUATOR_PROFILES[roleCookie]) {
+    if (roleCookie && EVALUATOR_PROFILES[roleCookie] && access) {
       const profile = EVALUATOR_PROFILES[roleCookie];
       return {
         user: profile,
-        accessToken: access || `eval-${roleCookie.toLowerCase()}-token`,
-        refreshToken: refresh || `eval-${roleCookie.toLowerCase()}-refresh`,
+        accessToken: access,
+        refreshToken: refresh,
         isAuthenticated: true,
       };
-    }
-    // Infer role from URL path if directly accessed on a protected route
-    const path = window.location.pathname;
-    if (path.startsWith("/user")) {
-      return { user: EVALUATOR_PROFILES.PATIENT, accessToken: "eval-patient-token", refreshToken: "eval-patient-refresh", isAuthenticated: true };
-    }
-    if (path.startsWith("/nurse")) {
-      return { user: EVALUATOR_PROFILES.NURSE, accessToken: "eval-nurse-token", refreshToken: "eval-nurse-refresh", isAuthenticated: true };
-    }
-    if (path.startsWith("/informaticist")) {
-      return { user: EVALUATOR_PROFILES.MEDICAL_INFORMATICIST, accessToken: "eval-mi-token", refreshToken: "eval-mi-refresh", isAuthenticated: true };
-    }
-    if (path.startsWith("/admin")) {
-      return { user: EVALUATOR_PROFILES.IT_ADMIN, accessToken: "eval-admin-token", refreshToken: "eval-admin-refresh", isAuthenticated: true };
-    }
-    if (path.startsWith("/doctor")) {
-      return { user: EVALUATOR_PROFILES.DOCTOR, accessToken: "eval-doctor-token", refreshToken: "eval-doctor-refresh", isAuthenticated: true };
     }
   } catch {}
   return { user: null, accessToken: null, refreshToken: null, isAuthenticated: false };
 }
 
-export const useAuthStore = create<AuthState>((set) => {
+export const useAuthStore = create<AuthState>((set, get) => {
   const initial = getInitialAuthState();
   return {
     user: initial.user,
@@ -177,6 +168,9 @@ export const useAuthStore = create<AuthState>((set) => {
     refreshToken: initial.refreshToken,
     isAuthenticated: initial.isAuthenticated,
     isLoading: false,
+    isLogoutDialogOpen: false,
+    logoutStatus: "IDLE",
+    logoutError: null,
 
   setAuth: (user, tokens) => {
     tokenStorage.setTokens(tokens);
@@ -192,6 +186,37 @@ export const useAuthStore = create<AuthState>((set) => {
       isAuthenticated: true,
       isLoading: false,
     });
+  },
+
+  openLogoutDialog: () => {
+    set({ isLogoutDialogOpen: true, logoutStatus: "OPEN", logoutError: null });
+  },
+
+  closeLogoutDialog: () => {
+    const { logoutStatus } = get();
+    // Do not close dialog while logout request is in progress
+    if (logoutStatus === "LOGGING_OUT") return;
+    set({ isLogoutDialogOpen: false, logoutStatus: "IDLE", logoutError: null });
+  },
+
+  confirmLogout: async () => {
+    set({ logoutStatus: "LOGGING_OUT", logoutError: null });
+    try {
+      const { performCentralizedLogout } = await import("@/services/authService");
+      await performCentralizedLogout();
+      set({
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        isAuthenticated: false,
+        logoutStatus: "SUCCESS",
+        isLogoutDialogOpen: false,
+      });
+    } catch (err: unknown) {
+      const errorMsg = (err as { message?: string })?.message || "Failed to log out. Please try again.";
+      set({ logoutStatus: "ERROR", logoutError: errorMsg });
+      throw err;
+    }
   },
 
   logout: () => {
@@ -214,6 +239,9 @@ export const useAuthStore = create<AuthState>((set) => {
       refreshToken: null,
       isAuthenticated: false,
       isLoading: false,
+      isLogoutDialogOpen: false,
+      logoutStatus: "IDLE",
+      logoutError: null,
     });
   },
 

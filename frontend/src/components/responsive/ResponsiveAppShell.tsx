@@ -22,6 +22,8 @@ import { BRAND_CONFIG } from "@/config/brand";
 import { useAuthStore, type RoleType } from "@/features/auth/authStore";
 import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { MobileFloatingNavigation } from "@/components/navigation/MobileFloatingNavigation";
+import { LogoutConfirmationDialog } from "@/components/auth/LogoutConfirmationDialog";
+import { initMultiTabAuthSync } from "@/services/authService";
 
 export interface NavItem {
   href: string;
@@ -112,7 +114,7 @@ export function ResponsiveAppShell({
 }: ResponsiveAppShellProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuthStore();
+  const { user, openLogoutDialog, logout } = useAuthStore();
 
   const [mobileDrawerOpen, setMobileDrawerOpen] = React.useState(false);
   const [tabletRailCollapsed, setTabletRailCollapsed] = React.useState(false);
@@ -126,6 +128,17 @@ export function ResponsiveAppShell({
     if (href.split("/").length > 2 && pathname.startsWith(href + "/")) return true;
     return false;
   };
+
+  // Synchronize logout across multiple tabs
+  React.useEffect(() => {
+    const cleanup = initMultiTabAuthSync(() => {
+      logout();
+      if (typeof window !== "undefined") {
+        window.location.href = "/login?logout=true";
+      }
+    });
+    return cleanup;
+  }, [logout]);
 
   // Lock body scroll when mobile drawer is open & handle Escape key
   React.useEffect(() => {
@@ -159,18 +172,6 @@ export function ResponsiveAppShell({
     window.addEventListener("resize", checkWidth);
     return () => window.removeEventListener("resize", checkWidth);
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    } catch {}
-    logout();
-    if (typeof window !== "undefined") {
-      document.cookie = "clinical_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-      document.cookie = "user_role=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
-      window.location.href = "/login?logout=true";
-    }
-  };
 
   // Top 4-5 items for mobile bottom quick navigation
   const mobileQuickItems = React.useMemo(() => {
@@ -367,7 +368,7 @@ export function ResponsiveAppShell({
 
             <button
               type="button"
-              onClick={handleLogout}
+              onClick={openLogoutDialog}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-medium text-rose-600 hover:bg-rose-50 transition-colors ${
                 tabletRailCollapsed ? "justify-center" : ""
               }`}
@@ -531,7 +532,7 @@ export function ResponsiveAppShell({
 
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={openLogoutDialog}
                 className="touch-target w-full flex items-center gap-3.5 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
               >
                 <LogOut className="h-5 w-5" />
@@ -546,6 +547,11 @@ export function ResponsiveAppShell({
       {/* 4. Mobile Floating Bottom Navigation (< 1024px)                      */}
       {/* ==================================================================== */}
       <MobileFloatingNavigation role={role} />
+
+      {/* ==================================================================== */}
+      {/* 5. Global Logout Confirmation Dialog                                 */}
+      {/* ==================================================================== */}
+      <LogoutConfirmationDialog />
     </div>
   );
 }

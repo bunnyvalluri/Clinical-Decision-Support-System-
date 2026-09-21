@@ -10,7 +10,8 @@
  */
 
 import * as React from "react";
-import { useAuthStore } from "@/features/auth/authStore";
+import { useRouter } from "next/navigation";
+import { useAuthStore, getRoleHomeRoute } from "@/features/auth/authStore";
 import type { RoleType } from "@/features/auth/authStore";
 
 interface RoleGuardProps {
@@ -19,14 +20,23 @@ interface RoleGuardProps {
 }
 
 export function RoleGuard({ requiredRoles, children }: RoleGuardProps) {
-  const { user, isAuthenticated, loginAsRole } = useAuthStore();
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
 
   React.useEffect(() => {
-    if (!isAuthenticated || !user || !requiredRoles.includes(user.role)) {
-      const targetRole = requiredRoles[0];
-      loginAsRole(targetRole);
+    if (!isAuthenticated || !user) {
+      router.replace("/login");
+      return;
     }
-  }, [isAuthenticated, user, requiredRoles, loginAsRole]);
+
+    if (!requiredRoles.includes(user.role)) {
+      router.replace(getRoleHomeRoute(user.role));
+    }
+  }, [isAuthenticated, user, requiredRoles, router]);
+
+  if (!isAuthenticated || !user || !requiredRoles.includes(user.role)) {
+    return null;
+  }
 
   return <>{children}</>;
 }

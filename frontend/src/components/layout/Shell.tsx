@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import Image from "next/image";
@@ -45,6 +45,7 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { MobileFloatingNavigation } from "@/components/navigation/MobileFloatingNavigation";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { RealtimeStatusBadge } from "@/components/ai/RealtimeStatusBadge";
+import { LogoutConfirmationDialog } from "@/components/auth/LogoutConfirmationDialog";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -58,7 +59,7 @@ export function Shell({ children }: ShellProps) {
   const [currentTime, setCurrentTime] = React.useState("");
   const [commandOpen, setCommandOpen] = React.useState(false);
 
-  const { user, logout, loginAsRole } = useAuthStore();
+  const { user, openLogoutDialog, logout, loginAsRole } = useAuthStore();
   const {
     notifications,
     unreadAlertsCount,
@@ -318,15 +319,9 @@ export function Shell({ children }: ShellProps) {
             </div>
           </div>
           <button
-            onClick={async () => {
-              try {
-                await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-              } catch {}
-              logout();
-              window.location.href = "/login?logout=true";
-            }}
+            onClick={openLogoutDialog}
             title="Sign Out"
-            className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-destructive transition-colors"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-muted hover:text-destructive transition-colors cursor-pointer"
           >
             <LogOut className="h-4 w-4" />
           </button>
@@ -531,6 +526,9 @@ export function Shell({ children }: ShellProps) {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
+
+      {/* Global Logout Confirmation Dialog */}
+      <LogoutConfirmationDialog />
     </div>
   );
 }

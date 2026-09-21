@@ -175,11 +175,41 @@ export function useWebSocket({
       }
     };
 
+    const handleTeardown = () => {
+      isMounted = false;
+      stopHeartbeat();
+      if (retryTimerRef.current) {
+        clearTimeout(retryTimerRef.current);
+        retryTimerRef.current = null;
+      }
+      if (wsRef.current) {
+        try {
+          wsRef.current.close(1000, "User logged out");
+        } catch {}
+        wsRef.current = null;
+      }
+      setState({
+        isConnected: false,
+        isConnecting: false,
+        error: null,
+        retryCount: 0,
+      });
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("healthnova:teardown-realtime", handleTeardown);
+    }
+
     return () => {
       isMounted = false;
       stopHeartbeat();
+      if (typeof window !== "undefined") {
+        window.removeEventListener("healthnova:teardown-realtime", handleTeardown);
+      }
       if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
-      ws.close(1000, "Component unmounted");
+      try {
+        ws.close(1000, "Component unmounted");
+      } catch {}
       if (wsRef.current === ws) {
         wsRef.current = null;
       }

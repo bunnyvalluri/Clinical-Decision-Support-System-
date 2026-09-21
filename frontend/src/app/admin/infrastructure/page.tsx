@@ -288,7 +288,7 @@ export default function AdminInfrastructurePage() {
               </span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 tracking-tight mt-1">
-              Platform Engineering & Infrastructure Governance
+              Coolify Infrastructure & Deployment Control Plane — Platform Engineering & Governance
             </h1>
             <p className="text-sm text-slate-500 mt-0.5">
               Declarative OpenTofu IaC, AWS cloud hardening, network isolation, policy guardrails, and drift auditing.

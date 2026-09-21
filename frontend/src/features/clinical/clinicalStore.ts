@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { create } from "zustand";
 import apiClient from "@/services/apiClient";
@@ -147,6 +147,7 @@ interface ClinicalStoreState {
     status: ReportItem["status"];
     progress: number;
   }) => void;
+  resetClinicalState: () => void;
 }
 
 const INITIAL_TIMELINE: ActivityTimelinePoint[] = [];
@@ -471,6 +472,16 @@ export const useClinicalStore = create<ClinicalStoreState>((set, get) => ({
 
   handleWebSocketTask: (task) => {
     get().updateReportStatus(task.task_id, task.status, task.progress);
+  },
+
+  resetClinicalState: () => {
+    set({
+      patients: [],
+      predictions: [],
+      notifications: [],
+      reports: [],
+      unreadAlertsCount: 0,
+    });
   },
 }));
 

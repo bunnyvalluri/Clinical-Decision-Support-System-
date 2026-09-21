@@ -25,7 +25,7 @@ import { useAuthStore } from "@/features/auth/authStore";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, logout, loginAsRole } = useAuthStore();
+  const { user, openLogoutDialog, logout, loginAsRole } = useAuthStore();
 
   const [savedSuccess, setSavedSuccess] = React.useState(false);
   const [criticalSmsAlerts, setCriticalSmsAlerts] = React.useState(true);
@@ -55,14 +55,8 @@ export default function ProfilePage() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={async () => {
-              try {
-                await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-              } catch {}
-              logout();
-              window.location.href = "/login?logout=true";
-            }}
-            className="text-xs gap-1.5 self-start sm:self-auto shadow-sm"
+            onClick={openLogoutDialog}
+            className="text-xs gap-1.5 self-start sm:self-auto shadow-sm cursor-pointer"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sign Out Workstation
