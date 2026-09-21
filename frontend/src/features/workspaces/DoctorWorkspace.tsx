@@ -143,6 +143,9 @@ export function DoctorWorkspace() {
   const [summaryData, setSummaryData] = React.useState<DoctorSummaryData | null>(null);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = React.useState<Date | null>(null);
+  const [isLive, setIsLive] = React.useState<boolean>(false);
+  const [pollCount, setPollCount] = React.useState<number>(0);
 
   const [selectedCase, setSelectedCase] = React.useState<PatientCase | null>(null);
   const [expandedCaseId, setExpandedCaseId] = React.useState<string | null>(null);
@@ -163,6 +166,7 @@ export function DoctorWorkspace() {
   ]);
   const [aiLoading, setAiLoading] = React.useState(false);
   const aiScrollRef = React.useRef<HTMLDivElement>(null);
+  const pollIntervalRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Fetch real cases and doctor summary from backend
   const fetchData = React.useCallback(async () => {
@@ -238,13 +242,24 @@ export function DoctorWorkspace() {
     } catch (err: any) {
       console.error("Failed to load doctor workspace data:", err);
       setError("Unable to load clinical records from the database. Please ensure the backend is connected.");
+      setIsLive(false);
     } finally {
       setLoading(false);
+      setLastUpdated(new Date());
+      setIsLive(true);
+      setPollCount((n) => n + 1);
     }
   }, [selectedCase]);
 
+  // ── Real-time polling: refresh every 30 seconds ──────────────────────────
   React.useEffect(() => {
     fetchData();
+    pollIntervalRef.current = setInterval(() => {
+      fetchData();
+    }, 30_000);
+    return () => {
+      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+    };
   }, []);
 
   React.useEffect(() => {
@@ -377,6 +392,18 @@ export function DoctorWorkspace() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* Live indicator */}
+          <div className="flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1">
+            <span className={`h-2 w-2 rounded-full ${isLive && !error ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`} />
+            <span className="text-[10px] font-semibold text-emerald-700">
+              {isLive && !error ? "LIVE" : "OFFLINE"}
+            </span>
+            {lastUpdated && (
+              <span className="text-[10px] text-emerald-600 font-mono hidden sm:inline">
+                · {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+          </div>
           <Button
             variant="outline"
             size="sm"
