@@ -213,9 +213,21 @@ export const useAuthStore = create<AuthState>((set, get) => {
         isLogoutDialogOpen: false,
       });
     } catch (err: unknown) {
-      const errorMsg = (err as { message?: string })?.message || "Failed to log out. Please try again.";
-      set({ logoutStatus: "ERROR", logoutError: errorMsg });
-      throw err;
+      console.warn("[AuthStore] Logout encountered an error, executing fallback local logout:", err);
+      // Guarantee client is completely logged out and redirected even if an unexpected error occurs
+      get().logout();
+      set({
+        user: null,
+        accessToken: null,
+        refreshToken: null,
+        isAuthenticated: false,
+        logoutStatus: "SUCCESS",
+        isLogoutDialogOpen: false,
+        logoutError: null,
+      });
+      if (typeof window !== "undefined") {
+        window.location.href = "/login?logout=true";
+      }
     }
   },
 

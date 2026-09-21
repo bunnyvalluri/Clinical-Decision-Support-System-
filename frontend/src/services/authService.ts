@@ -101,17 +101,14 @@ export async function performCentralizedLogout(options: LogoutOptions = {}): Pro
   const refreshToken = tokenStorage.getRefresh();
 
   // 1. Invalidate refresh token on Django REST backend if available and not skipped
-  if (!options.skipApi && refreshToken) {
+  if (!options.skipApi && refreshToken && !refreshToken.startsWith("eval-") && !refreshToken.startsWith("registered-")) {
     try {
-      await apiClient.post("/auth/logout/", { refresh: refreshToken });
+      await apiClient.post("/auth/logout/", { refresh: refreshToken }, { timeout: 4000 });
     } catch (apiError: unknown) {
-      const err = apiError as { response?: { status?: number; data?: Record<string, unknown> } };
-      // 400 with "Token invalid or already revoked" is acceptable (already blacklisted)
-      if (err?.response?.status !== 400 && err?.response?.status !== 401) {
-        console.error("[AuthService] Backend logout failed:", apiError);
-        // Do not silently ignore server errors (500 etc)
-        throw apiError;
-      }
+      // Backend may be offline, unreachable, or returning an error (e.g. Network Error, 500, CORS).
+      // Even if the backend call fails, client-side logout MUST ALWAYS succeed to prevent
+      // trapping the user in an authenticated session.
+      console.warn("[AuthService] Backend logout notification failed or unreachable:", apiError);
     }
   }
 
