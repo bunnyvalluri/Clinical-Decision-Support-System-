@@ -119,11 +119,16 @@ export default function DoctorReviewActionDetailPage() {
     }
   }
 
-  const patientName = prediction?.patient_name || (prediction?.patient ? `Patient ${prediction.patient}` : `MRN: ${prediction?.patient_mrn || reviewId}`);
-  const topFactors =
+  const patientName = prediction?.patient ? `Patient ${prediction.patient}` : `MRN: ${prediction?.patient_mrn || reviewId}`;
+  const rawFactors: Array<{ feature?: string; feature_name?: string; contribution?: number; description?: string }> =
     prediction?.cdss_guidance?.key_contributing_factors ||
     prediction?.explanation?.top_risk_factors ||
     [];
+  const topFactors = rawFactors.map((f) => ({
+    feature: f.feature ?? f.feature_name ?? "Unknown",
+    contribution: f.contribution ?? 0,
+    description: f.description,
+  }));
 
   return (
     <DoctorLayout>
@@ -230,8 +235,8 @@ export default function DoctorReviewActionDetailPage() {
             <RiskAssessmentCard
               riskLevel={prediction.risk_level}
               probability={prediction.probability}
-              confidenceScore={prediction.confidence_score}
-              uncertaintyScore={prediction.uncertainty_score}
+              confidenceScore={prediction.confidence_score ?? undefined}
+              uncertaintyScore={prediction.uncertainty_score ?? undefined}
               isAbstaining={prediction.is_abstaining}
               modelName={prediction.model_name}
               modelVersion={prediction.model_version_str || String(prediction.model_version || "1.0.0")}
@@ -243,7 +248,7 @@ export default function DoctorReviewActionDetailPage() {
             {/* Explanation Panel */}
             <PredictionExplanationPanel
               method={prediction.explanation?.method || "TreeSHAP"}
-              baselineValue={prediction.explanation?.baseline_value || 0.312}
+              baselineValue={prediction.explanation?.baseline_value ?? 0.312}
               features={topFactors}
             />
 
