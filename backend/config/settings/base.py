@@ -208,18 +208,28 @@ MEDIA_ROOT = BASE_DIR / "media"
 REDIS_URL: str = config("REDIS_URL", default="redis://localhost:6379/0")
 
 # ---------------------------------------------------------------------------
-# Django Channels — Redis channel layer
+# Django Channels — Redis channel layer (falls back to InMemory if no Redis)
 # ---------------------------------------------------------------------------
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [REDIS_URL],
-            "capacity": 1500,
-            "expiry": 10,
+_redis_is_real = REDIS_URL and not any(
+    x in REDIS_URL for x in ["localhost", "127.0.0.1", "red-placeholder", "placeholder"]
+)
+if _redis_is_real:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [REDIS_URL],
+                "capacity": 1500,
+                "expiry": 10,
+            },
         },
-    },
-}
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
 
 # ---------------------------------------------------------------------------
 # Celery
