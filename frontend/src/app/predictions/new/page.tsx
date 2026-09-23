@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Activity,
   AlertTriangle,
+  ArrowLeft,
   ArrowRight,
   BarChart3,
   CheckCircle2,
@@ -195,30 +196,69 @@ function NewPredictionContent() {
     }, 700);
   };
 
+  const handleResetToBaseline = () => {
+    if (selectedPatient) {
+      setAge(String(selectedPatient.age));
+      setSex(selectedPatient.gender === "M" ? "1" : "0");
+      setRestingBP(String(selectedPatient.systolic_bp));
+      setMaxHR(String(selectedPatient.heart_rate + 25));
+      setChestPainType("1");
+      setCholesterol("248");
+      setFastingBS("1");
+      setRestingECG("1");
+      setExerciseAngina("1");
+      setStDepression("2.2");
+      setSlope("2");
+      setVessels("2");
+      setThal("3");
+    }
+  };
+
   return (
     <Shell>
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Header */}
+      <div className="max-w-5xl mx-auto space-y-5">
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center justify-between text-xs text-slate-500">
+          <div className="flex items-center gap-2">
+            <Link href="/predictions" className="hover:text-slate-800 flex items-center gap-1 font-medium transition-colors">
+              <ArrowLeft className="h-3.5 w-3.5" />
+              <span>Prediction Audit Log</span>
+            </Link>
+            {selectedPatient && (
+              <>
+                <span>/</span>
+                <Link
+                  href={`/patients/${selectedPatient.id}`}
+                  className="hover:text-emerald-700 font-semibold text-slate-700 transition-colors"
+                >
+                  {selectedPatient.first_name} {selectedPatient.last_name} ({selectedPatient.mrn})
+                </Link>
+              </>
+            )}
+          </div>
+          <Badge variant="outline" className="text-[11px] font-mono bg-white border-slate-200 text-slate-700">
+            Engine: ~22ms Inference
+          </Badge>
+        </div>
+
+        {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
               <HeartPulse className="h-6 w-6 text-emerald-600" />
-              Patient Risk Level Prediction
+              Patient Risk Level Assessment
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Ensemble machine learning inference using 13 clinical biomarkers with confidence bounds.
+              Deterministic & ML ensemble risk estimation using 13 clinical biomarkers with 95% confidence intervals.
             </p>
           </div>
-          <Badge variant="outline" className="text-xs font-mono self-start sm:self-auto bg-white border-slate-200 text-slate-700">
-            Latency: ~22ms
-          </Badge>
         </div>
 
         {/* Institutional Decision Support Disclaimer */}
         <div className="p-3 rounded-xl border border-blue-200 bg-blue-50/70 text-xs text-blue-900 flex items-start gap-2.5">
           <Info className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            <strong>Clinical Decision Support Disclaimer:</strong> This computational system provides machine learning risk estimations based on clinical statistical correlations. It does NOT produce medical diagnoses. Final clinical diagnosis and treatment plans remain the sole professional responsibility of the attending licensed physician.
+            <strong>Clinical Decision Support Disclaimer:</strong> This computational system provides machine learning risk estimations based on clinical statistical correlations. It does NOT produce autonomous medical diagnoses. Final clinical diagnosis and treatment plans remain the sole professional responsibility of the attending licensed physician.
           </p>
         </div>
 
@@ -279,63 +319,111 @@ function NewPredictionContent() {
           </div>
         )}
 
-        {/* Evaluation Form */}
-        <form onSubmit={handleRunInference} className="space-y-6">
-          <Card className="bg-white border-slate-200 shadow-sm">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Cpu className="h-4 w-4 text-purple-600" />
-                Target Patient & Model Configuration
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
-                Select inpatient admission and algorithm runtime.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Select
-                label="Target Patient"
-                value={selectedPatientId}
-                onChange={(e) => {
-                  setSelectedPatientId(e.target.value);
-                  const p = patients.find((pat) => pat.id === e.target.value);
-                  if (p) {
-                    setAge(String(p.age));
-                    setSex(p.gender === "M" ? "1" : "0");
-                    setRestingBP(String(p.systolic_bp));
-                    setMaxHR(String(p.heart_rate + 25));
-                  }
-                }}
-                options={patients.map((p) => ({
-                  value: p.id,
-                  label: `${p.first_name} ${p.last_name} (${p.mrn}) — Room: ${p.room_number}`,
-                }))}
-              />
+        {/* Unified Clinical Evaluation Form */}
+        <form onSubmit={handleRunInference}>
+          <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+            {/* Target Patient & Model Selection Section */}
+            <div className="p-5 sm:p-6 bg-slate-50/60 border-b border-slate-200">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Cpu className="h-4 w-4 text-purple-600" />
+                    Target Patient & Inference Configuration
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Select patient admission to autofill baseline vitals, and configure algorithm runtime.
+                  </p>
+                </div>
+                {selectedPatient && (
+                  <Link
+                    href={`/patients/${selectedPatient.id}`}
+                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1 self-start sm:self-auto"
+                  >
+                    <span>Open Patient Chart</span>
+                    <ArrowRight className="h-3 w-3" />
+                  </Link>
+                )}
+              </div>
 
-              <Select
-                label="ML Model Algorithm"
-                value={modelType}
-                onChange={(e) => setModelType(e.target.value)}
-                options={[
-                  { value: "CardioEnsemble-RF", label: "Random Forest (Active Ensemble, 92.4% ROC-AUC)" },
-                  { value: "AdaBoost-Cardio-V2", label: "AdaBoost Classifier (91.1% ROC-AUC)" },
-                  { value: "SVM-RBF-Classifier", label: "Support Vector Machine (88.4% ROC-AUC)" },
-                ]}
-              />
-            </CardContent>
-          </Card>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Select
+                  label="Target Patient"
+                  value={selectedPatientId}
+                  onChange={(e) => {
+                    setSelectedPatientId(e.target.value);
+                    const p = patients.find((pat) => pat.id === e.target.value);
+                    if (p) {
+                      setAge(String(p.age));
+                      setSex(p.gender === "M" ? "1" : "0");
+                      setRestingBP(String(p.systolic_bp));
+                      setMaxHR(String(p.heart_rate + 25));
+                    }
+                  }}
+                  options={patients.map((p) => ({
+                    value: p.id,
+                    label: `${p.first_name} ${p.last_name} (${p.mrn}) — Room: ${p.room_number}`,
+                  }))}
+                />
 
-          {/* 13 Physiological Clinical Markers Grid */}
-          <Card className="bg-white border-slate-200 shadow-sm">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <Activity className="h-4 w-4 text-emerald-600" />
-                13 Clinical Biomarkers & Diagnostic Features
-              </CardTitle>
-              <CardDescription className="text-xs text-slate-500">
-                Derived from standard Framingham / Cleveland cardiovascular risk cohorts.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-4 space-y-6">
+                <Select
+                  label="ML Model Algorithm"
+                  value={modelType}
+                  onChange={(e) => setModelType(e.target.value)}
+                  options={[
+                    { value: "CardioEnsemble-RF", label: "Random Forest (Active Ensemble, 92.4% ROC-AUC)" },
+                    { value: "AdaBoost-Cardio-V2", label: "AdaBoost Classifier (91.1% ROC-AUC)" },
+                    { value: "SVM-RBF-Classifier", label: "Support Vector Machine (88.4% ROC-AUC)" },
+                  ]}
+                />
+              </div>
+
+              {/* Patient Quick Vitals Pill Bar */}
+              {selectedPatient && (
+                <div className="mt-4 pt-3 border-t border-slate-200/70 flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">EHR Baseline:</span>
+                  <Badge variant="outline" className="bg-white border-slate-200 text-slate-700 text-[11px] font-normal">
+                    MRN: <strong className="ml-1 text-slate-900 font-mono">{selectedPatient.mrn}</strong>
+                  </Badge>
+                  <Badge variant="outline" className="bg-white border-slate-200 text-slate-700 text-[11px] font-normal">
+                    Room: <strong className="ml-1 text-slate-900">{selectedPatient.room_number}</strong>
+                  </Badge>
+                  <Badge variant="outline" className="bg-white border-slate-200 text-slate-700 text-[11px] font-normal">
+                    Resting BP: <strong className="ml-1 text-slate-900">{selectedPatient.systolic_bp}/{selectedPatient.diastolic_bp} mmHg</strong>
+                  </Badge>
+                  <Badge variant="outline" className="bg-white border-slate-200 text-slate-700 text-[11px] font-normal">
+                    HR: <strong className="ml-1 text-slate-900">{selectedPatient.heart_rate} bpm</strong>
+                  </Badge>
+                  <Badge variant="outline" className="bg-white border-slate-200 text-slate-700 text-[11px] font-normal">
+                    SpO2: <strong className="ml-1 text-slate-900">{selectedPatient.spo2}%</strong>
+                  </Badge>
+                </div>
+              )}
+            </div>
+
+            {/* 13 Physiological Clinical Markers Grid */}
+            <div className="p-5 sm:p-6 space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-emerald-600" />
+                    13 Clinical Biomarkers & Diagnostic Features
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Derived from standard Framingham / Cleveland cardiovascular risk cohorts.
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetToBaseline}
+                  className="text-xs text-slate-600 border-slate-200 hover:bg-slate-50 self-start sm:self-auto gap-1.5"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                  <span>Reset to Baseline</span>
+                </Button>
+              </div>
+
               {/* Row 1: Age, Sex, Chest Pain */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Input
@@ -470,21 +558,36 @@ function NewPredictionContent() {
                   ]}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Form Action Controls */}
-          <div className="flex items-center justify-end gap-3 pt-2">
-            <Button
-              type="submit"
-              variant="default"
-              size="lg"
-              isLoading={isEvaluating}
-              className="text-sm gap-2 shadow-sm px-8"
-            >
-              <Zap className="h-4 w-4" />
-              <span>Execute ML Risk Inference</span>
-            </Button>
+            {/* Unified Card Footer with Disclaimer and Execute Action */}
+            <div className="px-5 sm:px-6 py-4 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
+                <ShieldAlert className="h-4 w-4 text-slate-400 shrink-0" />
+                <span>Decision support only • Final diagnosis remains physician responsibility</span>
+              </div>
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleResetToBaseline}
+                  className="text-xs border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
+                >
+                  Reset Form
+                </Button>
+                <Button
+                  type="submit"
+                  variant="default"
+                  size="default"
+                  isLoading={isEvaluating}
+                  className="text-xs gap-2 shadow-sm px-6 font-semibold"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>Execute ML Risk Inference</span>
+                </Button>
+              </div>
+            </div>
           </div>
         </form>
       </div>

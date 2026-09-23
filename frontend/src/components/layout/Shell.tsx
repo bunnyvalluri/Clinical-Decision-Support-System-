@@ -186,6 +186,20 @@ export function Shell({ children }: ShellProps) {
     ];
   }, [user?.role, unreadAlertsCount]);
 
+  // Determine active navigation item cleanly without false parent matches
+  const activeNavItemHref = React.useMemo(() => {
+    // 1. Exact match takes highest precedence
+    const exact = navItems.find((item) => item.href === pathname);
+    if (exact) return exact.href;
+
+    // 2. Otherwise find longest prefix match (excluding /dashboard)
+    const prefixMatches = navItems
+      .filter((item) => item.href !== "/dashboard" && pathname.startsWith(item.href + "/"))
+      .sort((a, b) => b.href.length - a.href.length);
+
+    return prefixMatches[0]?.href ?? "";
+  }, [navItems, pathname]);
+
   const sidebarContent = (
     <div className="flex h-full flex-col bg-card text-card-foreground">
       {/* Brand Header */}
@@ -231,11 +245,7 @@ export function Shell({ children }: ShellProps) {
       {/* Navigation Menu */}
       <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-2">
         {navItems.map((item) => {
-          const isActive =
-            item.href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname === item.href ||
-                (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
+          const isActive = item.href === activeNavItemHref;
           const Icon = item.icon;
 
           return (
