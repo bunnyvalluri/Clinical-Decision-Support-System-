@@ -20,6 +20,7 @@ from channels_app.security_consumers import SecurityAgentConsumer
 from channels_app.loop_consumers import EngineeringLoopConsumer
 from channels_app.jules_consumers import JulesAutomationConsumer
 from channels_app.kaggle_consumers import KaggleDatasetConsumer
+from channels_app.browser_agent_consumers import BrowserAgentTaskConsumer
 
 websocket_urlpatterns = [
     re_path(r"^ws/dashboard/$", consumers.DashboardConsumer.as_asgi()),
@@ -32,6 +33,7 @@ websocket_urlpatterns = [
     re_path(r"^ws/user/$", consumers.UserConsumer.as_asgi()),
     re_path(r"^ws/ai/(?:(?P<workflow_id>[0-9a-f-]{36})/)?$", consumers.AIOrchestratorConsumer.as_asgi()),
     re_path(r"^ws/ai/agent/(?P<session_id>[0-9a-f-]{36})/$", AIAgentConsumer.as_asgi()),
+    re_path(r"^ws/ai-agents/tasks/$", BrowserAgentTaskConsumer.as_asgi()),
     re_path(r"^ws/mobile/$", MobileGatewayConsumer.as_asgi()),
     re_path(r"^ws/whiteboards/(?P<whiteboard_id>[0-9a-f-]{36})/$", consumers.WhiteboardCollaborationConsumer.as_asgi()),
     re_path(r"^ws/nocodb/(?P<dataset_slug>[a-zA-Z0-9_-]+)/$", consumers.NocoDBWorkspaceConsumer.as_asgi()),

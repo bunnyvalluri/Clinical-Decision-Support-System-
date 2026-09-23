@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from apps.ai_orchestrator.ollama_views import OllamaHealthView
+from apps.ai_orchestrator.typed_decision_views import LayaCapabilitiesView, LayaHealthView
 from apps.clinical.direct_urls import (
     alerts_router,
     evidence_router,
@@ -29,6 +30,11 @@ urlpatterns = [
     # Direct alias for Ollama Healthcheck
     path("api/ai/providers/ollama/health", OllamaHealthView.as_view(), name="ollama-health-direct"),
     path("api/ai/providers/ollama/health/", OllamaHealthView.as_view(), name="ollama-health-direct-slash"),
+    # Prompt 68: Direct aliases for Laya-MLX Capabilities and Health
+    path("api/ai/providers/laya/capabilities", LayaCapabilitiesView.as_view(), name="laya-capabilities-direct"),
+    path("api/ai/providers/laya/capabilities/", LayaCapabilitiesView.as_view(), name="laya-capabilities-direct-slash"),
+    path("api/ai/providers/laya/health", LayaHealthView.as_view(), name="laya-health-direct"),
+    path("api/ai/providers/laya/health/", LayaHealthView.as_view(), name="laya-health-direct-slash"),
     # Admin interface
     path("admin/", admin.site.urls),
 
@@ -68,6 +74,7 @@ urlpatterns = [
     path("api/v1/models/", include("apps.model_registry.urls", namespace="model_registry")),
     path("api/v1/audit/", include("apps.audit.urls", namespace="audit")),
     path("api/v1/ai/agents/", include("apps.ai_agents.urls", namespace="ai_agents")),
+    path("api/v1/ai-agents/", include("apps.ai_agents.urls", namespace="ai_agents_direct")),
     path("api/v1/ai/", include("apps.ai_orchestrator.urls", namespace="ai_orchestrator")),
     path("api/v1/external-apis/", include("apps.external_apis.urls", namespace="external_apis")),
     path("api/v1/user/", include("apps.patient_portal.urls")),

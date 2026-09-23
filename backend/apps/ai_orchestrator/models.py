@@ -1387,3 +1387,21 @@ class EmbeddingRegistry(models.Model):
 
     def __str__(self) -> str:
         return f"EmbeddingRegistry {self.model_name} (dim: {self.dimension})"
+
+
+# ---------------------------------------------------------------------------
+# Prompt 68: Controlled Local Typed-Decision AI Engine Models (Laya-MLX)
+# ---------------------------------------------------------------------------
+from .typed_decision_models import (  # noqa: E402
+    TypedDecisionProvider,
+    TypedDecisionModel,
+    TypedDecisionSchema,
+    TypedDecisionRequest,
+    TypedDecisionResult,
+    TypedDecisionEvaluation,
+    TypedDecisionAuditEvent,
+    SchemaStatus,
+    DecisionTypeChoices,
+    UncertaintyStatusChoices,
+)
+

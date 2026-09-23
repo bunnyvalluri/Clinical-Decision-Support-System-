@@ -58,6 +58,7 @@ Traditional clinical scoring tools (e.g., Framingham, TIMI) often rely on coarse
 | **Physician Override** | Structured override API with documented clinical rationales and timestamping | Preserves physician agency with tamper-evident audit records |
 | **Asynchronous PDF Reports** | Celery task queue + ReportLab rendering pipeline | Generates formatted, audit-ready clinical discharge and risk summaries |
 | **Patient Risk Timeline** | Phase 3 Controlled Taxonomy & multi-source event aggregation | Unified longitudinal trajectory with role-scoped privacy boundaries |
+| **Controlled Browser Agent** | Laya Ultrafast integration behind Agent Safety Gateway | Non-clinical operational & guideline automation; strict allowlist, zero PHI |
 | **Prediction Comparison Engine** | Current vs. Previous feature deltas, % changes, and TreeSHAP shifts | Instant clinical divergence audit and automatic escalation alert triggers |
 | **Clinician Feedback Loop** | Structured feedback (`PredictionFeedback`) without autonomous retraining | Empirically validates ML utility while preserving human clinical sovereignty |
 | **Cloud-Native Database** | Neon Serverless PostgreSQL with connection pooling & branching | Enterprise durability, instant schema test branches, and low-latency queries |

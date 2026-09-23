@@ -23,9 +23,11 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Django debug toolbar
-INSTALLED_APPS = INSTALLED_APPS + ["debug_toolbar"]
-MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
+# Django debug toolbar (opt-in only, disabled by default to prevent API latency)
+ENABLE_DEBUG_TOOLBAR = config("ENABLE_DEBUG_TOOLBAR", default=False, cast=bool)
+if ENABLE_DEBUG_TOOLBAR:
+    INSTALLED_APPS = INSTALLED_APPS + ["debug_toolbar"]
+    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
 
 INTERNAL_IPS = ["127.0.0.1", "::1"]
 

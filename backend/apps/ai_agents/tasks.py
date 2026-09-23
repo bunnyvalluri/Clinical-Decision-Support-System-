@@ -34,3 +34,18 @@ def execute_async_agent_task(
     except Exception as exc:
         logger.exception(f"Async agent task failed: {exc}")
         return {"status": "FAILED", "error": str(exc)}
+
+
+@shared_task(name="apps.ai_agents.tasks.execute_browser_agent_task_async")
+def execute_browser_agent_task_async(task_id: str):
+    """
+    Celery background worker executing controlled browser agent tasks.
+    Enforces timeout, independent verification, and immutable audit logging.
+    """
+    try:
+        from integrations.laya_agent.adapter import LayaAgentAdapter
+        task = LayaAgentAdapter.execute_task(task_id=task_id)
+        return {"status": task.execution_status, "task_id": str(task.id)}
+    except Exception as exc:
+        logger.exception(f"Async browser agent task failed: {exc}")
+        return {"status": "FAILED", "error": str(exc)}

@@ -717,3 +717,149 @@ class AgentFeedback(BaseModel):
 
     def __str__(self) -> str:
         return f"Feedback {self.rating} (score={self.score}) by {self.user}"
+
+
+class BrowserTaskState(models.TextChoices):
+    PENDING = "PENDING", "Pending"
+    VALIDATING = "VALIDATING", "Validating"
+    AWAITING_APPROVAL = "AWAITING_APPROVAL", "Awaiting Approval"
+    APPROVED = "APPROVED", "Approved"
+    RUNNING = "RUNNING", "Running"
+    VERIFYING = "VERIFYING", "Verifying"
+    SUCCEEDED = "SUCCEEDED", "Succeeded"
+    FAILED = "FAILED", "Failed"
+    BLOCKED = "BLOCKED", "Blocked"
+    CANCELLED = "CANCELLED", "Cancelled"
+    TIMED_OUT = "TIMED_OUT", "Timed Out"
+    REQUIRES_HUMAN_ACTION = "REQUIRES_HUMAN_ACTION", "Requires Human Action"
+
+
+class VerificationStatus(models.TextChoices):
+    UNVERIFIED = "UNVERIFIED", "Unverified"
+    PASSED = "PASSED", "Passed"
+    FAILED = "FAILED", "Failed"
+
+
+class ApprovedDestination(BaseModel):
+    """
+    Allowlist for approved browser automation target domains.
+    Default policy: DENY. Unknown domains are strictly BLOCKED.
+    """
+    domain = models.CharField(max_length=255, unique=True, db_index=True)
+    purpose = models.TextField(help_text="Clinical or operational justification for this domain.")
+    environment = models.CharField(max_length=50, default="PRODUCTION")
+    owner = models.CharField(max_length=150, default="Security Administration")
+    allowed_operations = models.JSONField(default=list, help_text="Allowed browser operations (e.g. READ_PUBLIC, NAVIGATE)")
+    phi_allowed = models.BooleanField(default=False, help_text="Whether PHI transmission is permitted. Default DENY.")
+    authentication_required = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        db_table = "approved_destinations"
+        verbose_name = "Approved Destination"
+        verbose_name_plural = "Approved Destinations"
+        ordering = ["domain"]
+
+    def __str__(self) -> str:
+        return f"{self.domain} [{'ACTIVE' if self.is_active else 'INACTIVE'}]"
+
+
+class BrowserAgentTask(BaseModel):
+    """
+    Controlled operational browser agent task model.
+    Authoritative store: Neon PostgreSQL.
+    """
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="browser_agent_tasks",
+    )
+    role = models.CharField(max_length=50, default="ADMIN")
+    goal = models.TextField(help_text="Natural-language goal for controlled browser execution.")
+    destination_url = models.URLField(max_length=1000)
+    destination_domain = models.CharField(max_length=255, db_index=True)
+    environment = models.CharField(max_length=50, default="PRODUCTION")
+    risk_level = models.CharField(
+        max_length=30,
+        choices=ToolRiskLevel.choices,
+        default=ToolRiskLevel.LOW,
+        db_index=True,
+    )
+    phi_classification = models.CharField(
+        max_length=50,
+        choices=DataClassification.choices,
+        default=DataClassification.PUBLIC,
+        db_index=True,
+    )
+    approval_status = models.CharField(
+        max_length=30,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.PENDING,
+        db_index=True,
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approved_browser_tasks",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    rejection_reason = models.TextField(blank=True, default="")
+    execution_status = models.CharField(
+        max_length=35,
+        choices=BrowserTaskState.choices,
+        default=BrowserTaskState.PENDING,
+        db_index=True,
+    )
+    verification_status = models.CharField(
+        max_length=30,
+        choices=VerificationStatus.choices,
+        default=VerificationStatus.UNVERIFIED,
+        db_index=True,
+    )
+    failure_reason = models.TextField(blank=True, default="")
+    audit_reference = models.CharField(max_length=100, blank=True, default="", db_index=True)
+    independent_verification_rules = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Programmatic rules to independently verify the outcome (e.g., expected text, selector present).",
+    )
+    steps_log = models.JSONField(default=list, blank=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "browser_agent_tasks"
+        verbose_name = "Browser Agent Task"
+        verbose_name_plural = "Browser Agent Tasks"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"BrowserTask {self.id} [{self.execution_status}] -> {self.destination_domain}"
+
+
+class AgentKillSwitchState(BaseModel):
+    """
+    Emergency operational kill switch for AI agent execution.
+    When active, all agent executions are instantly halted with AGENT_DISABLED.
+    """
+    is_active = models.BooleanField(default=False, help_text="True if emergency kill switch is activated.")
+    activated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="activated_kill_switches",
+    )
+    reason = models.TextField(blank=True, default="")
+    activated_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "agent_kill_switch_state"
+        verbose_name = "Agent Kill Switch State"
+        verbose_name_plural = "Agent Kill Switch States"
+
+    def __str__(self) -> str:
+        return f"KillSwitch [{'ACTIVATED' if self.is_active else 'INACTIVE'}]"
+

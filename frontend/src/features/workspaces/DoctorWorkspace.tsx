@@ -178,20 +178,21 @@ export function DoctorWorkspace() {
     const timeoutId = setTimeout(() => controller.abort(), 8_000);
 
     try {
-      // 1. Fetch summary metrics (fire-and-forget, non-blocking)
-      const summaryRes = await apiClient
-        .get("/predictions/doctor-summary/", { signal: controller.signal })
-        .catch(() => null);
-      if (summaryRes?.data?.data) setSummaryData(summaryRes.data.data);
+      // Fetch summary metrics and predictions in parallel for 2x+ faster loading
+      const [summaryResResult, predsResResult] = await Promise.allSettled([
+        apiClient.get("/predictions/doctor-summary/", { signal: controller.signal }),
+        apiClient.get("/predictions/", { signal: controller.signal }).catch(() =>
+          apiClient.get("/predictions/records/", { signal: controller.signal })
+        ),
+      ]);
 
-      // 2. Fetch predictions list — try two endpoints
-      let predsRes = await apiClient
-        .get("/predictions/", { signal: controller.signal })
-        .catch(() => null);
-      if (!predsRes?.data) {
-        predsRes = await apiClient
-          .get("/predictions/records/", { signal: controller.signal })
-          .catch(() => null);
+      if (summaryResResult.status === "fulfilled" && summaryResResult.value?.data?.data) {
+        setSummaryData(summaryResResult.value.data.data);
+      }
+
+      let predsRes: any = null;
+      if (predsResResult.status === "fulfilled" && predsResResult.value?.data) {
+        predsRes = predsResResult.value;
       }
 
       const rawList: any[] =

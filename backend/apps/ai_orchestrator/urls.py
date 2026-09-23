@@ -46,6 +46,18 @@ from .ollama_views import (
     OllamaModelStatusUpdateView,
     OllamaModelSyncView,
 )
+from .typed_decision_views import (
+    LayaCapabilitiesView,
+    LayaHealthView,
+    TypedDecisionInferenceView,
+    TypedDecisionSchemaListCreateView,
+    TypedDecisionSchemaDetailView,
+    TypedDecisionEvaluationListView,
+    SchemaRobustnessTriggerView,
+    TypedDecisionHistoryListView,
+    TypedDecisionKillSwitchView,
+    TypedDecisionReviewView,
+)
 
 app_name = "ai_orchestrator"
 
@@ -102,4 +114,17 @@ urlpatterns = [
     path("cline/approvals/decide/", ClineApprovalDecisionView.as_view(), name="cline-approvals-decide"),
     path("cline/kill-switch/", ClineKillSwitchView.as_view(), name="cline-kill-switch"),
     path("cline/tools/", ClineToolDefinitionListView.as_view(), name="cline-tools-list"),
+
+    # Prompt 68: Controlled Local Typed-Decision AI Engine (Laya-MLX)
+    path("providers/laya/capabilities/", LayaCapabilitiesView.as_view(), name="laya-capabilities"),
+    path("providers/laya/health/", LayaHealthView.as_view(), name="laya-health"),
+    path("typed-decisions/predict/", TypedDecisionInferenceView.as_view(), name="typed-decision-predict"),
+    path("typed-decisions/schemas/", TypedDecisionSchemaListCreateView.as_view(), name="typed-decision-schemas"),
+    path("typed-decisions/schemas/<uuid:schema_id>/", TypedDecisionSchemaDetailView.as_view(), name="typed-decision-schema-detail"),
+    path("typed-decisions/evaluations/", TypedDecisionEvaluationListView.as_view(), name="typed-decision-evaluations"),
+    path("typed-decisions/evaluations/robustness-test/", SchemaRobustnessTriggerView.as_view(), name="typed-decision-robustness-test"),
+    path("typed-decisions/history/", TypedDecisionHistoryListView.as_view(), name="typed-decision-history"),
+    path("typed-decisions/results/<uuid:result_id>/review/", TypedDecisionReviewView.as_view(), name="typed-decision-review"),
+    path("typed-decisions/kill-switch/", TypedDecisionKillSwitchView.as_view(), name="typed-decision-kill-switch"),
 ]
+

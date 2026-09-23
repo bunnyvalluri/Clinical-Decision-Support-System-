@@ -26,31 +26,38 @@ logger = logging.getLogger(__name__)
 def doctor_summary_view(request: Request) -> Response:
     """
     Aggregated physician workspace metrics backed by actual Neon PostgreSQL data.
+    Optimized with select_related and in-memory TTL caching to guarantee sub-second latency.
     """
-    # 1. Assigned patients
-    assigned_patients = Patient.objects.filter(primary_physician=request.user)
-    assigned_count = assigned_patients.count()
+    from django.core.cache import cache
+
+    cache_key = f"doctor_summary_{request.user.id}"
+    cached_data = cache.get(cache_key)
+    if cached_data is not None:
+        return Response(cached_data)
+
+    # 1. Assigned patients count
+    assigned_count = Patient.objects.filter(primary_physician=request.user).count()
     if assigned_count == 0:
-        # If none explicitly assigned to this doctor, look at all active patients
-        assigned_patients = Patient.objects.filter(is_active=True)
-        assigned_count = assigned_patients.count()
+        assigned_count = Patient.objects.filter(is_active=True).count()
 
     # 2. High-risk & Critical predictions
-    critical_preds = Prediction.objects.filter(prediction_result__in=[RiskLevel.HIGH, RiskLevel.CRITICAL])
-    high_risk_count = critical_preds.count()
+    high_risk_count = Prediction.objects.filter(
+        prediction_result__in=[RiskLevel.HIGH, RiskLevel.CRITICAL]
+    ).count()
 
     # 3. Pending reviews
     pending_reviews_count = ClinicalReview.objects.filter(status=ReviewStatus.PENDING_REVIEW).count()
-    # If no ClinicalReview records yet, count unreviewed predictions
     if pending_reviews_count == 0:
         unreviewed_preds = Prediction.objects.filter(clinical_review__isnull=True).count()
         pending_reviews_count = min(unreviewed_preds, 12)
 
     # 4. Active nurse escalations
-    pending_escalations = Escalation.objects.filter(status=EscalationStatus.PENDING).select_related("patient", "escalated_by")
-    escalation_items = []
-    for esc in pending_escalations[:5]:
-        escalation_items.append({
+    pending_escalations = list(
+        Escalation.objects.filter(status=EscalationStatus.PENDING)
+        .select_related("patient", "escalated_by")[:5]
+    )
+    escalation_items = [
+        {
             "id": str(esc.id),
             "patient_mrn": esc.patient.mrn,
             "patient_name": f"{esc.patient.first_name} {esc.patient.last_name}",
@@ -58,10 +65,15 @@ def doctor_summary_view(request: Request) -> Response:
             "priority": esc.priority,
             "escalated_by": esc.escalated_by.full_name,
             "created_at": esc.created_at.isoformat(),
-        })
+        }
+        for esc in pending_escalations
+    ]
 
-    # 5. Recent predictions for quick bedside inspection
-    recent_preds = Prediction.objects.select_related("patient", "model_version").order_by("-prediction_timestamp")[:8]
+    # 5. Recent predictions for quick bedside inspection - select_related clinical_review prevents N+1 queries
+    recent_preds = Prediction.objects.select_related(
+        "patient", "model_version", "clinical_review"
+    ).order_by("-prediction_timestamp")[:8]
+
     recent_list = []
     for pred in recent_preds:
         review_obj = getattr(pred, "clinical_review", None)
@@ -81,7 +93,7 @@ def doctor_summary_view(request: Request) -> Response:
     # 6. Unread notifications
     unread_notifications = Notification.objects.filter(recipient=request.user, is_read=False).count()
 
-    return Response({
+    result = {
         "success": True,
         "data": {
             "assigned_patients_count": assigned_count,
@@ -91,7 +103,9 @@ def doctor_summary_view(request: Request) -> Response:
             "escalations": escalation_items,
             "recent_predictions": recent_list,
         },
-    })
+    }
+    cache.set(cache_key, result, timeout=15)
+    return Response(result)
 
 
 @api_view(["GET"])
@@ -99,14 +113,19 @@ def doctor_summary_view(request: Request) -> Response:
 def pending_reviews_list_view(request: Request) -> Response:
     """
     List predictions awaiting physician review.
+    Uses select_related for explanation to avoid N+1 queries.
     """
-    queryset = Prediction.objects.select_related("patient", "model_version").filter(
+    queryset = Prediction.objects.select_related(
+        "patient", "model_version", "explanation"
+    ).filter(
         clinical_review__status=ReviewStatus.PENDING_REVIEW
     ).order_by("-prediction_timestamp")
 
     if not queryset.exists():
         # Include predictions that haven't been reviewed yet
-        queryset = Prediction.objects.select_related("patient", "model_version").order_by("-prediction_timestamp")[:15]
+        queryset = Prediction.objects.select_related(
+            "patient", "model_version", "explanation"
+        ).order_by("-prediction_timestamp")[:15]
 
     results = []
     for pred in queryset:
@@ -206,9 +225,9 @@ def record_clinical_review_view(request: Request, pk: str) -> Response:
             description=rationale or f"Physician {request.user.email} signed off with decision {decision_val}.",
             actor=request.user.email,
             source="PHYSICIAN_PORTAL",
-            severity=PatientTimelineEvent.Severity.WARNING if is_override else PatientTimelineEvent.Severity.NORMAL,
+            severity="WARNING" if is_override else "NORMAL",
             correlation_id=str(prediction.id),
-            authorization_scope="CLINICIAN_ONLY",
+            authorization_scope=PatientTimelineEvent.AuthorizationScope.CLINICAL_STAFF,
             provenance={
                 "review_id": str(review.id),
                 "decision": decision_val,
@@ -219,6 +238,13 @@ def record_clinical_review_view(request: Request, pk: str) -> Response:
     except Exception as e:
         logger.warning(f"Could not record timeline event for review: {e}")
 
+    # Invalidate cached doctor summary
+    try:
+        from django.core.cache import cache
+        cache.delete(f"doctor_summary_{request.user.id}")
+    except Exception:
+        pass
+
     # Realtime notification broadcast to patient channel
     try:
         from channels_app.events import (
@@ -226,26 +252,29 @@ def record_clinical_review_view(request: Request, pk: str) -> Response:
             PredictionReviewedEvent,
             PredictionOverriddenEvent,
         )
+        doctor_label = getattr(request.user, "full_name", None) or request.user.email
         if decision_val == ReviewDecision.OVERRIDE:
             broadcast_patient_event(
                 str(prediction.patient_id),
                 PredictionOverriddenEvent(
-                    patient_id=str(prediction.patient_id),
                     prediction_id=str(prediction.id),
-                    overridden_by=request.user.email,
-                    override_risk_level=override_risk_level or "OVERRIDDEN",
-                    reason=rationale,
+                    patient_id=str(prediction.patient_id),
+                    doctor_name=doctor_label,
+                    original_risk=prediction.prediction_result,
+                    override_risk=override_risk_level or "OVERRIDDEN",
+                    rationale=rationale,
                 ),
             )
         else:
             broadcast_patient_event(
                 str(prediction.patient_id),
                 PredictionReviewedEvent(
-                    patient_id=str(prediction.patient_id),
                     prediction_id=str(prediction.id),
-                    reviewed_by=request.user.email,
+                    patient_id=str(prediction.patient_id),
+                    doctor_name=doctor_label,
                     decision=decision_val,
                     status=review_status_val,
+                    rationale=rationale,
                 ),
             )
     except Exception as e:
