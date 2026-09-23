@@ -65,6 +65,7 @@ export const ROLE_ROUTE_REGISTRY: Record<RoleCategory, string[]> = {
     "/doctor/patients/:patientId/predictions",
     "/doctor/patients/:patientId/reviews",
     "/doctor/predictions",
+    "/doctor/predictions/new",
     "/doctor/predictions/:predictionId",
     "/doctor/reviews",
     "/doctor/reviews/:reviewId",

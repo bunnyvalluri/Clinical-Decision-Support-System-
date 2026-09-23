@@ -41,6 +41,12 @@ function NewPredictionContent() {
   const { patients, models, addPrediction } = useClinicalStore();
   const { user } = useAuthStore();
 
+  React.useEffect(() => {
+    const q = searchParams.toString();
+    const destination = q ? `/doctor/predictions/new?${q}` : "/doctor/predictions/new";
+    router.replace(destination);
+  }, [router, searchParams]);
+
   const [selectedPatientId, setSelectedPatientId] = React.useState(
     preselectedPatientId || (patients[0]?.id ?? "")
   );

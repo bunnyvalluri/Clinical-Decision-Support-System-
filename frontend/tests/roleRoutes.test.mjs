@@ -80,6 +80,7 @@ test("Doctor: Allowed routes", () => {
   assert.equal(resolveRoleRedirect("DOCTOR", "/doctor/patients/p-101"), null);
   assert.equal(resolveRoleRedirect("DOCTOR", "/doctor/patients/p-101/timeline"), null);
   assert.equal(resolveRoleRedirect("DOCTOR", "/doctor/predictions"), null);
+  assert.equal(resolveRoleRedirect("DOCTOR", "/doctor/predictions/new"), null);
   assert.equal(resolveRoleRedirect("DOCTOR", "/doctor/reviews"), null);
 });
 

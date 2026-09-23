@@ -23,6 +23,7 @@ const DOCTOR_NAV_ITEMS: NavItem[] = [
   { href: "/doctor/dashboard", icon: LayoutDashboard, label: "Dashboard", mobileQuick: true },
   { href: "/doctor/patients", icon: Users, label: "Patients", mobileQuick: true },
   { href: "/doctor/predictions", icon: Activity, label: "Predictions", mobileQuick: true },
+  { href: "/doctor/predictions/new", icon: HeartPulse, label: "Risk Assessment", mobileQuick: true },
   { href: "/doctor/reviews", icon: ClipboardList, label: "Reviews", badge: 3, mobileQuick: true },
   { href: "/doctor/whiteboards", icon: PenTool, label: "Whiteboards" },
   { href: "/doctor/data-workspace", icon: Database, label: "Data Workspace" },

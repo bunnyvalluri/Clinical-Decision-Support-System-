@@ -125,6 +125,8 @@ export function ResponsiveAppShell({
   // Active route matching
   const isActive = (href: string) => {
     if (pathname === href) return true;
+    const hasExact = navItems.some((n) => n.href === pathname);
+    if (hasExact) return false;
     if (href.split("/").length > 2 && pathname.startsWith(href + "/")) return true;
     return false;
   };

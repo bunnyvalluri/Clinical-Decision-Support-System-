@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ChevronRight,
   HeartPulse,
+  Plus,
   Search,
   TrendingUp,
   X,
@@ -96,6 +97,14 @@ export default function DoctorPredictionsPage() {
     <ResponsivePageContainer
       title="AI Risk Predictions"
       subtitle={`${predictions.length} active predictions — physician review required before clinical action`}
+      actions={
+        <Link href="/doctor/predictions/new">
+          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs gap-1.5 shadow-xs font-semibold">
+            <Plus className="h-3.5 w-3.5" />
+            New Assessment
+          </Button>
+        </Link>
+      }
     >
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

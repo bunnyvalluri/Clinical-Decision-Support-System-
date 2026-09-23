@@ -136,7 +136,7 @@ type ActiveTab = "DECISION_CENTER" | "GUIDELINES" | "TIMELINE" | "AI_SAFETY";
 export function DoctorWorkspace() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { notifications } = useClinicalStore();
+  const { notifications, predictions: storePredictions } = useClinicalStore();
 
   const [activeTab, setActiveTab] = React.useState<ActiveTab>("DECISION_CENTER");
   const [cases, setCases] = React.useState<PatientCase[]>([]);
@@ -248,8 +248,37 @@ export function DoctorWorkspace() {
         };
       });
 
-      setCases(mappedCases);
-      if (mappedCases.length > 0 && !selectedCase) setSelectedCase(mappedCases[0]);
+      if (mappedCases.length === 0 && storePredictions && storePredictions.length > 0) {
+        const fallbackCases: PatientCase[] = storePredictions.map((sp) => ({
+          id: String(sp.id),
+          patientId: String(sp.patient_id),
+          mrn: sp.patient_mrn || `MRN-${sp.patient_id}`,
+          name: sp.patient_name || "Assigned Inpatient",
+          age: (sp.clinical_factors?.age as number) || 62,
+          gender: (sp.clinical_factors?.sex as string) || "M",
+          bed: "ICU-Bed-01",
+          riskLevel: sp.risk_level,
+          probability: sp.probability,
+          ciLower: sp.confidence_interval?.[0] ?? Math.max(0, sp.probability - 0.04),
+          ciUpper: sp.confidence_interval?.[1] ?? Math.min(1, sp.probability + 0.04),
+          shapDrivers: (sp.shap_attributions || []).map((s) => ({
+            feature: s.feature,
+            impact: s.attribution,
+            label: s.description || `${s.feature} observed`,
+            positive: s.attribution >= 0,
+          })),
+          reviewStatus: sp.physician_override ? "OVERRIDDEN" : "PENDING",
+          admittedAt: sp.timestamp || "Recent",
+          chiefComplaint: sp.chief_complaint || "Cardiopulmonary monitoring",
+          modelVersion: sp.model_version || "RandomForest v1.4.2",
+          modelName: sp.model_name || "CardioEnsemble-RF",
+        }));
+        setCases(fallbackCases);
+        if (!selectedCase && fallbackCases.length > 0) setSelectedCase(fallbackCases[0]);
+      } else {
+        setCases(mappedCases);
+        if (mappedCases.length > 0 && !selectedCase) setSelectedCase(mappedCases[0]);
+      }
       setIsLive(true);
       setError(null);
     } catch (err: any) {
@@ -441,7 +470,7 @@ export function DoctorWorkspace() {
           </Button>
           <Button
             size="sm"
-            onClick={() => router.push("/predictions/new")}
+            onClick={() => router.push("/doctor/predictions/new")}
             className="text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -626,7 +655,7 @@ export function DoctorWorkspace() {
                 </p>
                 <Button
                   size="sm"
-                  onClick={() => router.push("/predictions/new")}
+                  onClick={() => router.push("/doctor/predictions/new")}
                   className="mt-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
                   <Plus className="h-3.5 w-3.5 mr-1" />
