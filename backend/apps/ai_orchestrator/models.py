@@ -1399,6 +1399,7 @@ from .typed_decision_models import (  # noqa: E402
     TypedDecisionRequest,
     TypedDecisionResult,
     TypedDecisionEvaluation,
+    TypedDecisionLanguageEvaluation,
     TypedDecisionAuditEvent,
     SchemaStatus,
     DecisionTypeChoices,

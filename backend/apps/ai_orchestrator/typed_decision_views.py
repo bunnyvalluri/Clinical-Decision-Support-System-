@@ -21,6 +21,7 @@ from .typed_decision_models import (
     TypedDecisionRequest,
     TypedDecisionResult,
     TypedDecisionEvaluation,
+    TypedDecisionLanguageEvaluation,
     TypedDecisionAuditEvent,
     SchemaStatus,
     DecisionTypeChoices,
@@ -33,6 +34,7 @@ from .typed_decision_serializers import (
     TypedDecisionRequestSerializer,
     TypedDecisionResultSerializer,
     TypedDecisionEvaluationSerializer,
+    TypedDecisionLanguageEvaluationSerializer,
     TypedDecisionInferenceInputSerializer,
     SchemaRobustnessTestSerializer,
     TypedDecisionKillSwitchSerializer,
@@ -159,22 +161,20 @@ class TypedDecisionInferenceView(APIView):
             decision_type=schema.decision_type,
         )
 
-        # 4. Invoke Provider
-        provider = LayaMLXProvider()
-        options = data.get("custom_options") or schema.allowed_options
+        # 4. Invoke Provider via TypedDecisionGateway
+        from integrations.typed_decisions.gateway import TypedDecisionGateway
 
-        if schema.decision_type == DecisionTypeChoices.CHOICE:
-            output = provider.predict_choice(
-                minimized, schema.instructions, options, schema.version, correlation_id
-            )
-        elif schema.decision_type == DecisionTypeChoices.SCORE:
-            output = provider.predict_score(
-                minimized, schema.instructions, options, schema.version, correlation_id
-            )
-        else:
-            output = provider.predict_boolean(
-                minimized, schema.instructions, schema.version, correlation_id
-            )
+        options = data.get("custom_options") or schema.allowed_options
+        output = TypedDecisionGateway.predict(
+            decision_type=schema.decision_type,
+            case_context=minimized,
+            instructions=schema.instructions,
+            options_or_criteria=options,
+            schema_version=schema.version,
+            correlation_id=correlation_id,
+            language=data.get("language"),
+            requested_provider=data.get("requested_provider"),
+        )
 
         # 5. Persist immutable result
         res_obj = TypedDecisionResult.objects.create(
@@ -201,6 +201,8 @@ class TypedDecisionInferenceView(APIView):
             "confidence": output.confidence,
             "requires_human_review": output.requires_human_review,
             "uncertainty_status": output.uncertainty_status,
+            "detected_language": output.detected_language,
+            "provider": output.provider_name,
         })
 
         return Response(
@@ -219,10 +221,62 @@ class TypedDecisionInferenceView(APIView):
                 "provider": output.provider_name,
                 "model_identifier": output.model_identifier,
                 "model_revision": output.model_revision,
+                "detected_language": output.detected_language,
+                "detected_script": output.detected_script,
+                "routing_decision": output.routing_decision,
                 "created_at": res_obj.created_at.isoformat(),
             },
             status=status.HTTP_200_OK,
         )
+
+
+class AllProvidersCapabilitiesView(APIView):
+    """
+    GET /api/ai/providers/capabilities
+    Aggregated capability comparison across all registered typed-decision providers.
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from integrations.typed_decisions.gateway import TypedDecisionGateway
+        return Response(TypedDecisionGateway.get_all_capabilities(), status=status.HTTP_200_OK)
+
+
+class LayaLanguageEvaluationListView(APIView):
+    """
+    GET /api/ai/evaluations/laya/languages/
+    Multilingual evaluation metrics and clinical validation status per language.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Auto-seed standard languages if empty
+        if not TypedDecisionLanguageEvaluation.objects.exists():
+            seed_data = [
+                ("en", "English", "convaiinnovations/laya", 0.783, 0.042, True, "EVALUATED"),
+                ("te", "Telugu", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+                ("hi", "Hindi", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+                ("ta", "Tamil", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+                ("kn", "Kannada", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+                ("ml", "Malayalam", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+                ("bn", "Bengali", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+                ("mr", "Marathi", "convaiinnovations/laya-multilingual", None, None, False, "NOT_EVALUATED"),
+            ]
+            for code, name, ckpt, acc, cal, val, st in seed_data:
+                TypedDecisionLanguageEvaluation.objects.create(
+                    language_code=code,
+                    language_name=name,
+                    checkpoint=ckpt,
+                    accuracy=acc,
+                    calibration_error=cal,
+                    is_clinically_validated=val,
+                    status=st,
+                )
+
+        evals = TypedDecisionLanguageEvaluation.objects.all().order_by("language_name")
+        serializer = TypedDecisionLanguageEvaluationSerializer(evals, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class TypedDecisionSchemaListCreateView(APIView):

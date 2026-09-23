@@ -8,7 +8,13 @@ from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from apps.ai_orchestrator.ollama_views import OllamaHealthView
-from apps.ai_orchestrator.typed_decision_views import LayaCapabilitiesView, LayaHealthView
+from apps.ai_orchestrator.typed_decision_views import (
+    LayaCapabilitiesView,
+    LayaHealthView,
+    TypedDecisionInferenceView,
+    TypedDecisionSchemaListCreateView,
+    LayaLanguageEvaluationListView,
+)
 from apps.clinical.direct_urls import (
     alerts_router,
     evidence_router,
@@ -30,11 +36,17 @@ urlpatterns = [
     # Direct alias for Ollama Healthcheck
     path("api/ai/providers/ollama/health", OllamaHealthView.as_view(), name="ollama-health-direct"),
     path("api/ai/providers/ollama/health/", OllamaHealthView.as_view(), name="ollama-health-direct-slash"),
-    # Prompt 68: Direct aliases for Laya-MLX Capabilities and Health
+    # Prompt 68 & 69: Direct aliases for Laya Capabilities, Health, Decisions, Schemas, and Evaluations
     path("api/ai/providers/laya/capabilities", LayaCapabilitiesView.as_view(), name="laya-capabilities-direct"),
     path("api/ai/providers/laya/capabilities/", LayaCapabilitiesView.as_view(), name="laya-capabilities-direct-slash"),
     path("api/ai/providers/laya/health", LayaHealthView.as_view(), name="laya-health-direct"),
     path("api/ai/providers/laya/health/", LayaHealthView.as_view(), name="laya-health-direct-slash"),
+    path("api/ai/decisions/predict", TypedDecisionInferenceView.as_view(), name="ai-decisions-predict-root"),
+    path("api/ai/decisions/predict/", TypedDecisionInferenceView.as_view(), name="ai-decisions-predict-root-slash"),
+    path("api/ai/decision-schemas", TypedDecisionSchemaListCreateView.as_view(), name="ai-decision-schemas-root"),
+    path("api/ai/decision-schemas/", TypedDecisionSchemaListCreateView.as_view(), name="ai-decision-schemas-root-slash"),
+    path("api/ai/evaluations/laya", LayaLanguageEvaluationListView.as_view(), name="ai-evaluations-laya-root"),
+    path("api/ai/evaluations/laya/", LayaLanguageEvaluationListView.as_view(), name="ai-evaluations-laya-root-slash"),
     # Admin interface
     path("admin/", admin.site.urls),
 

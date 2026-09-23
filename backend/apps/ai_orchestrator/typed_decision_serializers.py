@@ -9,6 +9,7 @@ from .typed_decision_models import (
      TypedDecisionRequest,
      TypedDecisionResult,
      TypedDecisionEvaluation,
+     TypedDecisionLanguageEvaluation,
      TypedDecisionAuditEvent,
      SchemaStatus,
      DecisionTypeChoices,
@@ -59,14 +60,23 @@ class TypedDecisionEvaluationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class TypedDecisionLanguageEvaluationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TypedDecisionLanguageEvaluation
+        fields = "__all__"
+
+
 class TypedDecisionInferenceInputSerializer(serializers.Serializer):
     schema_name = serializers.CharField(max_length=128, required=True)
     schema_version = serializers.CharField(max_length=32, default="1.0.0")
     case_context = serializers.CharField(required=True)
+    language = serializers.CharField(max_length=16, required=False, default="")
+    requested_provider = serializers.CharField(max_length=32, required=False, default="")
     custom_options = serializers.ListField(
         child=serializers.CharField(), required=False, allow_empty=True
     )
     correlation_id = serializers.CharField(max_length=64, required=False, default="")
+
 
 
 class SchemaRobustnessTestSerializer(serializers.Serializer):

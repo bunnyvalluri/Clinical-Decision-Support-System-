@@ -200,6 +200,37 @@ class TypedDecisionEvaluation(models.Model):
         return f"Eval {self.schema.name} (robustness: {self.robustness_score})"
 
 
+class TypedDecisionLanguageEvaluation(models.Model):
+    """
+    Multilingual evaluation record per language and checkpoint.
+    Displays 'NOT EVALUATED' unless controlled evaluation benchmark has been executed.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    language_code = models.CharField(max_length=16, db_index=True)
+    language_name = models.CharField(max_length=64)
+    checkpoint = models.CharField(max_length=128, default="convaiinnovations/laya-multilingual")
+    accuracy = models.FloatField(null=True, blank=True)
+    calibration_error = models.FloatField(null=True, blank=True)
+    confidence_mean = models.FloatField(null=True, blank=True)
+    abstention_rate = models.FloatField(null=True, blank=True)
+    human_override_rate = models.FloatField(null=True, blank=True)
+    sample_size = models.IntegerField(default=0)
+    is_clinically_validated = models.BooleanField(default=False)
+    status = models.CharField(max_length=32, default="NOT_EVALUATED")
+    evaluation_notes = models.TextField(blank=True, default="")
+    evaluated_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "typed_decision_language_evaluations"
+        unique_together = ("language_code", "checkpoint")
+        verbose_name = "Typed Decision Language Evaluation"
+        verbose_name_plural = "Typed Decision Language Evaluations"
+        ordering = ["language_name"]
+
+    def __str__(self) -> str:
+        return f"{self.language_name} ({self.language_code}) - {self.status}"
+
+
 class TypedDecisionAuditEvent(models.Model):
     """
     Tamper-evident audit event for administrative, configuration, and inference actions.
@@ -220,3 +251,5 @@ class TypedDecisionAuditEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.created_at.strftime('%Y-%m-%d %H:%M:%S')} - {self.action} by {self.actor_role}"
+
+

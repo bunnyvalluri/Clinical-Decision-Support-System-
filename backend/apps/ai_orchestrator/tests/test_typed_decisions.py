@@ -297,3 +297,107 @@ class TestTypedDecisionAPI:
         assert resp_on.status_code == status.HTTP_200_OK
         assert resp_on.data["is_enabled"] is True
 
+
+from integrations.typed_decisions.language_router import LayaLanguageRouter
+from integrations.typed_decisions.gateway import TypedDecisionGateway
+from integrations.typed_decisions.base import ProviderType
+from apps.ai_orchestrator.typed_decision_views import (
+    AllProvidersCapabilitiesView,
+    LayaLanguageEvaluationListView,
+)
+
+
+class TestMultilingualLanguageRouter:
+    """Prompt 69 Multilingual Script Detection & Routing tests."""
+
+    def test_telugu_script_routes_to_multilingual_checkpoint(self):
+        """Telugu text must route to convaiinnovations/laya-multilingual."""
+        telugu_text = "రోగికి జ్వరం మరియు తీవ్రమైన తలనొప్పి ఉంది."
+        analysis = LayaLanguageRouter.analyse(telugu_text)
+        assert analysis["detected_language"] == "te"
+        assert analysis["script"] == "telugu"
+        assert analysis["recommended_checkpoint"] == "convaiinnovations/laya-multilingual"
+        assert "Non-Latin script detected" in analysis["routing_reason"]
+
+    def test_hindi_script_routes_to_multilingual_checkpoint(self):
+        """Devanagari text must route to convaiinnovations/laya-multilingual."""
+        hindi_text = "रोगी को तेज बुखार और खांसी है।"
+        analysis = LayaLanguageRouter.analyse(hindi_text)
+        assert analysis["detected_language"] == "hi"
+        assert analysis["script"] == "devanagari"
+        assert analysis["recommended_checkpoint"] == "convaiinnovations/laya-multilingual"
+
+    def test_english_script_routes_to_monolingual_checkpoint(self):
+        """Pure English text routes to convaiinnovations/laya."""
+        eng_text = "Patient vitals: BP 120/80 mmHg, HR 72 bpm, SpO2 98%."
+        analysis = LayaLanguageRouter.analyse(eng_text)
+        assert analysis["script"] == "latin"
+        assert analysis["is_english"] is True
+        assert analysis["recommended_checkpoint"] == "convaiinnovations/laya"
+
+    def test_detect_script_direct(self):
+        """Direct script detector returns script and fraction."""
+        script, fraction = LayaLanguageRouter.detect_script("రోగికి జ్వరం")
+        assert script == "telugu"
+        assert fraction > 0.5
+
+
+
+class TestTypedDecisionGateway:
+    """Prompt 69 Common Abstraction Gateway tests."""
+
+    def test_gateway_lists_providers(self):
+        gw = TypedDecisionGateway()
+        status_map = gw.get_all_capabilities()
+        assert "default_provider" in status_map
+        assert "providers" in status_map
+        assert "laya" in status_map["providers"]
+        assert "laya_mlx" in status_map["providers"]
+
+    def test_gateway_resolves_laya_provider(self):
+        gw = TypedDecisionGateway()
+        provider = gw.get_provider("LAYA")
+        assert provider.name == "laya"
+        caps = provider.capabilities()
+        assert caps["provider"] == "laya"
+        assert "supported_languages" in caps
+
+    @patch("apps.ai_orchestrator.typed_decision_models.TypedDecisionLanguageEvaluation.objects.exists")
+    @patch("apps.ai_orchestrator.typed_decision_models.TypedDecisionLanguageEvaluation.objects.all")
+    def test_language_evaluations_endpoint(self, mock_lang_eval_all, mock_exists):
+        """GET /api/ai/evaluations/laya/languages/ returns evaluations."""
+        mock_exists.return_value = True
+        mock_eval = MagicMock()
+        mock_eval.language_code = "te"
+        mock_eval.language_name = "Telugu"
+        mock_eval.checkpoint = "convaiinnovations/laya-multilingual"
+        mock_eval.status = "EVALUATED"
+        mock_eval.accuracy = 0.82
+        mock_eval.calibration_error = 0.04
+        mock_eval.abstention_rate = 0.05
+        mock_eval.human_override_rate = 0.03
+        mock_eval.sample_size = 100
+        mock_eval.is_clinically_validated = True
+        mock_eval.evaluation_notes = "Benchmarked on Indian Health Service corpus"
+        mock_eval.evaluated_at = None
+        mock_lang_eval_all.return_value.order_by.return_value = [mock_eval]
+
+        factory = APIRequestFactory()
+        request = factory.get("/api/ai/evaluations/laya/languages/")
+        user = MagicMock()
+        user.is_authenticated = True
+        user.role = "INFORMATICIST"
+        user.is_staff = True
+        force_authenticate(request, user=user)
+
+        view = LayaLanguageEvaluationListView.as_view()
+        response = view(request)
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        assert response.data[0]["language_name"] == "Telugu"
+        assert response.data[0]["language_code"] == "te"
+        assert response.data[0]["accuracy"] == 0.82
+
+
+
+
