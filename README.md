@@ -59,6 +59,9 @@ Traditional clinical scoring tools (e.g., Framingham, TIMI) often rely on coarse
 | **Asynchronous PDF Reports** | Celery task queue + ReportLab rendering pipeline | Generates formatted, audit-ready clinical discharge and risk summaries |
 | **Patient Risk Timeline** | Phase 3 Controlled Taxonomy & multi-source event aggregation | Unified longitudinal trajectory with role-scoped privacy boundaries |
 | **Controlled Browser Agent** | Laya Ultrafast integration behind Agent Safety Gateway | Non-clinical operational & guideline automation; strict allowlist, zero PHI |
+| **Typed Decision Gateway** | Unified `TypedDecisionProvider` abstraction (Laya & Laya-MLX) | Controlled categorical choice, score, and boolean workflow routing |
+| **Multilingual Script Router** | Pure-Python Unicode script router (Telugu, Hindi, Tamil, Kannada, Malayalam, etc.) | Prevents non-Latin model collapse by routing to `laya-multilingual` |
+| **AI Evaluation Center** | Real-time calibration, permutation robustness, and language matrix | Complete transparency with explicit `NOT EVALUATED` tags for non-validated sets |
 | **Prediction Comparison Engine** | Current vs. Previous feature deltas, % changes, and TreeSHAP shifts | Instant clinical divergence audit and automatic escalation alert triggers |
 | **Clinician Feedback Loop** | Structured feedback (`PredictionFeedback`) without autonomous retraining | Empirically validates ML utility while preserving human clinical sovereignty |
 | **Cloud-Native Database** | Neon Serverless PostgreSQL with connection pooling & branching | Enterprise durability, instant schema test branches, and low-latency queries |
@@ -658,6 +661,10 @@ For in-depth architectural specifications and subsystem runbooks, consult the `d
 - [📡 API & WebSockets Guide](docs/api.md) — Complete endpoint reference with payload examples.
 - [💾 Database Architecture](docs/database.md) — Neon PostgreSQL schemas, indexing, and recovery.
 - [🚢 Deployment Runbook](docs/deployment_guide.md) — Containerization, Nginx, and cloud hosting guidelines.
+- [🧠 Laya Multilingual Provider](docs/ai/laya.md) — Script-first multilingual routing (`convaiinnovations/laya-multilingual`) and quality evaluations.
+- [⚡ Laya-MLX Engine](docs/ai/laya-mlx.md) — Apple Silicon native MLX typed decisions, capability checks, and failovers.
+- [📜 ADR-0068: Laya-MLX Integration](docs/adr/ADR-0068-laya-mlx-integration.md) — Auxiliary typed decisions on Apple Silicon.
+- [📜 ADR-0069: Laya Multilingual Integration](docs/adr/ADR-0069-laya-provider.md) — Common abstraction, Indic script routing, and transparency invariants.
 
 ---
 
