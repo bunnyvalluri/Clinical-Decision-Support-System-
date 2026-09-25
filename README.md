@@ -4,12 +4,12 @@
 
 <p align="center">
   <a href="https://clinical-decision-support-system-2026.vercel.app">
-    <img src="frontend/public/landing-hero.png" alt="HealthNova AI — Clinical Decision Support & Patient Risk Intelligence" width="100%" />
+    <img src="frontend/public/landing-hero.png" alt="HealthNova AI — Clinical Decision Support & Patient Risk Intelligence" style="max-width: 100%; height: auto; border-radius: 12px;" width="100%" />
   </a>
 </p>
 
 <p align="center">
-  <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-clinical--decision--support--system--2026.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <a href="https://clinical-decision-support-system-2026.vercel.app"><img src="https://img.shields.io/badge/🚀%20Live%20Demo-clinical--decision--support--system--2026.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" style="max-width: 100%;" /></a>
 </p>
 
 <h3 align="center">Academic Research Project: Enhancing Clinical Decision Support Systems Through Patient Risk Level Prediction Using Machine Learning Techniques</h3>
@@ -24,6 +24,7 @@
   <a href="https://djangoproject.com"><img src="https://img.shields.io/badge/Django-5.0.14-092E20?style=flat-square&logo=django&logoColor=white" alt="Django 5.0" /></a>
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-16.3-black?style=flat-square&logo=next.js&logoColor=white" alt="Next.js 16" /></a>
   <a href="https://react.dev"><img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React 19" /></a>
+  <br/>
   <a href="https://typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript 5" /></a>
   <a href="https://neon.tech"><img src="https://img.shields.io/badge/Neon-PostgreSQL%2016-00E599?style=flat-square&logo=postgresql&logoColor=black" alt="Neon PostgreSQL" /></a>
   <a href="https://redis.io"><img src="https://img.shields.io/badge/Redis-7%20Alpine-DC382D?style=flat-square&logo=redis&logoColor=white" alt="Redis 7" /></a>
@@ -194,30 +195,30 @@ sequenceDiagram
 
 ## 💻 Technology Stack
 
-| Layer | Component | Version | Role & Architectural Purpose |
-|---|---|---|---|
-| **Frontend Framework** | [Next.js](https://nextjs.org/) | `16.3.5` | React application framework with App Router, SSR, and standalone build target |
-| **UI Library** | [React](https://react.dev/) | `19.0.0` | High-performance declarative component rendering |
-| **Frontend Language** | [TypeScript](https://www.typescriptlang.org/) | `^5.0.0` | End-to-end type safety, strict clinical interfaces, and compile-time verification |
-| **Styling & Design** | [Tailwind CSS](https://tailwindcss.com/) | `^4.0.0` | Institutional dark-mode design system with calibrated clinical color tokens |
-| **Client State** | [Zustand](https://github.com/pmndrs/zustand) | `^5.0.3` | Lightweight, high-speed reactive stores (`authStore`, `clinicalStore`) |
-| **Data Fetching** | [Axios](https://axios-http.com/) & [React Query](https://tanstack.com/query) | `^1.7.9` / `^5.102` | API communication with automated JWT token rotation interceptors |
-| **Icons & Charts** | [Lucide React](https://lucide.dev/) & [Recharts](https://recharts.org/) | `^0.475` / `^3.10` | Accessible clinical iconography and interactive risk trend charts |
-| **Backend Framework** | [Django](https://www.djangoproject.com/) | `5.0.14` | Enterprise Python framework, relational ORM, and schema migrations |
-| **REST API** | [Django REST Framework](https://www.django-rest-framework.org/) | `3.15.2` | RESTful serialization, viewsets, filters, and permission controllers |
-| **ASGI Server** | [Daphne](https://github.com/django/daphne) | `4.1.2` | Twisted-based ASGI server managing simultaneous HTTP and WebSocket traffic |
-| **Real-Time Layer** | [Django Channels](https://channels.readthedocs.io/) | `4.1.0` | WebSocket routing, multiplexed room channels, and asynchronous consumers |
-| **Channel Broker** | [channels-redis](https://github.com/django/channels_redis) | `4.2.0` | Redis-backed channel layer for cross-process event pub/sub |
-| **Asynchronous Queue** | [Celery](https://docs.celeryq.dev/) | `5.4.0` | Distributed asynchronous task queue for compute-heavy background jobs |
-| **Database** | [Neon Serverless PostgreSQL](https://neon.tech/) | `16 (Cloud)` | Serverless cloud Postgres with instant branching, autoscaling, and connection pooling |
-| **Database Driver** | [psycopg2-binary](https://www.psycopg.org/) | `2.9.10` | High-performance C-optimized PostgreSQL database adapter for Python |
-| **Cache & Broker** | [Redis](https://redis.io/) | `7-Alpine` | In-memory broker for Channels, Celery tasks, and distributed locks |
-| **Machine Learning** | [scikit-learn](https://scikit-learn.org/) | `1.6.1` | Model training and inference (Random Forest, SVM, AdaBoost) |
-| **Explainable AI** | [SHAP](https://shap.readthedocs.io/) | `0.46.0` | TreeSHAP computation for localized feature attribution weights |
-| **Data Processing** | [Pandas](https://pandas.pydata.org/) & [NumPy](https://numpy.org/) | `2.2.3` / `2.2.3` | Matrix manipulation, imputation, scaling, and feature engineering |
-| **Report Generation** | [ReportLab](https://www.reportlab.com/) | `4.3.1` | Programmatic compilation of styled clinical PDF discharge summaries |
-| **Reverse Proxy** | [Nginx](https://nginx.org/) | `1.25-Alpine` | TLS/SSL termination, WebSocket header upgrades, and static caching |
-| **Containerization** | [Docker](https://www.docker.com/) & [Compose](https://docs.docker.com/compose/) | `24+` / `v2+` | Multi-container orchestration across development, staging, and production |
+| Component & Layer | Version | Architectural Role |
+|---|:---:|---|
+| **[Next.js](https://nextjs.org/)** (Frontend) | `16.3.5` | React framework with App Router, SSR & standalone output |
+| **[React](https://react.dev/)** (UI Library) | `19.0.0` | High-performance declarative component rendering |
+| **[TypeScript](https://www.typescriptlang.org/)** (Language) | `^5.0.0` | End-to-end type safety & strict clinical data contracts |
+| **[Tailwind CSS](https://tailwindcss.com/)** (Styling) | `^4.0.0` | Light clinical design system with calibrated risk tokens |
+| **[Zustand](https://github.com/pmndrs/zustand)** (State) | `^5.0.3` | Lightweight reactive stores (`authStore`, `clinicalStore`) |
+| **[Axios](https://axios-http.com/) & [React Query](https://tanstack.com/query)** | `^1.7` / `^5.1` | API communication with automated JWT token rotation |
+| **[Lucide React](https://lucide.dev/) & [Recharts](https://recharts.org/)** | `^0.47` / `^3.1` | Accessible medical iconography & responsive risk charts |
+| **[Django](https://www.djangoproject.com/)** (Backend) | `5.0.14` | Enterprise Python framework, relational ORM & migrations |
+| **[Django REST Framework](https://www.django-rest-framework.org/)** | `3.15.2` | RESTful serialization, viewsets, filters & permission guards |
+| **[Daphne](https://github.com/django/daphne)** (ASGI Server) | `4.1.2` | Twisted-based ASGI handling simultaneous HTTP & WebSockets |
+| **[Django Channels](https://channels.readthedocs.io/)** (Real-Time) | `4.1.0` | WebSocket routing, multiplexed rooms & async consumers |
+| **[channels-redis](https://github.com/django/channels_redis)** | `4.2.0` | Redis channel layer for cross-process event pub/sub |
+| **[Celery](https://docs.celeryq.dev/)** (Async Queue) | `5.4.0` | Distributed asynchronous task queue for background compute |
+| **[Neon PostgreSQL](https://neon.tech/)** (Cloud DB) | `16 (Cloud)` | Serverless PostgreSQL with pooling, branching & autoscaling |
+| **[psycopg2-binary](https://www.psycopg.org/)** (Driver) | `2.9.10` | High-performance C-optimized PostgreSQL database adapter |
+| **[Redis](https://redis.io/)** (Cache / Broker) | `7-Alpine` | In-memory broker for Channels, Celery tasks & locks |
+| **[scikit-learn](https://scikit-learn.org/)** (ML Engine) | `1.6.1` | Supervised model training (Random Forest, SVM, AdaBoost) |
+| **[SHAP](https://shap.readthedocs.io/)** (XAI) | `0.46.0` | TreeSHAP individualized feature attribution weights |
+| **[Pandas](https://pandas.pydata.org/) & [NumPy](https://numpy.org/)** | `2.2.3` | Matrix manipulation, imputation, scaling & feature prep |
+| **[ReportLab](https://www.reportlab.com/)** (PDF Reports) | `4.3.1` | Programmatic compilation of audit-ready clinical summaries |
+| **[Nginx](https://nginx.org/)** (Reverse Proxy) | `1.25-Alpine` | TLS/SSL termination, WebSocket upgrades & static caching |
+| **[Docker](https://www.docker.com/) & [Compose](https://docs.docker.com/compose/)** | `24+` / `v2+` | Multi-container orchestration across dev and production |
 
 ---
 
@@ -229,21 +230,40 @@ Aligned with foundational research in patient risk prediction (*"Enhancing Clini
 > ⚠️ **Mandatory Invariant — Zero Metric Fabrication**:
 > While the exploratory reference research paper reported a preliminary 99% accuracy for Random Forest on initial partitioned data, production clinical deployment requires honest, reproducible cross-validation on unaugmented clinical cohorts without synthetic inflation.
 
-| Algorithm Family | Model Variant | Evaluated Accuracy | Precision (Macro) | Recall / Sensitivity | F1-Score | ROC-AUC (OVR) | Brier Score | Calibration Method | Operational Role |
-|---|---|---|---|---|---|---|---|---|---|
-| **Random Forest Classifier** | 150 Trees, Gini, Balanced Subsample | **89.20%** | 88.45% | 89.10% | **88.75%** | **0.9420** | **0.0825** | Platt Calibrated | **Champion (Production Default)** |
-| **Support Vector Machine (SVM)** | RBF Kernel, C=1.5, Platt Probabilities | **85.50%** | 84.80% | 85.20% | **84.95%** | **0.9180** | **0.1040** | Platt Calibrated | **Challenger (Informatics)** |
-| **AdaBoost Classifier** | 100 Estimators, SAMME.R, LR=0.5 | **83.90%** | 83.10% | 83.70% | **83.35%** | **0.8960** | **0.1180** | Empirical Sigmoid | **Challenger (Edge-Case Boundary)** |
+| Model Architecture | Accuracy | ROC-AUC | F1-Score | Clinical Status |
+|---|:---:|:---:|:---:|---|
+| **Random Forest Classifier** | **89.20%** | **0.9420** | **88.75%** | 🏆 Champion (Production Default) |
+| **Support Vector Machine (SVM)** | 85.50% | 0.9180 | 84.95% | 🔬 Challenger (Informatics) |
+| **AdaBoost Classifier** | 83.90% | 0.8960 | 83.35% | ⚡ Challenger (Edge Boundary) |
+
+<details>
+<summary><b>🔍 View Full Calibration, Hyperparameters & Validation Matrix (Expand)</b></summary>
+
+| Evaluation Parameter | Random Forest | Support Vector Machine | AdaBoost |
+|---|---|---|---|
+| **Hyperparameters** | 150 Trees, Gini, Balanced | RBF Kernel, C=1.5, Platt | 100 Estimators, SAMME.R, LR=0.5 |
+| **Evaluated Accuracy** | **89.20%** | 85.50% | 83.90% |
+| **Precision (Macro)** | 88.45% | 84.80% | 83.10% |
+| **Recall / Sensitivity** | 89.10% | 85.20% | 83.70% |
+| **F1-Score (Macro)** | **88.75%** | 84.95% | 83.35% |
+| **ROC-AUC (OVR)** | **0.9420** | 0.9180 | 0.8960 |
+| **Brier Score** | **0.0825** | 0.1040 | 0.1180 |
+| **Calibration Method** | Platt Calibrated | Platt Calibrated | Empirical Sigmoid |
+| **Operational Tier** | **Production Champion** | Challenger (Informatics) | Challenger (Edge Boundaries) |
+
+</details>
 
 ### 2. Configurable Clinical Risk Threshold Policies (`RiskThresholdPolicy`)
 Rather than rigid hardcoded cutoffs, HealthNova AI provides an auditable, database-backed threshold policy engine:
 - **Governance**: Policies specify `low_threshold`, `medium_threshold`, and `high_threshold`, requiring Chief Medical Officer or Informatics approval before activation.
 - **Auditing**: Every risk prediction links to the active policy version (e.g. `policy-v2026.1`), guaranteeing full retrospective auditability.
 
-```
-[0.00 ────────── [Low Thresh] ────────── [Med Thresh] ────────── [High Thresh] ────────── 1.00]
-      LOW (Green)               MEDIUM (Amber)             HIGH (Rose)             CRITICAL (Purple)
-   Routine Follow-up          Enhanced Monitoring         Urgent Review           Immediate Triage
+```text
+[0.00] ────── Low ────── Med ────── High ────── [1.00]
+🟢 LOW: Routine Follow-up (< 0.35)
+🟡 MEDIUM: Enhanced Monitoring (0.35 - 0.65)
+🔴 HIGH: Urgent Review (0.65 - 0.85)
+🟣 CRITICAL: Immediate Triage (> 0.85)
 ```
 
 ### 3. Out-Of-Distribution (OOD) Detection & Shannon Entropy Abstention
@@ -388,16 +408,16 @@ docker compose up --build -d
 ```
 
 #### Service Endpoints:
-| Service | Endpoint URL | Description |
+| Service | Local Endpoint | Description |
 |---|---|---|
-| **Clinical Web App** | [http://localhost:3000](http://localhost:3000) | Next.js Clinician Portal & Telemetry Dashboard |
-| **Backend REST API** | [http://localhost:8000/api/v1/](http://localhost:8000/api/v1/) | Browsable Django REST Framework API |
-| **FHIR R4 Metadata** | [http://localhost:8000/fhir/r4/metadata](http://localhost:8000/fhir/r4/metadata) | HL7 FHIR Release 4 CapabilityStatement |
-| **FHIR Interoperability API** | [http://localhost:8000/api/v1/interoperability/](http://localhost:8000/api/v1/interoperability/) | Endpoints, Sync Jobs, Mappings & Review Queue |
-| **Informaticist FHIR Hub** | [http://localhost:3000/informaticist/interoperability](http://localhost:3000/informaticist/interoperability) | Clinical Data Exchange & Reconciliation Portal |
-| **API Health Probe** | [http://localhost:8000/api/v1/health/](http://localhost:8000/api/v1/health/) | JSON health & dependency readiness probe |
-| **Django Admin** | [http://localhost:8000/admin/](http://localhost:8000/admin/) | System Administration & Database Browser |
-| **Nginx Reverse Proxy**| [http://localhost](http://localhost) | Unified ingress proxy (Port 80) |
+| **[Clinical Web App](http://localhost:3000)** | `:3000` | Clinician Portal & Telemetry Dashboard |
+| **[Backend REST API](http://localhost:8000/api/v1/)** | `:8000/api/v1/` | Browsable Django REST Framework API |
+| **[FHIR R4 Metadata](http://localhost:8000/fhir/r4/metadata)** | `:8000/fhir/r4/` | HL7 FHIR Release 4 CapabilityStatement |
+| **[FHIR Interop API](http://localhost:8000/api/v1/interoperability/)** | `:8000/.../interop/` | Endpoints, Sync Jobs & Review Queue |
+| **[Informaticist Hub](http://localhost:3000/informaticist/interoperability)** | `:3000/.../interop` | Clinical Data Exchange & Reconciliation |
+| **[API Health Probe](http://localhost:8000/api/v1/health/)** | `:8000/api/v1/health/` | JSON Health & Readiness Check |
+| **[Django Admin](http://localhost:8000/admin/)** | `:8000/admin/` | System Administration & Database |
+| **[Nginx Reverse Proxy](http://localhost)** | `:80` | Unified Ingress Reverse Proxy |
 
 ---
 
@@ -527,24 +547,24 @@ All REST endpoints under `/api/v1/` adhere to a strictly typed, uniform response
 
 ### Core REST API Endpoints
 
-| Domain | Method | Path | Description | Access Control |
-|---|---|---|---|---|
-| **Health** | `GET` | `/api/v1/health/` | Service liveness probe | Public |
-| **Health** | `GET` | `/api/v1/health/ready/` | Dependency readiness probe (DB + Redis) | Public |
-| **Auth** | `POST` | `/api/v1/auth/login/` | Authenticate & obtain JWT pair | Public |
-| **Auth** | `POST` | `/api/v1/auth/token/refresh/` | Rotate expired access token | Public |
-| **Auth** | `GET` | `/api/v1/auth/me/` | Current user profile & clinical role | Authenticated |
-| **Patients** | `GET` | `/api/v1/patients/` | Filterable list of admitted patients | Care Team / Admin |
-| **Patients** | `POST` | `/api/v1/patients/` | Register/admit new patient record | Clinician / Nurse |
-| **Clinical** | `POST` | `/api/v1/patients/{id}/clinical-records/` | Record new vital signs & lab panel | Clinician / Nurse |
-| **Clinical** | `GET` | `/api/v1/patients/{id}/clinical-records/` | Historical encounter list for patient | Care Team |
-| **Predictions** | `POST` | `/api/v1/predictions/` | Execute real-time risk assessment | Clinician / Admin |
-| **Predictions** | `GET` | `/api/v1/predictions/{id}/` | Full risk evaluation with SHAP weights | Care Team |
-| **Predictions** | `POST` | `/api/v1/predictions/{id}/override/` | Document clinician risk override | Clinician Only |
-| **Models** | `GET` | `/api/v1/models/` | List model versions and metrics | Authenticated |
-| **Models** | `POST` | `/api/v1/models/{id}/activate/` | Promote candidate model version | Admin Only |
-| **Reports** | `POST` | `/api/v1/reports/` | Enqueue async PDF discharge report | Clinician / Admin |
-| **Audit** | `GET` | `/api/v1/audit/` | Inspect HIPAA-compliant audit logs | Admin Only |
+| Endpoint | Description | Access |
+|---|---|---|
+| `GET /api/v1/health/` | Service liveness probe | Public |
+| `GET /api/v1/health/ready/` | Dependency readiness probe (DB + Redis) | Public |
+| `POST /api/v1/auth/login/` | Authenticate & obtain JWT pair | Public |
+| `POST /api/v1/auth/token/refresh/` | Rotate expired access token | Public |
+| `GET /api/v1/auth/me/` | Current user profile & clinical role | Authenticated |
+| `GET /api/v1/patients/` | Filterable list of admitted patients | Care Team / Admin |
+| `POST /api/v1/patients/` | Register/admit new patient record | Clinician / Nurse |
+| `POST /api/v1/patients/{id}/clinical-records/` | Record new vital signs & lab panel | Clinician / Nurse |
+| `GET /api/v1/patients/{id}/clinical-records/` | Historical encounter list for patient | Care Team |
+| `POST /api/v1/predictions/` | Execute real-time risk assessment | Clinician / Admin |
+| `GET /api/v1/predictions/{id}/` | Full risk evaluation with SHAP weights | Care Team |
+| `POST /api/v1/predictions/{id}/override/` | Document clinician risk override | Clinician Only |
+| `GET /api/v1/models/` | List model versions and metrics | Authenticated |
+| `POST /api/v1/models/{id}/activate/` | Promote candidate model version | Admin Only |
+| `POST /api/v1/reports/` | Enqueue async PDF discharge report | Clinician / Admin |
+| `GET /api/v1/audit/` | Inspect HIPAA-compliant audit logs | Admin Only |
 
 ---
 
@@ -633,17 +653,17 @@ make clean         # Purge caches, build artifacts, and coverage data
 The application is configured using a `.env` file at the repository root. Key parameters include:
 
 | Variable | Default (Dev) | Description |
-|---|---|---|
-| `DJANGO_SECRET_KEY` | *None (Required)* | Cryptographic key for Django sessions and signing |
+|---|:---:|---|
+| `DJANGO_SECRET_KEY` | *Required* | Cryptographic key for Django sessions and signing |
 | `DJANGO_DEBUG` | `True` | Set to `False` in production environments |
-| `DATABASE_URL` | *None (Required)* | Pooled connection string to Neon PostgreSQL |
-| `DATABASE_URL_UNPOOLED` | *None (Required)* | Direct connection string to Neon PostgreSQL (for migrations) |
-| `REDIS_URL` | `redis://localhost:6379/0` | Connection URI for Redis broker & Channels cache |
-| `CELERY_BROKER_URL` | `redis://localhost:6379/0` | Message broker URI for Celery worker tasks |
-| `CELERY_RESULT_BACKEND`| `redis://localhost:6379/1` | Result backend URI for Celery tasks |
-| `NEXT_PUBLIC_API_BASE_URL`| `http://localhost:8000/api/v1` | Public REST API base URL for frontend requests |
-| `NEXT_PUBLIC_WS_BASE_URL` | `ws://localhost:8000/ws` | Public WebSocket base URL for telemetry |
-| `ML_ARTIFACTS_DIR` | `/app/ml/artifacts` | Filesystem path where trained ML models are loaded |
+| `DATABASE_URL` | *Required* | Pooled connection string to Neon PostgreSQL |
+| `DATABASE_URL_UNPOOLED` | *Required* | Direct connection string for schema migrations |
+| `REDIS_URL` | `...:6379/0` | Connection URI for Redis broker & Channels cache |
+| `CELERY_BROKER_URL` | `...:6379/0` | Message broker URI for Celery worker tasks |
+| `CELERY_RESULT_BACKEND`| `...:6379/1` | Result backend URI for Celery tasks |
+| `NEXT_PUBLIC_API_BASE_URL`| `...:8000/api/v1` | Public REST API base URL for frontend requests |
+| `NEXT_PUBLIC_WS_BASE_URL` | `...:8000/ws` | Public WebSocket base URL for telemetry |
+| `ML_ARTIFACTS_DIR` | `/app/ml/artifacts` | Path where serialized ML models are loaded |
 
 Refer to [`.env.example`](.env.example) for the complete list of production options.
 
