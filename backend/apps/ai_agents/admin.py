@@ -1,17 +1,26 @@
 from django.contrib import admin
 from apps.ai_agents.models import (
-    AgentDefinition,
-    AgentSession,
-    AgentExecution,
-    AgentMessage,
-    AgentToolDefinition,
-    AgentToolExecution,
     AgentApproval,
+    AgentDefinition,
+    AgentEvaluation,
+    AgentExecution,
+    AgentFeedback,
+    AgentKillSwitchState,
     AgentMemory,
+    AgentMessage,
     AgentProviderExecution,
     AgentSafetyEvent,
-    AgentEvaluation,
-    AgentFeedback,
+    AgentSession,
+    AgentToolDefinition,
+    AgentToolExecution,
+    BrowserAgentAction,
+    BrowserAgentAuditEvent,
+    BrowserAgentRun,
+    BrowserAgentTask,
+    BrowserArtifact,
+    BrowserDestination,
+    BrowserTaskPolicy,
+    BrowserVerification,
 )
 
 
@@ -74,3 +83,60 @@ class AgentEvaluationAdmin(admin.ModelAdmin):
 class AgentFeedbackAdmin(admin.ModelAdmin):
     list_display = ["execution", "user", "rating", "created_at"]
     list_filter = ["rating"]
+
+
+@admin.register(BrowserDestination)
+class BrowserDestinationAdmin(admin.ModelAdmin):
+    list_display = ["domain", "scheme", "port", "sensitivity", "approval_required", "is_active", "owner"]
+    list_filter = ["is_active", "sensitivity", "approval_required"]
+    search_fields = ["domain", "purpose", "owner"]
+
+
+@admin.register(BrowserTaskPolicy)
+class BrowserTaskPolicyAdmin(admin.ModelAdmin):
+    list_display = ["name", "task_type", "destination", "required_role", "approval_required", "max_steps", "enabled"]
+    list_filter = ["enabled", "approval_required", "required_role"]
+    search_fields = ["name", "task_type", "destination"]
+
+
+@admin.register(BrowserAgentTask)
+class BrowserAgentTaskAdmin(admin.ModelAdmin):
+    list_display = ["id", "destination_domain", "requested_by", "role", "execution_status", "verification_status", "provider", "created_at"]
+    list_filter = ["execution_status", "verification_status", "provider", "risk_level"]
+    search_fields = ["destination_domain", "goal", "audit_reference"]
+
+
+@admin.register(BrowserAgentRun)
+class BrowserAgentRunAdmin(admin.ModelAdmin):
+    list_display = ["id", "task", "status", "steps_count", "duration_ms", "started_at", "completed_at"]
+    list_filter = ["status"]
+
+
+@admin.register(BrowserAgentAction)
+class BrowserAgentActionAdmin(admin.ModelAdmin):
+    list_display = ["task", "step_index", "operation", "target_index", "target_label", "is_mutation", "status"]
+    list_filter = ["operation", "is_mutation", "status"]
+
+
+@admin.register(BrowserVerification)
+class BrowserVerificationAdmin(admin.ModelAdmin):
+    list_display = ["task", "status", "verified_at"]
+    list_filter = ["status"]
+
+
+@admin.register(BrowserArtifact)
+class BrowserArtifactAdmin(admin.ModelAdmin):
+    list_display = ["name", "artifact_type", "task", "phi_classification", "size_bytes", "created_at"]
+    list_filter = ["artifact_type", "phi_classification"]
+
+
+@admin.register(BrowserAgentAuditEvent)
+class BrowserAgentAuditEventAdmin(admin.ModelAdmin):
+    list_display = ["event_type", "task", "actor", "destination", "security_decision", "timestamp"]
+    list_filter = ["event_type", "security_decision"]
+    search_fields = ["destination", "details"]
+
+
+@admin.register(AgentKillSwitchState)
+class AgentKillSwitchStateAdmin(admin.ModelAdmin):
+    list_display = ["is_active", "activated_by", "reason", "activated_at"]

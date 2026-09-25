@@ -14,12 +14,14 @@ import {
   Sparkles,
   TrendingDown,
   User,
+  Globe,
 } from "lucide-react";
 import { RoleGuard } from "@/components/layout/RoleGuard";
 import { ResponsiveAppShell, NavItem } from "@/components/responsive/ResponsiveAppShell";
 
 const INFORMATICIST_NAV_ITEMS: NavItem[] = [
   { href: "/informaticist/dashboard", icon: LayoutDashboard, label: "Dashboard", mobileQuick: true },
+  { href: "/informaticist/ai-agents", icon: Globe, label: "Browser AI Agents", mobileQuick: true },
   { href: "/informaticist/models", icon: Brain, label: "Models & Registry", mobileQuick: true },
   { href: "/informaticist/datasets", icon: Database, label: "Datasets & Ingestion", mobileQuick: true },
   { href: "/informaticist/drift", icon: TrendingDown, label: "Drift Monitor", mobileQuick: true },

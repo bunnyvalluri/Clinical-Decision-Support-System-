@@ -720,16 +720,24 @@ class AgentFeedback(BaseModel):
 
 
 class BrowserTaskState(models.TextChoices):
-    PENDING = "PENDING", "Pending"
+    DRAFT = "DRAFT", "Draft"
     VALIDATING = "VALIDATING", "Validating"
     AWAITING_APPROVAL = "AWAITING_APPROVAL", "Awaiting Approval"
-    APPROVED = "APPROVED", "Approved"
+    READY = "READY", "Ready"
     RUNNING = "RUNNING", "Running"
-    VERIFYING = "VERIFYING", "Verifying"
-    SUCCEEDED = "SUCCEEDED", "Succeeded"
-    FAILED = "FAILED", "Failed"
+    PAUSED = "PAUSED", "Paused"
+    COMPLETED = "COMPLETED", "Completed"
+    VERIFICATION_FAILED = "VERIFICATION_FAILED", "Verification Failed"
     BLOCKED = "BLOCKED", "Blocked"
     CANCELLED = "CANCELLED", "Cancelled"
+    FAILED = "FAILED", "Failed"
+    EXPIRED = "EXPIRED", "Expired"
+
+    # Additional operational states
+    PENDING = "PENDING", "Pending"
+    APPROVED = "APPROVED", "Approved"
+    VERIFYING = "VERIFYING", "Verifying"
+    SUCCEEDED = "SUCCEEDED", "Succeeded"
     TIMED_OUT = "TIMED_OUT", "Timed Out"
     REQUIRES_HUMAN_ACTION = "REQUIRES_HUMAN_ACTION", "Requires Human Action"
 
@@ -740,18 +748,30 @@ class VerificationStatus(models.TextChoices):
     FAILED = "FAILED", "Failed"
 
 
-class ApprovedDestination(BaseModel):
+class BrowserDestination(BaseModel):
     """
-    Allowlist for approved browser automation target domains.
-    Default policy: DENY. Unknown domains are strictly BLOCKED.
+    Allowlist for approved browser automation target destinations.
+    Default policy: DENY. Unknown hostnames are strictly BLOCKED.
     """
     domain = models.CharField(max_length=255, unique=True, db_index=True)
+    hostname = models.CharField(max_length=255, blank=True, db_index=True)
+    scheme = models.CharField(max_length=10, default="https")
+    port = models.IntegerField(default=443)
+    allowed_paths = models.JSONField(default=list, blank=True, help_text="Allowed URL path prefixes, e.g. ['/docs', '/guidelines'].")
+    allowed_operations = models.JSONField(default=list, blank=True, help_text="Allowed operations, e.g. ['CLICK', 'TYPE_TEXT', 'WAIT', 'DONE'].")
+    allowed_roles = models.JSONField(default=list, blank=True, help_text="Allowed roles e.g. ['ADMIN', 'INFORMATICIST', 'DOCTOR'].")
+    sensitivity = models.CharField(
+        max_length=50,
+        choices=DataClassification.choices,
+        default=DataClassification.PUBLIC,
+    )
+    approval_required = models.BooleanField(default=False)
     purpose = models.TextField(help_text="Clinical or operational justification for this domain.")
     environment = models.CharField(max_length=50, default="PRODUCTION")
     owner = models.CharField(max_length=150, default="Security Administration")
-    allowed_operations = models.JSONField(default=list, help_text="Allowed browser operations (e.g. READ_PUBLIC, NAVIGATE)")
     phi_allowed = models.BooleanField(default=False, help_text="Whether PHI transmission is permitted. Default DENY.")
     authentication_required = models.BooleanField(default=False)
+    expiration = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
 
     class Meta:
@@ -762,6 +782,80 @@ class ApprovedDestination(BaseModel):
 
     def __str__(self) -> str:
         return f"{self.domain} [{'ACTIVE' if self.is_active else 'INACTIVE'}]"
+
+    def save(self, *args, **kwargs):
+        if not self.hostname:
+            self.hostname = self.domain
+        if not self.domain and self.hostname:
+            self.domain = self.hostname
+        super().save(*args, **kwargs)
+
+
+# Backward compatibility alias
+ApprovedDestination = BrowserDestination
+BrowserDestinationAllowlist = BrowserDestination
+
+
+def default_allowed_operations() -> list:
+    return ["CLICK", "TYPE_TEXT", "SELECT", "SCROLL_UP", "SCROLL_DOWN", "WAIT", "DONE", "BLOCKED"]
+
+
+class BrowserTaskPolicy(BaseModel):
+    """
+    Configurable server-side policy governing browser agent executions.
+    """
+    name = models.CharField(max_length=100, unique=True, db_index=True)
+    task_type = models.CharField(max_length=100, default="GENERAL_BROWSER_READ", db_index=True)
+    destination = models.CharField(max_length=255, default="*", help_text="Hostname or wildcard pattern")
+    allowed_operations = models.JSONField(
+        default=default_allowed_operations,
+        help_text="Permitted browser operations.",
+    )
+    sensitivity = models.CharField(
+        max_length=50,
+        choices=DataClassification.choices,
+        default=DataClassification.PUBLIC,
+    )
+    required_role = models.CharField(
+        max_length=50,
+        choices=AgentRoleType.choices,
+        default=AgentRoleType.DOCTOR,
+    )
+    approval_required = models.BooleanField(default=False)
+    max_steps = models.IntegerField(default=15)
+    max_duration = models.IntegerField(default=60, help_text="Maximum execution duration in seconds")
+    allowed_file_types = models.JSONField(default=list, blank=True)
+    enabled = models.BooleanField(default=True, db_index=True)
+
+    class Meta:
+        db_table = "browser_task_policies"
+        verbose_name = "Browser Task Policy"
+        verbose_name_plural = "Browser Task Policies"
+        ordering = ["name"]
+
+    def __str__(self) -> str:
+        return f"Policy {self.name} ({self.task_type})"
+
+
+class BrowserAgentProvider(BaseModel):
+    """
+    Registry of configured browser automation runtime providers.
+    """
+    provider_id = models.CharField(max_length=50, unique=True, db_index=True)
+    name = models.CharField(max_length=100)
+    version = models.CharField(max_length=30, default="0.1.0")
+    is_enabled = models.BooleanField(default=True, db_index=True)
+    runtime_mode = models.CharField(max_length=30, default="sandbox")
+    max_concurrent_sessions = models.IntegerField(default=5)
+    config_metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        db_table = "browser_agent_providers"
+        verbose_name = "Browser Agent Provider"
+        verbose_name_plural = "Browser Agent Providers"
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.provider_id} v{self.version})"
 
 
 class BrowserAgentTask(BaseModel):
@@ -778,6 +872,18 @@ class BrowserAgentTask(BaseModel):
     goal = models.TextField(help_text="Natural-language goal for controlled browser execution.")
     destination_url = models.URLField(max_length=1000)
     destination_domain = models.CharField(max_length=255, db_index=True)
+    allowed_operations = models.JSONField(
+        default=default_allowed_operations,
+        blank=True,
+    )
+    patient_context_reference = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    sensitivity_classification = models.CharField(
+        max_length=50,
+        choices=DataClassification.choices,
+        default=DataClassification.PUBLIC,
+        db_index=True,
+    )
+    approval_required = models.BooleanField(default=False)
     environment = models.CharField(max_length=50, default="PRODUCTION")
     risk_level = models.CharField(
         max_length=30,
@@ -809,9 +915,12 @@ class BrowserAgentTask(BaseModel):
     execution_status = models.CharField(
         max_length=35,
         choices=BrowserTaskState.choices,
-        default=BrowserTaskState.PENDING,
+        default=BrowserTaskState.READY,
         db_index=True,
     )
+    provider = models.CharField(max_length=50, default="jev-ultrafast", db_index=True)
+    provider_version = models.CharField(max_length=30, default="0.1.0")
+    browser_session_reference = models.CharField(max_length=100, blank=True, default="")
     verification_status = models.CharField(
         max_length=30,
         choices=VerificationStatus.choices,
@@ -826,6 +935,7 @@ class BrowserAgentTask(BaseModel):
         help_text="Programmatic rules to independently verify the outcome (e.g., expected text, selector present).",
     )
     steps_log = models.JSONField(default=list, blank=True)
+    artifacts = models.JSONField(default=list, blank=True)
     started_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
@@ -837,6 +947,219 @@ class BrowserAgentTask(BaseModel):
 
     def __str__(self) -> str:
         return f"BrowserTask {self.id} [{self.execution_status}] -> {self.destination_domain}"
+
+    @property
+    def task_id(self):
+        return self.id
+
+    @property
+    def requester(self):
+        return self.requested_by
+
+    @requester.setter
+    def requester(self, value):
+        self.requested_by = value
+
+    @property
+    def destination(self):
+        return self.destination_domain
+
+    @destination.setter
+    def destination(self, value):
+        self.destination_domain = value
+
+    @property
+    def status(self):
+        return self.execution_status
+
+    @status.setter
+    def status(self, value):
+        self.execution_status = value
+
+
+# Backward compatibility alias
+AgentTask = BrowserAgentTask
+
+
+class BrowserAgentRun(BaseModel):
+    """
+    Execution run instance for a browser agent task.
+    """
+    task = models.ForeignKey(
+        BrowserAgentTask,
+        on_delete=models.CASCADE,
+        related_name="runs",
+    )
+    started_at = models.DateTimeField(default=timezone.now)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    duration_ms = models.IntegerField(default=0)
+    steps_count = models.IntegerField(default=0)
+    status = models.CharField(
+        max_length=35,
+        choices=BrowserTaskState.choices,
+        default=BrowserTaskState.RUNNING,
+    )
+    provider_latency_ms = models.IntegerField(default=0)
+    text_helper_latency_ms = models.IntegerField(default=0)
+    model_calls_count = models.IntegerField(default=0)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        db_table = "browser_agent_runs"
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Run {self.id} for Task {self.task_id} [{self.status}]"
+
+
+class BrowserAgentAction(BaseModel):
+    """
+    Individual atomic action performed during a browser run.
+    """
+    task = models.ForeignKey(
+        BrowserAgentTask,
+        on_delete=models.CASCADE,
+        related_name="actions",
+    )
+    run = models.ForeignKey(
+        BrowserAgentRun,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="actions",
+    )
+    step_index = models.IntegerField(default=1)
+    operation = models.CharField(max_length=50) # CLICK, TYPE_TEXT, SELECT, WAIT, DONE, BLOCKED
+    target_index = models.CharField(max_length=50, blank=True, default="")
+    target_label = models.CharField(max_length=255, blank=True, default="")
+    target_role = models.CharField(max_length=50, blank=True, default="")
+    input_text = models.CharField(max_length=500, blank=True, default="")
+    is_mutation = models.BooleanField(default=False)
+    elapsed_ms = models.IntegerField(default=0)
+    page_changed = models.BooleanField(null=True, blank=True)
+    status = models.CharField(max_length=50, default="COMPLETED")
+
+    class Meta:
+        db_table = "browser_agent_actions"
+        ordering = ["step_index"]
+
+    def __str__(self) -> str:
+        return f"Action #{self.step_index}: {self.operation} on [{self.target_index}]"
+
+
+class BrowserApproval(BaseModel):
+    """
+    Human sign-off audit for browser automation tasks.
+    """
+    task = models.ForeignKey(
+        BrowserAgentTask,
+        on_delete=models.CASCADE,
+        related_name="approvals",
+    )
+    reviewer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="browser_approvals",
+    )
+    decision = models.CharField(
+        max_length=30,
+        choices=ApprovalStatus.choices,
+        default=ApprovalStatus.APPROVED,
+    )
+    justification = models.TextField(blank=True, default="")
+    decided_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "browser_approvals"
+        ordering = ["-decided_at"]
+
+    def __str__(self) -> str:
+        return f"Approval {self.decision} for Task {self.task_id} by {self.reviewer}"
+
+
+class BrowserVerification(BaseModel):
+    """
+    Independent outcome verification audit for a browser task.
+    """
+    task = models.OneToOneField(
+        BrowserAgentTask,
+        on_delete=models.CASCADE,
+        related_name="verification_record",
+    )
+    status = models.CharField(
+        max_length=30,
+        choices=VerificationStatus.choices,
+        default=VerificationStatus.UNVERIFIED,
+    )
+    rules_applied = models.JSONField(default=dict, blank=True)
+    checks_passed = models.JSONField(default=list, blank=True)
+    evidence = models.JSONField(default=dict, blank=True)
+    verified_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        db_table = "browser_verifications"
+
+    def __str__(self) -> str:
+        return f"Verification {self.status} for Task {self.task_id}"
+
+
+class BrowserArtifact(BaseModel):
+    """
+    Artifacts (screenshots, DOM snapshots, files) created during execution.
+    """
+    task = models.ForeignKey(
+        BrowserAgentTask,
+        on_delete=models.CASCADE,
+        related_name="artifact_files",
+    )
+    name = models.CharField(max_length=255)
+    artifact_type = models.CharField(max_length=50) # SCREENSHOT, SUMMARY, EVIDENCE, DOWNLOAD
+    phi_classification = models.CharField(
+        max_length=50,
+        choices=DataClassification.choices,
+        default=DataClassification.PUBLIC,
+    )
+    sha256 = models.CharField(max_length=64, blank=True, default="")
+    file_path = models.CharField(max_length=500, blank=True, default="")
+    mime_type = models.CharField(max_length=100, default="application/json")
+    size_bytes = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = "browser_artifacts"
+
+    def __str__(self) -> str:
+        return f"Artifact {self.name} ({self.artifact_type}) [{self.phi_classification}]"
+
+
+class BrowserAgentAuditEvent(BaseModel):
+    """
+    Immutable audit record for all browser agent security and lifecycle events.
+    """
+    event_type = models.CharField(max_length=100, db_index=True)
+    task = models.ForeignKey(
+        BrowserAgentTask,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audit_events",
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    destination = models.CharField(max_length=255, blank=True, default="")
+    security_decision = models.CharField(max_length=50, default="ALLOW")
+    details = models.JSONField(default=dict, blank=True)
+    timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        db_table = "browser_agent_audit_events"
+        ordering = ["-timestamp"]
+
+    def __str__(self) -> str:
+        return f"AuditEvent {self.event_type} [{self.security_decision}] at {self.timestamp}"
 
 
 class AgentKillSwitchState(BaseModel):
@@ -862,4 +1185,5 @@ class AgentKillSwitchState(BaseModel):
 
     def __str__(self) -> str:
         return f"KillSwitch [{'ACTIVATED' if self.is_active else 'INACTIVE'}]"
+
 

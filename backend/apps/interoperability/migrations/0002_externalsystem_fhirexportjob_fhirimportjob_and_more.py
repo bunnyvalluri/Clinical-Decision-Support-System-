@@ -251,6 +251,10 @@ class Migration(migrations.Migration):
             model_name='fhirauditlog',
             name='user',
         ),
+        migrations.RemoveIndex(
+            model_name='fhirsyncjob',
+            name='fhir_sync_j_endpoin_4860e1_idx',
+        ),
         migrations.RemoveField(
             model_name='fhirsyncjob',
             name='endpoint',
