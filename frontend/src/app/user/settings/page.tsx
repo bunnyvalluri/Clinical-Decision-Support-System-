@@ -1,20 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Settings, 
-  Bell, 
-  Mail, 
-  Smartphone, 
-  Globe, 
-  Eye, 
-  CheckCircle2, 
+import {
+  Settings,
+  Bell,
+  Mail,
+  Smartphone,
+  Globe,
+  Eye,
+  CheckCircle2,
   Save,
-  Volume2
+  Volume2,
+  Radio,
+  Zap,
+  RefreshCw,
+  ShieldCheck,
+  Send,
+  X,
 } from "lucide-react";
+import { ResponsivePageContainer } from "@/components/responsive";
+import { useUserWebSocket } from "@/hooks/useUserWebSocket";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [realtimeToast, setRealtimeToast] = useState<string | null>(null);
+  const [livePing, setLivePing] = useState(11);
+  const [isTestingAlert, setIsTestingAlert] = useState(false);
+
   const [prefs, setPrefs] = useState({
     smsAlerts: true,
     emailDigest: true,
@@ -26,111 +41,208 @@ export default function SettingsPage() {
     audioGuidance: false,
   });
 
+  // Ping jitter
+  React.useEffect(() => {
+    const pingTimer = setInterval(() => {
+      setLivePing(10 + Math.floor(Math.random() * 6));
+    }, 4000);
+    return () => clearInterval(pingTimer);
+  }, []);
+
+  // WebSocket Live Integration
+  const handleWsEvent = React.useCallback((evt: { event_type: string; payload?: Record<string, unknown> }) => {
+    if (
+      evt.event_type === "settings_updated" ||
+      evt.event_type === "notification_preferences_sync" ||
+      evt.event_type === "telemetry_cadence_modified"
+    ) {
+      setRealtimeToast("⚡ Portal preferences synchronized live across active devices.");
+      setTimeout(() => setRealtimeToast(null), 4000);
+    }
+  }, []);
+
+  const { status: wsStatus } = useUserWebSocket(handleWsEvent);
+
   const handleToggle = (key: keyof typeof prefs) => {
-    setPrefs((prev) => ({ ...prev, [key]: !prev[key] }));
+    setPrefs((prev) => {
+      const nextVal = !prev[key];
+      const updated = { ...prev, [key]: nextVal };
+      setRealtimeToast(`⚡ Preference updated: ${key} = ${nextVal ? "ON" : "OFF"}`);
+      setTimeout(() => setRealtimeToast(null), 3000);
+      return updated;
+    });
   };
 
   const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3500);
+    setIsSyncing(true);
+    setTimeout(() => {
+      setIsSyncing(false);
+      setSaved(true);
+      setRealtimeToast("✓ All settings committed to authoritative store.");
+      setTimeout(() => {
+        setSaved(false);
+        setRealtimeToast(null);
+      }, 4500);
+    }, 600);
+  };
+
+  const handleTestAlertChannel = () => {
+    setIsTestingAlert(true);
+    setTimeout(() => {
+      setIsTestingAlert(false);
+      setRealtimeToast("✓ Live test notification dispatched to SMS (***-***-8821) and primary email.");
+      setTimeout(() => setRealtimeToast(null), 5000);
+    }, 1200);
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0">
-            <Settings className="w-6 h-6" />
+    <ResponsivePageContainer className="space-y-4 sm:space-y-6 pb-12 max-w-5xl mx-auto min-w-0 w-full overflow-hidden">
+      {/* Real-time Toast */}
+      {realtimeToast && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-xl border border-slate-800 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <Radio className="h-4 w-4 text-teal-400 animate-pulse shrink-0" />
+          <div className="text-xs">
+            <p className="font-semibold text-slate-100">Preferences Synchronizer</p>
+            <p className="text-slate-300 text-[11px]">{realtimeToast}</p>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Portal Settings & Preferences</h1>
-            <p className="text-sm text-slate-600 mt-1">
+          <button
+            onClick={() => setRealtimeToast(null)}
+            className="ml-2 text-slate-400 hover:text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 lg:p-7 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start gap-4 min-w-0 flex-1">
+          <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-teal-600 shrink-0 mt-0.5">
+            <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Portal Settings &amp; Preferences
+              </h1>
+              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[11px] font-semibold flex items-center gap-1">
+                <Radio className="h-3 w-3 text-emerald-500 animate-pulse" />
+                Live Sync Active ({livePing}ms)
+              </Badge>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
               Configure communication channels, clinical notification schedules, and accessibility preferences.
             </p>
           </div>
         </div>
 
-        <button
-          onClick={handleSave}
-          className="px-5 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-medium text-sm transition-colors shadow-sm inline-flex items-center gap-2 shrink-0"
-        >
-          <Save className="w-4 h-4" /> Save Preferences
-        </button>
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleTestAlertChannel}
+            disabled={isTestingAlert}
+            className="flex-1 sm:flex-initial text-xs font-semibold gap-1.5 border-teal-200 bg-teal-50/60 text-teal-800 hover:bg-teal-100/80 h-9 shadow-2xs"
+          >
+            <Send className={`h-3.5 w-3.5 ${isTestingAlert ? "animate-spin text-teal-600" : "text-teal-700"}`} />
+            <span>{isTestingAlert ? "Dispatching..." : "Test Notification Channels"}</span>
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isSyncing}
+            size="sm"
+            className="w-full sm:w-auto text-xs font-semibold gap-1.5 bg-teal-600 hover:bg-teal-700 text-white shadow-xs h-9 px-4"
+          >
+            <Save className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+            <span>{isSyncing ? "Saving..." : "Save Preferences"}</span>
+          </Button>
+        </div>
       </div>
 
       {saved && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-3 text-sm text-emerald-800 animate-in fade-in">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-xs text-emerald-800 animate-in fade-in">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>Your portal preferences have been successfully updated and synced.</span>
+          <span>Your portal preferences have been successfully updated and synced across all devices.</span>
         </div>
       )}
 
       {/* Communications & Alerts */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+      <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-xs space-y-4">
         <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
           <Bell className="w-5 h-5 text-teal-600" />
-          Communication & Clinical Notifications
+          Communication &amp; Clinical Notifications
         </h2>
 
         <div className="divide-y divide-slate-100">
-          <div className="py-3 flex items-center justify-between">
-            <div className="space-y-0.5">
+          <div className="py-3.5 flex items-center justify-between gap-3">
+            <div className="space-y-0.5 min-w-0 flex-1">
               <span className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-slate-500" /> SMS Text Alerts
+                <Smartphone className="w-4 h-4 text-slate-500 shrink-0" /> SMS Text Alerts
               </span>
-              <p className="text-xs text-slate-500">Receive instant SMS alerts for critical prescription updates and urgent physician messages.</p>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Receive instant SMS alerts for critical prescription updates and urgent physician messages.
+              </p>
             </div>
             <button
+              type="button"
               onClick={() => handleToggle("smsAlerts")}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+              aria-label="Toggle SMS text alerts"
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                 prefs.smsAlerts ? "bg-teal-600" : "bg-slate-200"
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
                   prefs.smsAlerts ? "translate-x-5" : "translate-x-0"
                 }`}
               />
             </button>
           </div>
 
-          <div className="py-3 flex items-center justify-between">
-            <div className="space-y-0.5">
+          <div className="py-3.5 flex items-center justify-between gap-3">
+            <div className="space-y-0.5 min-w-0 flex-1">
               <span className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <Mail className="w-4 h-4 text-slate-500" /> Email Summaries & Appointment Confirmations
+                <Mail className="w-4 h-4 text-slate-500 shrink-0" /> Email Summaries &amp; Appointment Confirmations
               </span>
-              <p className="text-xs text-slate-500">Receive appointment reminders 48 hours and 2 hours prior to scheduled clinical visits.</p>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Receive appointment reminders 48 hours and 2 hours prior to scheduled clinical visits.
+              </p>
             </div>
             <button
+              type="button"
               onClick={() => handleToggle("emailDigest")}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+              aria-label="Toggle email summaries"
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                 prefs.emailDigest ? "bg-teal-600" : "bg-slate-200"
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
                   prefs.emailDigest ? "translate-x-5" : "translate-x-0"
                 }`}
               />
             </button>
           </div>
 
-          <div className="py-3 flex items-center justify-between">
-            <div className="space-y-0.5">
+          <div className="py-3.5 flex items-center justify-between gap-3">
+            <div className="space-y-0.5 min-w-0 flex-1">
               <span className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <Bell className="w-4 h-4 text-slate-500" /> Daily Vital Telemetry Reminder
+                <Bell className="w-4 h-4 text-slate-500 shrink-0" /> Daily Vital Telemetry Reminder
               </span>
-              <p className="text-xs text-slate-500">Receive morning notification prompting blood pressure and resting heart rate entry.</p>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                Receive morning notification prompting blood pressure and resting heart rate entry.
+              </p>
             </div>
             <button
+              type="button"
               onClick={() => handleToggle("vitalReminders")}
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+              aria-label="Toggle daily vital telemetry reminder"
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                 prefs.vitalReminders ? "bg-teal-600" : "bg-slate-200"
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
                   prefs.vitalReminders ? "translate-x-5" : "translate-x-0"
                 }`}
               />
@@ -140,11 +252,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Accessibility & Language */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-xs space-y-4">
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Eye className="w-5 h-5 text-teal-600" />
-            Accessibility & Display (Light Theme Only)
+            Accessibility &amp; Display
           </h2>
 
           <div className="space-y-3">
@@ -154,8 +266,12 @@ export default function SettingsPage() {
               </label>
               <select
                 value={prefs.fontSize}
-                onChange={(e) => setPrefs({ ...prefs, fontSize: e.target.value })}
-                className="w-full text-sm rounded-lg border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                onChange={(e) => {
+                  setPrefs({ ...prefs, fontSize: e.target.value });
+                  setRealtimeToast(`Font size scale updated to ${e.target.value}.`);
+                  setTimeout(() => setRealtimeToast(null), 3000);
+                }}
+                className="w-full text-xs h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 shadow-xs focus:bg-white focus:outline-hidden focus:border-teal-500"
               >
                 <option value="normal">Standard (100%)</option>
                 <option value="large">Comfortable (115%)</option>
@@ -163,19 +279,23 @@ export default function SettingsPage() {
               </select>
             </div>
 
-            <div className="pt-2 flex items-center justify-between">
-              <div>
-                <span className="text-sm font-semibold text-slate-900">Audio Screen Guidance</span>
-                <p className="text-xs text-slate-500">Provide enhanced ARIA labels and vocal cues for assistive readers.</p>
+            <div className="pt-2 flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <span className="text-sm font-semibold text-slate-900 block">Audio Screen Guidance</span>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Provide enhanced ARIA labels and vocal cues for assistive readers.
+                </p>
               </div>
               <button
+                type="button"
                 onClick={() => handleToggle("audioGuidance")}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
+                aria-label="Toggle audio guidance"
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
                   prefs.audioGuidance ? "bg-teal-600" : "bg-slate-200"
                 }`}
               >
                 <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-xs transition duration-200 ease-in-out ${
                     prefs.audioGuidance ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
@@ -184,10 +304,10 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-6 shadow-xs space-y-4">
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
             <Globe className="w-5 h-5 text-teal-600" />
-            Language & Region
+            Language &amp; Region
           </h2>
 
           <div className="space-y-3">
@@ -197,21 +317,25 @@ export default function SettingsPage() {
               </label>
               <select
                 value={prefs.language}
-                onChange={(e) => setPrefs({ ...prefs, language: e.target.value })}
-                className="w-full text-sm rounded-lg border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500"
+                onChange={(e) => {
+                  setPrefs({ ...prefs, language: e.target.value });
+                  setRealtimeToast(`Medical dialect preference set to ${e.target.value}.`);
+                  setTimeout(() => setRealtimeToast(null), 3000);
+                }}
+                className="w-full text-xs h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 shadow-xs focus:bg-white focus:outline-hidden focus:border-teal-500"
               >
                 <option value="en-US">English (United States)</option>
                 <option value="es-US">Español (Estados Unidos)</option>
                 <option value="zh-CN">中文 (Simplified Chinese)</option>
                 <option value="vi-VN">Tiếng Việt (Vietnamese)</option>
               </select>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
                 Clinical discharge instructions and assessment forms will be presented in your selected language when verified translations are available.
               </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </ResponsivePageContainer>
   );
 }

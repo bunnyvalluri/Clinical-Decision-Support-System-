@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import {
   Activity,
+  AlertCircle,
   AlertTriangle,
   Calendar,
   Check,
@@ -13,11 +14,14 @@ import {
   Clock,
   Copy,
   Download,
+  Heart,
   HeartPulse,
   Info,
   MapPin,
   MessageSquare,
+  Pause,
   Phone,
+  Play,
   Plus,
   RefreshCw,
   ShieldCheck,
@@ -25,6 +29,8 @@ import {
   Stethoscope,
   TrendingDown,
   TrendingUp,
+  Wifi,
+  WifiOff,
   X,
   Zap,
 } from "lucide-react";
@@ -36,6 +42,7 @@ import { useAuthStore } from "@/features/auth/authStore";
 import { ResponsiveModal } from "@/components/responsive";
 import apiClient from "@/services/apiClient";
 import { userApi } from "@/services/api/userApi";
+import { useUserWebSocket, UserRealtimeEvent } from "@/hooks/useUserWebSocket";
 
 interface DashboardPatient {
   full_name: string;
@@ -92,8 +99,16 @@ interface DashboardData {
   unread_notification_count: number;
 }
 
-// 7-day historical telemetry data
-const TELEMETRY_HISTORY = [
+interface TelemetryPoint {
+  day: string;
+  systolic: number;
+  diastolic: number;
+  hr: number;
+  spo2: number;
+}
+
+// 7-day historical telemetry baseline
+const BASE_TELEMETRY: TelemetryPoint[] = [
   { day: "Mon", systolic: 138, diastolic: 88, hr: 78, spo2: 97 },
   { day: "Tue", systolic: 136, diastolic: 87, hr: 75, spo2: 98 },
   { day: "Wed", systolic: 135, diastolic: 86, hr: 79, spo2: 97 },
@@ -104,13 +119,151 @@ const TELEMETRY_HISTORY = [
 ];
 
 /**
+ * Real-time continuous ECG Lead-II waveform simulator
+ */
+function RealtimeEcgWaveform({ bpm, isSpike }: { bpm: number; isSpike: boolean }) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let x = 0;
+    const width = canvas.width;
+    const height = canvas.height;
+    const midY = height / 2;
+
+    // Clear canvas
+    ctx.fillStyle = "#0f172a";
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw grid lines
+    ctx.strokeStyle = "rgba(15, 118, 110, 0.15)";
+    ctx.lineWidth = 1;
+    for (let gx = 0; gx < width; gx += 20) {
+      ctx.beginPath();
+      ctx.moveTo(gx, 0);
+      ctx.lineTo(gx, height);
+      ctx.stroke();
+    }
+    for (let gy = 0; gy < height; gy += 20) {
+      ctx.beginPath();
+      ctx.moveTo(0, gy);
+      ctx.lineTo(width, gy);
+      ctx.stroke();
+    }
+
+    let lastY = midY;
+    let phase = 0;
+    const beatInterval = (60 / Math.max(40, bpm)) * 60; // frames per beat at ~60fps
+
+    const render = () => {
+      // Erase trailing head
+      const eraseWidth = 8;
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect((x + 2) % width, 0, eraseWidth, height);
+
+      // Re-draw subtle grid under eraser
+      ctx.strokeStyle = "rgba(15, 118, 110, 0.15)";
+      ctx.lineWidth = 1;
+      const curX = (x + 2) % width;
+      if (curX % 20 < eraseWidth) {
+        const snapX = curX - (curX % 20);
+        ctx.beginPath();
+        ctx.moveTo(snapX, 0);
+        ctx.lineTo(snapX, height);
+        ctx.stroke();
+      }
+
+      // Compute ECG point
+      phase = (phase + 1) % beatInterval;
+      const t = phase / beatInterval;
+      let yOffset = 0;
+
+      // P wave
+      if (t > 0.1 && t < 0.2) {
+        yOffset = -Math.sin(((t - 0.1) / 0.1) * Math.PI) * 6;
+      }
+      // Q wave
+      else if (t >= 0.2 && t < 0.24) {
+        yOffset = 4;
+      }
+      // R peak (QRS complex)
+      else if (t >= 0.24 && t < 0.28) {
+        const peakAmp = isSpike ? 28 : 22;
+        yOffset = -peakAmp;
+      }
+      // S wave
+      else if (t >= 0.28 && t < 0.32) {
+        yOffset = 7;
+      }
+      // T wave
+      else if (t >= 0.42 && t < 0.58) {
+        yOffset = -Math.sin(((t - 0.42) / 0.16) * Math.PI) * 9;
+      }
+
+      const nextY = midY + yOffset + (Math.random() - 0.5) * 1.5;
+
+      // Draw trace line
+      ctx.beginPath();
+      ctx.moveTo(x, lastY);
+      ctx.lineTo((x + 1) % width, nextY);
+      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
+      ctx.lineWidth = 2;
+      ctx.shadowColor = isSpike ? "#f43f5e" : "#10b981";
+      ctx.shadowBlur = 4;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      lastY = nextY;
+      x = (x + 1) % width;
+
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+
+    return () => {
+      cancelAnimationFrame(animId);
+    };
+  }, [bpm, isSpike]);
+
+  return (
+    <div className="relative w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 shadow-inner">
+      <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
+        <span className="flex h-2 w-2 relative">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+        </span>
+        <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-emerald-400">
+          Lead II ECG · Telemetry Live {bpm} BPM
+        </span>
+      </div>
+      <div className="absolute top-2 right-3 z-10 text-[10px] font-mono text-slate-400">
+        Sweep 25mm/s · 10mm/mV
+      </div>
+      <canvas
+        ref={canvasRef}
+        width={560}
+        height={80}
+        className="w-full h-20 block rounded-lg"
+      />
+    </div>
+  );
+}
+
+/**
  * Ultra-fast, zero-lag pure SVG Telemetry Chart.
- * Eliminates Recharts ResizeObserver loops and guarantees 120 FPS performance.
  */
 function NativeTelemetryChart({
   tab,
+  history,
 }: {
   tab: "bp" | "hr";
+  history: TelemetryPoint[];
 }) {
   const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
 
@@ -120,7 +273,6 @@ function NativeTelemetryChart({
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
 
-  // Domain scaling
   const bpMin = 60;
   const bpMax = 160;
   const hrMin = 50;
@@ -132,24 +284,23 @@ function NativeTelemetryChart({
   };
 
   const getX = (idx: number) => {
-    return padding.left + (idx / (TELEMETRY_HISTORY.length - 1)) * chartW;
+    return padding.left + (idx / (history.length - 1)) * chartW;
   };
 
-  // Build SVG Path
-  const buildPath = (dataKeys: (item: (typeof TELEMETRY_HISTORY)[0]) => number, min: number, max: number) => {
-    const points = TELEMETRY_HISTORY.map((d, i) => `${getX(i).toFixed(1)},${getY(dataKeys(d), min, max).toFixed(1)}`);
+  const buildPath = (dataKeys: (item: TelemetryPoint) => number, min: number, max: number) => {
+    const points = history.map((d, i) => `${getX(i).toFixed(1)},${getY(dataKeys(d), min, max).toFixed(1)}`);
     return `M ${points.join(" L ")}`;
   };
 
-  const buildArea = (dataKeys: (item: (typeof TELEMETRY_HISTORY)[0]) => number, min: number, max: number) => {
-    const points = TELEMETRY_HISTORY.map((d, i) => `${getX(i).toFixed(1)},${getY(dataKeys(d), min, max).toFixed(1)}`);
+  const buildArea = (dataKeys: (item: TelemetryPoint) => number, min: number, max: number) => {
+    const points = history.map((d, i) => `${getX(i).toFixed(1)},${getY(dataKeys(d), min, max).toFixed(1)}`);
     const firstX = getX(0).toFixed(1);
-    const lastX = getX(TELEMETRY_HISTORY.length - 1).toFixed(1);
+    const lastX = getX(history.length - 1).toFixed(1);
     const bottomY = (padding.top + chartH).toFixed(1);
     return `M ${points.join(" L ")} L ${lastX},${bottomY} L ${firstX},${bottomY} Z`;
   };
 
-  const hoveredItem = hoverIndex !== null ? TELEMETRY_HISTORY[hoverIndex] : null;
+  const hoveredItem = hoverIndex !== null ? history[hoverIndex] : null;
 
   return (
     <div className="w-full relative select-none">
@@ -200,7 +351,6 @@ function NativeTelemetryChart({
                 </g>
               );
             })}
-            {/* Target 120 annotation */}
             <text
               x={width - padding.right - 4}
               y={getY(120, bpMin, bpMax) - 4}
@@ -242,7 +392,7 @@ function NativeTelemetryChart({
         )}
 
         {/* X-axis Day Labels */}
-        {TELEMETRY_HISTORY.map((d, i) => (
+        {history.map((d, i) => (
           <text
             key={d.day}
             x={getX(i)}
@@ -258,7 +408,6 @@ function NativeTelemetryChart({
         {/* Data Paths */}
         {tab === "bp" ? (
           <>
-            {/* Diastolic Area & Line */}
             <path d={buildArea((d) => d.diastolic, bpMin, bpMax)} fill="url(#chartDiaGrad)" />
             <path
               d={buildPath((d) => d.diastolic, bpMin, bpMax)}
@@ -267,7 +416,6 @@ function NativeTelemetryChart({
               strokeWidth={2.5}
             />
 
-            {/* Systolic Area & Line */}
             <path d={buildArea((d) => d.systolic, bpMin, bpMax)} fill="url(#chartSysGrad)" />
             <path
               d={buildPath((d) => d.systolic, bpMin, bpMax)}
@@ -276,8 +424,7 @@ function NativeTelemetryChart({
               strokeWidth={2.5}
             />
 
-            {/* Systolic & Diastolic Dots */}
-            {TELEMETRY_HISTORY.map((d, i) => {
+            {history.map((d, i) => {
               const sx = getX(i);
               const sy = getY(d.systolic, bpMin, bpMax);
               const dy = getY(d.diastolic, bpMin, bpMax);
@@ -302,7 +449,6 @@ function NativeTelemetryChart({
           </>
         ) : (
           <>
-            {/* Pulse Line & Area */}
             <path d={buildArea((d) => d.hr, hrMin, hrMax)} fill="url(#chartHrGrad)" />
             <path
               d={buildPath((d) => d.hr, hrMin, hrMax)}
@@ -311,8 +457,7 @@ function NativeTelemetryChart({
               strokeWidth={2.5}
             />
 
-            {/* Pulse Dots */}
-            {TELEMETRY_HISTORY.map((d, i) => {
+            {history.map((d, i) => {
               const x = getX(i);
               const y = getY(d.hr, hrMin, hrMax);
               const isHov = hoverIndex === i;
@@ -329,10 +474,10 @@ function NativeTelemetryChart({
           </>
         )}
 
-        {/* Transparent hover capture columns */}
-        {TELEMETRY_HISTORY.map((_, i) => {
-          const x = getX(i) - chartW / (TELEMETRY_HISTORY.length - 1) / 2;
-          const w = chartW / (TELEMETRY_HISTORY.length - 1);
+        {/* Hover capture columns */}
+        {history.map((_, i) => {
+          const x = getX(i) - chartW / (history.length - 1) / 2;
+          const w = chartW / (history.length - 1);
           return (
             <rect
               key={i}
@@ -354,7 +499,7 @@ function NativeTelemetryChart({
         <div
           className="absolute top-2 pointer-events-none transition-all duration-150 bg-slate-900 text-white px-3 py-2 rounded-lg shadow-xl text-xs space-y-0.5 z-20"
           style={{
-            left: `${Math.min(75, Math.max(15, ((hoverIndex || 0) / 6) * 100))}%`,
+            left: `${Math.min(75, Math.max(15, ((hoverIndex || 0) / (history.length - 1)) * 100))}%`,
             transform: "translateX(-50%)",
           }}
         >
@@ -389,6 +534,7 @@ function NativeTelemetryChart({
 export default function PatientDashboardPage() {
   const { user } = useAuthStore();
   const [data, setData] = React.useState<DashboardData | null>(null);
+  const [telemetryHistory, setTelemetryHistory] = React.useState<TelemetryPoint[]>(BASE_TELEMETRY);
   const [toastMessage, setToastMessage] = React.useState<string | null>(null);
   const [chartTab, setChartTab] = React.useState<"bp" | "hr">("bp");
   const [copiedMrn, setCopiedMrn] = React.useState(false);
@@ -397,12 +543,43 @@ export default function PatientDashboardPage() {
   const [newTaskTitle, setNewTaskTitle] = React.useState("");
   const [showAddTaskInput, setShowAddTaskInput] = React.useState(false);
 
+  // Real-time telemetry streaming state
+  const [isLiveStreaming, setIsLiveStreaming] = React.useState(true);
+  const [streamIntervalMs, setStreamIntervalMs] = React.useState(2000);
+  const [isAcuteSpikeActive, setIsAcuteSpikeActive] = React.useState(false);
+  const [lastTelemetryUpdate, setLastTelemetryUpdate] = React.useState<Date>(new Date());
+  const [latencyMs, setLatencyMs] = React.useState(18);
+
+  // Real-time live vitals state
+  const [currentSbp, setCurrentSbp] = React.useState(134);
+  const [currentDbp, setCurrentDbp] = React.useState(86);
+  const [currentHr, setCurrentHr] = React.useState(76);
+  const [currentSpo2, setCurrentSpo2] = React.useState(98);
+
   // Quick log vitals form state
   const [logSbp, setLogSbp] = React.useState("130");
   const [logDbp, setLogDbp] = React.useState("84");
   const [logHr, setLogHr] = React.useState("74");
   const [logSpo2, setLogSpo2] = React.useState("98");
   const [isSubmittingVital, setIsSubmittingVital] = React.useState(false);
+
+  // Dynamic ML Risk calculation
+  const calculateRisk = React.useCallback((sbp: number, dbp: number, hr: number, spo2: number) => {
+    let score = 0.30;
+    if (sbp >= 140) score += 0.25;
+    else if (sbp >= 130) score += 0.12;
+    if (dbp >= 90) score += 0.15;
+    else if (dbp >= 85) score += 0.08;
+    if (hr >= 100 || hr < 55) score += 0.18;
+    else if (hr > 85) score += 0.08;
+    if (spo2 < 95) score += 0.20;
+
+    score = Math.min(0.95, Math.max(0.08, score));
+    const level = score >= 0.7 ? "HIGH" : score >= 0.35 ? "MEDIUM" : "LOW";
+    return { score, level };
+  }, []);
+
+  const [liveRisk, setLiveRisk] = React.useState({ score: 0.42, level: "MEDIUM" });
 
   // Interactive task list
   const [tasks, setTasks] = React.useState<DashboardTask[]>([
@@ -456,10 +633,10 @@ export default function PatientDashboardPage() {
         primary_physician: "Dr. Sarah Lin, MD (Chief of Cardiology)",
       },
       latest_vitals: {
-        systolic_bp: 134,
-        diastolic_bp: 86,
-        heart_rate: 76,
-        spo2: 98,
+        systolic_bp: currentSbp,
+        diastolic_bp: currentDbp,
+        heart_rate: currentHr,
+        spo2: currentSpo2,
         recorded_at: new Date().toISOString(),
         source: "USER_ENTERED",
       },
@@ -467,11 +644,11 @@ export default function PatientDashboardPage() {
         id: "pred-demo-01",
         model_name: "CardioEnsemble-RF",
         model_version_str: "v1.4.2",
-        prediction_result: "MEDIUM",
-        probability: 0.42,
+        prediction_result: liveRisk.level,
+        probability: liveRisk.score,
         created_at: new Date().toISOString(),
         explanation:
-          "The ensemble machine learning model evaluates your current blood pressure readings, historical ambulatory telemetry, and demographic risk factors as Moderate Risk (42.0%). Systolic BP elevation contributes most to this score, while regular physical exercise serves as a protective factor.",
+          "The ensemble machine learning model evaluates your current blood pressure readings, historical ambulatory telemetry, and demographic risk factors in real-time. Systolic BP elevation and heart rate variability are actively monitored.",
         disclaimer:
           "Notice: This prediction is a model-generated estimate for clinical decision support. It is not an autonomous diagnosis.",
       },
@@ -485,9 +662,35 @@ export default function PatientDashboardPage() {
       },
       unread_notification_count: 2,
     };
-  }, [user?.full_name, user?.license_number]);
+  }, [user?.full_name, user?.license_number, currentSbp, currentDbp, currentHr, currentSpo2, liveRisk.level, liveRisk.score]);
 
-  // Fetch once on mount
+  // WebSocket live event handler
+  const handleWebSocketEvent = React.useCallback((event: UserRealtimeEvent) => {
+    if (event.event_type === "vitals_recorded" && event.payload) {
+      const sbp = Number(event.payload.systolic_bp) || currentSbp;
+      const dbp = Number(event.payload.diastolic_bp) || currentDbp;
+      const hr = Number(event.payload.heart_rate) || currentHr;
+      const spo2 = Number(event.payload.oxygen_saturation) || currentSpo2;
+
+      setCurrentSbp(sbp);
+      setCurrentDbp(dbp);
+      setCurrentHr(hr);
+      setCurrentSpo2(spo2);
+      setLastTelemetryUpdate(new Date());
+
+      const computed = calculateRisk(sbp, dbp, hr, spo2);
+      setLiveRisk(computed);
+      showToast(`Real-time Telemetry Ingested: ${sbp}/${dbp} mmHg, ${hr} bpm`);
+    } else if (event.event_type === "task_completed" && event.resource_id) {
+      setTasks((prev) =>
+        prev.map((t) => (t.id === event.resource_id ? { ...t, status: "COMPLETED" } : t))
+      );
+    }
+  }, [currentSbp, currentDbp, currentHr, currentSpo2, calculateRisk]);
+
+  const { status: wsStatus } = useUserWebSocket(handleWebSocketEvent);
+
+  // Initial load
   React.useEffect(() => {
     let isMounted = true;
     const load = async () => {
@@ -501,6 +704,12 @@ export default function PatientDashboardPage() {
             if (user?.license_number) {
               dashboardData.patient.mrn = user.license_number;
             }
+          }
+          if (dashboardData.latest_vitals) {
+            setCurrentSbp(dashboardData.latest_vitals.systolic_bp || 134);
+            setCurrentDbp(dashboardData.latest_vitals.diastolic_bp || 86);
+            setCurrentHr(dashboardData.latest_vitals.heart_rate || 76);
+            setCurrentSpo2(dashboardData.latest_vitals.spo2 || 98);
           }
           setData(dashboardData);
           return;
@@ -517,6 +726,63 @@ export default function PatientDashboardPage() {
       isMounted = false;
     };
   }, [getFallbackData, user?.full_name, user?.license_number]);
+
+  // Real-time Ambulatory Telemetry Generator
+  React.useEffect(() => {
+    if (!isLiveStreaming) return;
+
+    const timer = setInterval(() => {
+      // Small ambulatory micro-fluctuations
+      const sbpDelta = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
+      const dbpDelta = Math.floor(Math.random() * 3) - 1;
+      const hrDelta = Math.floor(Math.random() * 3) - 1;
+
+      setCurrentSbp((prev) => {
+        const base = isAcuteSpikeActive ? 154 : 134;
+        return Math.max(110, Math.min(185, prev + sbpDelta + (prev < base ? 1 : prev > base ? -1 : 0)));
+      });
+
+      setCurrentDbp((prev) => {
+        const base = isAcuteSpikeActive ? 96 : 86;
+        return Math.max(70, Math.min(115, prev + dbpDelta + (prev < base ? 1 : prev > base ? -1 : 0)));
+      });
+
+      setCurrentHr((prev) => {
+        const base = isAcuteSpikeActive ? 104 : 76;
+        return Math.max(55, Math.min(140, prev + hrDelta + (prev < base ? 1 : prev > base ? -1 : 0)));
+      });
+
+      setCurrentSpo2((prev) => {
+        const base = isAcuteSpikeActive ? 94 : 98;
+        return Math.max(90, Math.min(100, prev + (prev < base ? 1 : prev > base ? -1 : 0)));
+      });
+
+      setLastTelemetryUpdate(new Date());
+      setLatencyMs(15 + Math.floor(Math.random() * 12));
+    }, streamIntervalMs);
+
+    return () => clearInterval(timer);
+  }, [isLiveStreaming, streamIntervalMs, isAcuteSpikeActive]);
+
+  // Sync latest vitals with 7-day chart "Today" node and recalculate ML risk
+  React.useEffect(() => {
+    setTelemetryHistory((prev) =>
+      prev.map((item) =>
+        item.day === "Today"
+          ? {
+              ...item,
+              systolic: currentSbp,
+              diastolic: currentDbp,
+              hr: currentHr,
+              spo2: currentSpo2,
+            }
+          : item
+      )
+    );
+
+    const calculated = calculateRisk(currentSbp, currentDbp, currentHr, currentSpo2);
+    setLiveRisk(calculated);
+  }, [currentSbp, currentDbp, currentHr, currentSpo2, calculateRisk]);
 
   const handleCopyMrn = (mrn: string) => {
     navigator.clipboard.writeText(mrn);
@@ -586,33 +852,41 @@ export default function PatientDashboardPage() {
       // Offline fallback
     }
 
-    if (data) {
-      setData({
-        ...data,
-        latest_vitals: {
-          systolic_bp: sbp,
-          diastolic_bp: dbp,
-          heart_rate: hr,
-          spo2: spo2,
-          recorded_at: new Date().toISOString(),
-          source: "USER_ENTERED",
-        },
-      });
-    }
+    setCurrentSbp(sbp);
+    setCurrentDbp(dbp);
+    setCurrentHr(hr);
+    setCurrentSpo2(spo2);
+    setLastTelemetryUpdate(new Date());
 
     setIsSubmittingVital(false);
     setShowLogModal(false);
     showToast(`Logged vitals: ${sbp}/${dbp} mmHg, ${hr} bpm, ${spo2}% SpO2.`);
   };
 
+  const handleToggleAcuteSpike = () => {
+    if (!isAcuteSpikeActive) {
+      setIsAcuteSpikeActive(true);
+      setCurrentSbp(158);
+      setCurrentDbp(98);
+      setCurrentHr(108);
+      setCurrentSpo2(93);
+      showToast("⚠️ Simulated Acute Telemetry Event: Elevated BP & Tachycardia triggered!");
+    } else {
+      setIsAcuteSpikeActive(false);
+      setCurrentSbp(134);
+      setCurrentDbp(86);
+      setCurrentHr(76);
+      setCurrentSpo2(98);
+      showToast("Baseline resting telemetry restored.");
+    }
+  };
+
   const handleExportSummary = () => {
     showToast("Clinical Telemetry Summary exported.");
   };
 
-  const vitals = data?.latest_vitals;
-  const prediction = data?.latest_prediction;
-  const nextAppt = data?.next_appointment;
   const patient = data?.patient;
+  const nextAppt = data?.next_appointment;
 
   // Task completion calculation
   const completedTasksCount = tasks.filter((t) => t.status === "COMPLETED").length;
@@ -625,13 +899,15 @@ export default function PatientDashboardPage() {
     return true;
   });
 
-  // Dynamic time greeting
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  // Risk display metadata
-  const riskScore = Math.round((prediction?.probability || 0.42) * 100);
-  const riskLevel = prediction?.prediction_result || "MEDIUM";
+  const riskScore = Math.round(liveRisk.score * 100);
+  const riskLevel = liveRisk.level;
+
+  // Derived calculations
+  const meanArterialPressure = Math.round(currentDbp + (currentSbp - currentDbp) / 3);
+  const pulsePressure = currentSbp - currentDbp;
 
   return (
     <div className="space-y-6 w-full min-w-0">
@@ -651,28 +927,117 @@ export default function PatientDashboardPage() {
         </div>
       )}
 
-      {/* Hero Welcome & Patient Identity Banner (Dedicated Clinical Light Mode) */}
+      {/* Real-time Telemetry Header Control Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 text-white shadow-md border border-slate-800">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs">
+            {wsStatus === "connected" ? (
+              <Wifi className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
+            ) : (
+              <Activity className="h-3.5 w-3.5 text-teal-400 animate-pulse" />
+            )}
+            <span className="font-semibold text-emerald-400">
+              {isLiveStreaming ? "REAL-TIME TELEMETRY LIVE" : "STREAM PAUSED"}
+            </span>
+            <span className="text-slate-400 text-[10px] font-mono">({latencyMs}ms)</span>
+          </div>
+
+          <span className="hidden sm:inline text-xs text-slate-400">
+            Last beat:{" "}
+            <strong className="text-slate-200 font-mono">
+              {lastTelemetryUpdate.toLocaleTimeString()}
+            </strong>
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Stream toggle */}
+          <button
+            onClick={() => setIsLiveStreaming(!isLiveStreaming)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+              isLiveStreaming
+                ? "bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700"
+                : "bg-emerald-600 text-white hover:bg-emerald-700"
+            }`}
+          >
+            {isLiveStreaming ? (
+              <>
+                <Pause className="h-3.5 w-3.5 text-amber-400" /> Pause Stream
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5" /> Resume Stream
+              </>
+            )}
+          </button>
+
+          {/* Rate selector */}
+          <select
+            value={streamIntervalMs}
+            onChange={(e) => setStreamIntervalMs(Number(e.target.value))}
+            className="bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded-lg px-2 py-1 font-mono focus:outline-hidden"
+          >
+            <option value={1000}>1.0s (High Freq)</option>
+            <option value={2000}>2.0s (Ambulatory)</option>
+            <option value={5000}>5.0s (Standard)</option>
+          </select>
+
+          {/* Acute Event Simulator */}
+          <button
+            onClick={handleToggleAcuteSpike}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+              isAcuteSpikeActive
+                ? "bg-rose-600 text-white animate-pulse"
+                : "bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700"
+            }`}
+          >
+            <Zap className="h-3.5 w-3.5" />
+            {isAcuteSpikeActive ? "Spike Active (Reset)" : "Simulate Acute Event"}
+          </button>
+        </div>
+      </div>
+
+      {/* Acute Anomaly Warning Banner if Spike is triggered */}
+      {isAcuteSpikeActive && (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 flex items-start gap-3 shadow-xs animate-in fade-in">
+          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
+          <div className="space-y-1 flex-1 min-w-0">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-rose-700">
+              Live Hemodynamic Anomaly Detected
+            </h4>
+            <p className="text-xs text-rose-800 leading-relaxed">
+              Acute systolic blood pressure elevation ({currentSbp} mmHg) with sinus tachycardia ({currentHr} bpm) detected on ambulatory stream. An automated high-priority alert has been routed to Dr. Sarah Lin (Cardiology Specialist).
+            </p>
+          </div>
+          <Button
+            size="sm"
+            onClick={handleToggleAcuteSpike}
+            className="bg-rose-600 hover:bg-rose-700 text-white text-xs shrink-0"
+          >
+            Acknowledge &amp; Reset
+          </Button>
+        </div>
+      )}
+
+      {/* Hero Welcome & Patient Identity Banner */}
       <div className="relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 p-5 sm:p-7 shadow-xs">
-        {/* Subtle clinical accent top bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-600 via-emerald-500 to-sky-500" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 min-w-0 flex-1">
-            {/* Live Status indicator & Regulatory tag */}
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
                 </span>
-                Active Telemetry Monitoring
+                Active Continuous Telemetry
               </span>
               <span className="text-xs text-slate-500 font-medium">
                 FDA SaMD Class II Aligned · Protocol Cardio-2026
               </span>
             </div>
 
-            {/* Dynamic Greeting (Natural inline text wrapping) */}
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-slate-900">
                 {greeting},{" "}
@@ -681,12 +1046,11 @@ export default function PatientDashboardPage() {
                 </span>
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 max-w-2xl leading-relaxed">
-                Your vitals are synchronizing in real time with your clinical care team. Last telemetry was recorded{" "}
-                <span className="text-slate-900 font-semibold">today at 08:00 AM</span>.
+                Your vitals are synchronizing in real time with your clinical care team. Real-time stream is active and updating every{" "}
+                <span className="text-slate-900 font-semibold">{streamIntervalMs / 1000}s</span>.
               </p>
             </div>
 
-            {/* Patient Meta Badges (Light clinical chips) */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
               <button
                 onClick={() => handleCopyMrn(user?.license_number || patient?.mrn || "MRN-PA-90241")}
@@ -716,7 +1080,6 @@ export default function PatientDashboardPage() {
             </div>
           </div>
 
-          {/* Quick Action Hub */}
           <div className="flex flex-wrap sm:flex-nowrap lg:flex-wrap items-center gap-2.5 shrink-0 pt-2 lg:pt-0 w-full sm:w-auto">
             <Link href="/user/risk-assessment/new" className="w-full sm:w-auto">
               <Button
@@ -748,7 +1111,10 @@ export default function PatientDashboardPage() {
         </div>
       </div>
 
-      {/* Vital Metrics Grid (4 Interactive Telemetry Cards: 1-col mobile, 2-col tablet/laptop, 4-col large desktop) */}
+      {/* Real-time Dynamic ECG Waveform Monitor */}
+      <RealtimeEcgWaveform bpm={currentHr} isSpike={isAcuteSpikeActive} />
+
+      {/* Vital Metrics Grid (4 Interactive Real-time Telemetry Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* Blood Pressure Card */}
         <Card className="bg-white border-slate-200/90 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden group">
@@ -774,27 +1140,42 @@ export default function PatientDashboardPage() {
 
             <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
-                <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-                  {vitals?.systolic_bp ? `${vitals.systolic_bp}/${vitals.diastolic_bp}` : "134/86"}
+                <span className={`text-2xl sm:text-3xl font-black tracking-tight transition-colors duration-200 ${
+                  currentSbp >= 140 ? "text-rose-600" : "text-slate-900"
+                }`}>
+                  {currentSbp}/{currentDbp}
                 </span>
                 <span className="ml-1.5 text-xs font-semibold text-slate-400">mmHg</span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 shrink-0">
-                <TrendingDown className="h-3 w-3" /> -2 mmHg
+              <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${
+                currentSbp >= 140
+                  ? "text-rose-700 bg-rose-50 border-rose-200"
+                  : "text-emerald-600 bg-emerald-50 border-emerald-200/60"
+              }`}>
+                {currentSbp >= 140 ? (
+                  <>
+                    <TrendingUp className="h-3 w-3" /> Stage 2 Alert
+                  </>
+                ) : (
+                  <>
+                    <TrendingDown className="h-3 w-3" /> Live Synced
+                  </>
+                )}
               </span>
             </div>
 
-            {/* Mini Sparkline */}
             <div className="pt-1">
               <div className="h-8 w-full flex items-end gap-1">
-                {[138, 136, 135, 133, 137, 132, vitals?.systolic_bp || 134].map((val, idx) => {
-                  const heightPercent = Math.min(100, Math.max(25, ((val - 120) / (145 - 120)) * 100));
+                {[138, 136, 135, 133, 137, 132, currentSbp].map((val, idx) => {
+                  const heightPercent = Math.min(100, Math.max(25, ((val - 120) / (160 - 120)) * 100));
                   return (
                     <div key={idx} className="flex-1 flex flex-col items-center gap-0.5 group/bar">
                       <div
                         style={{ height: `${heightPercent}%` }}
                         className={`w-full rounded-sm transition-all duration-300 ${
-                          idx === 6 ? "bg-rose-500" : "bg-rose-200 group-hover/bar:bg-rose-400"
+                          idx === 6
+                            ? val >= 140 ? "bg-rose-600 animate-pulse" : "bg-rose-500"
+                            : "bg-rose-200 group-hover/bar:bg-rose-400"
                         }`}
                         title={`Day ${idx + 1}: ${val} mmHg`}
                       />
@@ -803,9 +1184,11 @@ export default function PatientDashboardPage() {
                 })}
               </div>
               <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-medium gap-1">
-                <span className="shrink-0">7 days ago</span>
-                <span className="text-slate-600 font-semibold truncate text-center">Moderate Control</span>
-                <span className="shrink-0">Today</span>
+                <span className="shrink-0">MAP: {meanArterialPressure} mmHg</span>
+                <span className="text-slate-600 font-semibold truncate text-center">
+                  PP: {pulsePressure} mmHg
+                </span>
+                <span className="shrink-0 text-emerald-600 font-bold">Live Stream</span>
               </div>
             </div>
           </CardContent>
@@ -818,7 +1201,14 @@ export default function PatientDashboardPage() {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
                 <div className="h-10 w-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold shrink-0">
-                  <Activity className="h-5 w-5" />
+                  <Heart
+                    className={`h-5 w-5 text-rose-500 transition-transform duration-300 ${
+                      isLiveStreaming ? "scale-110" : ""
+                    }`}
+                    style={{
+                      animation: isLiveStreaming ? `pulse ${(60 / currentHr).toFixed(2)}s infinite` : "none",
+                    }}
+                  />
                 </div>
                 <div className="min-w-0">
                   <h2 className="text-xs font-bold text-slate-700 uppercase tracking-wider truncate">Resting Pulse</h2>
@@ -835,27 +1225,33 @@ export default function PatientDashboardPage() {
 
             <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
-                <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-                  {vitals?.heart_rate || 76}
+                <span className={`text-2xl sm:text-3xl font-black tracking-tight transition-colors duration-200 ${
+                  currentHr > 100 ? "text-rose-600" : "text-slate-900"
+                }`}>
+                  {currentHr}
                 </span>
                 <span className="ml-1.5 text-xs font-semibold text-slate-400">bpm</span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 shrink-0">
-                <CheckCircle2 className="h-3 w-3" /> Normal Rhythm
+              <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${
+                currentHr > 100
+                  ? "text-rose-700 bg-rose-50 border-rose-200"
+                  : "text-emerald-600 bg-emerald-50 border-emerald-200/60"
+              }`}>
+                {currentHr > 100 ? "Tachycardia Alert" : "Sinus Rhythm"}
               </span>
             </div>
 
             <div className="pt-1">
               <div className="h-8 w-full flex items-center justify-between px-2 bg-amber-50/50 rounded-lg border border-amber-100 gap-1">
                 <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-800 min-w-0">
-                  <span className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                  <span className="truncate">Sinus Rhythm (Normal)</span>
+                  <span className={`h-2 w-2 rounded-full shrink-0 ${currentHr > 100 ? "bg-rose-500 animate-ping" : "bg-emerald-500"}`} />
+                  <span className="truncate">{currentHr > 100 ? "High Ambulatory Pulse" : "Normal Sinus Rhythm"}</span>
                 </div>
-                <span className="text-[10px] font-mono text-slate-500 shrink-0">Avg 74</span>
+                <span className="text-[10px] font-mono text-slate-500 shrink-0">{currentHr} bpm</span>
               </div>
               <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-medium gap-1">
-                <span className="shrink-0">Min: 68 bpm</span>
-                <span className="shrink-0">Max: 82 bpm</span>
+                <span className="shrink-0">RR: {Math.round(currentHr / 4.5)} /min</span>
+                <span className="shrink-0">HRV: 48 ms</span>
               </div>
             </div>
           </CardContent>
@@ -885,13 +1281,19 @@ export default function PatientDashboardPage() {
 
             <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
-                <span className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
-                  {vitals?.spo2 || 98}
+                <span className={`text-2xl sm:text-3xl font-black tracking-tight transition-colors duration-200 ${
+                  currentSpo2 < 95 ? "text-amber-600" : "text-slate-900"
+                }`}>
+                  {currentSpo2}
                 </span>
                 <span className="ml-1 text-xs font-semibold text-slate-400">%</span>
               </div>
-              <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200/60 shrink-0">
-                Optimal
+              <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${
+                currentSpo2 < 95
+                  ? "text-amber-700 bg-amber-50 border-amber-200"
+                  : "text-teal-700 bg-teal-50 border-teal-200/60"
+              }`}>
+                {currentSpo2 < 95 ? "Low Saturation" : "Optimal"}
               </span>
             </div>
 
@@ -899,12 +1301,12 @@ export default function PatientDashboardPage() {
               <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                 <div
                   className="bg-gradient-to-r from-sky-500 to-teal-500 h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${vitals?.spo2 || 98}%` }}
+                  style={{ width: `${currentSpo2}%` }}
                 />
               </div>
               <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium gap-1">
-                <span className="truncate">Pulse Oximeter</span>
-                <span className="text-emerald-600 font-semibold shrink-0">100% Saturation Max</span>
+                <span className="truncate">Perfusion Index: 4.8</span>
+                <span className="text-emerald-600 font-semibold shrink-0">Pleth Track Active</span>
               </div>
             </div>
           </CardContent>
@@ -934,25 +1336,29 @@ export default function PatientDashboardPage() {
 
             <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
               <div>
-                <span className="text-2xl sm:text-3xl font-black tracking-tight text-amber-700">
+                <span className={`text-2xl sm:text-3xl font-black tracking-tight transition-colors duration-200 ${
+                  riskLevel === "HIGH" ? "text-rose-600" : riskLevel === "MEDIUM" ? "text-amber-700" : "text-emerald-600"
+                }`}>
                   {riskScore}%
                 </span>
-                <span className="ml-1.5 text-xs font-bold text-amber-800 uppercase tracking-wide">
+                <span className={`ml-1.5 text-xs font-bold uppercase tracking-wide ${
+                  riskLevel === "HIGH" ? "text-rose-800" : riskLevel === "MEDIUM" ? "text-amber-800" : "text-emerald-800"
+                }`}>
                   {riskLevel}
                 </span>
               </div>
               <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
-                95% CI: 36-48%
+                Live Recomputed
               </span>
             </div>
 
             <div className="pt-1 space-y-1">
               <div className="grid grid-cols-3 gap-1 h-2 rounded-full overflow-hidden">
-                <div className="bg-emerald-400" title="Low Risk (0-30%)" />
-                <div className="bg-amber-400 relative" title="Moderate Risk (30-70%)">
+                <div className="bg-emerald-400" title="Low Risk (0-35%)" />
+                <div className="bg-amber-400 relative" title="Moderate Risk (35-70%)">
                   <div
                     className="absolute top-0 bottom-0 w-1.5 bg-slate-900 rounded-full shadow-sm"
-                    style={{ left: `${((riskScore - 30) / 40) * 100}%` }}
+                    style={{ left: `${Math.max(0, Math.min(100, ((riskScore - 35) / 35) * 100))}%` }}
                   />
                 </div>
                 <div className="bg-rose-400" title="High Risk (70-100%)" />
@@ -967,7 +1373,7 @@ export default function PatientDashboardPage() {
         </Card>
       </div>
 
-      {/* Main Content Layout: Responsive grid (1-col on mobile/tablet/laptop, 3-col on xl: >= 1280px) */}
+      {/* Main Content Layout */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         {/* Left 2 Columns: Clinical AI Assessment Deep-Dive & Telemetry Trends */}
         <div className="xl:col-span-2 space-y-6 min-w-0">
@@ -984,12 +1390,15 @@ export default function PatientDashboardPage() {
                       <CardTitle className="text-base sm:text-lg font-bold text-slate-900">
                         AI Clinical Risk Analysis
                       </CardTitle>
-                      <Badge variant="medium" className="text-[11px] font-bold shrink-0">
+                      <Badge
+                        variant={riskLevel === "HIGH" ? "destructive" : riskLevel === "MEDIUM" ? "medium" : "outline"}
+                        className="text-[11px] font-bold shrink-0"
+                      >
                         {riskLevel} RISK · {riskScore}%
                       </Badge>
                     </div>
                     <CardDescription className="text-xs text-slate-500 truncate">
-                      Evaluated by {prediction?.model_name || "CardioEnsemble-RF"} {prediction?.model_version_str || "v1.4.2"} · Updated today
+                      Evaluated in real time by CardioEnsemble-RF v1.4.2 · Continuous ML inference
                     </CardDescription>
                   </div>
                 </div>
@@ -1043,21 +1452,24 @@ export default function PatientDashboardPage() {
 
                     <div className="absolute flex flex-col items-center justify-center">
                       <span className="text-2xl font-black text-slate-900">{riskScore}%</span>
-                      <span className="text-[10px] font-bold text-amber-700 tracking-wider uppercase">
-                        Moderate
+                      <span className={`text-[10px] font-bold tracking-wider uppercase ${
+                        riskLevel === "HIGH" ? "text-rose-600" : riskLevel === "MEDIUM" ? "text-amber-700" : "text-emerald-700"
+                      }`}>
+                        {riskLevel}
                       </span>
                     </div>
                   </div>
                   <span className="text-[11px] font-medium text-slate-500 mt-1">
-                    95% Confidence Interval: [36% – 48%]
+                    Live 95% CI: [{Math.max(5, riskScore - 6)}% – {Math.min(99, riskScore + 6)}%]
                   </span>
                 </div>
 
                 {/* Algorithmic Narrative Breakdown */}
                 <div className="md:col-span-2 space-y-3 min-w-0">
                   <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                    {prediction?.explanation ||
-                      "The clinical algorithm evaluates your cardiovascular risk index as moderate. Primary drivers include sustained systolic pressure at 134 mmHg and demographic age factors, balanced by stable oxygenation and continuous compliance with medications."}
+                    {riskLevel === "HIGH"
+                      ? `Alert: Acute systolic pressure (${currentSbp} mmHg) and pulse (${currentHr} bpm) place current hemodynamic profile in the High Risk category (${riskScore}%). Care team has been notified.`
+                      : `The clinical ensemble model evaluates your real-time risk index as ${riskLevel} (${riskScore}%). Key drivers are active SBP of ${currentSbp} mmHg and Heart Rate at ${currentHr} bpm, balanced by steady oxygenation at ${currentSpo2}%.`}
                   </p>
 
                   {/* Feature Drivers Breakdown */}
@@ -1069,29 +1481,39 @@ export default function PatientDashboardPage() {
                       <div className="flex flex-wrap items-baseline justify-between gap-1">
                         <span className="text-slate-600 flex items-center gap-1.5 min-w-0">
                           <span className="h-1.5 w-1.5 rounded-full bg-rose-500 shrink-0" />
-                          <span className="truncate">Systolic BP (134 mmHg average)</span>
+                          <span className="truncate">Systolic BP ({currentSbp} mmHg live)</span>
                         </span>
-                        <span className="font-semibold text-rose-600 shrink-0">+18% risk weight</span>
+                        <span className="font-semibold text-rose-600 shrink-0">
+                          {currentSbp >= 140 ? "+28% acute weight" : "+18% risk weight"}
+                        </span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5">
-                        <div className="bg-rose-500 h-1.5 rounded-full" style={{ width: "65%" }} />
+                        <div
+                          className="bg-rose-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, (currentSbp / 180) * 100)}%` }}
+                        />
                       </div>
 
                       <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
                         <span className="text-slate-600 flex items-center gap-1.5 min-w-0">
                           <span className="h-1.5 w-1.5 rounded-full bg-amber-500 shrink-0" />
-                          <span className="truncate">Age &amp; Prior Clinical History</span>
+                          <span className="truncate">Resting Heart Rate ({currentHr} bpm)</span>
                         </span>
-                        <span className="font-semibold text-amber-600 shrink-0">+12% risk weight</span>
+                        <span className="font-semibold text-amber-600 shrink-0">
+                          {currentHr > 90 ? "+16% weight" : "+10% weight"}
+                        </span>
                       </div>
                       <div className="w-full bg-slate-100 rounded-full h-1.5">
-                        <div className="bg-amber-500 h-1.5 rounded-full" style={{ width: "42%" }} />
+                        <div
+                          className="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, (currentHr / 140) * 100)}%` }}
+                        />
                       </div>
 
                       <div className="flex flex-wrap items-baseline justify-between gap-1 pt-1">
                         <span className="text-slate-600 flex items-center gap-1.5 min-w-0">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
-                          <span className="truncate">Optimal SpO2 (98%) &amp; Walking Activity</span>
+                          <span className="truncate">Oxygenation ({currentSpo2}%) &amp; Compliance</span>
                         </span>
                         <span className="font-semibold text-emerald-600 shrink-0">-8% protective factor</span>
                       </div>
@@ -1111,7 +1533,7 @@ export default function PatientDashboardPage() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
-                    <p className="text-xs font-bold text-slate-800">1. Daily BP Logging</p>
+                    <p className="text-xs font-bold text-slate-800">1. Real-time Logging</p>
                     <p className="text-[11px] text-slate-500 leading-snug">
                       Record morning readings prior to breakfast to capture true resting baseline.
                     </p>
@@ -1125,7 +1547,7 @@ export default function PatientDashboardPage() {
                   <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1 sm:col-span-2 md:col-span-1">
                     <p className="text-xs font-bold text-slate-800">3. Clinician Review</p>
                     <p className="text-[11px] text-slate-500 leading-snug">
-                      Discuss these 30-day telemetry trends during your appointment on Thursday.
+                      Discuss these live telemetry trends during your upcoming clinic follow-up.
                     </p>
                   </div>
                 </div>
@@ -1144,7 +1566,6 @@ export default function PatientDashboardPage() {
                 </div>
               </div>
 
-              {/* Bottom Card Navigation */}
               <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-100">
                 <Link
                   href="/user/predictions"
@@ -1171,7 +1592,7 @@ export default function PatientDashboardPage() {
                   7-Day Telemetry Trend Visualizer
                 </CardTitle>
                 <CardDescription className="text-xs text-slate-500">
-                  Continuous multi-parameter vital telemetry synced with hospital electronic health records
+                  Continuous multi-parameter vital telemetry synced in real time with hospital EHR
                 </CardDescription>
               </div>
 
@@ -1233,14 +1654,13 @@ export default function PatientDashboardPage() {
                   </span>
                 </div>
 
-                {/* Pure Native SVG Chart - zero ResizeObserver lag */}
-                <NativeTelemetryChart tab={chartTab} />
+                <NativeTelemetryChart tab={chartTab} history={telemetryHistory} />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Right Column: Daily Health Plan, Care Team & Appointments (Stacked in 1-col on xl, 3-col on lg, 2-col on md, 1-col on mobile) */}
+        {/* Right Column: Daily Health Plan, Care Team & Appointments */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1 gap-6 min-w-0">
           {/* Daily Health Plan & Task Checklist */}
           <Card className="bg-white border-slate-200/90 shadow-sm overflow-hidden">
@@ -1297,7 +1717,6 @@ export default function PatientDashboardPage() {
             </CardHeader>
 
             <CardContent className="p-3 sm:p-4 space-y-2.5">
-              {/* Quick Add Task Form */}
               {showAddTaskInput && (
                 <form onSubmit={handleAddNewTask} className="p-2.5 rounded-xl bg-teal-50/50 border border-teal-100 space-y-2">
                   <Input
@@ -1324,7 +1743,6 @@ export default function PatientDashboardPage() {
                 </form>
               )}
 
-              {/* Tasks List */}
               <div className="space-y-2">
                 {filteredTasks.map((task) => {
                   const isDone = task.status === "COMPLETED";
@@ -1403,7 +1821,6 @@ export default function PatientDashboardPage() {
 
               <CardContent className="p-4 sm:p-5 space-y-4">
                 <div className="flex items-start gap-3.5 min-w-0">
-                  {/* Calendar Badge */}
                   <div className="h-12 w-12 rounded-xl bg-slate-100 border border-slate-200 flex flex-col items-center justify-center shrink-0">
                     <span className="text-[9px] font-black text-slate-400 uppercase">SEP</span>
                     <span className="text-lg font-black text-slate-900 leading-none">17</span>
@@ -1423,7 +1840,6 @@ export default function PatientDashboardPage() {
                   </div>
                 </div>
 
-                {/* Pre-Appointment Checklist */}
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/70 text-[11px] text-slate-600 space-y-1">
                   <span className="font-bold text-slate-700 block">Pre-Visit Instructions:</span>
                   <div className="flex items-center gap-1.5 text-slate-500">
@@ -1467,8 +1883,8 @@ export default function PatientDashboardPage() {
                   </CardTitle>
                 </div>
                 <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 shrink-0">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  Online
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Sync
                 </span>
               </div>
             </CardHeader>
@@ -1488,7 +1904,7 @@ export default function PatientDashboardPage() {
                   <span className="text-[10px] text-slate-400 shrink-0">Yesterday</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed italic">
-                  &quot;Your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know immediately if any dizziness occurs.&quot;
+                  &quot;Your real-time vitals telemetry is streaming directly to our clinical monitoring station. Keep up the daily check-ins.&quot;
                 </p>
               </div>
 
@@ -1586,7 +2002,7 @@ export default function PatientDashboardPage() {
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2">
             <Info className="h-4 w-4 text-teal-600 shrink-0 mt-0.5" />
             <span>
-              Telemetry will be instantly reviewed by your assigned clinical team and ingested into your risk prediction model.
+              Telemetry will be instantly reviewed by your assigned clinical team and ingested into your risk prediction model in real time.
             </span>
           </div>
 

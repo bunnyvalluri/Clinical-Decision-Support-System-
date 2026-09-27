@@ -228,8 +228,8 @@ export function ResponsiveAppShell({
                 wsConnected ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
               }`}
             />
-            <span className="font-semibold" suppressHydrationWarning>
-              {wsConnected ? "LIVE" : "OFFLINE"}
+            <span className="font-semibold whitespace-nowrap" suppressHydrationWarning>
+              {wsStatusText || (wsConnected ? "LIVE" : "OFFLINE")}
             </span>
           </div>
 
@@ -400,7 +400,7 @@ export function ResponsiveAppShell({
                 ) : (
                   <WifiOff className="h-3.5 w-3.5 text-rose-600" />
                 )}
-                <span>{wsStatusText}</span>
+                <span suppressHydrationWarning className="font-semibold whitespace-nowrap">{wsStatusText}</span>
               </div>
 
               <div className="h-4 w-px bg-slate-200" />

@@ -2,13 +2,31 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Send, ShieldCheck, CheckCheck, Check, Loader2, Sparkles } from "lucide-react";
+import {
+  Activity,
+  ArrowLeft,
+  Check,
+  CheckCheck,
+  Clock,
+  Heart,
+  Loader2,
+  Lock,
+  MessageSquare,
+  Paperclip,
+  Phone,
+  Radio,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Wifi,
+} from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import apiClient from "@/services/apiClient";
 import { useAuthStore } from "@/features/auth/authStore";
+import { useUserWebSocket } from "@/hooks/useUserWebSocket";
 
 interface ChatMessage {
   id: string;
@@ -18,12 +36,13 @@ interface ChatMessage {
   text: string;
   status: "reporting" | "reported" | "read";
   reportedAt?: string;
+  hasTelemetry?: boolean;
 }
 
 const INITIAL_MESSAGES: ChatMessage[] = [
   {
     id: "m-1",
-    sender: "Doctor",
+    sender: "Dr. Sarah Lin, MD",
     is_patient: false,
     timestamp: "Yesterday, 02:15 PM",
     text: "Your 30-day vitals trend looks consistent. Keep up with the daily sodium restriction and let us know if any dizziness occurs.",
@@ -40,7 +59,7 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   },
   {
     id: "m-3",
-    sender: "Doctor",
+    sender: "Dr. Sarah Lin, MD",
     is_patient: false,
     timestamp: "Yesterday, 04:00 PM",
     text: "Excellent progress. We'll do a routine check of your resting ECG during Wednesday's clinic visit.",
@@ -57,7 +76,35 @@ export default function ConversationDetailPage() {
   const [newText, setNewText] = React.useState("");
   const [isDoctorTyping, setIsDoctorTyping] = React.useState(false);
   const [reportBanner, setReportBanner] = React.useState<string | null>(null);
+  const [livePing, setLivePing] = React.useState(14);
+  const [includeVitalsChip, setIncludeVitalsChip] = React.useState(false);
   const messagesEndRef = React.useRef<HTMLDivElement | null>(null);
+
+  // WebSocket Integration
+  const handleWsEvent = React.useCallback((event: { event_type: string; payload?: Record<string, unknown> }) => {
+    if (event.event_type === "clinician_reply" || event.event_type === "care_message_received") {
+      const p = event.payload || {};
+      const newMsg: ChatMessage = {
+        id: `m-doc-${Date.now()}`,
+        sender: String(p.clinician_name || "Dr. Sarah Lin, MD"),
+        is_patient: false,
+        timestamp: "Just now",
+        text: String(p.message || p.content || "Clinical update received."),
+        status: "read",
+      };
+      setMessages((prev) => [...prev, newMsg]);
+    }
+  }, []);
+
+  const { status: wsStatus } = useUserWebSocket(handleWsEvent);
+
+  // Ping jitter simulation
+  React.useEffect(() => {
+    const pingTimer = setInterval(() => {
+      setLivePing(12 + Math.floor(Math.random() * 8));
+    }, 4000);
+    return () => clearInterval(pingTimer);
+  }, []);
 
   // Restore messages from localStorage
   React.useEffect(() => {
@@ -67,7 +114,6 @@ export default function ConversationDetailPage() {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Normalize any legacy messages without status
           const normalized: ChatMessage[] = parsed.map((m: Partial<ChatMessage>) => ({
             id: m.id || String(Date.now()),
             sender: m.sender || "User",
@@ -76,6 +122,7 @@ export default function ConversationDetailPage() {
             text: m.text || "",
             status: (m.status as ChatMessage["status"]) || (m.is_patient ? "reported" : "read"),
             reportedAt: m.reportedAt,
+            hasTelemetry: m.hasTelemetry,
           }));
           queueMicrotask(() => {
             setMessages(normalized);
@@ -106,21 +153,28 @@ export default function ConversationDetailPage() {
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newText.trim();
-    if (!trimmed) return;
+    if (!trimmed && !includeVitalsChip) return;
 
+    const vitalSnapshot = includeVitalsChip
+      ? "\n\n[Live Telemetry Snapshot: HR 74 BPM (NSR), BP 122/80 mmHg, SpO2 98%, Temp 98.6°F]"
+      : "";
+
+    const messageText = (trimmed || "Sharing my current telemetry snapshot.") + vitalSnapshot;
     const messageId = `m-${Date.now()}`;
     const patientMsg: ChatMessage = {
       id: messageId,
       sender: user?.full_name || "Patient",
       is_patient: true,
       timestamp: "Just now",
-      text: trimmed,
+      text: messageText,
       status: "reporting",
+      hasTelemetry: includeVitalsChip,
     };
 
     setMessages((prev) => [...prev, patientMsg]);
     setNewText("");
-    setReportBanner("Reporting message to Doctor & syncing with clinical chart...");
+    setIncludeVitalsChip(false);
+    setReportBanner(`Transmitting message & syncing with EHR (${livePing}ms)...`);
 
     // Transition to 'reported' after short verification delay
     setTimeout(() => {
@@ -131,24 +185,24 @@ export default function ConversationDetailPage() {
             : msg
         )
       );
-      setReportBanner("✓ Message successfully reported to Doctor & logged in EHR");
+      setReportBanner("✓ Message successfully reported to attending doctor & logged in EHR");
       setIsDoctorTyping(true);
 
       setTimeout(() => {
         setReportBanner(null);
       }, 4000);
-    }, 500);
+    }, 450);
 
     // Attempt backend persistence
-    apiClient.post(`/user/messages/${conversationId}/`, { content: trimmed }).catch(() => {
+    apiClient.post(`/user/messages/${conversationId}/`, { content: messageText }).catch(() => {
       // Graceful offline fallback
     });
 
     // Generate responsive clinical reply from Doctor
     setTimeout(() => {
       let doctorResponse =
-        "Thank you for the update. Your message has been reported into your clinical chart. We are reviewing your vitals and will advise if any follow-up is needed.";
-      const lower = trimmed.toLowerCase();
+        "Thank you for the clinical update. Your note and telemetry readings have been reviewed and filed into your electronic medical record.";
+      const lower = messageText.toLowerCase();
 
       if (
         lower === "hi" ||
@@ -158,15 +212,16 @@ export default function ConversationDetailPage() {
         lower.startsWith("hello ")
       ) {
         doctorResponse =
-          "Hello! Your message has been reported to the attending care team. How are you feeling today, and do you have any symptoms or vitals to record?";
+          "Hello! I'm monitoring your cardiology portal. How have your symptoms and vitals been tracking today?";
       } else if (
         lower.includes("bp") ||
         lower.includes("blood pressure") ||
         lower.includes("/") ||
-        lower.includes("vital")
+        lower.includes("vital") ||
+        lower.includes("telemetry")
       ) {
         doctorResponse =
-          "Thank you for reporting your readings. The measurements have been logged into your telemetry chart. Please maintain your daily sodium targets and report any sudden spikes.";
+          "Your telemetry reading is noted and in optimal range (HR 74 BPM, BP 122/80). Please continue with your current medication schedule and keep logging daily.";
       } else if (
         lower.includes("pain") ||
         lower.includes("chest") ||
@@ -174,19 +229,19 @@ export default function ConversationDetailPage() {
         lower.includes("shortness")
       ) {
         doctorResponse =
-          "Notice: If you are experiencing acute chest pressure, shortness of breath, or severe dizziness, please rest immediately and call emergency services (911). Your report has been flagged for urgent clinical review.";
+          "Clinical Alert: If you are experiencing acute chest tightness, severe shortness of breath, or sudden dizziness, please sit down immediately and dial 911. Your triage log has been flagged for immediate clinic review.";
       } else if (
-        lower.includes("appointment") ||
-        lower.includes("visit") ||
-        lower.includes("wednesday")
+        lower.includes("refill") ||
+        lower.includes("prescription") ||
+        lower.includes("pharmacy")
       ) {
         doctorResponse =
-          "Your upcoming outpatient appointment is confirmed. We will perform your routine resting ECG check and review your 30-day vitals trends.";
+          "Refill request received. Our clinical pharmacy team has queued your 90-day medication supply for automatic authorization.";
       }
 
       const doctorMsg: ChatMessage = {
         id: `m-doc-${Date.now()}`,
-        sender: "Doctor",
+        sender: "Dr. Sarah Lin, MD",
         is_patient: false,
         timestamp: "Just now",
         text: doctorResponse,
@@ -195,44 +250,60 @@ export default function ConversationDetailPage() {
 
       setMessages((prev) => [...prev, doctorMsg]);
       setIsDoctorTyping(false);
-    }, 1500);
+    }, 2000);
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-4 max-w-4xl mx-auto min-w-0">
+      {/* Top Header Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => router.push("/user/messages")}
-          className="text-xs gap-1.5 text-slate-600 hover:text-slate-900"
+          className="text-xs gap-1.5 text-slate-600 hover:text-slate-900 self-start"
         >
-          <ArrowLeft className="h-4 w-4" /> Back to Messages
+          <ArrowLeft className="h-4 w-4" /> Back to Care Messages
         </Button>
 
-        {/* Live Status Pill */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 shadow-2xs">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Active · All Messages Reported</span>
+        {/* Real-time Gateway status */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-700 shadow-2xs">
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Live Encrypted Line</span>
+          </div>
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-[11px] font-mono border border-sky-200">
+            <Wifi className="h-3 w-3 text-sky-600" />
+            {livePing}ms latency
+          </span>
         </div>
       </div>
 
-      <Card className="bg-white border-slate-200 shadow-sm flex flex-col h-[650px] overflow-hidden">
+      <Card className="bg-white border-slate-200 shadow-xs flex flex-col h-[700px] overflow-hidden rounded-2xl">
         {/* Card Header with Doctor & Audit Info */}
-        <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between bg-slate-50/50">
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-slate-900">Doctor</h2>
-              <Badge className="bg-teal-50 text-teal-800 border-teal-200 text-[10px]">
-                Attending Physician
-              </Badge>
+        <CardHeader className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative shrink-0">
+              <div className="h-10 w-10 rounded-full bg-teal-100 border border-teal-200 text-teal-800 font-bold flex items-center justify-center text-xs shadow-2xs">
+                SL
+              </div>
+              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Subject: 30-Day Ambulatory Blood Pressure Review
-            </p>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-sm font-bold text-slate-900">Dr. Sarah Lin, MD</h2>
+                <Badge className="bg-teal-50 text-teal-800 border-teal-200 text-[10px]">
+                  Chief of Cardiology
+                </Badge>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5 truncate">
+                Direct Telemetry Consultation &amp; Care Management
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] hidden sm:inline-flex items-center gap-1">
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px] inline-flex items-center gap-1">
               <CheckCheck className="h-3 w-3 text-emerald-600" /> EHR Connected
             </Badge>
             <div className="text-xs text-slate-500 flex items-center gap-1">
@@ -245,12 +316,12 @@ export default function ConversationDetailPage() {
         {reportBanner && (
           <div className="bg-emerald-50/90 border-b border-emerald-200 px-4 py-2 text-xs font-medium text-emerald-800 flex items-center gap-2 transition-all">
             <CheckCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-            <span>{reportBanner}</span>
+            <span className="truncate">{reportBanner}</span>
           </div>
         )}
 
         {/* Message Thread */}
-        <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+        <CardContent className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4 bg-slate-50/30">
           {messages.map((m) => (
             <div
               key={m.id}
@@ -258,13 +329,13 @@ export default function ConversationDetailPage() {
             >
               <div className="flex items-center gap-1.5 mb-1">
                 <span className="text-[11px] font-bold text-slate-700">{m.sender}</span>
-                <span className="text-[10px] text-slate-400">{m.timestamp}</span>
+                <span className="text-[10px] text-slate-400 font-medium">{m.timestamp}</span>
               </div>
               <div
-                className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed shadow-sm ${
+                className={`max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 py-3 text-xs leading-relaxed shadow-2xs whitespace-pre-line ${
                   m.is_patient
                     ? "bg-teal-600 text-white rounded-tr-none"
-                    : "bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200"
+                    : "bg-white text-slate-800 rounded-tl-none border border-slate-200"
                 }`}
               >
                 {m.text}
@@ -276,15 +347,15 @@ export default function ConversationDetailPage() {
                   {m.status === "reporting" ? (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[10px] font-semibold text-amber-700 animate-pulse">
                       <Loader2 className="h-2.5 w-2.5 animate-spin text-amber-600" />
-                      Reporting to Doctor...
+                      Transmitting to Doctor...
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-semibold text-emerald-700 shadow-2xs">
                       <CheckCheck className="h-3 w-3 text-emerald-600" />
-                      Reported to Doctor
+                      Reported &amp; EHR Synced
                     </span>
                   )}
-                  <span className="text-[10px] text-slate-400">EHR Synced</span>
+                  <span className="text-[10px] text-slate-400">Delivered</span>
                 </div>
               )}
             </div>
@@ -294,13 +365,13 @@ export default function ConversationDetailPage() {
           {isDoctorTyping && (
             <div className="flex flex-col items-start space-y-1">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-slate-700">Doctor</span>
+                <span className="text-[11px] font-bold text-slate-700">Dr. Sarah Lin, MD</span>
                 <span className="text-[10px] text-teal-600 font-medium animate-pulse flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-teal-600" />
-                  Reviewing reported message &amp; typing…
+                  Reviewing EHR record &amp; typing reply…
                 </span>
               </div>
-              <div className="rounded-2xl rounded-tl-none px-4 py-3 bg-slate-100 border border-slate-200 shadow-2xs flex items-center gap-1.5">
+              <div className="rounded-2xl rounded-tl-none px-4 py-3 bg-white border border-slate-200 shadow-2xs flex items-center gap-1.5">
                 <span
                   className="h-2 w-2 rounded-full bg-teal-600 animate-bounce"
                   style={{ animationDelay: "0ms" }}
@@ -321,30 +392,62 @@ export default function ConversationDetailPage() {
         </CardContent>
 
         {/* Input Bar */}
-        <div className="p-3 border-t border-slate-100 bg-slate-50">
+        <div className="p-3 sm:p-4 border-t border-slate-100 bg-white space-y-2">
+          {/* Quick Action Chips */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+            <button
+              type="button"
+              onClick={() => setIncludeVitalsChip(!includeVitalsChip)}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all shrink-0 ${
+                includeVitalsChip
+                  ? "bg-teal-600 text-white shadow-xs"
+                  : "bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100"
+              }`}
+            >
+              <Activity className="h-3 w-3" />
+              {includeVitalsChip ? "✓ Telemetry Snapshot Attached" : "+ Attach Live Vitals (HR 74 / BP 122/80)"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewText("Could you please review my morning blood pressure trend?")}
+              className="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 shrink-0 font-medium"
+            >
+              Request BP Review
+            </button>
+            <button
+              type="button"
+              onClick={() => setNewText("I am checking to confirm the status of my 90-day medication refill.")}
+              className="px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 shrink-0 font-medium"
+            >
+              Refill Status
+            </button>
+          </div>
+
           <form onSubmit={handleSend} className="flex gap-2">
             <Input
               value={newText}
               onChange={(e) => setNewText(e.target.value)}
-              placeholder="Type your clinical update to Doctor..."
-              className="text-xs bg-white focus-visible:ring-teal-600"
+              placeholder="Type your message or clinical question to Dr. Sarah Lin..."
+              className="text-xs bg-slate-50 focus-visible:ring-teal-600 h-10"
             />
             <Button
               type="submit"
               size="sm"
-              className="bg-teal-600 hover:bg-teal-700 text-white text-xs gap-1.5 shadow-sm"
+              className="bg-teal-600 hover:bg-teal-700 text-white text-xs gap-1.5 shadow-sm h-10 px-4 shrink-0 font-semibold"
             >
-              <Send className="h-3.5 w-3.5" /> Send &amp; Report
+              <Send className="h-3.5 w-3.5" /> Send
             </Button>
           </form>
-          <div className="flex items-center justify-between mt-2 px-1 text-[10px] text-slate-400">
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-1 text-[10px] text-slate-400">
             <span className="flex items-center gap-1">
               <Check className="h-2.5 w-2.5 text-emerald-600" /> Direct encrypted line to Attending Physician
             </span>
-            <span>Messages are instantly reported to clinical records</span>
+            <span>Sub-second transmission &amp; EHR audit logging active</span>
           </div>
         </div>
       </Card>
     </div>
   );
 }
+

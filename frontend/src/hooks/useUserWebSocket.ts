@@ -35,10 +35,17 @@ export function useUserWebSocket(onEvent?: (event: UserRealtimeEvent) => void) {
 
     let isMounted = true;
     let retryTimer: NodeJS.Timeout | null = null;
-    const protocol = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
-    const port = "8000"; // Django ASGI backend
-    const url = `${protocol}//${host}:${port}/ws/user/?token=${accessToken || ""}`;
+    let url = "";
+    if (process.env.NEXT_PUBLIC_WS_BASE_URL) {
+      const base = process.env.NEXT_PUBLIC_WS_BASE_URL.replace(/\/+$/, "");
+      url = `${base}/user/?token=${encodeURIComponent(accessToken || "")}`;
+    } else {
+      const protocol = typeof window !== "undefined" && window.location.protocol === "https:" ? "wss:" : "ws:";
+      const host = typeof window !== "undefined" ? window.location.hostname : "localhost";
+      const isLocal = host === "localhost" || host === "127.0.0.1";
+      const port = isLocal ? ":8000" : "";
+      url = `${protocol}//${host}${port}/ws/user/?token=${encodeURIComponent(accessToken || "")}`;
+    }
 
     const connect = () => {
       if (!isMounted) return;

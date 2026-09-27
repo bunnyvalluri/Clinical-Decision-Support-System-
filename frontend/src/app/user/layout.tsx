@@ -49,9 +49,28 @@ const USER_BOTTOM_ITEMS: NavItem[] = [
 
 function UserLayoutInner({ children }: { children: React.ReactNode }) {
   const { status: wsStatus } = useUserWebSocket();
+  const [liveTime, setLiveTime] = React.useState<string>("");
+
+  React.useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setLiveTime(
+        now.toLocaleTimeString("en-US", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        })
+      );
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const isWsLive = wsStatus === "connected";
-  const statusLabel = isWsLive ? "Portal Live" : "Portal Active";
+  const baseStatus = isWsLive ? "Portal Live" : "Portal Active";
+  const statusLabel = liveTime ? `${baseStatus} · ${liveTime}` : baseStatus;
 
   return (
     <ResponsiveAppShell
