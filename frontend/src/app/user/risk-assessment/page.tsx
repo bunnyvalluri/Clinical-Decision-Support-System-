@@ -415,41 +415,41 @@ export default function PatientRiskAssessmentListPage() {
         </div>
       </div>
 
-      {/* Real-time Ambulatory Telemetry Bar */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white p-4 rounded-2xl shadow-sm border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Real-time Ambulatory Telemetry Bar - Pure Light Clinical Theme */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-teal-200/90 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="p-2.5 bg-white/10 rounded-xl border border-white/10 text-teal-300 shrink-0">
+          <div className="p-2.5 bg-teal-50 rounded-xl border border-teal-200 text-teal-700 shrink-0">
             <HeartPulse className="h-5 w-5 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-teal-300">
+              <span className="text-xs font-bold uppercase tracking-wider text-teal-800">
                 Continuous Ambulatory Stream
               </span>
-              <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono">
-                <Radio className="h-2.5 w-2.5 animate-ping" /> {livePing}ms
+              <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono font-bold border border-emerald-200">
+                <Radio className="h-2.5 w-2.5 animate-ping text-emerald-600" /> {livePing}ms
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Live vitals actively streamed:{" "}
-              <strong className="text-white font-mono">{liveVitals.systolic}/{liveVitals.diastolic} mmHg</strong> |{" "}
-              <strong className="text-white font-mono">{liveVitals.heartRate} bpm</strong> |{" "}
-              <strong className="text-white font-mono">SpO2 {liveVitals.spo2}%</strong>
+              <strong className="text-slate-900 font-mono">{liveVitals.systolic}/{liveVitals.diastolic} mmHg</strong> |{" "}
+              <strong className="text-slate-900 font-mono">{liveVitals.heartRate} bpm</strong> |{" "}
+              <strong className="text-slate-900 font-mono">SpO2 {liveVitals.spo2}%</strong>
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-4 bg-white/5 px-4 py-2 rounded-xl border border-white/10 w-full md:w-auto justify-between md:justify-start">
+        <div className="flex items-center gap-4 bg-teal-50/50 px-4 py-2 rounded-xl border border-teal-100 w-full md:w-auto justify-between md:justify-start">
           <div>
-            <div className="text-[10px] text-slate-400 uppercase font-semibold">Live Calculated Risk</div>
+            <div className="text-[10px] text-slate-500 uppercase font-semibold">Live Calculated Risk</div>
             <div className="flex items-center gap-1.5">
-              <span className="text-lg font-extrabold text-teal-300 font-mono">
+              <span className="text-lg font-extrabold text-teal-900 font-mono">
                 {liveVitals.calculatedRisk.toFixed(1)}%
               </span>
               {liveVitals.trendDirection === "up" ? (
-                <TrendingUp className="h-4 w-4 text-amber-400" />
+                <TrendingUp className="h-4 w-4 text-amber-600" />
               ) : (
-                <TrendingDown className="h-4 w-4 text-emerald-400" />
+                <TrendingDown className="h-4 w-4 text-emerald-600" />
               )}
             </div>
           </div>
@@ -457,7 +457,7 @@ export default function PatientRiskAssessmentListPage() {
             size="sm"
             onClick={handleTriggerInstantInference}
             disabled={isSimulatingInference}
-            className="h-7 text-[11px] bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-3 shadow-xs"
+            className="h-8 text-xs bg-teal-600 hover:bg-teal-700 text-white font-bold px-3 shadow-xs"
           >
             Capture Point-in-Time
           </Button>
@@ -801,16 +801,16 @@ export default function PatientRiskAssessmentListPage() {
         maxWidth="xl"
       >
         <div className="space-y-5 text-slate-900 text-xs">
-          <div className="p-4 bg-teal-900 text-white rounded-2xl flex items-center justify-between shadow-sm">
+          <div className="p-4 bg-teal-50 border border-teal-200 rounded-2xl flex items-center justify-between shadow-2xs">
             <div>
-              <span className="text-[11px] uppercase tracking-wider text-teal-300 font-semibold block">
+              <span className="text-[11px] uppercase tracking-wider text-teal-800 font-bold block">
                 Simulated 10-Yr Cardiovascular Risk
               </span>
-              <div className="text-2xl font-black font-mono text-teal-100 mt-0.5">
+              <div className="text-2xl font-black font-mono text-teal-900 mt-0.5">
                 {simulatedScore}%
               </div>
             </div>
-            <Badge className="bg-teal-800 text-teal-200 border-teal-700 text-xs">
+            <Badge className="bg-white text-teal-800 border-teal-300 text-xs font-bold shadow-2xs">
               {Number(simulatedScore) > 50 ? "Elevated" : Number(simulatedScore) > 30 ? "Moderate" : "Optimal"}
             </Badge>
           </div>

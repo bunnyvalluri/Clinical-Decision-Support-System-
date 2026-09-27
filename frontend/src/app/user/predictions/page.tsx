@@ -359,40 +359,40 @@ export default function PatientPredictionsPage() {
         </div>
       </div>
 
-      {/* Real-time Telemetry Bar */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-teal-950 text-white p-4 rounded-2xl shadow-sm border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Real-time Telemetry Bar - Pure Light Clinical Theme */}
+      <div className="bg-white p-4 sm:p-5 rounded-2xl shadow-xs border border-teal-200/90 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="p-2.5 bg-white/10 rounded-xl border border-white/10 text-teal-300 shrink-0">
+          <div className="p-2.5 bg-teal-50 rounded-xl border border-teal-200 text-teal-700 shrink-0">
             <Brain className="h-5 w-5 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-teal-300">
+              <span className="text-xs font-bold uppercase tracking-wider text-teal-800">
                 Model Pipeline: CardioEnsemble-RF v1.4.2
               </span>
-              <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-mono">
-                <Radio className="h-2.5 w-2.5 animate-ping" /> Sub-second Sync
+              <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono font-bold border border-emerald-200">
+                <Radio className="h-2.5 w-2.5 animate-ping text-emerald-600" /> Sub-second Sync
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-600 mt-0.5">
               Live Input Telemetry:{" "}
-              <strong className="text-white font-mono">{liveStreamVitals.systolic}/{liveStreamVitals.diastolic} mmHg</strong> |{" "}
-              <strong className="text-white font-mono">{liveStreamVitals.heartRate} bpm</strong> |{" "}
-              <strong className="text-white font-mono">SpO2 {liveStreamVitals.spo2}%</strong>
+              <strong className="text-slate-900 font-mono">{liveStreamVitals.systolic}/{liveStreamVitals.diastolic} mmHg</strong> |{" "}
+              <strong className="text-slate-900 font-mono">{liveStreamVitals.heartRate} bpm</strong> |{" "}
+              <strong className="text-slate-900 font-mono">SpO2 {liveStreamVitals.spo2}%</strong>
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
-          <Badge className="bg-teal-900/60 text-teal-200 border-teal-700 text-xs px-2.5 py-1">
-            <ShieldCheck className="h-3.5 w-3.5 mr-1 text-teal-400" />
+          <Badge className="bg-teal-50 text-teal-800 border-teal-200 text-xs px-2.5 py-1 font-semibold">
+            <ShieldCheck className="h-3.5 w-3.5 mr-1 text-teal-600" />
             FDA SaMD Class II Aligned
           </Badge>
           <Button
             size="sm"
             onClick={handleRunInference}
             disabled={isInferenceRunning}
-            className="h-8 text-xs bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold px-3 shadow-xs"
+            className="h-8 text-xs bg-teal-600 hover:bg-teal-700 text-white font-bold px-3 shadow-xs"
           >
             Compute Live Score
           </Button>

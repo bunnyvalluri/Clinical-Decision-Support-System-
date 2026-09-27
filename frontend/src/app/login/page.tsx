@@ -319,14 +319,14 @@ export default function LoginPage() {
             </div>
 
             {/* High-Fidelity Real-Time Moving ECG Telemetry Stream */}
-            <div className="relative h-14 w-full overflow-hidden rounded-xl bg-slate-950 flex items-center shadow-inner border border-slate-800/80">
+            <div className="relative h-14 w-full overflow-hidden rounded-xl bg-teal-50/40 flex items-center shadow-2xs border border-teal-100">
               <RealtimeEcgWaveform
                 heartRate={72}
-                theme="dark"
+                theme="light"
                 className="!h-full !w-full !border-0 !rounded-none !bg-transparent !p-0"
               />
-              <div className="absolute right-3 top-2.5 z-10 flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 font-bold bg-slate-900/90 px-2 py-0.5 rounded-md border border-emerald-500/30 backdrop-blur-xs shadow-xs pointer-events-none">
-                <HeartPulse className="h-3 w-3 animate-pulse text-rose-400" />
+              <div className="absolute right-3 top-2.5 z-10 flex items-center gap-1.5 text-[10px] font-mono text-teal-800 font-bold bg-white/90 px-2 py-0.5 rounded-md border border-teal-200 backdrop-blur-xs shadow-2xs pointer-events-none">
+                <HeartPulse className="h-3 w-3 animate-pulse text-rose-500" />
                 <span>72 BPM · 99% SpO2 · 120/80</span>
               </div>
             </div>
