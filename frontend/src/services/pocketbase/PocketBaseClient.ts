@@ -32,7 +32,7 @@ export class PocketBaseClient {
 
     // Fallback to local default only in development/test, never assume hardcoded prod
     this.baseUrl = rawUrl && rawUrl.trim() !== "" ? rawUrl.trim() : "http://127.0.0.1:8090";
-    this.timeoutMs = config?.timeoutMs ?? 5000;
+    this.timeoutMs = config?.timeoutMs ?? 1000;
 
     this.client = new PocketBase(this.baseUrl);
     // Configure default request timeout if supported

@@ -10,7 +10,7 @@
  */
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore, getRoleHomeRoute } from "@/features/auth/authStore";
 import type { RoleType } from "@/features/auth/authStore";
 
@@ -21,22 +21,57 @@ interface RoleGuardProps {
 
 export function RoleGuard({ requiredRoles, children }: RoleGuardProps) {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuthStore();
+  const pathname = usePathname();
+  const { user, isAuthenticated, isLoading } = useAuthStore();
+  const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const rolesKey = React.useMemo(() => requiredRoles.slice().sort().join(","), [requiredRoles]);
+
+  React.useEffect(() => {
+    if (!mounted || isLoading) return;
+
     if (!isAuthenticated || !user) {
-      router.replace("/login");
+      if (pathname !== "/login") {
+        router.replace("/login");
+      }
       return;
     }
 
     if (!requiredRoles.includes(user.role)) {
-      router.replace(getRoleHomeRoute(user.role));
+      const targetHome = getRoleHomeRoute(user.role);
+      if (pathname !== targetHome) {
+        router.replace(targetHome);
+      }
     }
-  }, [isAuthenticated, user, requiredRoles, router]);
+  }, [mounted, isLoading, isAuthenticated, user?.role, rolesKey, pathname, router, requiredRoles]);
+
+  // Prevent hydration mismatch on initial SSR vs client render
+  if (!mounted || isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-teal-600 border-t-transparent animate-spin" />
+          <span className="text-xs text-slate-500 font-medium">Verifying authorization...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || !user || !requiredRoles.includes(user.role)) {
-    return null;
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-teal-600 border-t-transparent animate-spin" />
+          <span className="text-xs text-slate-500 font-medium">Redirecting...</span>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;
 }
+

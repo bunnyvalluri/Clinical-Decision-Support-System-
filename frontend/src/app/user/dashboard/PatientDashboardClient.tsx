@@ -485,7 +485,7 @@ export default function PatientDashboardPage() {
       },
       unread_notification_count: 2,
     };
-  }, [user]);
+  }, [user?.full_name, user?.license_number]);
 
   // Fetch once on mount
   React.useEffect(() => {
@@ -498,7 +498,7 @@ export default function PatientDashboardPage() {
           const dashboardData = res.data?.data || res.data;
           if (user?.full_name && dashboardData.patient) {
             dashboardData.patient.full_name = user.full_name;
-            if (user.license_number) {
+            if (user?.license_number) {
               dashboardData.patient.mrn = user.license_number;
             }
           }
@@ -516,7 +516,7 @@ export default function PatientDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, [getFallbackData, user]);
+  }, [getFallbackData, user?.full_name, user?.license_number]);
 
   const handleCopyMrn = (mrn: string) => {
     navigator.clipboard.writeText(mrn);

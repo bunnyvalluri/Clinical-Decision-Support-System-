@@ -131,8 +131,7 @@ export function useWebSocket({
     };
 
     ws.onerror = () => {
-      if (!isMounted) return;
-      setState((s) => ({ ...s, error: "WebSocket connection error.", isConnecting: false }));
+      // ws.onclose handles state and retry cleanup
     };
 
     ws.onclose = (event: CloseEvent) => {
@@ -152,20 +151,20 @@ export function useWebSocket({
         errorMessage = `Connection closed (code ${event.code})`;
       }
 
-      setState((s) => ({
-        ...s,
+      const nextRetryCount = shouldRetry && retryCountRef.current < maxRetries ? retryCountRef.current + 1 : retryCountRef.current;
+      retryCountRef.current = nextRetryCount;
+
+      setState({
         isConnected: false,
         isConnecting: false,
         error: errorMessage,
-      }));
+        retryCount: nextRetryCount,
+      });
 
-      if (shouldRetry && retryCountRef.current < maxRetries) {
-        // Exponential backoff with small random jitter
-        const baseDelay = Math.min(1000 * 2 ** retryCountRef.current, 30000);
+      if (shouldRetry && nextRetryCount <= maxRetries) {
+        const baseDelay = Math.min(2000 * 2 ** (nextRetryCount - 1), 30000);
         const jitter = Math.random() * 500;
         const delay = baseDelay + jitter;
-        retryCountRef.current += 1;
-        setState((s) => ({ ...s, retryCount: retryCountRef.current }));
 
         retryTimerRef.current = setTimeout(() => {
           if (isMounted) {
@@ -174,6 +173,7 @@ export function useWebSocket({
         }, delay);
       }
     };
+
 
     const handleTeardown = () => {
       isMounted = false;

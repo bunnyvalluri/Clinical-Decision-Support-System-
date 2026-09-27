@@ -444,9 +444,8 @@ export function MobileFloatingNavigation({
   const [liveSecurityCount, setLiveSecurityCount] = React.useState<number | undefined>(undefined);
 
   // Hook into WebSocket stream to update badges in real-time
-  useWebSocket({
-    path: "dashboard/",
-    handlers: {
+  const wsHandlers = React.useMemo(
+    () => ({
       prediction_created: () => {
         setLivePredictionsCount((prev) => (prev ? prev + 1 : 1));
       },
@@ -462,9 +461,16 @@ export function MobileFloatingNavigation({
       security_event: () => {
         setLiveSecurityCount((prev) => (prev ? prev + 1 : 1));
       },
-    },
+    }),
+    []
+  );
+
+  useWebSocket({
+    path: "dashboard/",
+    handlers: wsHandlers,
     autoReconnect: true,
   });
+
 
   // Effective user role
   const effectiveRole: RoleType =
