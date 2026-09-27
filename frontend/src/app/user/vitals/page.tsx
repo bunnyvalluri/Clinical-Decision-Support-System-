@@ -461,9 +461,9 @@ export default function PatientVitalsPage() {
           </div>
 
           <span className="hidden sm:inline text-xs text-slate-400">
-            Last beat:{" "}
-            <strong className="text-slate-200 font-mono">
-              {lastLiveBeat.toLocaleTimeString()}
+            Rhythm:{" "}
+            <strong className="text-emerald-400 font-mono">
+              Lead-II Synchronized
             </strong>
           </span>
         </div>
