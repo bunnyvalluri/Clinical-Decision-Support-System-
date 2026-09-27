@@ -928,21 +928,21 @@ export default function PatientDashboardPage() {
       )}
 
       {/* Real-time Telemetry Header Control Strip - Pure Light Clinical Theme */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl bg-white text-slate-900 shadow-xs border border-teal-200">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-3.5 rounded-xl bg-white text-slate-900 shadow-xs border border-teal-200">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-wrap">
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 shrink-0">
             {wsStatus === "connected" ? (
               <Wifi className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />
             ) : (
               <Activity className="h-3.5 w-3.5 text-teal-600 animate-pulse" />
             )}
-            <span>
+            <span className="truncate">
               {isLiveStreaming ? "REAL-TIME TELEMETRY LIVE" : "STREAM PAUSED"}
             </span>
             <span className="text-emerald-700 text-[10px] font-mono font-normal">({latencyMs}ms)</span>
           </div>
 
-          <span className="hidden sm:inline text-xs text-slate-500">
+          <span className="hidden md:inline text-xs text-slate-500">
             Rhythm:{" "}
             <strong className="text-teal-800 font-mono font-bold">
               Lead-II Synchronized
@@ -950,11 +950,11 @@ export default function PatientDashboardPage() {
           </span>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           {/* Stream toggle */}
           <button
             onClick={() => setIsLiveStreaming(!isLiveStreaming)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
               isLiveStreaming
                 ? "bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200"
                 : "bg-teal-600 text-white hover:bg-teal-700 shadow-xs"
@@ -962,7 +962,7 @@ export default function PatientDashboardPage() {
           >
             {isLiveStreaming ? (
               <>
-                <Pause className="h-3.5 w-3.5 text-amber-400" /> Pause Stream
+                <Pause className="h-3.5 w-3.5 text-amber-500" /> Pause Stream
               </>
             ) : (
               <>
@@ -975,7 +975,7 @@ export default function PatientDashboardPage() {
           <select
             value={streamIntervalMs}
             onChange={(e) => setStreamIntervalMs(Number(e.target.value))}
-            className="bg-slate-800 text-slate-200 border border-slate-700 text-xs rounded-lg px-2 py-1 font-mono focus:outline-hidden"
+            className="bg-slate-50 text-slate-800 border border-slate-200 text-xs rounded-lg px-2.5 py-1.5 font-mono focus:outline-hidden font-medium"
           >
             <option value={1000}>1.0s (High Freq)</option>
             <option value={2000}>2.0s (Ambulatory)</option>
@@ -985,14 +985,19 @@ export default function PatientDashboardPage() {
           {/* Acute Event Simulator */}
           <button
             onClick={handleToggleAcuteSpike}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
               isAcuteSpikeActive
                 ? "bg-rose-600 text-white animate-pulse"
-                : "bg-slate-800 text-amber-300 hover:bg-slate-700 border border-slate-700"
+                : "bg-amber-50 text-amber-900 hover:bg-amber-100 border border-amber-300"
             }`}
           >
-            <Zap className="h-3.5 w-3.5" />
-            {isAcuteSpikeActive ? "Spike Active (Reset)" : "Simulate Acute Event"}
+            <Zap className="h-3.5 w-3.5 text-amber-600" />
+            <span className="hidden sm:inline">
+              {isAcuteSpikeActive ? "Spike Active (Reset)" : "Simulate Acute Event"}
+            </span>
+            <span className="sm:hidden">
+              {isAcuteSpikeActive ? "Reset Spike" : "Simulate"}
+            </span>
           </button>
         </div>
       </div>

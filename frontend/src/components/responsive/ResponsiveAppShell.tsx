@@ -187,8 +187,8 @@ export function ResponsiveAppShell({
       {/* ==================================================================== */}
       {/* 1. Mobile & Tablet Adaptive Top Header (< 1024px)                     */}
       {/* ==================================================================== */}
-      <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-3 sm:px-4 h-14 sm:h-16 flex items-center justify-between shadow-2xs">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1 mr-2">
+      <header className="lg:hidden sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-2.5 sm:px-4 h-14 sm:h-16 flex items-center justify-between shadow-2xs gap-2">
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 flex-1">
           <button
             type="button"
             onClick={() => setMobileDrawerOpen(true)}
@@ -198,15 +198,15 @@ export function ResponsiveAppShell({
             <Menu className="h-5 w-5" />
           </button>
 
-          <Link href={`/${role.toLowerCase()}/dashboard`} className="flex items-center gap-2.5 min-w-0">
+          <Link href={`/${role.toLowerCase()}/dashboard`} className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             <div className={`h-8 w-8 rounded-xl ${colors.brandBg} text-white flex items-center justify-center shadow-xs shrink-0`}>
               <BrandIcon className="h-4 w-4" />
             </div>
             <div className="min-w-0">
-              <span className="text-xs sm:text-sm font-bold text-slate-900 leading-tight truncate block">
+              <span className="text-xs sm:text-sm font-bold text-slate-900 leading-tight whitespace-nowrap block truncate">
                 {BRAND_CONFIG.brandName}
               </span>
-              <span className="text-[10px] text-slate-500 font-medium block leading-tight truncate">
+              <span className="hidden md:block text-[10px] text-slate-500 font-medium leading-tight truncate">
                 {workspaceSubtitle || BRAND_CONFIG.tagline}
               </span>
             </div>
@@ -214,9 +214,9 @@ export function ResponsiveAppShell({
         </div>
 
         {/* Header Right Status Badges */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <div
-            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-medium border shadow-2xs ${
+            className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-mono font-medium border shadow-2xs ${
               wsConnected
                 ? "bg-emerald-50 text-emerald-700 border-emerald-200/90"
                 : "bg-rose-50 text-rose-700 border-rose-200/90"
@@ -229,7 +229,8 @@ export function ResponsiveAppShell({
               }`}
             />
             <span className="font-semibold whitespace-nowrap" suppressHydrationWarning>
-              {wsStatusText || (wsConnected ? "LIVE" : "OFFLINE")}
+              <span className="inline sm:hidden">{wsConnected ? "Live" : "Offline"}</span>
+              <span className="hidden sm:inline">{wsStatusText || (wsConnected ? "LIVE" : "OFFLINE")}</span>
             </span>
           </div>
 
