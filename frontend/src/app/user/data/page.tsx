@@ -552,8 +552,8 @@ export default function UserDataPage() {
           maxWidth="lg"
         >
           <div className="space-y-4">
-            <div className="p-3.5 rounded-xl bg-slate-950 text-emerald-400 font-mono text-[11px] overflow-x-auto shadow-inner border border-slate-800 space-y-1">
-              <p className="text-slate-400">// FHIR R4 Observation Resource JSON</p>
+            <div className="p-3.5 rounded-xl bg-slate-50 text-slate-800 font-mono text-[11px] overflow-x-auto border border-slate-200 space-y-1">
+              <p className="text-teal-700 font-semibold">// FHIR R4 Observation Resource JSON</p>
               <pre>
                 {JSON.stringify(
                   {

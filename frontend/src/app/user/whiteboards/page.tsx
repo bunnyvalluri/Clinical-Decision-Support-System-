@@ -525,32 +525,32 @@ export default function UserWhiteboardsPage() {
         >
           <div className="space-y-4">
             {/* Visual Roadmap Steps */}
-            <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-4 shadow-xl">
-              <div className="flex items-center justify-between text-xs border-b border-slate-800 pb-3">
+            <div className="p-4 rounded-2xl bg-teal-50/50 border border-teal-200 text-slate-900 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between text-xs border-b border-teal-100 pb-3">
                 <div className="flex items-center gap-2">
-                  <Radio className="h-4 w-4 text-emerald-400 animate-pulse" />
-                  <span className="font-bold text-slate-200">Live Recovery Trajectory Roadmap</span>
+                  <Radio className="h-4 w-4 text-teal-600 animate-pulse" />
+                  <span className="font-bold text-teal-900">Live Recovery Trajectory Roadmap</span>
                 </div>
-                <span className="text-[11px] text-slate-400 font-mono">EHR Synced</span>
+                <span className="text-[11px] text-teal-700 font-mono font-medium">EHR Synced</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 relative">
                 {[
-                  { stage: "Stage 1", title: "Acute Stabilization", status: "Completed", icon: CheckCircle2, color: "text-emerald-400" },
-                  { stage: "Stage 2", title: "Ambulatory Progression", status: "Active (65%)", icon: Radio, color: "text-amber-400", active: true },
-                  { stage: "Stage 3", title: "Cardio Rehab Phase", status: "Upcoming", icon: Target, color: "text-slate-400" },
-                  { stage: "Stage 4", title: "Long-term Maintenance", status: "Target", icon: Award, color: "text-slate-500" },
+                  { stage: "Stage 1", title: "Acute Stabilization", status: "Completed", icon: CheckCircle2, color: "text-emerald-600" },
+                  { stage: "Stage 2", title: "Ambulatory Progression", status: "Active (65%)", icon: Radio, color: "text-amber-600", active: true },
+                  { stage: "Stage 3", title: "Cardio Rehab Phase", status: "Upcoming", icon: Target, color: "text-slate-500" },
+                  { stage: "Stage 4", title: "Long-term Maintenance", status: "Target", icon: Award, color: "text-slate-400" },
                 ].map((step, idx) => (
                   <div
                     key={idx}
                     className={`p-3 rounded-xl border transition-all ${
                       step.active
-                        ? "bg-slate-800 border-amber-400/80 shadow-lg ring-1 ring-amber-400/30"
-                        : "bg-slate-800/50 border-slate-700/60"
+                        ? "bg-white border-amber-400 shadow-sm ring-1 ring-amber-400/30"
+                        : "bg-white/80 border-slate-200"
                     }`}
                   >
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{step.stage}</p>
-                    <p className="text-xs font-bold text-white mt-0.5 leading-snug">{step.title}</p>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{step.stage}</p>
+                    <p className="text-xs font-bold text-slate-900 mt-0.5 leading-snug">{step.title}</p>
                     <div className="flex items-center gap-1 mt-2 text-[10px]">
                       <step.icon className={`h-3 w-3 ${step.color} ${step.active ? "animate-pulse" : ""}`} />
                       <span className={`font-semibold ${step.color}`}>{step.status}</span>

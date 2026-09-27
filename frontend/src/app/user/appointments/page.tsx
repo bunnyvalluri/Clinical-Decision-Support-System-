@@ -252,10 +252,10 @@ export default function PatientAppointmentsPage() {
       {/* Toast */}
       {toastMessage && (
         <div className="fixed top-20 right-4 sm:right-6 z-50 animate-in slide-in-from-top-4 fade-in duration-200 max-w-[calc(100vw-2rem)]">
-          <div className="bg-slate-900/95 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 backdrop-blur-md flex items-center gap-3 text-xs font-medium">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+          <div className="bg-white text-slate-900 px-4 py-3 rounded-xl shadow-xl border border-teal-200 backdrop-blur-md flex items-center gap-3 text-xs font-medium">
+            <CheckCircle2 className="h-4 w-4 text-teal-600 shrink-0" />
             <span className="truncate">{toastMessage}</span>
-            <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-white shrink-0">
+            <button onClick={() => setToastMessage(null)} className="text-slate-400 hover:text-slate-700 shrink-0">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
@@ -263,16 +263,16 @@ export default function PatientAppointmentsPage() {
       )}
 
       {/* Real-time Care Team & Consultation Channel Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-slate-900 text-white shadow-md border border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl bg-white text-slate-900 shadow-sm border border-teal-200">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-xs">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-semibold text-emerald-400">CLINICAL CHANNEL ACTIVE</span>
-            <span className="text-slate-400 text-[10px] font-mono">(E2EE Video Ready)</span>
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-teal-50 border border-teal-200 text-xs">
+            <span className="h-2 w-2 rounded-full bg-teal-600 animate-pulse" />
+            <span className="font-semibold text-teal-800">CLINICAL CHANNEL ACTIVE</span>
+            <span className="text-slate-500 text-[10px] font-mono">(E2EE Video Ready)</span>
           </div>
 
-          <span className="hidden sm:inline text-xs text-slate-300 font-medium truncate">
-            Dr. Sarah Lin (Cardiology) · <strong className="text-emerald-400 font-normal">Online for Consultations</strong>
+          <span className="hidden sm:inline text-xs text-slate-700 font-medium truncate">
+            Dr. Sarah Lin (Cardiology) · <strong className="text-teal-700 font-normal">Online for Consultations</strong>
           </span>
         </div>
 
@@ -280,9 +280,9 @@ export default function PatientAppointmentsPage() {
           <button
             onClick={handleSyncSlots}
             disabled={isSyncing}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 transition-colors"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin text-teal-400" : "text-slate-400"}`} />
+            <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? "animate-spin text-teal-600" : "text-slate-500"}`} />
             <span>Sync Live Slots</span>
           </button>
         </div>
@@ -555,21 +555,21 @@ export default function PatientAppointmentsPage() {
         >
           <div className="space-y-4 pt-1">
             {/* Live Video Preview Box */}
-            <div className="relative rounded-2xl bg-slate-950 aspect-video flex flex-col items-center justify-center text-white overflow-hidden border border-slate-800 shadow-xl">
-              <div className="absolute top-3 left-3 flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-900/90 border border-slate-700 text-xs font-mono">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
-                <span className="text-emerald-400">LIVE E2EE CHANNEL</span>
+            <div className="relative rounded-2xl bg-slate-100 aspect-video flex flex-col items-center justify-center text-slate-800 overflow-hidden border border-slate-200 shadow-inner">
+              <div className="absolute top-3 left-3 flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/90 border border-teal-200 text-xs font-mono shadow-xs">
+                <span className="h-2 w-2 rounded-full bg-teal-500 animate-ping" />
+                <span className="text-teal-700 font-semibold">LIVE E2EE CHANNEL</span>
               </div>
 
               <div className="flex flex-col items-center gap-3 text-center p-6">
-                <div className="h-16 w-16 rounded-full bg-teal-600/30 border border-teal-400/40 flex items-center justify-center text-teal-300 text-xl font-bold">
+                <div className="h-16 w-16 rounded-full bg-teal-100 border border-teal-300 flex items-center justify-center text-teal-700 text-xl font-bold shadow-xs">
                   SL
                 </div>
                 <div className="space-y-1">
-                  <h4 className="text-sm font-bold text-white">{activeTelehealthAppt.clinician_name}</h4>
-                  <p className="text-xs text-slate-400">{activeTelehealthAppt.department}</p>
+                  <h4 className="text-sm font-bold text-slate-900">{activeTelehealthAppt.clinician_name}</h4>
+                  <p className="text-xs text-slate-500">{activeTelehealthAppt.department}</p>
                 </div>
-                <span className="text-xs text-emerald-400 font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                <span className="text-xs text-teal-800 font-medium bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
                   Clinician connected · Microphone &amp; Camera active
                 </span>
               </div>
