@@ -37,97 +37,8 @@ import { Badge } from "@/components/ui/badge";
 import { useUserWebSocket } from "@/hooks/useUserWebSocket";
 import apiClient from "@/services/apiClient";
 
-/**
- * Authentic Clinical Dark Phosphor ECG Rhythm Canvas for Notifications Command Bar
- */
-function NotificationsEcgMonitor({ bpm, isSpike }: { bpm: number; isSpike: boolean }) {
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+import { BedsideTelemetryBadge } from "@/components/clinical";
 
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let step = 0;
-
-    const width = canvas.width;
-    const height = canvas.height;
-    const midY = height / 2;
-
-    const render = () => {
-      ctx.fillStyle = "#0f172a";
-      ctx.fillRect(0, 0, width, height);
-
-      // Phosphor background grid
-      ctx.strokeStyle = "rgba(15, 118, 110, 0.15)";
-      ctx.lineWidth = 0.75;
-      const gridSize = 12;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      // ECG Waveform
-      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
-      ctx.lineWidth = 1.75;
-      ctx.shadowColor = isSpike ? "rgba(244, 63, 94, 0.7)" : "rgba(16, 185, 129, 0.7)";
-      ctx.shadowBlur = 4;
-
-      ctx.beginPath();
-      const points = 160;
-      for (let i = 0; i < points; i++) {
-        const x = (i / points) * width;
-        const progress = (i + step) % 50;
-
-        let yOffset = 0;
-        if (progress > 18 && progress < 21) {
-          yOffset = -5; // P-wave
-        } else if (progress >= 21 && progress <= 23) {
-          yOffset = 3; // Q
-        } else if (progress > 23 && progress < 27) {
-          yOffset = isSpike ? -24 : -18; // R spike
-        } else if (progress >= 27 && progress <= 29) {
-          yOffset = isSpike ? 8 : 5; // S drop
-        } else if (progress > 33 && progress < 39) {
-          yOffset = -7; // T wave
-        }
-
-        const y = midY + yOffset;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      step = (step + 1) % 50;
-      animId = requestAnimationFrame(render);
-    };
-
-    render();
-    return () => cancelAnimationFrame(animId);
-  }, [bpm, isSpike]);
-
-  return (
-    <div className="flex items-center gap-3 bg-slate-950 px-3.5 py-2 rounded-xl border border-slate-800 shadow-inner">
-      <div className="flex flex-col">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">ALERT STREAM</span>
-        <span className="font-mono text-sm font-black text-white leading-none flex items-center gap-1 mt-0.5">
-          {bpm} <span className="text-[9px] font-normal text-slate-400">BPM</span>
-        </span>
-      </div>
-      <canvas ref={canvasRef} width={130} height={28} className="rounded" />
-    </div>
-  );
-}
 
 type NotifType = "CRITICAL" | "ALERT" | "INFO" | "SUCCESS" | "SYSTEM";
 type NotifCategory = "CLINICAL" | "AI_MODEL" | "REVIEW" | "SYSTEM" | "ADMIN";
@@ -437,7 +348,7 @@ export default function DoctorNotificationsPage() {
 
         {/* Real-time Telemetry Strip & Actions */}
         <div className="flex items-center gap-3 flex-wrap">
-          <NotificationsEcgMonitor bpm={criticalCount > 0 ? 98 : 74} isSpike={criticalCount > 0} />
+          <BedsideTelemetryBadge label="ALERT STREAM" bpm={criticalCount > 0 ? 98 : 74} isSpike={criticalCount > 0} />
 
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-xl border border-rose-200 bg-rose-50/80 px-3 py-2 text-xs font-semibold text-rose-800 shadow-2xs">

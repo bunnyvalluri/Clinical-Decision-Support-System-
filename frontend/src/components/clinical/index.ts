@@ -14,3 +14,4 @@ export * from "./EvidenceCard";
 export * from "./AIExplanationCard";
 export * from "./AIReviewPanel";
 export * from "./RealtimeEcgWaveform";
+export * from "./BedsideTelemetryBadge";

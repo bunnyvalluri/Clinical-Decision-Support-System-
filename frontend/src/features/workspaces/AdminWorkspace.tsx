@@ -174,101 +174,8 @@ const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
   },
 ];
 
-/**
- * Authentic Clinical Dark Phosphor CRT Lead II ECG System Telemetry Monitor
- */
-function SystemTelemetryEcgMonitor({ ops, isSpike }: { ops: number; isSpike: boolean }) {
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+import { BedsideTelemetryBadge } from "@/components/clinical";
 
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let step = 0;
-
-    const width = canvas.width;
-    const height = canvas.height;
-    const midY = height / 2;
-
-    const render = () => {
-      ctx.fillStyle = "#090d16";
-      ctx.fillRect(0, 0, width, height);
-
-      // Phosphor background grid
-      ctx.strokeStyle = isSpike ? "rgba(244, 63, 94, 0.15)" : "rgba(16, 185, 129, 0.12)";
-      ctx.lineWidth = 0.75;
-      const gridSize = 12;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      // ECG Waveform
-      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
-      ctx.lineWidth = 1.75;
-      ctx.shadowColor = isSpike ? "rgba(244, 63, 94, 0.8)" : "rgba(16, 185, 129, 0.7)";
-      ctx.shadowBlur = isSpike ? 6 : 4;
-
-      ctx.beginPath();
-      const points = 160;
-      for (let i = 0; i < points; i++) {
-        const x = (i / points) * width;
-        const progress = (i + step) % 50;
-
-        let yOffset = 0;
-        if (progress > 18 && progress < 21) {
-          yOffset = -5; // P-wave
-        } else if (progress >= 21 && progress <= 23) {
-          yOffset = 3; // Q-wave
-        } else if (progress > 23 && progress < 27) {
-          yOffset = isSpike ? -26 : -18; // R-wave spike
-        } else if (progress >= 27 && progress <= 29) {
-          yOffset = isSpike ? 8 : 6; // S-wave
-        } else if (progress > 32 && progress < 39) {
-          yOffset = -8; // T-wave
-        } else {
-          yOffset = (Math.random() - 0.5) * (isSpike ? 2.5 : 1.2);
-        }
-
-        const y = midY + yOffset;
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      }
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      step = (step + (isSpike ? 1.0 : 0.6)) % 50;
-      animId = requestAnimationFrame(render);
-    };
-
-    animId = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(animId);
-  }, [ops, isSpike]);
-
-  return (
-    <div className={`relative rounded-lg overflow-hidden border p-1 shadow-inner ${isSpike ? "border-rose-800 bg-[#160a0f]" : "border-slate-800 bg-[#090d16]"}`}>
-      <canvas ref={canvasRef} width={220} height={44} className="block w-full h-10" />
-      <div className={`absolute top-1 right-1.5 flex items-center gap-1 text-[9px] font-mono ${isSpike ? "text-rose-400 font-bold" : "text-emerald-400"}`}>
-        <Radio className={`h-2.5 w-2.5 animate-pulse ${isSpike ? "text-rose-400" : "text-emerald-400"}`} />
-        <span>CLUSTER TELEMETRY: {ops} ops/s</span>
-      </div>
-    </div>
-  );
-}
 
 const getActionBadgeClass = (action: string) => {
   if (action.includes("DENIED") || action.includes("RATE_LIMIT")) {
@@ -431,7 +338,7 @@ export function AdminWorkspace() {
 
         {/* Lead II Monitor + Quick Actions */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-          <SystemTelemetryEcgMonitor ops={148} isSpike={false} />
+          <BedsideTelemetryBadge label="CLUSTER TELEMETRY" bpm={74} isSpike={false} />
 
           <div className="flex flex-col gap-2 w-full sm:w-auto">
             <div className="flex items-center gap-2">

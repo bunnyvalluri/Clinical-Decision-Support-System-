@@ -41,101 +41,8 @@ import { AISafetyStatusCard } from "@/components/clinical/AISafetyStatusCard";
 import { useUserWebSocket } from "@/hooks/useUserWebSocket";
 import { Radio, Flame, Check, X, SlidersHorizontal, ArrowDownRight } from "lucide-react";
 
-/**
- * Authentic Clinical Dark Phosphor ECG Rhythm Canvas for Informatics MLOps
- */
-function InformaticsEcgMonitor({ bpm, isSpike }: { bpm: number; isSpike: boolean }) {
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+import { BedsideTelemetryBadge } from "@/components/clinical";
 
-  React.useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let step = 0;
-
-    const width = canvas.width;
-    const height = canvas.height;
-    const midY = height / 2;
-
-    const render = () => {
-      ctx.fillStyle = "#090d16";
-      ctx.fillRect(0, 0, width, height);
-
-      // Phosphor background grid
-      ctx.strokeStyle = "rgba(16, 185, 129, 0.12)";
-      ctx.lineWidth = 0.75;
-      const gridSize = 12;
-      for (let x = 0; x < width; x += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, height);
-        ctx.stroke();
-      }
-      for (let y = 0; y < height; y += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(width, y);
-        ctx.stroke();
-      }
-
-      // ECG Waveform
-      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
-      ctx.lineWidth = 1.75;
-      ctx.shadowColor = isSpike ? "rgba(244, 63, 94, 0.7)" : "rgba(16, 185, 129, 0.7)";
-      ctx.shadowBlur = 4;
-
-      ctx.beginPath();
-      const points = 160;
-      for (let i = 0; i < points; i++) {
-        const x = (i / points) * width;
-        const progress = (i + step) % 50;
-
-        let yOffset = 0;
-        if (progress > 18 && progress < 21) {
-          yOffset = -5; // P-wave
-        } else if (progress >= 21 && progress <= 23) {
-          yOffset = 3; // Q-wave
-        } else if (progress > 23 && progress < 27) {
-          yOffset = isSpike ? -26 : -18; // R-wave spike
-        } else if (progress >= 27 && progress <= 29) {
-          yOffset = 6; // S-wave
-        } else if (progress > 32 && progress < 39) {
-          yOffset = -8; // T-wave
-        } else {
-          yOffset = (Math.random() - 0.5) * 1.5; // Baseline noise
-        }
-
-        const y = midY + yOffset;
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      }
-      ctx.stroke();
-      ctx.shadowBlur = 0;
-
-      step = (step + 0.6) % 50;
-      animId = requestAnimationFrame(render);
-    };
-
-    animId = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(animId);
-  }, [bpm, isSpike]);
-
-  return (
-    <div className="relative rounded-lg overflow-hidden border border-slate-800 bg-[#090d16] p-1 shadow-inner">
-      <canvas ref={canvasRef} width={220} height={44} className="block w-full h-10" />
-      <div className="absolute top-1 right-1.5 flex items-center gap-1 text-[9px] font-mono text-emerald-400">
-        <Radio className="h-2.5 w-2.5 animate-pulse text-emerald-400" />
-        <span>ML TELEMETRY: {bpm} BPM</span>
-      </div>
-    </div>
-  );
-}
 
 interface ModelBenchmark {
   name: string;
@@ -345,7 +252,7 @@ export function InformaticsWorkspace() {
         </div>
 
         <div className="flex items-center gap-2.5 flex-wrap">
-          <InformaticsEcgMonitor bpm={84} isSpike={isSimulatingSpike} />
+          <BedsideTelemetryBadge label="ML TELEMETRY" bpm={84} isSpike={isSimulatingSpike} />
 
           <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
             {(["1H", "24H", "7D", "30D"] as const).map((r) => (
