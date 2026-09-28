@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -33,6 +33,104 @@ import { Button } from "@/components/ui/button";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
 import type { MLModelDetail } from "@/services/clinicalData";
 import { riskApi, RiskModel } from "@/services/risk/riskApi";
+import { useUserWebSocket } from "@/hooks/useUserWebSocket";
+import { Radio, Flame, Check } from "lucide-react";
+
+/**
+ * Authentic Clinical Dark Phosphor ECG Rhythm Canvas for Models Registry
+ */
+function ModelsEcgMonitor({ bpm, isSpike }: { bpm: number; isSpike: boolean }) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let step = 0;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const midY = height / 2;
+
+    const render = () => {
+      ctx.fillStyle = "#090d16";
+      ctx.fillRect(0, 0, width, height);
+
+      // Phosphor background grid
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.12)";
+      ctx.lineWidth = 0.75;
+      const gridSize = 12;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // ECG Waveform
+      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
+      ctx.lineWidth = 1.75;
+      ctx.shadowColor = isSpike ? "rgba(244, 63, 94, 0.7)" : "rgba(16, 185, 129, 0.7)";
+      ctx.shadowBlur = 4;
+
+      ctx.beginPath();
+      const points = 160;
+      for (let i = 0; i < points; i++) {
+        const x = (i / points) * width;
+        const progress = (i + step) % 50;
+
+        let yOffset = 0;
+        if (progress > 18 && progress < 21) {
+          yOffset = -5; // P-wave
+        } else if (progress >= 21 && progress <= 23) {
+          yOffset = 3; // Q-wave
+        } else if (progress > 23 && progress < 27) {
+          yOffset = isSpike ? -26 : -18; // R-wave spike
+        } else if (progress >= 27 && progress <= 29) {
+          yOffset = 6; // S-wave
+        } else if (progress > 32 && progress < 39) {
+          yOffset = -8; // T-wave
+        } else {
+          yOffset = (Math.random() - 0.5) * 1.5; // Baseline noise
+        }
+
+        const y = midY + yOffset;
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      step = (step + 0.6) % 50;
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animId);
+  }, [bpm, isSpike]);
+
+  return (
+    <div className="relative rounded-lg overflow-hidden border border-slate-800 bg-[#090d16] p-1 shadow-inner">
+      <canvas ref={canvasRef} width={220} height={44} className="block w-full h-10" />
+      <div className="absolute top-1 right-1.5 flex items-center gap-1 text-[9px] font-mono text-emerald-400">
+        <Radio className="h-2.5 w-2.5 animate-pulse text-emerald-400" />
+        <span>INFERENCE PIPELINE: {bpm} ms</span>
+      </div>
+    </div>
+  );
+}
 
 interface ExtendedModel extends MLModelDetail {
   architecture?: string;
@@ -179,6 +277,7 @@ const REGISTRY_STAGES = [
 
 export default function InformaticistModelsPage() {
   const { models, promoteModel } = useClinicalStore();
+  const { status: wsStatus } = useUserWebSocket();
   const [promotedModelId, setPromotedModelId] = React.useState<string | null>(null);
   const [backendModels, setBackendModels] = React.useState<RiskModel[]>([]);
   const [selectedTab, setSelectedTab] = React.useState<"REGISTRY" | "COMPARE" | "STAGES" | "EVALUATIONS">("REGISTRY");
@@ -188,6 +287,7 @@ export default function InformaticistModelsPage() {
   const [compareModelId, setCompareModelId] = React.useState<string>("mod-02");
   const [notification, setNotification] = React.useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = React.useState(false);
+  const [isSimulatingSpike, setIsSimulatingSpike] = React.useState(false);
 
   React.useEffect(() => {
     async function fetchRealModels() {
@@ -337,13 +437,19 @@ export default function InformaticistModelsPage() {
             <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200 text-xs">
               SaMD Version Provenance
             </Badge>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              {wsStatus === "connected" ? "Model Swarm Synchronized" : "Socket Active"}
+            </span>
           </div>
           <p className="text-xs text-slate-500 mt-1">
             Production model repository, isotonic calibration audit trail, and shadow validation lifecycle.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <ModelsEcgMonitor bpm={32} isSpike={isSimulatingSpike} />
+
           <Button
             size="sm"
             onClick={() => setShowRegisterModal(true)}
@@ -356,8 +462,12 @@ export default function InformaticistModelsPage() {
             size="sm"
             variant="outline"
             onClick={() => {
-              setNotification("MLflow artifact synchronization complete.");
-              setTimeout(() => setNotification(null), 3000);
+              setIsSimulatingSpike(true);
+              setNotification("MLflow artifact synchronization & shadow scoring sweep complete.");
+              setTimeout(() => {
+                setIsSimulatingSpike(false);
+                setNotification(null);
+              }, 4000);
             }}
             className="text-xs h-8 border-slate-200"
           >

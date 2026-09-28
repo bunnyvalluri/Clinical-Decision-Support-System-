@@ -137,11 +137,11 @@ function RealtimeEcgWaveform({ bpm, isSpike }: { bpm: number; isSpike: boolean }
     const midY = height / 2;
 
     // Clear canvas
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#0f172a";
     ctx.fillRect(0, 0, width, height);
 
     // Draw grid lines
-    ctx.strokeStyle = "rgba(13, 148, 136, 0.15)";
+    ctx.strokeStyle = "rgba(15, 118, 110, 0.15)";
     ctx.lineWidth = 1;
     for (let gx = 0; gx < width; gx += 20) {
       ctx.beginPath();
@@ -163,11 +163,11 @@ function RealtimeEcgWaveform({ bpm, isSpike }: { bpm: number; isSpike: boolean }
     const render = () => {
       // Erase trailing head
       const eraseWidth = 8;
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#0f172a";
       ctx.fillRect((x + 2) % width, 0, eraseWidth, height);
 
       // Re-draw subtle grid under eraser
-      ctx.strokeStyle = "rgba(13, 148, 136, 0.15)";
+      ctx.strokeStyle = "rgba(15, 118, 110, 0.15)";
       ctx.lineWidth = 1;
       const curX = (x + 2) % width;
       if (curX % 20 < eraseWidth) {
@@ -211,10 +211,10 @@ function RealtimeEcgWaveform({ bpm, isSpike }: { bpm: number; isSpike: boolean }
       ctx.beginPath();
       ctx.moveTo(x, lastY);
       ctx.lineTo((x + 1) % width, nextY);
-      ctx.strokeStyle = isSpike ? "#e11d48" : "#0d9488";
+      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
       ctx.lineWidth = 2;
-      ctx.shadowColor = isSpike ? "rgba(225, 29, 72, 0.3)" : "rgba(13, 148, 136, 0.3)";
-      ctx.shadowBlur = 3;
+      ctx.shadowColor = isSpike ? "#f43f5e" : "#10b981";
+      ctx.shadowBlur = 4;
       ctx.stroke();
       ctx.shadowBlur = 0;
 
@@ -232,17 +232,17 @@ function RealtimeEcgWaveform({ bpm, isSpike }: { bpm: number; isSpike: boolean }
   }, [bpm, isSpike]);
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden border border-teal-200 bg-white p-2 shadow-sm">
+    <div className="relative w-full rounded-xl overflow-hidden border border-slate-800 bg-slate-950 p-2 shadow-inner">
       <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
         <span className="flex h-2 w-2 relative">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-600" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
         </span>
-        <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-teal-800">
+        <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-emerald-400">
           Lead II ECG · Telemetry Live {bpm} BPM
         </span>
       </div>
-      <div className="absolute top-2 right-3 z-10 text-[10px] font-mono text-slate-500">
+      <div className="absolute top-2 right-3 z-10 text-[10px] font-mono text-slate-400">
         Sweep 25mm/s · 10mm/mV
       </div>
       <canvas

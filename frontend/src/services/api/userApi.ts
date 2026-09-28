@@ -10,8 +10,10 @@ export interface PatientProfileData {
   phone_number?: string;
   address?: string;
   date_of_birth?: string;
+  age?: number;
   gender?: string;
   blood_type?: string;
+  blood_group?: string;
   primary_physician_name?: string;
   emergency_contact_name?: string;
   emergency_contact_phone?: string;

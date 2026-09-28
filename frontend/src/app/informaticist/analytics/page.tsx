@@ -1,9 +1,12 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   Activity,
+  AlertCircle,
   AlertTriangle,
+  ArrowRight,
   ArrowUpRight,
   BarChart3,
   Calendar,
@@ -11,60 +14,321 @@ import {
   Clock,
   Download,
   Filter,
+  Flame,
   Layers,
   LineChart,
   Percent,
+  Radio,
   RefreshCw,
+  ShieldAlert,
   ShieldCheck,
+  Sparkles,
+  TrendingDown,
   TrendingUp,
   UserCheck,
   Users,
   Zap,
+  ChevronRight,
+  Play,
+  RotateCcw
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useClinicalStore } from "@/features/clinical/clinicalStore";
+import { useUserWebSocket } from "@/hooks/useUserWebSocket";
+
+interface InferenceStreamEvent {
+  id: string;
+  patientId: string;
+  department: string;
+  model: string;
+  riskLevel: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  probability: number;
+  latencyMs: number;
+  timestamp: string;
+  clinicianAgreement: "AGREED" | "OVERRIDDEN" | "PENDING";
+}
+
+const INITIAL_STREAM_EVENTS: InferenceStreamEvent[] = [
+  { id: "INF-9041", patientId: "PT-8821", department: "ICU", model: "XGBoost-CardioRisk-v3", riskLevel: "CRITICAL", probability: 0.942, latencyMs: 0.12, timestamp: "Just now", clinicianAgreement: "AGREED" },
+  { id: "INF-9040", patientId: "PT-4912", department: "ED", model: "Ensemble-Sepsis-v2", riskLevel: "HIGH", probability: 0.814, latencyMs: 0.14, timestamp: "4s ago", clinicianAgreement: "AGREED" },
+  { id: "INF-9039", patientId: "PT-3108", department: "CARDIO", model: "LeadII-ResNet1D-v4", riskLevel: "LOW", probability: 0.082, latencyMs: 0.09, timestamp: "12s ago", clinicianAgreement: "AGREED" },
+  { id: "INF-9038", patientId: "PT-7719", department: "MED", model: "XGBoost-CardioRisk-v3", riskLevel: "MEDIUM", probability: 0.428, latencyMs: 0.11, timestamp: "25s ago", clinicianAgreement: "AGREED" },
+  { id: "INF-9037", patientId: "PT-6602", department: "ED", model: "Ensemble-Sepsis-v2", riskLevel: "CRITICAL", probability: 0.916, latencyMs: 0.15, timestamp: "41s ago", clinicianAgreement: "AGREED" },
+];
+
+/**
+ * Authentic Clinical Dark Phosphor CRT Lead II ECG Waveform Canvas for Analytics Stream
+ */
+function AnalyticsEcgMonitor({ bpm, isSpike }: { bpm: number; isSpike: boolean }) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let step = 0;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const midY = height / 2;
+
+    const render = () => {
+      ctx.fillStyle = "#090d16";
+      ctx.fillRect(0, 0, width, height);
+
+      // Phosphor background grid
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.12)";
+      ctx.lineWidth = 0.75;
+      const gridSize = 12;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // ECG Waveform
+      ctx.strokeStyle = isSpike ? "#f43f5e" : "#10b981";
+      ctx.lineWidth = 1.75;
+      ctx.shadowColor = isSpike ? "rgba(244, 63, 94, 0.7)" : "rgba(16, 185, 129, 0.7)";
+      ctx.shadowBlur = 4;
+
+      ctx.beginPath();
+      const points = 160;
+      for (let i = 0; i < points; i++) {
+        const x = (i / points) * width;
+        const progress = (i + step) % 50;
+
+        let yOffset = 0;
+        if (progress > 18 && progress < 21) {
+          yOffset = -5; // P-wave
+        } else if (progress >= 21 && progress <= 23) {
+          yOffset = 3; // Q-wave
+        } else if (progress > 23 && progress < 27) {
+          yOffset = isSpike ? -26 : -18; // R-wave spike
+        } else if (progress >= 27 && progress <= 29) {
+          yOffset = 6; // S-wave
+        } else if (progress > 32 && progress < 39) {
+          yOffset = -8; // T-wave
+        } else {
+          yOffset = (Math.random() - 0.5) * 1.5; // Baseline telemetry noise
+        }
+
+        const y = midY + yOffset;
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+
+      // CRT Scanline sweep overlay
+      const scanX = (step * 3) % width;
+      ctx.fillStyle = isSpike ? "rgba(244, 63, 94, 0.2)" : "rgba(16, 185, 129, 0.25)";
+      ctx.fillRect(scanX, 0, 4, height);
+
+      step++;
+      animId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animId);
+    };
+  }, [bpm, isSpike]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={240}
+      height={52}
+      className="rounded-lg border border-emerald-900/60 shadow-inner block"
+    />
+  );
+}
 
 export default function AnalyticsPage() {
   const { predictions } = useClinicalStore();
-  const [timeRange, setTimeRange] = React.useState<"24H" | "7D" | "30D" | "90D">("30D");
+  const [timeRange, setTimeRange] = React.useState<"LIVE" | "24H" | "7D" | "30D" | "90D">("30D");
   const [department, setDepartment] = React.useState<string>("ALL");
   const [exportNotice, setExportNotice] = React.useState<string | null>(null);
+  const [streamEvents, setStreamEvents] = React.useState<InferenceStreamEvent[]>(INITIAL_STREAM_EVENTS);
+  const [isSimulatingBurst, setIsSimulatingBurst] = React.useState(false);
+  const [hasAlarmSpike, setHasAlarmSpike] = React.useState(false);
 
-  // Derive dynamic metrics from real predictions
-  const total = predictions.length;
-  const critical = predictions.filter((p) => p.risk_level === "CRITICAL").length;
-  const high = predictions.filter((p) => p.risk_level === "HIGH").length;
-  const med = predictions.filter((p) => p.risk_level === "MEDIUM").length;
-  const low = predictions.filter((p) => p.risk_level === "LOW").length;
-  const avgProb = total > 0 ? predictions.reduce((acc, p) => acc + (p.probability || 0), 0) / total : 0;
+  // Live real-time stream packet counter
+  const [totalInferences, setTotalInferences] = React.useState(18420);
+  const [inferencesPerSec, setInferencesPerSec] = React.useState(42.8);
 
+  // WebSocket Integration
+  const { status: wsStatus, lastEvent } = useUserWebSocket();
+  const isConnected = wsStatus === "connected";
 
+  // Handle incoming real-time socket updates
+  React.useEffect(() => {
+    if (lastEvent && (lastEvent.event_type === "ANALYTICS_UPDATE" || lastEvent.event_type === "INFERENCE_EVENT")) {
+      setTotalInferences(prev => prev + 1);
+    }
+  }, [lastEvent]);
+
+  // Periodic automatic stream update
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setTotalInferences(prev => prev + Math.floor(Math.random() * 4) + 1);
+      setInferencesPerSec(Number((38 + Math.random() * 12).toFixed(1)));
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Filtered store calculations or synthetic baseline
+  const baseTotal = totalInferences;
+  const criticalCount = Math.round(baseTotal * 0.024);
+  const highCount = Math.round(baseTotal * 0.118);
+  const medCount = Math.round(baseTotal * 0.274);
+  const lowCount = baseTotal - criticalCount - highCount - medCount;
+
+  // 1-Click Simulate Live Ingestion Burst
+  const handleSimulateBurst = () => {
+    setIsSimulatingBurst(true);
+    setHasAlarmSpike(true);
+
+    setTimeout(() => {
+      const newBurstEvents: InferenceStreamEvent[] = [
+        {
+          id: `INF-${Math.floor(1000 + Math.random() * 9000)}`,
+          patientId: `PT-${Math.floor(1000 + Math.random() * 9000)}`,
+          department: "ICU",
+          model: "XGBoost-CardioRisk-v3",
+          riskLevel: "CRITICAL",
+          probability: Number((0.89 + Math.random() * 0.09).toFixed(3)),
+          latencyMs: 0.11,
+          timestamp: "Just now",
+          clinicianAgreement: "AGREED",
+        },
+        {
+          id: `INF-${Math.floor(1000 + Math.random() * 9000)}`,
+          patientId: `PT-${Math.floor(1000 + Math.random() * 9000)}`,
+          department: "ED",
+          model: "Ensemble-Sepsis-v2",
+          riskLevel: "HIGH",
+          probability: Number((0.76 + Math.random() * 0.1).toFixed(3)),
+          latencyMs: 0.13,
+          timestamp: "1s ago",
+          clinicianAgreement: "AGREED",
+        },
+      ];
+
+      setStreamEvents(prev => [...newBurstEvents, ...prev.slice(0, 6)]);
+      setTotalInferences(prev => prev + 50);
+      setIsSimulatingBurst(false);
+      setExportNotice("Simulated live batch of 50 patient encounters ingested into telemetry pipeline.");
+      setTimeout(() => {
+        setExportNotice(null);
+        setHasAlarmSpike(false);
+      }, 4000);
+    }, 700);
+  };
+
+  // Export CSV
   const handleExport = () => {
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      "EventID,PatientID,Department,Model,RiskLevel,Probability,LatencyMs,ClinicianAgreement,Timestamp\n" +
+      streamEvents.map(e => `"${e.id}","${e.patientId}","${e.department}","${e.model}","${e.riskLevel}",${e.probability},${e.latencyMs},"${e.clinicianAgreement}","${e.timestamp}"`).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `clinical_population_analytics_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     setExportNotice("Informatics Population Risk & Telemetry CSV successfully downloaded.");
     setTimeout(() => setExportNotice(null), 3500);
   };
 
   return (
     <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
-      {/* Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
+      {/* Header Banner & Live Telemetry Stream */}
+      <div className="bg-slate-900 border border-slate-800 text-white rounded-2xl p-5 shadow-xl flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2.5 flex-wrap">
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Clinical Population Analytics</h1>
-            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 text-xs">
-              Cohort Telemetry &amp; Utilization
+            <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <h1 className="text-2xl font-bold tracking-tight text-slate-100 flex items-center gap-2">
+              Clinical Population Analytics &amp; Telemetry
+            </h1>
+            <Badge variant="outline" className="bg-purple-500/20 text-purple-300 border-purple-500/40 text-xs font-mono">
+              Live Stream Active • {inferencesPerSec} inf/s
             </Badge>
           </div>
-          <p className="text-xs text-slate-500 mt-1">
-            Real-time inference volume, risk stratification distribution, demographic correlations, and physician agreement telemetry.
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Real-time inference volume, risk stratification distribution, demographic correlations, and physician concordance telemetry across all hospital care units.
           </p>
+          <div className="flex items-center gap-4 text-[11px] text-slate-400 font-mono pt-1">
+            <span className="flex items-center gap-1">
+              <Radio className="h-3 w-3 text-emerald-400" />
+              Socket: {isConnected ? "Active WebSocket" : "Simulated Stream (Sub-20ms)"}
+            </span>
+            <span>•</span>
+            <span>Total Encounters: <strong className="text-slate-200">{totalInferences.toLocaleString()}</strong></span>
+            <span>•</span>
+            <span>Clinician Agreement: <strong className="text-emerald-400">98.1%</strong></span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2.5 flex-wrap">
+        {/* Lead II ECG Monitor & Controls */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+          <div className="bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-emerald-400 font-mono">
+              <span className="flex items-center gap-1">
+                <Activity className="h-3 w-3 text-emerald-400 animate-pulse" />
+                TELEMETRY LEAD II
+              </span>
+              <span>74 BPM • QTc 410ms</span>
+            </div>
+            <AnalyticsEcgMonitor bpm={74} isSpike={hasAlarmSpike} />
+          </div>
+
+          <div className="flex flex-col gap-2 w-full sm:w-auto">
+            <Button
+              size="sm"
+              onClick={handleSimulateBurst}
+              disabled={isSimulatingBurst}
+              className="text-xs h-8 bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-xs"
+            >
+              <Sparkles className={`h-3.5 w-3.5 mr-1.5 ${isSimulatingBurst ? "animate-spin" : ""}`} />
+              Simulate Ingestion Burst
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleExport}
+              className="text-xs h-8 bg-teal-600 hover:bg-teal-700 text-white font-semibold shadow-xs"
+            >
+              <Download className="h-3.5 w-3.5 mr-1.5" />
+              Export Telemetry
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter and Time Range Toolbar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Time Window:</span>
           <div className="inline-flex rounded-lg bg-slate-100 p-1 border border-slate-200 text-xs">
-            {(["24H", "7D", "30D", "90D"] as const).map(r => (
+            {(["LIVE", "24H", "7D", "30D", "90D"] as const).map(r => (
               <button
                 key={r}
                 onClick={() => setTimeRange(r)}
@@ -74,41 +338,42 @@ export default function AnalyticsPage() {
                     : "text-slate-500 hover:text-slate-900"
                 }`}
               >
-                {r}
+                {r === "LIVE" ? "🔴 Live Stream" : r}
               </button>
             ))}
           </div>
+        </div>
 
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Care Unit:</span>
           <select
             value={department}
             onChange={e => setDepartment(e.target.value)}
-            className="text-xs rounded-lg border border-slate-200 px-3 py-1.5 bg-white text-slate-800 focus:outline-none focus:border-amber-400 h-8"
+            className="text-xs rounded-lg border border-slate-200 px-3 py-1.5 bg-white text-slate-800 font-medium focus:outline-none focus:border-purple-400 h-8"
           >
-            <option value="ALL">All Care Units</option>
-            <option value="ED">Emergency Department</option>
+            <option value="ALL">All Care Units (Hospital-Wide)</option>
+            <option value="ED">Emergency Department (ED)</option>
             <option value="CARDIO">Cardiology Inpatient</option>
-            <option value="ICU">Intensive Care Unit</option>
+            <option value="ICU">Intensive Care Unit (ICU)</option>
             <option value="MED">General Medicine</option>
           </select>
 
-          <Button
-            size="sm"
-            onClick={handleExport}
-            className="bg-teal-600 hover:bg-teal-700 text-white text-xs h-8 shadow-2xs font-semibold"
-          >
-            <Download className="h-3.5 w-3.5 mr-1.5" />
-            Export Telemetry
-          </Button>
+          <Link href="/informaticist/drift">
+            <Button size="sm" variant="outline" className="text-xs h-8 text-slate-700 border-slate-200 hover:bg-slate-50">
+              <Activity className="h-3.5 w-3.5 mr-1.5 text-purple-600" />
+              Drift Monitor
+            </Button>
+          </Link>
         </div>
       </div>
 
       {exportNotice && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-xs flex items-center justify-between animate-in fade-in">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-xl text-xs flex items-center justify-between animate-in fade-in shadow-xs">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            {exportNotice}
+            <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+            <span className="font-medium">{exportNotice}</span>
           </span>
-          <span className="text-[10px] text-emerald-600 font-mono">21 CFR Part 11 Compliant</span>
+          <span className="text-[10px] text-emerald-600 font-mono hidden sm:inline">21 CFR Part 11 Compliant</span>
         </div>
       )}
 
@@ -120,9 +385,9 @@ export default function AnalyticsPage() {
               <p className="text-xs font-semibold text-slate-500 uppercase">Total Inferences</p>
               <Zap className="h-4 w-4 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-slate-900 mt-1">{total.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-slate-900 mt-1">{baseTotal.toLocaleString()}</p>
             <p className="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center">
-              <ArrowUpRight className="h-3 w-3 mr-0.5" /> +12.4% vs last period
+              <ArrowUpRight className="h-3 w-3 mr-0.5" /> +14.2% vs last period
             </p>
           </CardContent>
         </Card>
@@ -130,12 +395,12 @@ export default function AnalyticsPage() {
         <Card className="bg-white border-slate-200 shadow-xs">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-500 uppercase">High Risk Flags</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase">High Risk Alerts</p>
               <AlertTriangle className="h-4 w-4 text-rose-600" />
             </div>
-            <p className="text-2xl font-bold text-rose-700 mt-1">{(high + critical).toLocaleString()}</p>
+            <p className="text-2xl font-bold text-rose-700 mt-1">{(highCount + criticalCount).toLocaleString()}</p>
             <p className="text-[11px] text-slate-500 mt-1 font-mono">
-              {(((high + critical) / total) * 100).toFixed(1)}% alert rate
+              {(((highCount + criticalCount) / baseTotal) * 100).toFixed(1)}% alert rate
             </p>
           </CardContent>
         </Card>
@@ -157,15 +422,15 @@ export default function AnalyticsPage() {
               <p className="text-xs font-semibold text-slate-500 uppercase">Mean Latency</p>
               <Clock className="h-4 w-4 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-purple-700 mt-1">0.136 ms</p>
-            <p className="text-[11px] text-slate-400 mt-1 font-mono">p99: 0.82ms</p>
+            <p className="text-2xl font-bold text-purple-700 mt-1">0.124 ms</p>
+            <p className="text-[11px] text-slate-400 mt-1 font-mono">p99: 0.78ms</p>
           </CardContent>
         </Card>
 
         <Card className="bg-white border-slate-200 shadow-xs col-span-2 sm:col-span-1">
           <CardContent className="pt-4 pb-4">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-slate-500 uppercase">Clinician Concordance</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase">Physician Agreement</p>
               <UserCheck className="h-4 w-4 text-sky-600" />
             </div>
             <p className="text-2xl font-bold text-sky-700 mt-1">98.1%</p>
@@ -184,16 +449,16 @@ export default function AnalyticsPage() {
                 30-Day Population Inference Volume &amp; Alert Spikes
               </CardTitle>
               <CardDescription className="text-xs text-slate-500">
-                Daily inference throughput with overlay of flagged high-risk clinical events.
+                Daily inference throughput with overlay of flagged high-risk clinical events across {department === "ALL" ? "All Departments" : department}.
               </CardDescription>
             </div>
             <div className="flex items-center gap-4 text-xs">
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-xs bg-purple-500" />
+              <span className="flex items-center gap-1.5 text-slate-600">
+                <span className="h-3 w-3 rounded-xs bg-purple-500 inline-block" />
                 Total Daily Inferences
               </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-3 w-3 rounded-xs bg-rose-500" />
+              <span className="flex items-center gap-1.5 text-rose-600 font-medium">
+                <span className="h-3 w-3 rounded-xs bg-rose-500 inline-block" />
                 High &amp; Critical Alerts
               </span>
             </div>
@@ -249,20 +514,81 @@ export default function AnalyticsPage() {
               <text x="140" y="195" fill="#94a3b8" fontSize="10">Day 7</text>
               <text x="320" y="195" fill="#94a3b8" fontSize="10">Day 15</text>
               <text x="500" y="195" fill="#94a3b8" fontSize="10">Day 22</text>
-              <text x="650" y="195" fill="#94a3b8" fontSize="10">Day 30</text>
+              <text x="650" y="195" fill="#94a3b8" fontSize="10">Day 30 (Live)</text>
             </svg>
           </div>
         </CardContent>
       </Card>
 
-      {/* Grid: Risk Stratification + Demographics Breakdown */}
+      {/* Grid: Live Ingestion Stream Ticker + Risk Tier Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Live Stream Ticker */}
+        <Card className="bg-white border-slate-200 shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100 flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <Radio className="h-4 w-4 text-emerald-600 animate-pulse" />
+                Live Telemetry Ingestion Ticker
+              </CardTitle>
+              <CardDescription className="text-xs text-slate-500">
+                Incoming sub-millisecond scoring events from hospital HL7/FHIR feeds
+              </CardDescription>
+            </div>
+            <Badge variant="outline" className="text-[10px] bg-emerald-50 text-emerald-700 border-emerald-200 font-mono">
+              Live Stream
+            </Badge>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="divide-y divide-slate-100">
+              {streamEvents.map(event => (
+                <div key={event.id} className="p-3.5 flex items-center justify-between text-xs hover:bg-slate-50/80 transition-colors">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-slate-900">{event.patientId}</span>
+                      <Badge variant="outline" className="text-[10px] bg-slate-100 text-slate-700 font-medium">
+                        {event.department}
+                      </Badge>
+                      <span className="text-[11px] text-slate-500 font-mono">{event.model}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400">
+                      Latency: <strong className="font-mono text-slate-600">{event.latencyMs}ms</strong> • {event.timestamp}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <div className="text-right">
+                      <span className="font-mono text-xs font-bold text-slate-900">
+                        {(event.probability * 100).toFixed(1)}%
+                      </span>
+                      <p className="text-[10px] text-emerald-600 font-semibold">{event.clinicianAgreement}</p>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] font-bold ${
+                        event.riskLevel === "CRITICAL"
+                          ? "bg-rose-50 text-rose-700 border-rose-200"
+                          : event.riskLevel === "HIGH"
+                          ? "bg-amber-50 text-amber-700 border-amber-200"
+                          : event.riskLevel === "MEDIUM"
+                          ? "bg-blue-50 text-blue-700 border-blue-200"
+                          : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                      }`}
+                    >
+                      {event.riskLevel}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Risk Stratification Breakdown */}
         <Card className="bg-white border-slate-200 shadow-xs">
           <CardHeader className="pb-3 border-b border-slate-100">
             <CardTitle className="text-sm font-bold text-slate-900 flex items-center justify-between">
               <span>Risk Tier Distribution</span>
-              <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-600">N={total.toLocaleString()}</Badge>
+              <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-600">N={baseTotal.toLocaleString()}</Badge>
             </CardTitle>
             <CardDescription className="text-xs text-slate-500">
               Proportion of cohort triaged into actionable clinical risk categories.
@@ -270,16 +596,16 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent className="p-5 space-y-4">
             {[
-              { label: "Critical Risk", count: critical, total, pct: "2.4%", color: "bg-rose-600", action: "Immediate STAT Bedside Review / Cath Lab" },
-              { label: "High Risk", count: high, total, pct: "11.8%", color: "bg-amber-500", action: "Continuous Telemetry & Serial Troponin" },
-              { label: "Moderate Risk", count: med, total, pct: "27.4%", color: "bg-blue-500", action: "Observation & 48h Stress Evaluation" },
-              { label: "Low Risk", count: low, total, pct: "58.4%", color: "bg-emerald-500", action: "Routine Outpatient / Cleared for Discharge" },
+              { label: "Critical Risk", count: criticalCount, total: baseTotal, pct: "2.4%", color: "bg-rose-600", action: "Immediate STAT Bedside Review / Cath Lab" },
+              { label: "High Risk", count: highCount, total: baseTotal, pct: "11.8%", color: "bg-amber-500", action: "Continuous Telemetry & Serial Troponin" },
+              { label: "Moderate Risk", count: medCount, total: baseTotal, pct: "27.4%", color: "bg-blue-500", action: "Observation & 48h Stress Evaluation" },
+              { label: "Low Risk", count: lowCount, total: baseTotal, pct: "58.4%", color: "bg-emerald-500", action: "Routine Outpatient / Cleared for Discharge" },
             ].map(tier => (
               <div key={tier.label} className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-semibold text-slate-800">{tier.label}</span>
                   <span className="font-mono text-slate-600">
-                    <strong className="text-slate-900">{tier.pct}</strong> ({tier.count.toLocaleString()})
+                    <strong className="text-slate-900">{tier.pct}</strong> ({tier.count.toLocaleString()} encounters)
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
@@ -290,55 +616,76 @@ export default function AnalyticsPage() {
             ))}
           </CardContent>
         </Card>
+      </div>
 
-        {/* Demographic & Age Bracket Stratification */}
+      {/* Grid: Demographics & Chief Complaint Stratification */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Age Stratification */}
         <Card className="bg-white border-slate-200 shadow-xs">
           <CardHeader className="pb-3 border-b border-slate-100">
             <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <Users className="h-4 w-4 text-sky-600" />
-              Age &amp; Complaint Risk Stratification
+              Risk Stratification by Age Bracket
             </CardTitle>
             <CardDescription className="text-xs text-slate-500">
-              Correlations across patient age brackets and admission chief complaints.
+              Correlations across patient age brackets and elevated risk classifications.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-5 space-y-4">
-            <div>
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Risk by Age Bracket</p>
-              <div className="grid grid-cols-4 gap-2 text-center text-xs">
-                {[
-                  { bracket: "< 40 yrs", highRiskPct: "4.2%", volume: "2,140" },
-                  { bracket: "40-59 yrs", highRiskPct: "11.8%", volume: "5,420" },
-                  { bracket: "60-74 yrs", highRiskPct: "21.4%", volume: "5,180" },
-                  { bracket: "75+ yrs", highRiskPct: "32.1%", volume: "2,080" },
-                ].map(b => (
-                  <div key={b.bracket} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <p className="text-[10px] text-slate-500 font-semibold">{b.bracket}</p>
-                    <p className="text-base font-bold text-slate-900 mt-0.5">{b.highRiskPct}</p>
-                    <p className="text-[10px] text-slate-400">N={b.volume}</p>
-                  </div>
-                ))}
-              </div>
+            <div className="grid grid-cols-4 gap-2 text-center text-xs">
+              {[
+                { bracket: "< 40 yrs", highRiskPct: "4.2%", volume: "2,140" },
+                { bracket: "40-59 yrs", highRiskPct: "11.8%", volume: "5,420" },
+                { bracket: "60-74 yrs", highRiskPct: "21.4%", volume: "5,180" },
+                { bracket: "75+ yrs", highRiskPct: "32.1%", volume: "2,080" },
+              ].map(b => (
+                <div key={b.bracket} className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-[10px] text-slate-500 font-semibold">{b.bracket}</p>
+                  <p className="text-base font-bold text-slate-900 mt-0.5">{b.highRiskPct}</p>
+                  <p className="text-[10px] text-slate-400">N={b.volume}</p>
+                </div>
+              ))}
             </div>
 
-            <div className="pt-2 border-t border-slate-100 space-y-2">
-              <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">Top Chief Complaints Triaged</p>
-              <div className="space-y-1.5 text-xs">
-                {[
-                  { complaint: "Typical Angina / Retrosternal Chest Pain", highRate: "64.2%", totalN: "3,410" },
-                  { complaint: "Exertional Dyspnea & Hypoxia", highRate: "38.5%", totalN: "4,120" },
-                  { complaint: "Unexplained Syncope / Palpitations", highRate: "18.2%", totalN: "2,840" },
-                  { complaint: "Pre-Operative Clearance", highRate: "2.4%", totalN: "4,450" },
-                ].map((c, i) => (
-                  <div key={i} className="flex justify-between items-center py-1 border-b border-slate-100 last:border-0">
-                    <span className="text-slate-700">{c.complaint}</span>
-                    <span className="font-mono text-xs">
-                      <strong className="text-rose-700">{c.highRate}</strong> <span className="text-slate-400 text-[10px]">(N={c.totalN})</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600 space-y-1">
+              <p className="font-bold text-slate-900">Demographic Inference Note:</p>
+              <p className="leading-relaxed text-[11px]">
+                Patients aged &gt;= 75 years exhibit higher prevalence of multi-vessel CAD and non-specific ST changes, triggering automated calibration safeguards to prevent alert fatigue.
+              </p>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Top Chief Complaints */}
+        <Card className="bg-white border-slate-200 shadow-xs">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Activity className="h-4 w-4 text-rose-600" />
+              Top Chief Complaints Triaged
+            </CardTitle>
+            <CardDescription className="text-xs text-slate-500">
+              Encounter risk rates broken down by presenting clinical symptomatology.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-5 space-y-3">
+            {[
+              { complaint: "Typical Angina / Retrosternal Chest Pain", highRate: "64.2%", totalN: "3,410", barColor: "bg-rose-500", width: "64.2%" },
+              { complaint: "Exertional Dyspnea & Hypoxia", highRate: "38.5%", totalN: "4,120", barColor: "bg-amber-500", width: "38.5%" },
+              { complaint: "Unexplained Syncope / Palpitations", highRate: "18.2%", totalN: "2,840", barColor: "bg-blue-500", width: "18.2%" },
+              { complaint: "Pre-Operative Clearance", highRate: "2.4%", totalN: "4,450", barColor: "bg-emerald-500", width: "2.4%" },
+            ].map((c, i) => (
+              <div key={i} className="space-y-1 text-xs">
+                <div className="flex justify-between items-center">
+                  <span className="text-slate-800 font-medium">{c.complaint}</span>
+                  <span className="font-mono text-xs">
+                    <strong className="text-rose-700">{c.highRate}</strong> <span className="text-slate-400 text-[10px]">(N={c.totalN})</span>
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
+                  <div className={`h-full rounded-full ${c.barColor}`} style={{ width: c.width }} />
+                </div>
+              </div>
+            ))}
           </CardContent>
         </Card>
       </div>
@@ -348,7 +695,7 @@ export default function AnalyticsPage() {
         <CardHeader className="pb-3 border-b border-slate-100">
           <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
             <Zap className="h-4 w-4 text-purple-600" />
-            Real-Time Inference SLA &amp; Compute Performance
+            Real-Time Inference SLA &amp; Compute Performance (Sub-Millisecond Engine)
           </CardTitle>
         </CardHeader>
         <CardContent className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
@@ -364,13 +711,13 @@ export default function AnalyticsPage() {
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
             <p className="text-[10px] uppercase font-semibold text-slate-400">p99 Latency</p>
-            <p className="text-xl font-bold text-slate-900 font-mono mt-1">0.820 ms</p>
+            <p className="text-xl font-bold text-slate-900 font-mono mt-1">0.780 ms</p>
             <p className="text-[10px] text-emerald-600 font-semibold">Target &lt; 5.0 ms</p>
           </div>
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
             <p className="text-[10px] uppercase font-semibold text-slate-400">Pipeline Uptime</p>
             <p className="text-xl font-bold text-emerald-700 font-mono mt-1">99.99%</p>
-            <p className="text-[10px] text-slate-500">Zero dropped events</p>
+            <p className="text-[10px] text-slate-500">Zero dropped encounters</p>
           </div>
         </CardContent>
       </Card>

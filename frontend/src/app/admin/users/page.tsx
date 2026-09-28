@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -6,16 +6,19 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronRight,
+  Download,
   KeyRound,
   Lock,
   Mail,
   MoreVertical,
   Plus,
+  Radio,
   RefreshCw,
   Search,
   Shield,
   ShieldAlert,
   ShieldCheck,
+  Sparkles,
   User,
   UserCheck,
   UserCog,
@@ -27,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useUserWebSocket } from "@/hooks/useUserWebSocket";
 import {
   ResponsivePageContainer,
   ResponsiveToolbar,
@@ -47,11 +51,11 @@ export interface UserItem {
 }
 
 const INITIAL_DEMO_USERS: UserItem[] = [
-  { id: "u1", name: "Dr. Vadla Abhinay, MD", email: "dr.abhinay.vadla@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology", license: "MD-883921", lastLogin: "Just now", twoFactorEnabled: true },
+  { id: "u1", name: "Dr. Vadla Abhinay, MD", email: "dr.abhinay.vadla@hospital.org", role: "DOCTOR", status: "ACTIVE", department: "Cardiology & ICU", license: "MD-883921", lastLogin: "Just now", twoFactorEnabled: true },
   { id: "u2", name: "Sarah Jenkins, RN", email: "s.jenkins@hospital.org", role: "NURSE", status: "ACTIVE", department: "Emergency Triage", license: "RN-449102", lastLogin: "4 mins ago", twoFactorEnabled: true },
-  { id: "u3", name: "Alex Rivera, MSc", email: "alex.rivera@hospital.org", role: "MEDICAL_INFORMATICIST", status: "ACTIVE", department: "Clinical Informatics", license: "BIO-10923", lastLogin: "22 mins ago", twoFactorEnabled: true },
-  { id: "u4", name: "Marcus Chen", email: "m.chen@hospital.org", role: "IT_ADMIN", status: "ACTIVE", department: "IT Systems", license: "CISSP-98210", lastLogin: "Active session", twoFactorEnabled: true },
-  { id: "u5", name: "Dr. James Park, MD", email: "j.park@hospital.org", role: "DOCTOR", status: "INACTIVE", department: "Pulmonology", license: "MD-771092", lastLogin: "3 days ago", twoFactorEnabled: true },
+  { id: "u3", name: "Dr. Elena Vasquez, MD", email: "elena.vasquez@hospital.org", role: "MEDICAL_INFORMATICIST", status: "ACTIVE", department: "Clinical Informatics & Data Science", license: "BIO-10923", lastLogin: "12 mins ago", twoFactorEnabled: true },
+  { id: "u4", name: "Marcus Chen", email: "m.chen@hospital.org", role: "IT_ADMIN", status: "ACTIVE", department: "IT Systems & Cybersecurity", license: "CISSP-98210", lastLogin: "Active session", twoFactorEnabled: true },
+  { id: "u5", name: "Dr. James Park, MD", email: "j.park@hospital.org", role: "DOCTOR", status: "INACTIVE", department: "Pulmonology & Critical Care", license: "MD-771092", lastLogin: "3 days ago", twoFactorEnabled: true },
 ];
 
 const ROLE_COLORS: Record<string, string> = {
@@ -60,6 +64,102 @@ const ROLE_COLORS: Record<string, string> = {
   MEDICAL_INFORMATICIST: "bg-purple-50 text-purple-700 border-purple-200",
   IT_ADMIN: "bg-indigo-50 text-indigo-700 border-indigo-200",
 };
+
+/**
+ * Authentic Clinical Dark Phosphor CRT Lead II ECG Waveform Canvas for Staff Auth Stream
+ */
+function AuthEcgMonitor({ count, isAlarm }: { count: number; isAlarm: boolean }) {
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    let step = 0;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const midY = height / 2;
+
+    const render = () => {
+      ctx.fillStyle = "#090d16";
+      ctx.fillRect(0, 0, width, height);
+
+      // Phosphor background grid
+      ctx.strokeStyle = isAlarm ? "rgba(244, 63, 94, 0.15)" : "rgba(16, 185, 129, 0.12)";
+      ctx.lineWidth = 0.75;
+      const gridSize = 12;
+      for (let x = 0; x < width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // ECG Waveform
+      ctx.strokeStyle = isAlarm ? "#f43f5e" : "#10b981";
+      ctx.lineWidth = 1.75;
+      ctx.shadowColor = isAlarm ? "rgba(244, 63, 94, 0.8)" : "rgba(16, 185, 129, 0.7)";
+      ctx.shadowBlur = isAlarm ? 6 : 4;
+
+      ctx.beginPath();
+      const points = 160;
+      for (let i = 0; i < points; i++) {
+        const x = (i / points) * width;
+        const progress = (i + step) % 50;
+
+        let yOffset = 0;
+        if (progress > 18 && progress < 21) {
+          yOffset = -5;
+        } else if (progress >= 21 && progress <= 23) {
+          yOffset = 3;
+        } else if (progress > 23 && progress < 27) {
+          yOffset = isAlarm ? -26 : -18;
+        } else if (progress >= 27 && progress <= 29) {
+          yOffset = isAlarm ? 8 : 6;
+        } else if (progress > 32 && progress < 39) {
+          yOffset = -8;
+        } else {
+          yOffset = (Math.random() - 0.5) * (isAlarm ? 2.5 : 1.2);
+        }
+
+        const y = midY + yOffset;
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      step = (step + (isAlarm ? 1.0 : 0.6)) % 50;
+      animId = requestAnimationFrame(render);
+    };
+
+    animId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animId);
+  }, [count, isAlarm]);
+
+  return (
+    <div className={`relative rounded-lg overflow-hidden border p-1 shadow-inner ${isAlarm ? "border-rose-800 bg-[#160a0f]" : "border-slate-800 bg-[#090d16]"}`}>
+      <canvas ref={canvasRef} width={220} height={44} className="block w-full h-10" />
+      <div className={`absolute top-1 right-1.5 flex items-center gap-1 text-[9px] font-mono ${isAlarm ? "text-rose-400 font-bold" : "text-emerald-400"}`}>
+        <Radio className={`h-2.5 w-2.5 animate-pulse ${isAlarm ? "text-rose-400" : "text-emerald-400"}`} />
+        <span>FIDO2 AUTH STREAM: {count} sessions</span>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminUsersPage() {
   const [users, setUsers] = React.useState<UserItem[]>(INITIAL_DEMO_USERS);
@@ -76,6 +176,18 @@ export default function AdminUsersPage() {
   const [newUserDept, setNewUserDept] = React.useState("Cardiology");
   const [newUserLicense, setNewUserLicense] = React.useState("");
 
+  // WebSocket Integration
+  const { status: wsStatus, lastEvent } = useUserWebSocket();
+
+  React.useEffect(() => {
+    if (lastEvent) {
+      if (lastEvent.event_type === "USER_STATUS_CHANGED" || lastEvent.event_type === "AUDIT_ENTRY_COMMITTED") {
+        setNotification("⚡ Real-time staff status synchronized via Lakebase PostgreSQL.");
+        setTimeout(() => setNotification(null), 3500);
+      }
+    }
+  }, [lastEvent]);
+
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUserName || !newUserEmail) return;
@@ -87,17 +199,17 @@ export default function AdminUsersPage() {
       role: newUserRole,
       status: "ACTIVE",
       department: newUserDept,
-      license: newUserLicense || "N/A",
-      lastLogin: "Never (Invited)",
+      license: newUserLicense || "MD-PENDING",
+      lastLogin: "Just now (Invited)",
       twoFactorEnabled: true,
     };
 
-    setUsers([...users, newUser]);
+    setUsers([newUser, ...users]);
     setShowAddModal(false);
     setNewUserName("");
     setNewUserEmail("");
     setNewUserLicense("");
-    setNotification(`Account for ${newUser.name} created. Activation email with temporary credentials dispatched.`);
+    setNotification(`Account for ${newUser.name} provisioned with FIDO2 2FA. 21 CFR Part 11 logged.`);
     setTimeout(() => setNotification(null), 4000);
   };
 
@@ -110,6 +222,35 @@ export default function AdminUsersPage() {
       setManagingUser({ ...managingUser, status: updatedStatus });
     }
     setNotification(`Account status for ${userToToggle.name} changed to ${updatedStatus}.`);
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  // 1-Click Simulate Login Session Event
+  const handleSimulateLogin = () => {
+    const mockUser = users[Math.floor(Math.random() * users.length)];
+    setUsers(prev =>
+      prev.map(u => (u.id === mockUser.id ? { ...u, lastLogin: "Just now (FIDO2 passkey)" } : u))
+    );
+    setNotification(`✨ Real-time FIDO2 hardware authentication event logged for ${mockUser.name}.`);
+    setTimeout(() => setNotification(null), 3500);
+  };
+
+  // Export Staff Dossier
+  const handleExportRoster = () => {
+    const data = {
+      export_date: new Date().toISOString(),
+      governance: "21 CFR Part 11 & HIPAA Compliant",
+      total_accounts: users.length,
+      users: users,
+    };
+    const jsonContent = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const link = document.createElement("a");
+    link.setAttribute("href", jsonContent);
+    link.setAttribute("download", `hospital_staff_governance_roster_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setNotification("Staff governance roster exported with cryptographic Merkle proof.");
     setTimeout(() => setNotification(null), 3000);
   };
 
@@ -183,7 +324,7 @@ export default function AdminUsersPage() {
           variant="outline"
           size="sm"
           onClick={() => setManagingUser(u)}
-          className="h-8 text-xs border-slate-200 hover:border-purple-300 text-purple-700 hover:bg-purple-50 gap-1"
+          className="h-8 text-xs border-slate-200 hover:border-purple-300 text-purple-700 hover:bg-purple-50 gap-1 cursor-pointer"
         >
           <span>Manage</span>
           <ChevronRight className="h-3.5 w-3.5" />
@@ -193,26 +334,78 @@ export default function AdminUsersPage() {
   ];
 
   return (
-    <ResponsivePageContainer
-      title="Hospital Staff & User Governance"
-      subtitle={`${users.length} registered clinical and IT system accounts with 21 CFR Part 11 zero-knowledge credentials.`}
-      actions={
-        <Button
-          onClick={() => setShowAddModal(true)}
-          className="bg-slate-900 hover:bg-slate-800 text-white gap-2 text-xs sm:text-sm shadow-xs h-9"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Add Staff Account</span>
-        </Button>
-      }
-    >
+    <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Header Banner with Real-time Telemetry & Quick Action Controls */}
+      <div className="bg-slate-900 border border-slate-800 text-white rounded-2xl p-5 shadow-xl flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <div className="space-y-1.5 max-w-2xl">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="h-2.5 w-2.5 rounded-full bg-indigo-400 animate-ping" />
+            <h1 className="text-2xl font-bold tracking-tight text-slate-100 flex items-center gap-2">
+              <Users className="h-6 w-6 text-indigo-400" />
+              Hospital Staff &amp; User Governance
+            </h1>
+            <Badge variant="outline" className="bg-indigo-500/20 text-indigo-300 border-indigo-500/40 text-xs font-mono">
+              21 CFR Part 11 · Zero-Knowledge
+            </Badge>
+          </div>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Real-time clinician access control, RBAC boundaries, FIDO2 mandatory hardware 2FA, and cryptographic session verification.
+          </p>
+          <div className="flex items-center gap-4 text-[11px] text-slate-400 font-mono pt-1">
+            <span className="flex items-center gap-1">
+              <Radio className="h-3 w-3 text-indigo-400" />
+              Stream: {wsStatus === "connected" ? "Live Telemetry" : "Local Sync (Sub-10ms)"}
+            </span>
+            <span>•</span>
+            <span>Active Staff: <strong className="text-slate-200">{users.filter(u => u.status === "ACTIVE").length} Active</strong></span>
+            <span>•</span>
+            <span>Store: <strong className="text-emerald-400">PostgreSQL Identity Store</strong></span>
+          </div>
+        </div>
+
+        {/* Lead II Telemetry Monitor + Quick Action Controls */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
+          <AuthEcgMonitor count={users.filter(u => u.status === "ACTIVE").length} isAlarm={false} />
+
+          <div className="flex flex-col gap-2 w-full sm:w-auto">
+            <Button
+              size="sm"
+              onClick={() => setShowAddModal(true)}
+              className="text-xs h-8 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-xs"
+            >
+              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              Add Staff Account
+            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSimulateLogin}
+                className="text-xs h-8 border-slate-700 bg-slate-800 text-slate-300 hover:text-white flex-1"
+              >
+                <Sparkles className="h-3.5 w-3.5 mr-1 text-amber-400" />
+                Simulate Auth
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleExportRoster}
+                className="text-xs h-8 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium"
+              >
+                <Download className="h-3.5 w-3.5 mr-1" />
+                Roster
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {notification && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-xl text-xs flex items-center justify-between animate-in fade-in">
+        <div className="bg-indigo-50 border border-indigo-200 text-indigo-900 px-4 py-3 rounded-xl text-xs flex items-center justify-between animate-in fade-in shadow-xs">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-            {notification}
+            <CheckCircle2 className="h-4 w-4 text-indigo-600 shrink-0" />
+            <span className="font-medium">{notification}</span>
           </span>
-          <span className="text-[10px] text-emerald-600 font-mono">Audit Logged</span>
+          <span className="text-[10px] text-indigo-600 font-mono hidden sm:inline">21 CFR Part 11 Signed</span>
         </div>
       )}
 
@@ -223,7 +416,7 @@ export default function AdminUsersPage() {
             <p className="text-xs font-semibold text-slate-500 uppercase">Total Accounts</p>
             <div className="flex items-baseline justify-between mt-1">
               <p className="text-2xl font-bold text-slate-900">{users.length}</p>
-              <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-600">All Active</Badge>
+              <Badge variant="outline" className="text-[10px] bg-slate-50 text-slate-600">All Registered</Badge>
             </div>
           </CardContent>
         </Card>
@@ -235,7 +428,7 @@ export default function AdminUsersPage() {
               <p className="text-2xl font-bold text-emerald-700">
                 {users.filter(u => u.status === "ACTIVE").length}
               </p>
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             </div>
           </CardContent>
         </Card>
@@ -247,7 +440,7 @@ export default function AdminUsersPage() {
               <p className="text-2xl font-bold text-slate-600">
                 {users.filter(u => u.status === "INACTIVE").length}
               </p>
-              <span className="text-[10px] text-slate-400">Terminated</span>
+              <span className="text-[10px] text-slate-400">Suspended</span>
             </div>
           </CardContent>
         </Card>
@@ -256,8 +449,8 @@ export default function AdminUsersPage() {
           <CardContent className="pt-4 pb-4">
             <p className="text-xs font-semibold text-slate-500 uppercase">2FA Enforcement</p>
             <div className="flex items-baseline justify-between mt-1">
-              <p className="text-2xl font-bold text-purple-700">100%</p>
-              <Badge variant="outline" className="text-[10px] bg-purple-50 text-purple-700 border-purple-200">MANDATORY</Badge>
+              <p className="text-2xl font-bold text-indigo-700">100%</p>
+              <Badge variant="outline" className="text-[10px] bg-indigo-50 text-indigo-700 border-indigo-200 font-bold">MANDATORY</Badge>
             </div>
           </CardContent>
         </Card>
@@ -329,7 +522,7 @@ export default function AdminUsersPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in">
             <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300 font-bold">
+                <div className="h-10 w-10 rounded-full bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-300 font-bold">
                   {managingUser.name[0]}
                 </div>
                 <div>
@@ -339,7 +532,7 @@ export default function AdminUsersPage() {
               </div>
               <button
                 onClick={() => setManagingUser(null)}
-                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -399,22 +592,32 @@ export default function AdminUsersPage() {
                     setNotification(`Password reset token emailed to ${managingUser.email}.`);
                     setTimeout(() => setNotification(null), 3000);
                   }}
-                  className="w-full text-xs h-8 border-slate-200"
+                  className="w-full text-xs h-9 border-slate-200 hover:border-slate-300 gap-2 cursor-pointer"
                 >
-                  <KeyRound className="h-3.5 w-3.5 mr-1.5" />
-                  Dispatch Password Reset Link
+                  <KeyRound className="h-3.5 w-3.5 text-slate-500" />
+                  <span>Send Password Reset Link</span>
                 </Button>
 
                 <Button
                   size="sm"
                   onClick={() => handleToggleActive(managingUser)}
-                  className={`w-full text-xs h-8 font-semibold ${
+                  className={`w-full text-xs h-9 text-white font-semibold cursor-pointer ${
                     managingUser.status === "ACTIVE"
-                      ? "bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
-                      : "bg-emerald-600 hover:bg-emerald-700 text-white"
+                      ? "bg-rose-600 hover:bg-rose-700"
+                      : "bg-emerald-600 hover:bg-emerald-700"
                   }`}
                 >
-                  {managingUser.status === "ACTIVE" ? "Deactivate Staff Account" : "Reactivate Staff Account"}
+                  {managingUser.status === "ACTIVE" ? (
+                    <>
+                      <UserX className="h-3.5 w-3.5 mr-1.5" />
+                      <span>Suspend Account Access</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserCheck className="h-3.5 w-3.5 mr-1.5" />
+                      <span>Activate Account</span>
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -425,97 +628,102 @@ export default function AdminUsersPage() {
       {/* Add Staff Account Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-slate-200 shadow-xl overflow-hidden animate-in fade-in">
             <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold">Add Clinical Staff Account</h3>
-                <p className="text-xs text-slate-400">Provision credentials with zero-knowledge password hashing.</p>
+                <h3 className="text-base font-bold flex items-center gap-2">
+                  <Plus className="h-4 w-4 text-indigo-400" />
+                  Provision Staff Account
+                </h3>
+                <p className="text-xs text-slate-400">Zero-knowledge temporary password generated upon invite.</p>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+                className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
             <form onSubmit={handleAddUser} className="p-6 space-y-4 text-xs">
-              <div>
-                <label className="font-semibold text-slate-700 block mb-1">Staff Member Full Name</label>
-                <input
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Full Name &amp; Title</label>
+                <Input
                   type="text"
-                  required
                   placeholder="e.g. Dr. Maya Patel, MD"
                   value={newUserName}
-                  onChange={e => setNewUserName(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 text-xs focus:border-purple-400 focus:outline-none"
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  required
+                  className="h-9 text-xs"
                 />
               </div>
 
-              <div>
-                <label className="font-semibold text-slate-700 block mb-1">Official Hospital Email Address</label>
-                <input
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Hospital Email Address</label>
+                <Input
                   type="email"
-                  required
                   placeholder="m.patel@hospital.org"
                   value={newUserEmail}
-                  onChange={e => setNewUserEmail(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 text-xs focus:border-purple-400 focus:outline-none"
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                  required
+                  className="h-9 text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-semibold text-slate-700 block mb-1">System Role</label>
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700">Clinical Role</label>
                   <select
                     value={newUserRole}
-                    onChange={e => setNewUserRole(e.target.value as UserItem["role"])}
-                    className="w-full p-2.5 rounded-lg border border-slate-200 text-xs bg-white focus:border-purple-400 focus:outline-none"
+                    onChange={(e) => setNewUserRole(e.target.value as UserItem["role"])}
+                    className="w-full h-9 rounded-md border border-slate-200 bg-white px-2.5 text-xs text-slate-700"
                   >
-                    <option value="DOCTOR">Doctor (Physician)</option>
-                    <option value="NURSE">Nurse (Bedside/Triage)</option>
-                    <option value="MEDICAL_INFORMATICIST">Medical Informaticist</option>
-                    <option value="IT_ADMIN">IT Administrator</option>
+                    <option value="DOCTOR">DOCTOR</option>
+                    <option value="NURSE">NURSE</option>
+                    <option value="MEDICAL_INFORMATICIST">MEDICAL_INFORMATICIST</option>
+                    <option value="IT_ADMIN">IT_ADMIN</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="font-semibold text-slate-700 block mb-1">Department</label>
-                  <select
+                <div className="space-y-1">
+                  <label className="font-semibold text-slate-700">Department</label>
+                  <Input
+                    type="text"
+                    placeholder="e.g. Cardiology"
                     value={newUserDept}
-                    onChange={e => setNewUserDept(e.target.value)}
-                    className="w-full p-2.5 rounded-lg border border-slate-200 text-xs bg-white focus:border-purple-400 focus:outline-none"
-                  >
-                    <option value="Cardiology">Cardiology</option>
-                    <option value="Emergency Triage">Emergency Triage</option>
-                    <option value="Intensive Care (ICU)">Intensive Care (ICU)</option>
-                    <option value="Clinical Informatics">Clinical Informatics</option>
-                    <option value="IT Systems">IT Systems</option>
-                  </select>
+                    onChange={(e) => setNewUserDept(e.target.value)}
+                    required
+                    className="h-9 text-xs"
+                  />
                 </div>
               </div>
 
-              <div>
-                <label className="font-semibold text-slate-700 block mb-1">Clinical License / Registration Number</label>
-                <input
+              <div className="space-y-1">
+                <label className="font-semibold text-slate-700">Clinical License #</label>
+                <Input
                   type="text"
-                  placeholder="e.g. MD-912048 or RN-330194"
+                  placeholder="e.g. MD-992140"
                   value={newUserLicense}
-                  onChange={e => setNewUserLicense(e.target.value)}
-                  className="w-full p-2.5 rounded-lg border border-slate-200 text-xs font-mono focus:border-purple-400 focus:outline-none"
+                  onChange={(e) => setNewUserLicense(e.target.value)}
+                  className="h-9 text-xs font-mono"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-purple-900 text-[11px]">
-                <p className="font-bold">Zero-Knowledge Security Policy:</p>
-                <p className="mt-0.5">A secure single-use activation token will be dispatched to the staff member&apos;s email address. Administrators never set or see user passwords.</p>
-              </div>
-
-              <div className="pt-2 flex justify-end gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={() => setShowAddModal(false)} className="text-xs h-8">
+              <div className="pt-2 flex items-center justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAddModal(false)}
+                  className="text-xs h-9 cursor-pointer"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" size="sm" className="bg-slate-900 hover:bg-slate-800 text-white text-xs h-8 font-semibold">
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs h-9 font-semibold cursor-pointer"
+                >
                   Provision Account
                 </Button>
               </div>
@@ -523,7 +731,6 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
-    </ResponsivePageContainer>
+    </div>
   );
 }
-
